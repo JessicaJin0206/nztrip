@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TestController {
 
-    @Value("${server.address}")
+    @Value("${my.config}")
     private String address;
 
     @RequestMapping("test")
