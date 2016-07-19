@@ -1,5 +1,6 @@
 package io.qhzhou.nztrip.controller;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -9,8 +10,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TestController {
 
-    @RequestMapping("/")
+    @Value("${server.address}")
+    private String address;
+
+    @RequestMapping("test")
     String home() {
-        return "Hello World!";
+        return "Hello World!" + " " + address;
     }
 }
