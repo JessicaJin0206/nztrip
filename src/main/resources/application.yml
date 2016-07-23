@@ -1,10 +1,17 @@
 spring:
   profiles: dev
+  datasource:
+    test-on-borrow: true
+    validation-query: SELECT 1
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/nztrip?useUnicode=true&characterEncoding=UTF-8
+    username: root
+    password:
+    type: com.zaxxer.hikari.HikariDataSource
+    initialize: false
   devtools:
     restart:
       exclude: static/**
-my:
-  config: dev
 debug: true
 
 ---
