@@ -9,7 +9,7 @@ CREATE TABLE `agent` (
   `email` VARCHAR(30) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `name_UNIQUE` (`user_name` ASC))
-  ENGINE = InnoDB;
+  ENGINE = InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `category`;
 CREATE TABLE `category` (
@@ -17,14 +17,14 @@ CREATE TABLE `category` (
   `name` VARCHAR(45) NOT NULL,
   `parent_category_id` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`))
-  ENGINE = InnoDB;
+  ENGINE = InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `city`;
 CREATE TABLE `city` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`id`))
-  ENGINE = InnoDB;
+  ENGINE = InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `order`;
 CREATE TABLE `order` (
@@ -42,7 +42,7 @@ CREATE TABLE `order` (
   `family_count` INT NULL DEFAULT 0,
   `price` INT NOT NULL,
   PRIMARY KEY (`id`))
-  ENGINE = InnoDB;
+  ENGINE = InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `sku`;
 CREATE TABLE `sku` (
@@ -51,6 +51,7 @@ CREATE TABLE `sku` (
   `name` VARCHAR(45) NOT NULL,
   `city_id` INT NOT NULL,
   `category_id` INT NOT NULL,
+  `vender_id` INT NOT NULL,
   `description` VARCHAR(1000) NULL,
   `adult_ticket` TINYINT(1) NOT NULL DEFAULT 1,
   `adult_ticket_remark` VARCHAR(45) NULL,
@@ -63,7 +64,7 @@ CREATE TABLE `sku` (
   `family_ticket` TINYINT(1) NOT NULL DEFAULT 0,
   `family_ticket_remark` VARCHAR(45) NULL,
   PRIMARY KEY (`id`))
-  ENGINE = InnoDB;
+  ENGINE = InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `sku_price`;
 CREATE TABLE `sku_price` (
@@ -81,7 +82,7 @@ CREATE TABLE `sku_price` (
   `family_cost_price` INT NULL,
   `family_sale_price` INT NULL,
   PRIMARY KEY (`id`))
-  ENGINE = InnoDB;
+  ENGINE = InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `sku_remark`;
 CREATE TABLE `sku_remark` (
@@ -91,4 +92,12 @@ CREATE TABLE `sku_remark` (
   `required` TINYINT(1) NOT NULL DEFAULT 0,
   `type` TINYINT(2) NOT NULL COMMENT '1 - int\n2 - String\n3 - Date',
   PRIMARY KEY (`id`))
-  ENGINE = InnoDB;
+  ENGINE = InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `vendor`;
+CREATE TABLE `vendor` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` varchar(30) NOT NULL DEFAULT '',
+  `email` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
