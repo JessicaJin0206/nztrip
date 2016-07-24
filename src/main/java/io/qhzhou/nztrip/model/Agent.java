@@ -57,7 +57,7 @@ public class Agent extends ModelObject {
     private String password;
     private String name;
     private String description;
-    private int discount;
+    private int discount = 100;
     private String email;
 
 }

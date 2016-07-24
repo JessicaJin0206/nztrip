@@ -1,7 +1,20 @@
 spring:
-  profiles: test
+  profiles.active: h2
+
+---
+spring:
+  profiles: mysql
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://localhost:3306/nztrip?useUnicode=true&characterEncoding=utf-8
     username: root
+    password:
+
+---
+spring:
+  profiles: h2
+  datasource:
+    url: jdbc:h2:mem:nztrip
+    driverClassName: org.h2.Driver
+    username: sa
     password:
