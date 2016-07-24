@@ -125,6 +125,14 @@ public class Sku extends ModelObject {
         this.familyTicketRemark = familyTicketRemark;
     }
 
+    public int getVendorId() {
+        return vendorId;
+    }
+
+    public void setVendorId(int vendorId) {
+        this.vendorId = vendorId;
+    }
+
     private String uuid;
     private String name;
     private int cityId;
@@ -140,4 +148,5 @@ public class Sku extends ModelObject {
     private String elderTicketRemark;
     private boolean familyTicket;
     private String familyTicketRemark;
+    private int vendorId;
 }

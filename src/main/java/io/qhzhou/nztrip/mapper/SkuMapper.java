@@ -8,8 +8,8 @@ import org.apache.ibatis.annotations.*;
  */
 public interface SkuMapper {
 
-    @Insert("insert into sku(uuid, name, city_id, category_id, description, adult_ticket, adult_ticket_remark, child_ticket, child_ticket_remark, baby_ticket, baby_ticket_remark, elder_ticket, elder_ticket_remark, family_ticket, family_ticket_remark) " +
-            "values(#{uuid}, #{name}, #{cityId}, #{categoryId}, #{description}, #{adultTicket}, #{adultTicketRemark}, #{childTicket}, #{childTicketRemark}, #{babyTicket}, #{babyTicketRemark}, #{elderTicket}, #{elderTicketRemark}, #{familyTicket}, #{familyTicketRemark})")
+    @Insert("insert into sku(uuid, name, city_id, category_id, description, adult_ticket, adult_ticket_remark, child_ticket, child_ticket_remark, baby_ticket, baby_ticket_remark, elder_ticket, elder_ticket_remark, family_ticket, family_ticket_remark, vendor_id) " +
+            "values(#{uuid}, #{name}, #{cityId}, #{categoryId}, #{description}, #{adultTicket}, #{adultTicketRemark}, #{childTicket}, #{childTicketRemark}, #{babyTicket}, #{babyTicketRemark}, #{elderTicket}, #{elderTicketRemark}, #{familyTicket}, #{familyTicketRemark}, #{vendorId})")
     @Options(useGeneratedKeys = true, keyColumn = "id", keyProperty = "id", flushCache = Options.FlushCachePolicy.DEFAULT)
     int create(Sku sku);
 
@@ -30,7 +30,8 @@ public interface SkuMapper {
             @Result(column = "elder_ticket", property = "elderTicket"),
             @Result(column = "elder_ticket_remark", property = "elderTicketRemark"),
             @Result(column = "family_ticket", property = "familyTicket"),
-            @Result(column = "family_ticket_remark", property = "familyTicketRemark")
+            @Result(column = "family_ticket_remark", property = "familyTicketRemark"),
+            @Result(column = "vendor_id", property = "vendorId"),
     })
     Sku findById(int id);
 }

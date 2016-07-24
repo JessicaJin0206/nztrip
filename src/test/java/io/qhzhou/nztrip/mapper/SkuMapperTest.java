@@ -31,6 +31,7 @@ public class SkuMapperTest extends BaseTest {
         Assert.assertEquals(sku.getBabyTicketRemark(), other.getBabyTicketRemark());
         Assert.assertEquals(sku.getElderTicketRemark(), other.getElderTicketRemark());
         Assert.assertEquals(sku.getFamilyTicketRemark(), other.getFamilyTicketRemark());
+        Assert.assertEquals(sku.getVendorId(), other.getVendorId());
     }
 
     @Test
@@ -51,6 +52,7 @@ public class SkuMapperTest extends BaseTest {
         sku.setFamilyTicketRemark("2 + 1");
         sku.setCityId(100);
         sku.setCategoryId(200);
+        sku.setVendorId(1024);
         assertTrue(skuMapper.create(sku) == 1);
         assertTrue(sku.getId() > 0);
         assertEquals(sku, skuMapper.findById(sku.getId()));

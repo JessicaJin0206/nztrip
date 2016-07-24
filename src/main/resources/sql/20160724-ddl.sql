@@ -51,7 +51,7 @@ CREATE TABLE `sku` (
   `name` VARCHAR(45) NOT NULL,
   `city_id` INT NOT NULL,
   `category_id` INT NOT NULL,
-  `vender_id` INT NOT NULL,
+  `vendor_id` INT NOT NULL,
   `description` VARCHAR(1000) NULL,
   `adult_ticket` TINYINT(1) NOT NULL DEFAULT 1,
   `adult_ticket_remark` VARCHAR(45) NULL,
