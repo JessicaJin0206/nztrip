@@ -5,6 +5,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -15,23 +16,23 @@ public class SkuMapperTest extends BaseTest {
     @Autowired
     private SkuMapper skuMapper;
 
-    private static void assertEquals(Sku sku, Sku other) {
-        Assert.assertEquals(sku.getId(), other.getId());
-        Assert.assertEquals(sku.getUuid(), other.getUuid());
-        Assert.assertEquals(sku.getDescription(), other.getDescription());
-        Assert.assertEquals(sku.getCityId(), other.getCityId());
-        Assert.assertEquals(sku.getCategoryId(), other.getCategoryId());
-        Assert.assertEquals(sku.hasAdultTicket(), other.hasAdultTicket());
-        Assert.assertEquals(sku.hasChildTicket(), other.hasChildTicket());
-        Assert.assertEquals(sku.hasBabyTicket(), other.hasBabyTicket());
-        Assert.assertEquals(sku.hasElderTicket(), other.hasElderTicket());
-        Assert.assertEquals(sku.hasFamilyTicket(), other.hasFamilyTicket());
-        Assert.assertEquals(sku.getAdultTicketRemark(), other.getAdultTicketRemark());
-        Assert.assertEquals(sku.getChildTicketRemark(), other.getChildTicketRemark());
-        Assert.assertEquals(sku.getBabyTicketRemark(), other.getBabyTicketRemark());
-        Assert.assertEquals(sku.getElderTicketRemark(), other.getElderTicketRemark());
-        Assert.assertEquals(sku.getFamilyTicketRemark(), other.getFamilyTicketRemark());
-        Assert.assertEquals(sku.getVendorId(), other.getVendorId());
+    private static void testEquals(Sku sku, Sku other) {
+        assertEquals(sku.getId(), other.getId());
+        assertEquals(sku.getUuid(), other.getUuid());
+        assertEquals(sku.getDescription(), other.getDescription());
+        assertEquals(sku.getCityId(), other.getCityId());
+        assertEquals(sku.getCategoryId(), other.getCategoryId());
+        assertEquals(sku.hasAdultTicket(), other.hasAdultTicket());
+        assertEquals(sku.hasChildTicket(), other.hasChildTicket());
+        assertEquals(sku.hasBabyTicket(), other.hasBabyTicket());
+        assertEquals(sku.hasElderTicket(), other.hasElderTicket());
+        assertEquals(sku.hasFamilyTicket(), other.hasFamilyTicket());
+        assertEquals(sku.getAdultTicketRemark(), other.getAdultTicketRemark());
+        assertEquals(sku.getChildTicketRemark(), other.getChildTicketRemark());
+        assertEquals(sku.getBabyTicketRemark(), other.getBabyTicketRemark());
+        assertEquals(sku.getElderTicketRemark(), other.getElderTicketRemark());
+        assertEquals(sku.getFamilyTicketRemark(), other.getFamilyTicketRemark());
+        assertEquals(sku.getVendorId(), other.getVendorId());
     }
 
     @Test
@@ -55,6 +56,6 @@ public class SkuMapperTest extends BaseTest {
         sku.setVendorId(1024);
         assertTrue(skuMapper.create(sku) == 1);
         assertTrue(sku.getId() > 0);
-        assertEquals(sku, skuMapper.findById(sku.getId()));
+        testEquals(sku, skuMapper.findById(sku.getId()));
     }
 }

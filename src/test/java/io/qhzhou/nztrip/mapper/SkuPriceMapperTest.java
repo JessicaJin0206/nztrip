@@ -10,6 +10,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * Created by qianhao.zhou on 7/24/16.
  */
@@ -18,19 +20,19 @@ public class SkuPriceMapperTest extends BaseTest {
     @Autowired
     private SkuPriceMapper skuPriceMapper;
 
-    private static void assertEquals(SkuPrice price, SkuPrice other) {
-        Assert.assertEquals(price.getSkuId(), other.getSkuId());
-        Assert.assertEquals(price.getStartTime(), other.getStartTime());
-        Assert.assertEquals(price.getAdultCostPrice(), other.getAdultCostPrice());
-        Assert.assertEquals(price.getAdultSalePrice(), other.getAdultSalePrice());
-        Assert.assertEquals(price.getChildCostPrice(), other.getChildCostPrice());
-        Assert.assertEquals(price.getChildSalePrice(), other.getChildSalePrice());
-        Assert.assertEquals(price.getBabyCostPrice(), other.getBabyCostPrice());
-        Assert.assertEquals(price.getBabySalePrice(), other.getBabySalePrice());
-        Assert.assertEquals(price.getElderCostPrice(), other.getElderCostPrice());
-        Assert.assertEquals(price.getElderSalePrice(), other.getElderSalePrice());
-        Assert.assertEquals(price.getFamilyCostPrice(), other.getFamilyCostPrice());
-        Assert.assertEquals(price.getFamilySalePrice(), other.getFamilySalePrice());
+    private static void testEquals(SkuPrice price, SkuPrice other) {
+        assertEquals(price.getSkuId(), other.getSkuId());
+        assertEquals(price.getStartTime(), other.getStartTime());
+        assertEquals(price.getAdultCostPrice(), other.getAdultCostPrice());
+        assertEquals(price.getAdultSalePrice(), other.getAdultSalePrice());
+        assertEquals(price.getChildCostPrice(), other.getChildCostPrice());
+        assertEquals(price.getChildSalePrice(), other.getChildSalePrice());
+        assertEquals(price.getBabyCostPrice(), other.getBabyCostPrice());
+        assertEquals(price.getBabySalePrice(), other.getBabySalePrice());
+        assertEquals(price.getElderCostPrice(), other.getElderCostPrice());
+        assertEquals(price.getElderSalePrice(), other.getElderSalePrice());
+        assertEquals(price.getFamilyCostPrice(), other.getFamilyCostPrice());
+        assertEquals(price.getFamilySalePrice(), other.getFamilySalePrice());
     }
 
     @Test
@@ -63,14 +65,14 @@ public class SkuPriceMapperTest extends BaseTest {
         price2.setFamilyCostPrice(2000);
         price2.setFamilySalePrice(4000);
 
-        Assert.assertEquals(skuPriceMapper.batchCreate(Arrays.asList(price1, price2)), 2);
-        Assert.assertEquals(skuPriceMapper.findBySkuIdAndStartTime(0, new Date(), new Date()).size(), 0);
-        Assert.assertEquals(skuPriceMapper.findBySkuIdAndStartTime(100, new Date(), new Date()).size(), 0);
-        Assert.assertEquals(skuPriceMapper.findBySkuIdAndStartTime(100, DateTime.now().minusDays(2).toDate(), DateTime.now().minusDays(1).toDate()).size(), 1);
+        assertEquals(skuPriceMapper.batchCreate(Arrays.asList(price1, price2)), 2);
+        assertEquals(skuPriceMapper.findBySkuIdAndStartTime(0, new Date(), new Date()).size(), 0);
+        assertEquals(skuPriceMapper.findBySkuIdAndStartTime(100, new Date(), new Date()).size(), 0);
+        assertEquals(skuPriceMapper.findBySkuIdAndStartTime(100, DateTime.now().minusDays(2).toDate(), DateTime.now().minusDays(1).toDate()).size(), 1);
         List<SkuPrice> result = skuPriceMapper.findBySkuIdAndStartTime(100, DateTime.now().minusDays(2).toDate(), DateTime.now().plusDays(1).toDate());
-        Assert.assertEquals(result.size(), 2);
-        assertEquals(result.get(0), price1);
-        assertEquals(result.get(1), price2);
+        assertEquals(result.size(), 2);
+        testEquals(result.get(0), price1);
+        testEquals(result.get(1), price2);
 
     }
 }

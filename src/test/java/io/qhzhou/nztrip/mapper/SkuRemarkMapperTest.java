@@ -1,14 +1,13 @@
 package io.qhzhou.nztrip.mapper;
 
-import com.google.common.collect.Lists;
 import io.qhzhou.nztrip.model.SkuRemark;
-import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by qianhao.zhou on 7/24/16.
@@ -18,11 +17,11 @@ public class SkuRemarkMapperTest extends BaseTest {
     @Autowired
     private SkuRemarkMapper skuRemarkMapper;
 
-    private static void assertEquals(SkuRemark skuRemark, SkuRemark other) {
-        Assert.assertEquals(skuRemark.getName(), other.getName());
-        Assert.assertEquals(skuRemark.getType(), other.getType());
-        Assert.assertEquals(skuRemark.isRequired(), other.isRequired());
-        Assert.assertEquals(skuRemark.getSkuId(), other.getSkuId());
+    private static void testEquals(SkuRemark skuRemark, SkuRemark other) {
+        assertEquals(skuRemark.getName(), other.getName());
+        assertEquals(skuRemark.getType(), other.getType());
+        assertEquals(skuRemark.isRequired(), other.isRequired());
+        assertEquals(skuRemark.getSkuId(), other.getSkuId());
     }
 
     @Test
@@ -40,12 +39,12 @@ public class SkuRemarkMapperTest extends BaseTest {
         remark2.setSkuId(skuId);
         remark2.setType(2);
 
-        Assert.assertEquals(skuRemarkMapper.batchCreate(Arrays.asList(remark1, remark2)), 2);
+        assertEquals(skuRemarkMapper.batchCreate(Arrays.asList(remark1, remark2)), 2);
 
         List<SkuRemark> remarks = skuRemarkMapper.findBySkuId(skuId);
-        Assert.assertEquals(remarks.size(), 2);
-        assertEquals(remark1, remarks.get(0));
-        assertEquals(remark2, remarks.get(1));
+        assertEquals(remarks.size(), 2);
+        testEquals(remark1, remarks.get(0));
+        testEquals(remark2, remarks.get(1));
 
     }
 }
