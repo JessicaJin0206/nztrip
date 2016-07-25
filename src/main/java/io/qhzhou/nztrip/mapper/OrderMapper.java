@@ -45,6 +45,9 @@ public interface OrderMapper {
     })
     List<Order> findByAgentId(@Param("agentId") int agentId, RowBounds rowBounds);
 
+    @Select("select count(1) from `order` where agent_id = #{agentId}")
+    int countByAgentId(int agentId);
+
     @Select("select * from `order` where agent_id = #{agentId} and status = #{status}")
     @Results({
             @Result(column = "id", property = "id"),
