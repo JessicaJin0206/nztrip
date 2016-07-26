@@ -11,7 +11,7 @@ spring:
     initialize: false
   devtools:
     restart:
-      exclude: static/**
+      exclude: static/**, templates/**
 debug: true
 
 ---
