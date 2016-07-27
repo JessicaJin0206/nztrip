@@ -20,11 +20,16 @@ public interface OrderMapper {
             @Result(column = "status", property = "status"),
             @Result(column = "create_time", property = "createTime"),
             @Result(column = "update_time", property = "updateTime"),
-            @Result(column = "adult_count", property = "adultCount"),
-            @Result(column = "child_count", property = "childCount"),
-            @Result(column = "baby_count", property = "babyCount"),
-            @Result(column = "elder_count", property = "elderCount"),
-            @Result(column = "family_count", property = "familyCount"),
+            @Result(column = "price", property = "price"),
+            @Result(column = "gathering_info", property = "gatheringInfo"),
+            @Result(column = "primary_contact", property = "primaryContact"),
+            @Result(column = "primary_contact_email", property = "primaryContactEmail"),
+            @Result(column = "primary_contact_phone", property = "primaryContactPhone"),
+            @Result(column = "primary_contact_wechat", property = "primaryContactWechat"),
+            @Result(column = "secondary_contact", property = "secondaryContact"),
+            @Result(column = "secondary_contact_email", property = "secondaryContactEmail"),
+            @Result(column = "secondary_contact_phone", property = "secondaryContactPhone"),
+            @Result(column = "secondary_contact_wechat", property = "secondaryContactWechat"),
     })
     Order findById(int id);
 
@@ -37,11 +42,16 @@ public interface OrderMapper {
             @Result(column = "status", property = "status"),
             @Result(column = "create_time", property = "createTime"),
             @Result(column = "update_time", property = "updateTime"),
-            @Result(column = "adult_count", property = "adultCount"),
-            @Result(column = "child_count", property = "childCount"),
-            @Result(column = "baby_count", property = "babyCount"),
-            @Result(column = "elder_count", property = "elderCount"),
-            @Result(column = "family_count", property = "familyCount"),
+            @Result(column = "price", property = "price"),
+            @Result(column = "gathering_info", property = "gatheringInfo"),
+            @Result(column = "primary_contact", property = "primaryContact"),
+            @Result(column = "primary_contact_email", property = "primaryContactEmail"),
+            @Result(column = "primary_contact_phone", property = "primaryContactPhone"),
+            @Result(column = "primary_contact_wechat", property = "primaryContactWechat"),
+            @Result(column = "secondary_contact", property = "secondaryContact"),
+            @Result(column = "secondary_contact_email", property = "secondaryContactEmail"),
+            @Result(column = "secondary_contact_phone", property = "secondaryContactPhone"),
+            @Result(column = "secondary_contact_wechat", property = "secondaryContactWechat"),
     })
     List<Order> findByAgentId(@Param("agentId") int agentId, RowBounds rowBounds);
 
@@ -57,16 +67,21 @@ public interface OrderMapper {
             @Result(column = "status", property = "status"),
             @Result(column = "create_time", property = "createTime"),
             @Result(column = "update_time", property = "updateTime"),
-            @Result(column = "adult_count", property = "adultCount"),
-            @Result(column = "child_count", property = "childCount"),
-            @Result(column = "baby_count", property = "babyCount"),
-            @Result(column = "elder_count", property = "elderCount"),
-            @Result(column = "family_count", property = "familyCount"),
+            @Result(column = "price", property = "price"),
+            @Result(column = "gathering_info", property = "gatheringInfo"),
+            @Result(column = "primary_contact", property = "primaryContact"),
+            @Result(column = "primary_contact_email", property = "primaryContactEmail"),
+            @Result(column = "primary_contact_phone", property = "primaryContactPhone"),
+            @Result(column = "primary_contact_wechat", property = "primaryContactWechat"),
+            @Result(column = "secondary_contact", property = "secondaryContact"),
+            @Result(column = "secondary_contact_email", property = "secondaryContactEmail"),
+            @Result(column = "secondary_contact_phone", property = "secondaryContactPhone"),
+            @Result(column = "secondary_contact_wechat", property = "secondaryContactWechat"),
     })
     List<Order> findByAgentIdAndStatus(@Param("agentId") int agentId, @Param("status") int status, RowBounds rowBounds);
 
-    @Insert("insert into `order` (sku_id, agent_id, remark, status, adult_count, child_count, baby_count, elder_count, family_count, price) " +
-            "values(#{skuId}, #{agentId}, #{remark}, #{status}, #{adultCount}, #{childCount}, #{babyCount}, #{elderCount}, #{familyCount}, #{price})")
+    @Insert("insert into `order` (sku_id, agent_id, remark, status, price, gathering_info, primary_contact, primary_contact_email, primary_contact_phone, primary_contact_wechat, secondary_contact, secondary_contact_email, secondary_contact_phone, secondary_contact_wechat) " +
+            "values(#{skuId}, #{agentId}, #{remark}, #{status}, #{price}, #{gatheringInfo}, #{primaryContact}, #{primaryContactEmail}, #{primaryContactPhone}, #{primaryContactWechat}, #{secondaryContact}, #{secondaryContactEmail}, #{secondaryContactPhone}, #{secondaryContactWechat})")
     @Options(useGeneratedKeys = true, keyColumn = "id", keyProperty = "id", flushCache = Options.FlushCachePolicy.DEFAULT)
     int create(Order order);
 }

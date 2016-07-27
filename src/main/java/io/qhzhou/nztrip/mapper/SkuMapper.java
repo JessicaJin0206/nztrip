@@ -11,8 +11,8 @@ import java.util.List;
  */
 public interface SkuMapper {
 
-    @Insert("insert into sku(uuid, name, city_id, category_id, description, adult_ticket, adult_ticket_remark, child_ticket, child_ticket_remark, baby_ticket, baby_ticket_remark, elder_ticket, elder_ticket_remark, family_ticket, family_ticket_remark, vendor_id) " +
-            "values(#{uuid}, #{name}, #{cityId}, #{categoryId}, #{description}, #{adultTicket}, #{adultTicketRemark}, #{childTicket}, #{childTicketRemark}, #{babyTicket}, #{babyTicketRemark}, #{elderTicket}, #{elderTicketRemark}, #{familyTicket}, #{familyTicketRemark}, #{vendorId})")
+    @Insert("insert into sku(uuid, name, city_id, category_id, description, vendor_id, pickup_service, gathering_place) " +
+            "values(#{uuid}, #{name}, #{cityId}, #{categoryId}, #{description}, #{vendorId}, #{pickupService}, #{gatheringPlace})")
     @Options(useGeneratedKeys = true, keyColumn = "id", keyProperty = "id", flushCache = Options.FlushCachePolicy.DEFAULT)
     int create(Sku sku);
 
@@ -24,17 +24,9 @@ public interface SkuMapper {
             @Result(column = "city_id", property = "cityId"),
             @Result(column = "category_id", property = "categoryId"),
             @Result(column = "description", property = "description"),
-            @Result(column = "adult_ticket", property = "adultTicket"),
-            @Result(column = "adult_ticket_remark", property = "adultTicketRemark"),
-            @Result(column = "child_ticket", property = "childTicket"),
-            @Result(column = "child_ticket_remark", property = "childTicketRemark"),
-            @Result(column = "baby_ticket", property = "babyTicket"),
-            @Result(column = "baby_ticket_remark", property = "babyTicketRemark"),
-            @Result(column = "elder_ticket", property = "elderTicket"),
-            @Result(column = "elder_ticket_remark", property = "elderTicketRemark"),
-            @Result(column = "family_ticket", property = "familyTicket"),
-            @Result(column = "family_ticket_remark", property = "familyTicketRemark"),
             @Result(column = "vendor_id", property = "vendorId"),
+            @Result(column = "gathering_place", property = "gatheringPlace"),
+            @Result(column = "pickup_service", property = "pickupService"),
     })
     Sku findById(int id);
 
@@ -46,17 +38,9 @@ public interface SkuMapper {
             @Result(column = "city_id", property = "cityId"),
             @Result(column = "category_id", property = "categoryId"),
             @Result(column = "description", property = "description"),
-            @Result(column = "adult_ticket", property = "adultTicket"),
-            @Result(column = "adult_ticket_remark", property = "adultTicketRemark"),
-            @Result(column = "child_ticket", property = "childTicket"),
-            @Result(column = "child_ticket_remark", property = "childTicketRemark"),
-            @Result(column = "baby_ticket", property = "babyTicket"),
-            @Result(column = "baby_ticket_remark", property = "babyTicketRemark"),
-            @Result(column = "elder_ticket", property = "elderTicket"),
-            @Result(column = "elder_ticket_remark", property = "elderTicketRemark"),
-            @Result(column = "family_ticket", property = "familyTicket"),
-            @Result(column = "family_ticket_remark", property = "familyTicketRemark"),
             @Result(column = "vendor_id", property = "vendorId"),
+            @Result(column = "gathering_place", property = "gatheringPlace"),
+            @Result(column = "pickup_service", property = "pickupService"),
     })
     List<Sku> findAll(RowBounds rowBounds);
 }

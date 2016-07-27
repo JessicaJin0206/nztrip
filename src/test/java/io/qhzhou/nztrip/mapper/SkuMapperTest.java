@@ -22,16 +22,8 @@ public class SkuMapperTest extends BaseTest {
         assertEquals(sku.getDescription(), other.getDescription());
         assertEquals(sku.getCityId(), other.getCityId());
         assertEquals(sku.getCategoryId(), other.getCategoryId());
-        assertEquals(sku.hasAdultTicket(), other.hasAdultTicket());
-        assertEquals(sku.hasChildTicket(), other.hasChildTicket());
-        assertEquals(sku.hasBabyTicket(), other.hasBabyTicket());
-        assertEquals(sku.hasElderTicket(), other.hasElderTicket());
-        assertEquals(sku.hasFamilyTicket(), other.hasFamilyTicket());
-        assertEquals(sku.getAdultTicketRemark(), other.getAdultTicketRemark());
-        assertEquals(sku.getChildTicketRemark(), other.getChildTicketRemark());
-        assertEquals(sku.getBabyTicketRemark(), other.getBabyTicketRemark());
-        assertEquals(sku.getElderTicketRemark(), other.getElderTicketRemark());
-        assertEquals(sku.getFamilyTicketRemark(), other.getFamilyTicketRemark());
+        assertEquals(sku.hasPickupService(), other.hasPickupService());
+        assertEquals(sku.getGatheringPlace(), other.getGatheringPlace());
         assertEquals(sku.getVendorId(), other.getVendorId());
     }
 
@@ -41,16 +33,8 @@ public class SkuMapperTest extends BaseTest {
         sku.setDescription("description");
         sku.setName("name");
         sku.setUuid("uuid");
-        sku.setAdultTicket(true);
-        sku.setAdultTicketRemark("adult > 18");
-        sku.setChildTicket(true);
-        sku.setChildTicketRemark("child > 5");
-        sku.setBabyTicket(true);
-        sku.setBabyTicketRemark("baby > 1");
-        sku.setElderTicket(true);
-        sku.setElderTicketRemark("elder < 90");
-        sku.setFamilyTicket(true);
-        sku.setFamilyTicketRemark("2 + 1");
+        sku.setPickupService(true);
+        sku.setGatheringPlace("a aaaa: bbb");
         sku.setCityId(100);
         sku.setCategoryId(200);
         sku.setVendorId(1024);

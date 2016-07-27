@@ -63,44 +63,76 @@ public class Order extends ModelObject {
         this.price = price;
     }
 
-    public int getAdultCount() {
-        return adultCount;
+    public String getPrimaryContact() {
+        return primaryContact;
     }
 
-    public void setAdultCount(int adultCount) {
-        this.adultCount = adultCount;
+    public void setPrimaryContact(String primaryContact) {
+        this.primaryContact = primaryContact;
     }
 
-    public int getChildCount() {
-        return childCount;
+    public String getPrimaryContactEmail() {
+        return primaryContactEmail;
     }
 
-    public void setChildCount(int childCount) {
-        this.childCount = childCount;
+    public void setPrimaryContactEmail(String primaryContactEmail) {
+        this.primaryContactEmail = primaryContactEmail;
     }
 
-    public int getBabyCount() {
-        return babyCount;
+    public String getPrimaryContactPhone() {
+        return primaryContactPhone;
     }
 
-    public void setBabyCount(int babyCount) {
-        this.babyCount = babyCount;
+    public void setPrimaryContactPhone(String primaryContactPhone) {
+        this.primaryContactPhone = primaryContactPhone;
     }
 
-    public int getElderCount() {
-        return elderCount;
+    public String getPrimaryContactWechat() {
+        return primaryContactWechat;
     }
 
-    public void setElderCount(int elderCount) {
-        this.elderCount = elderCount;
+    public void setPrimaryContactWechat(String primaryContactWechat) {
+        this.primaryContactWechat = primaryContactWechat;
     }
 
-    public int getFamilyCount() {
-        return familyCount;
+    public String getSecondaryContact() {
+        return secondaryContact;
     }
 
-    public void setFamilyCount(int familyCount) {
-        this.familyCount = familyCount;
+    public void setSecondaryContact(String secondaryContact) {
+        this.secondaryContact = secondaryContact;
+    }
+
+    public String getSecondaryContactEmail() {
+        return secondaryContactEmail;
+    }
+
+    public void setSecondaryContactEmail(String secondaryContactEmail) {
+        this.secondaryContactEmail = secondaryContactEmail;
+    }
+
+    public String getSecondaryContactPhone() {
+        return secondaryContactPhone;
+    }
+
+    public void setSecondaryContactPhone(String secondaryContactPhone) {
+        this.secondaryContactPhone = secondaryContactPhone;
+    }
+
+    public String getSecondaryContactWechat() {
+        return secondaryContactWechat;
+    }
+
+    public void setSecondaryContactWechat(String secondaryContactWechat) {
+        this.secondaryContactWechat = secondaryContactWechat;
+    }
+
+    public String getGatheringInfo() {
+        return gatheringInfo;
+    }
+
+    public void setGatheringInfo(String gatheringInfo) {
+        this.gatheringInfo = gatheringInfo;
     }
 
     private int skuId;
@@ -110,9 +142,13 @@ public class Order extends ModelObject {
     private Date createTime;
     private Date updateTime;
     private int price;
-    private int adultCount;
-    private int childCount;
-    private int babyCount;
-    private int elderCount;
-    private int familyCount;
+    private String primaryContact;
+    private String primaryContactEmail;
+    private String primaryContactPhone;
+    private String primaryContactWechat;
+    private String secondaryContact;
+    private String secondaryContactEmail;
+    private String secondaryContactPhone;
+    private String secondaryContactWechat;
+    private String gatheringInfo;
 }

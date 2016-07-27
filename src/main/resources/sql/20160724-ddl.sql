@@ -8,7 +8,7 @@ CREATE TABLE `agent` (
   `discount` INT NOT NULL DEFAULT 100,
   `email` VARCHAR(30) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `name_UNIQUE` (`user_name` ASC))
+  UNIQUE INDEX `UNIQUE_user_name` (`user_name` ASC))
   ENGINE = InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `category`;
@@ -28,21 +28,25 @@ CREATE TABLE `city` (
 
 DROP TABLE IF EXISTS `order`;
 CREATE TABLE `order` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `sku_id` INT NOT NULL,
-  `agent_id` INT NOT NULL,
-  `remark` TEXT(1000) NOT NULL COMMENT 'store in json format according to sku_remark',
-  `status` TINYINT(2) NOT NULL COMMENT '10 - pending\n20 - confirmed\n30 - cancelled\n40 - closed\n90 - deleted',
-  `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  `update_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  `adult_count` INT NOT NULL,
-  `child_count` INT NULL DEFAULT 0,
-  `baby_count` INT NULL DEFAULT 0,
-  `elder_count` INT NULL DEFAULT 0,
-  `family_count` INT NULL DEFAULT 0,
-  `price` INT NOT NULL,
-  PRIMARY KEY (`id`))
-  ENGINE = InnoDB DEFAULT CHARSET=utf8;
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `sku_id` int(11) NOT NULL,
+  `agent_id` int(11) NOT NULL,
+  `remark` text NOT NULL COMMENT 'user remark',
+  `status` tinyint(2) NOT NULL COMMENT '10 - pending\n20 - confirmed\n30 - cancelled\n40 - closed\n90 - deleted',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `price` int(11) NOT NULL,
+  `primary_contact` varchar(30) NOT NULL DEFAULT '',
+  `primary_contact_email` varchar(30) NOT NULL DEFAULT '',
+  `primary_contact_phone` varchar(20) NOT NULL DEFAULT '',
+  `primary_contact_wechat` varchar(30) DEFAULT NULL,
+  `secondary_contact` varchar(30) DEFAULT NULL,
+  `secondary_contact_email` varchar(30) DEFAULT NULL,
+  `secondary_contact_phone` varchar(30) DEFAULT NULL,
+  `secondary_contact_wechat` varchar(30) DEFAULT NULL,
+  `gathering_info` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;;
 
 DROP TABLE IF EXISTS `sku`;
 CREATE TABLE `sku` (
@@ -53,34 +57,34 @@ CREATE TABLE `sku` (
   `category_id` INT NOT NULL,
   `vendor_id` INT NOT NULL,
   `description` VARCHAR(1000) NULL,
-  `adult_ticket` TINYINT(1) NOT NULL DEFAULT 1,
-  `adult_ticket_remark` VARCHAR(45) NULL,
-  `child_ticket` TINYINT(1) NOT NULL DEFAULT 0,
-  `child_ticket_remark` VARCHAR(45) NULL,
-  `baby_ticket` TINYINT(1) NOT NULL DEFAULT 0,
-  `baby_ticket_remark` VARCHAR(45) NULL,
-  `elder_ticket` TINYINT(1) NOT NULL DEFAULT 0,
-  `elder_ticket_remark` VARCHAR(45) NULL,
-  `family_ticket` TINYINT(1) NOT NULL DEFAULT 0,
-  `family_ticket_remark` VARCHAR(45) NULL,
+  `gathering_place` VARCHAR(200) NULL,
+  `pickup_service` TINYINT(2) DEFAULT 0,
+  `reference_number` VARCHAR(30) NULL,
   PRIMARY KEY (`id`))
   ENGINE = InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `sku_price`;
-CREATE TABLE `sku_price` (
+DROP TABLE IF EXISTS `sku_ticket`;
+CREATE TABLE `sku_ticket` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `sku_id` INT NOT NULL,
-  `start_time` TIMESTAMP NOT NULL,
-  `adult_cost_price` INT NOT NULL DEFAULT 0,
-  `adult_sale_price` INT NOT NULL DEFAULT 0,
-  `child_cost_price` INT NULL,
-  `child_sale_price` INT NULL,
-  `baby_cost_price` INT NULL,
-  `baby_sale_price` INT NULL,
-  `elder_cost_price` INT NULL,
-  `elder_sale_price` INT NULL,
-  `family_cost_price` INT NULL,
-  `family_sale_price` INT NULL,
+  `name` VARCHAR(20) NOT NULL,
+  `count_constraint` VARCHAR(15) NOT NULL DEFAULT '1',
+  `age_constraint` VARCHAR(15) NULL,
+  `weight_constraint` VARCHAR(15) NULL,
+  `description` VARCHAR(100) NULL,
+  PRIMARY KEY (`id`))
+  ENGINE = InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `sku_ticket_price`;
+CREATE TABLE `sku_ticket_price` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `sku_id` INT NOT NULL,
+  `sku_ticket_id` INT NOT NULL,
+  `date` DATETIME NOT NULL,
+  `time` VARCHAR(20) NOT NULL,
+  `sale_price` INT DEFAULT 0,
+  `cost_price` INT DEFAULT 0,
+  `description` VARCHAR(100) NULL,
   PRIMARY KEY (`id`))
   ENGINE = InnoDB DEFAULT CHARSET=utf8;
 

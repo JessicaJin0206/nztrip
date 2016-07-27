@@ -27,11 +27,10 @@ public class OrderMapperTest extends BaseTest {
         order1.setPrice(1024);
         order1.setRemark("{}");
         order1.setStatus(OrderStatus.PENDING);
-        order1.setAdultCount(2);
-        order1.setChildCount(1);
-        order1.setBabyCount(0);
-        order1.setElderCount(2);
-        order1.setFamilyCount(1);
+        order1.setPrimaryContact("will");
+        order1.setPrimaryContactEmail("will@abc.com");
+        order1.setPrimaryContactWechat("123124523");
+        order1.setPrimaryContactPhone("1342323456");
         assertEquals(orderMapper.create(order1), 1);
 
         Order order2 = new Order();
@@ -40,11 +39,10 @@ public class OrderMapperTest extends BaseTest {
         order2.setPrice(1000);
         order2.setRemark("{}");
         order2.setStatus(OrderStatus.CONFIRMED);
-        order2.setAdultCount(2);
-        order2.setChildCount(2);
-        order2.setBabyCount(1);
-        order2.setElderCount(0);
-        order2.setFamilyCount(0);
+        order2.setPrimaryContact("phil");
+        order2.setPrimaryContactEmail("phil@abc.com");
+        order2.setPrimaryContactWechat("1234124523");
+        order2.setPrimaryContactPhone("1342123456");
         assertEquals(orderMapper.create(order2), 1);
 
     }
@@ -52,14 +50,18 @@ public class OrderMapperTest extends BaseTest {
     private static void testEquals(Order order, Order other) {
         assertEquals(order.getSkuId(), other.getSkuId());
         assertEquals(order.getAgentId(), other.getAgentId());
-        assertEquals(order.getAdultCount(), other.getAdultCount());
-        assertEquals(order.getChildCount(), other.getChildCount());
-        assertEquals(order.getBabyCount(), other.getBabyCount());
-        assertEquals(order.getElderCount(), other.getElderCount());
-        assertEquals(order.getFamilyCount(), other.getFamilyCount());
         assertEquals(order.getCreateTime(), other.getCreateTime());
         assertEquals(order.getUpdateTime(), other.getUpdateTime());
         assertEquals(order.getPrice(), other.getPrice());
+        assertEquals(order.getGatheringInfo(), other.getGatheringInfo());
+        assertEquals(order.getPrimaryContact(), other.getPrimaryContact());
+        assertEquals(order.getPrimaryContactEmail(), other.getPrimaryContactEmail());
+        assertEquals(order.getPrimaryContactPhone(), other.getPrimaryContactPhone());
+        assertEquals(order.getPrimaryContactWechat(), other.getPrimaryContactWechat());
+        assertEquals(order.getSecondaryContact(), other.getPrimaryContact());
+        assertEquals(order.getSecondaryContactEmail(), other.getPrimaryContactEmail());
+        assertEquals(order.getSecondaryContactPhone(), other.getPrimaryContactPhone());
+        assertEquals(order.getSecondaryContactWechat(), other.getPrimaryContactWechat());
     }
 
     @After
