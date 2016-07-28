@@ -19,6 +19,7 @@ package io.qhzhou.nztrip.controller;
 import io.qhzhou.nztrip.mapper.CategoryMapper;
 import io.qhzhou.nztrip.mapper.CityMapper;
 import io.qhzhou.nztrip.mapper.SkuMapper;
+import io.qhzhou.nztrip.mapper.VendorMapper;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -45,6 +46,9 @@ public class HomeController {
     private CategoryMapper categoryMapper;
 
     @Autowired
+    private VendorMapper vendorMapper;
+
+    @Autowired
     private SkuMapper skuMapper;
 
     @RequestMapping("dashboard")
@@ -68,14 +72,23 @@ public class HomeController {
     @RequestMapping("create_sku")
     public String createSku(Map<String, Object> model) {
         model.put("module", MODULE_CREATE_SKU);
+        model.put("cities", cityMapper.findAll());
+        model.put("categories", categoryMapper.findAll());
+        model.put("vendors", vendorMapper.findAll());
         return "create_sku";
     }
 
     @RequestMapping("skus")
-    public String querySku(@RequestParam(value = "pagesize", defaultValue = "10") int pageSize,
+    public String querySku(@RequestParam(value = "keyword", defaultValue = "") String keyword,
+                           @RequestParam(value = "cityid", defaultValue = "0") int cityId,
+                           @RequestParam(value = "categoryid", defaultValue = "0") int categoryId,
+                           @RequestParam(value = "pagesize", defaultValue = "10") int pageSize,
                            @RequestParam(value = "pagenumber", defaultValue = "0") int pageNumber,
                            Map<String, Object> model) {
         model.put("module", MODULE_QUERY_SKU);
+        model.put("cityId", cityId);
+        model.put("categoryId", categoryId);
+        model.put("keyword", keyword);
         model.put("cities", cityMapper.findAll());
         model.put("categories", categoryMapper.findAll());
         model.put("skus", skuMapper.findAll(new RowBounds(pageNumber * pageSize, pageSize)));

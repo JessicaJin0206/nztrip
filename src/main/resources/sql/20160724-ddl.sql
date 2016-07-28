@@ -45,6 +45,7 @@ CREATE TABLE `order` (
   `secondary_contact_phone` varchar(30) DEFAULT NULL,
   `secondary_contact_wechat` varchar(30) DEFAULT NULL,
   `gathering_info` varchar(50) DEFAULT NULL,
+  `reference_number` VARCHAR(30) NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;;
 
@@ -59,7 +60,6 @@ CREATE TABLE `sku` (
   `description` VARCHAR(1000) NULL,
   `gathering_place` VARCHAR(200) NULL,
   `pickup_service` TINYINT(2) DEFAULT 0,
-  `reference_number` VARCHAR(30) NULL,
   PRIMARY KEY (`id`))
   ENGINE = InnoDB DEFAULT CHARSET=utf8;
 

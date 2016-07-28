@@ -36,30 +36,37 @@
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
             <div class="row">
                 <div class="dropdown col-md-3">
-                    <button class="btn btn-default dropdown-toggle" type="button" id="city_drop_down"
+                    <button class="btn btn-default dropdown-toggle" type="button" id="selected_city_button"
                             data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="true">
-                        选择城市
+                        <span id="j_selected_city" value="0">选择城市</span>
                         <span class="caret"></span>
                     </button>
-                    <ul class="dropdown-menu" aria-labelledby="city_drop_down">
+                    <ul class="dropdown-menu" id="j_city_drop_down" aria-labelledby="selected_city_button">
+                        <li><a value="0">选择城市</a></li>
                     <#list cities as city>
-                        <li><a href="#">${city.name}</a></li>
+                        <li><a value="${city.id}">${city.name}</a></li>
                     </#list>
                     </ul>
                 </div>
                 <div class="dropdown col-md-3">
-                    <button class="btn btn-default dropdown-toggle" type="button" id="category_drop_down"
+                    <button class="btn btn-default dropdown-toggle" type="button" id="selected_category_button"
                             data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="true">
-                        选择类别
+                        <span id="j_selected_category" value="0">选择类别</span>
                         <span class="caret"></span>
                     </button>
-                    <ul class="dropdown-menu" aria-labelledby="category_drop_down">
+                    <ul class="dropdown-menu" id="j_category_drop_down" aria-labelledby="selected_category_button">
+                        <li><a value="0">选择类别</a></li>
                     <#list categories as category>
-                        <li><a href="#">${category.name}</a></li>
+                        <li><a value="${category.id}">${category.name}</a></li>
                     </#list>
                     </ul>
+                </div>
+                <div class="col-md-4"><input type="text" id="j_keyword" class="form-control" placeholder="请输入编号...">
+                </div>
+                <div class="col-md-2">
+                    <button id="j_search" class="btn btn-default">搜索</button>
                 </div>
             </div>
 
@@ -67,7 +74,7 @@
                 <table class="table table-hover">
                     <thead>
                     <tr>
-                        <th>#</th>
+                        <th>编号</th>
                         <th>城市</th>
                         <th>类别</th>
                         <th>名称</th>
@@ -102,9 +109,11 @@
                 <nav aria-label="...">
                     <ul class="pager">
                         <li class="<#if (pageNumber <= 0)>disabled</#if>">
-                            <a href="<#if (pageNumber > 0)>skus?pagenumber=${pageNumber-1}&pagesize=${pageSize}</#if>">上一页</a>
+                            <a href="skus?<#if (cityId > 0)>cityid=${cityId}&</#if><#if (categoryId > 0)>categoryid=${categoryId}&</#if><#if (keyword != "")>keyword=${keyword}&</#if><#if (pageNumber > 0)>pagenumber=${pageNumber-1}&pagesize=${pageSize}</#if>">上一页</a>
                         </li>
-                        <li><a href="skus?pagenumber=${pageNumber+1}&pagesize=${pageSize}">下一页</a></li>
+                        <li>
+                            <a href="skus?<#if (cityId > 0)>cityid=${cityId}&</#if><#if (categoryId > 0)>categoryid=${categoryId}&</#if><#if (keyword != "")>keyword=${keyword}&</#if>pagenumber=${pageNumber+1}&pagesize=${pageSize}">下一页</a>
+                        </li>
                     </ul>
                 </nav>
             </div>
@@ -112,15 +121,7 @@
     </div>
 </div>
 
-<!-- Bootstrap core JavaScript
-================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
-<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
-<script>window.jQuery || document.write('<script src="assets/js/vendor/jquery.min.js"><\/script>')</script>
-<script src="js/bootstrap.min.js"></script>
-<!-- Just to make our placeholder images work. Don't actually copy the next line! -->
-<script src="assets/js/vendor/holder.min.js"></script>
-<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-<script src="assets/js/ie10-viewport-bug-workaround.js"></script>
+<#include "third_party_file.ftl"/>
+<script src="js/sku.js"></script>
 </body>
 </html>
