@@ -23,6 +23,7 @@ DROP TABLE IF EXISTS `city`;
 CREATE TABLE `city` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NOT NULL,
+  `name_en` varchar(45) NOT NULL,
   PRIMARY KEY (`id`))
   ENGINE = InnoDB DEFAULT CHARSET=utf8;
 
