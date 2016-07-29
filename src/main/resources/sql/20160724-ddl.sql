@@ -60,7 +60,8 @@ CREATE TABLE `sku` (
   `description` VARCHAR(1000) NULL,
   `gathering_place` VARCHAR(200) NULL,
   `pickup_service` TINYINT(2) DEFAULT 0,
-  PRIMARY KEY (`id`))
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UNIQUE_uuid` (`uuid`))
   ENGINE = InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `sku_ticket`;

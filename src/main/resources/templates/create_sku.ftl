@@ -34,7 +34,7 @@
     <div class="row">
     <#include "menu.ftl"/>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-            <form>
+            <form onsubmit="return false">
                 <div class="form-group"><label>创建项目</label></div>
                 <div class="form-group"><input type="text" id="j_uuid" class="form-control" placeholder="请输入项目编号...">
                 </div>
@@ -81,12 +81,14 @@
                 </div>
                 <div class="form-group"><input type="text" id="j_gathering_place" class="form-control" placeholder="请输入集合地点...">
                 </div>
+                <div class="form-group"><input type="text" id="j_description" class="form-control" placeholder="请输入项目详情...">
+                </div>
                 <div class="checkbox">
                     <label>
                         <input type="checkbox">是否有接送服务
                     </label>
                 </div>
-                <button type="submit" class="btn btn-default">提交</button>
+                <button id="j_submit" class="btn btn-default">提交</button>
             </form>
         </div>
 
