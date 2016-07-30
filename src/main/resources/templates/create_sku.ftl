@@ -79,15 +79,29 @@
                     </#list>
                     </ul>
                 </div>
-                <div class="form-group"><input type="text" id="j_gathering_place" class="form-control" placeholder="请输入集合地点...">
+                <div class="form-group"><input type="text" id="j_gathering_place" class="form-control"
+                                               placeholder="请输入集合地点...">
                 </div>
-                <div class="form-group"><input type="text" id="j_description" class="form-control" placeholder="请输入项目详情...">
+                <div class="form-group"><input type="text" id="j_description" class="form-control"
+                                               placeholder="请输入项目详情...">
                 </div>
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox">是否有接送服务
-                    </label>
+                <#--<div class="checkbox">-->
+                    <#--<label>-->
+                        <#--<input type="checkbox">-->
+                    <#--</label>-->
+                <#--</div>-->
+                <div id="j_pickup_service" class="form-group">
+                    <span>是否有接送服务?</span>
+                    <div class="btn-group" data-toggle="buttons">
+                        <label class="btn btn-default">
+                            <input type="radio" class="toggle" value="1">是
+                        </label>
+                        <label class="btn btn-default active">
+                            <input type="radio" class="toggle" value="0">否
+                        </label>
+                    </div>
                 </div>
+
                 <button id="j_submit" class="btn btn-default">提交</button>
             </form>
         </div>

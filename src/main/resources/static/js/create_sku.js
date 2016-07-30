@@ -83,6 +83,7 @@ $('#j_submit').on('click', function () {
     }
     var gatheringPlace = $('#j_gathering_place').val();
     var description = $('#j_description').val();
+    var pickupService = $('#j_pickup_service label.active input').val();
     $.ajax({
         type: 'POST',
         url: 'v1/api/skus',
@@ -92,7 +93,7 @@ $('#j_submit').on('click', function () {
             cityId: cityId,
             categoryId: categoryId,
             vendorId: vendorId,
-            pickupService: false,
+            pickupService: pickupService,
             gatheringPlace: gatheringPlace,
             description: description
         }
