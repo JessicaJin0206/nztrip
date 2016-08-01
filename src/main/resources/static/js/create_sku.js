@@ -55,6 +55,11 @@ var error = function(message) {
     $('.main form').prepend(alert);
 };
 
+var gatheringPlace = $('#j_gathering_place');
+gatheringPlace.find('a').on('click', function() {
+    $('.j_gathering_place_input').parent().last().after($('<div class="form-group"><input type="text" class="form-control j_gathering_place_input" placeholder="请输入集合地点..."></div>'));
+})
+
 $('#j_submit').on('click', function () {
     var uuid = $('#j_uuid').val();
     if (uuid.length == 0) {
@@ -81,25 +86,33 @@ $('#j_submit').on('click', function () {
         warn("请选择供应商");
         return;
     }
-    var gatheringPlace = $('#j_gathering_place').val();
+    var gatheringPlace = [];
+    $('.j_gathering_place_input').each(function() {
+        var item = $(this).val();
+        if (item.length > 0) {
+            gatheringPlace.push(item);
+        }
+    });
     var description = $('#j_description').val();
     var pickupService = $('#j_pickup_service label.active input').val();
+    var data = {
+        uuid: uuid,
+        name: name,
+        cityId: cityId,
+        categoryId: categoryId,
+        vendorId: vendorId,
+        pickupService: !!pickupService,
+        gatheringPlace: gatheringPlace,
+        description: description
+    };
     $.ajax({
         type: 'POST',
+        contentType:"application/json; charset=utf-8",
         url: 'v1/api/skus',
-        data: {
-            uuid: uuid,
-            name: name,
-            cityId: cityId,
-            categoryId: categoryId,
-            vendorId: vendorId,
-            pickupService: pickupService,
-            gatheringPlace: gatheringPlace,
-            description: description
-        }
-    }).success(function (data) {
+        data: JSON.stringify(data)
+    }).success(function () {
         success("添加成功");
-    }).error(function (data){
+    }).error(function (){
         error("添加失败");
     });
 });

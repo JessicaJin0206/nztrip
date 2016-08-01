@@ -1,5 +1,7 @@
 package io.qhzhou.nztrip.vo;
 
+import java.util.List;
+
 /**
  * Created by qianhao.zhou on 7/29/16.
  */
@@ -45,14 +47,6 @@ public class SkuVo {
         this.categoryId = categoryId;
     }
 
-    public String getGatheringPlace() {
-        return gatheringPlace;
-    }
-
-    public void setGatheringPlace(String gatheringPlace) {
-        this.gatheringPlace = gatheringPlace;
-    }
-
     public boolean hasPickupService() {
         return pickupService;
     }
@@ -77,13 +71,21 @@ public class SkuVo {
         this.vendorId = vendorId;
     }
 
+    public List<String> getGatheringPlace() {
+        return gatheringPlace;
+    }
+
+    public void setGatheringPlace(List<String> gatheringPlace) {
+        this.gatheringPlace = gatheringPlace;
+    }
+
     private int id;
     private String uuid;
     private String name;
     private int cityId;
     private int categoryId;
     private int vendorId;
-    private String gatheringPlace;
+    private List<String> gatheringPlace;
     private boolean pickupService;
     private String description;
 }
