@@ -29,7 +29,5 @@ $('#j_search').on('click', function(){
     if (keyword.length > 0) {
         seachString += "keyword=" + encodeURI(keyword) + "&";
     }
-    if (seachString.length > 0) {
-        window.location.href = "skus?" + seachString;
-    }
+    window.location.href = "skus?" + seachString;
 })

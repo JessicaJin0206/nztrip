@@ -79,11 +79,29 @@ public class SkuVo {
         this.gatheringPlace = gatheringPlace;
     }
 
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
     private int id;
     private String uuid;
     private String name;
     private int cityId;
+    private String city;
     private int categoryId;
+    private String category;
     private int vendorId;
     private List<String> gatheringPlace;
     private boolean pickupService;

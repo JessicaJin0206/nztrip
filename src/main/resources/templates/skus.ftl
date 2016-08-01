@@ -63,7 +63,7 @@
                     </#list>
                     </ul>
                 </div>
-                <div class="col-md-4"><input type="text" id="j_keyword" class="form-control" placeholder="请输入编号...">
+                <div class="col-md-4"><input type="text" id="j_keyword" class="form-control" placeholder="请输入关键词...">
                 </div>
                 <div class="col-md-2">
                     <button id="j_search" class="btn btn-default">搜索</button>
@@ -86,8 +86,8 @@
                     <#list skus as sku>
                     <tr>
                         <th scope="row">${sku.uuid}</th>
-                        <td>${sku.cityId}</td>
-                        <td>${sku.categoryId}</td>
+                        <td>${sku.city}</td>
+                        <td>${sku.category}</td>
                         <td>${sku.name}</td>
                         <td>${sku.description}</td>
                         <td>

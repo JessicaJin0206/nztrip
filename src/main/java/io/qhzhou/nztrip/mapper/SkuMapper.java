@@ -43,4 +43,18 @@ public interface SkuMapper {
             @Result(column = "pickup_service", property = "pickupService"),
     })
     List<Sku> findAll(RowBounds rowBounds);
+
+    @Select("select * from sku where name like CONCAT('%',#{name},'%')")
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "uuid", property = "uuid"),
+            @Result(column = "name", property = "name"),
+            @Result(column = "city_id", property = "cityId"),
+            @Result(column = "category_id", property = "categoryId"),
+            @Result(column = "description", property = "description"),
+            @Result(column = "vendor_id", property = "vendorId"),
+            @Result(column = "gathering_place", property = "gatheringPlace"),
+            @Result(column = "pickup_service", property = "pickupService"),
+    })
+    List<Sku> findAllByName(String name, RowBounds rowBounds);
 }

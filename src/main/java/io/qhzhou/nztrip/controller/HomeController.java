@@ -16,17 +16,24 @@
 
 package io.qhzhou.nztrip.controller;
 
-import io.qhzhou.nztrip.mapper.CategoryMapper;
-import io.qhzhou.nztrip.mapper.CityMapper;
+import com.google.common.collect.Lists;
+import io.qhzhou.nztrip.constants.CommonConstants;
 import io.qhzhou.nztrip.mapper.SkuMapper;
 import io.qhzhou.nztrip.mapper.VendorMapper;
+import io.qhzhou.nztrip.model.Category;
+import io.qhzhou.nztrip.model.City;
+import io.qhzhou.nztrip.model.Sku;
+import io.qhzhou.nztrip.service.CategoryService;
+import io.qhzhou.nztrip.service.CityService;
+import io.qhzhou.nztrip.vo.SkuVo;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -41,10 +48,10 @@ public class HomeController {
     public static final String MODULE_CREATE_VENDOR = "create_vendor";
 
     @Autowired
-    private CityMapper cityMapper;
+    private CityService cityService;
 
     @Autowired
-    private CategoryMapper categoryMapper;
+    private CategoryService categoryService;
 
     @Autowired
     private VendorMapper vendorMapper;
@@ -73,8 +80,8 @@ public class HomeController {
     @RequestMapping("create_sku")
     public String createSku(Map<String, Object> model) {
         model.put("module", MODULE_CREATE_SKU);
-        model.put("cities", cityMapper.findAll());
-        model.put("categories", categoryMapper.findAll());
+        model.put("cities", Lists.newArrayList(cityService.findAll().values()));
+        model.put("categories", Lists.newArrayList(categoryService.findAll().values()));
         model.put("vendors", vendorMapper.findAll());
         return "create_sku";
     }
@@ -86,16 +93,27 @@ public class HomeController {
                            @RequestParam(value = "pagesize", defaultValue = "10") int pageSize,
                            @RequestParam(value = "pagenumber", defaultValue = "0") int pageNumber,
                            Map<String, Object> model) {
+        Map<Integer, City> cityMap = cityService.findAll();
+        Map<Integer, Category> categoryMap = categoryService.findAll();
+        RowBounds rowBounds = new RowBounds(pageNumber * pageSize, pageSize);
         model.put("module", MODULE_QUERY_SKU);
         model.put("cityId", cityId);
         model.put("categoryId", categoryId);
         model.put("keyword", keyword);
-        model.put("cities", cityMapper.findAll());
-        model.put("categories", categoryMapper.findAll());
-        model.put("skus", skuMapper.findAll(new RowBounds(pageNumber * pageSize, pageSize)));
+        model.put("cities", Lists.newArrayList(cityMap.values()));
+        model.put("categories", Lists.newArrayList(categoryMap.values()));
+        model.put("skus", Lists.transform(seachSku(keyword, cityId, categoryId, rowBounds), (input) -> parse(input, cityMap, categoryMap)));
         model.put("pageSize", pageSize);
         model.put("pageNumber", pageNumber);
         return "skus";
+    }
+
+    private List<Sku> seachSku(String keyword, int cityId, int categoryId, RowBounds rowBounds) {
+        if (!StringUtils.isEmpty(keyword)) {
+            return skuMapper.findAllByName(keyword, rowBounds);
+        } else {
+            return skuMapper.findAll(rowBounds);
+        }
     }
 
     @RequestMapping("create_vendor")
@@ -108,6 +126,22 @@ public class HomeController {
     public String queryVendor(Map<String, Object> model) {
         model.put("module", MODULE_QUERY_VENDOR);
         return "vendors";
+    }
+
+    private static SkuVo parse(Sku sku, Map<Integer, City> cityMap, Map<Integer, Category> categoryMap) {
+        SkuVo result = new SkuVo();
+        result.setId(sku.getId());
+        result.setName(sku.getName());
+        result.setUuid(sku.getUuid());
+        result.setVendorId(sku.getVendorId());
+        result.setDescription(sku.getDescription());
+        result.setCategoryId(sku.getCategoryId());
+        result.setCategory(categoryMap.get(sku.getCategoryId()).getName());
+        result.setCityId(sku.getCityId());
+        result.setCity(cityMap.get(sku.getCityId()).getName());
+        result.setGatheringPlace(Lists.newArrayList(sku.getGatheringPlace().split(CommonConstants.SEPERATOR)));
+        result.setPickupService(sku.hasPickupService());
+        return result;
     }
 
 }
