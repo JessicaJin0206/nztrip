@@ -1,6 +1,7 @@
 package io.qhzhou.nztrip.controller;
 
 import com.google.common.base.Joiner;
+import io.qhzhou.nztrip.constants.CommonConstants;
 import io.qhzhou.nztrip.mapper.SkuMapper;
 import io.qhzhou.nztrip.model.Sku;
 import io.qhzhou.nztrip.vo.SkuVo;
@@ -31,7 +32,7 @@ public class RestApiController {
         Sku result = new Sku();
         result.setUuid(skuVo.getUuid());
         result.setName(skuVo.getName());
-        result.setGatheringPlace(Joiner.on(';').join(skuVo.getGatheringPlace()));
+        result.setGatheringPlace(Joiner.on(CommonConstants.SEPERATOR).join(skuVo.getGatheringPlace()));
         result.setPickupService(skuVo.hasPickupService());
         result.setDescription(skuVo.getDescription());
         result.setVendorId(skuVo.getVendorId());
