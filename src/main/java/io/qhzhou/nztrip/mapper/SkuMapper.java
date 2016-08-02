@@ -57,4 +57,24 @@ public interface SkuMapper {
             @Result(column = "pickup_service", property = "pickupService"),
     })
     List<Sku> findAllByName(String name, RowBounds rowBounds);
+
+
+    @Select("<script>" +
+            "select * from sku where 1 = 1 " +
+            "<if test =\"name != null and name != ''\">and name like CONCAT('%',#{name},'%') </if> " +
+            "<if test =\"categoryId > 0\">and category_id = #{categoryId}</if> " +
+            "<if test =\"cityId > 0\">and city_id = #{cityId}</if> " +
+            "</script>")
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "uuid", property = "uuid"),
+            @Result(column = "name", property = "name"),
+            @Result(column = "city_id", property = "cityId"),
+            @Result(column = "category_id", property = "categoryId"),
+            @Result(column = "description", property = "description"),
+            @Result(column = "vendor_id", property = "vendorId"),
+            @Result(column = "gathering_place", property = "gatheringPlace"),
+            @Result(column = "pickup_service", property = "pickupService"),
+    })
+    List<Sku> findAllByMultiFields(@Param("name") String name, @Param("cityId") int cityId, @Param("categoryId") int categoryId, RowBounds rowBounds);
 }

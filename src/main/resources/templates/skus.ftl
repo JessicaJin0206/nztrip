@@ -39,12 +39,23 @@
                     <button class="btn btn-default dropdown-toggle" type="button" id="selected_city_button"
                             data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="true">
+                    <#assign hasCity = 0>
+                    <#if (cityId > 0)>
+                        <#list cityMap?values as city>
+                            <#if (city.id = cityId)>
+                                <#assign hasCity = 1>
+                                <span id="j_selected_city" value="${city.id}">${city.name}</span>
+                            </#if>
+                        </#list>
+                    </#if>
+                    <#if (hasCity = 0)>
                         <span id="j_selected_city" value="0">选择城市</span>
+                    </#if>
                         <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" id="j_city_drop_down" aria-labelledby="selected_city_button">
                         <li><a value="0">选择城市</a></li>
-                    <#list cities as city>
+                    <#list cityMap?values as city>
                         <li><a value="${city.id}">${city.name}</a></li>
                     </#list>
                     </ul>
@@ -53,17 +64,28 @@
                     <button class="btn btn-default dropdown-toggle" type="button" id="selected_category_button"
                             data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="true">
+                    <#assign hasCategory = 0>
+                    <#if (categoryId > 0)>
+                        <#list categoryMap?values as category>
+                            <#if (categoryId = category.id)>
+                                <#assign hasCategory = 1>
+                                <span id="j_selected_category" value="${category.id}">${category.name}</span>
+                            </#if>
+                        </#list>
+                    </#if>
+                    <#if (hasCategory = 0)>
                         <span id="j_selected_category" value="0">选择类别</span>
+                    </#if>
                         <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" id="j_category_drop_down" aria-labelledby="selected_category_button">
                         <li><a value="0">选择类别</a></li>
-                    <#list categories as category>
+                    <#list categoryMap?values as category>
                         <li><a value="${category.id}">${category.name}</a></li>
                     </#list>
                     </ul>
                 </div>
-                <div class="col-md-4"><input type="text" id="j_keyword" class="form-control" placeholder="请输入关键词...">
+                <div class="col-md-4"><input type="text" id="j_keyword" class="form-control" placeholder="请输入关键词..." value="${keyword}">
                 </div>
                 <div class="col-md-2">
                     <button id="j_search" class="btn btn-default">搜索</button>

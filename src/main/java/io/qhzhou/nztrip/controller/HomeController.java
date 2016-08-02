@@ -26,7 +26,6 @@ import io.qhzhou.nztrip.model.Sku;
 import io.qhzhou.nztrip.service.CategoryService;
 import io.qhzhou.nztrip.service.CityService;
 import io.qhzhou.nztrip.vo.SkuVo;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -100,20 +99,16 @@ public class HomeController {
         model.put("cityId", cityId);
         model.put("categoryId", categoryId);
         model.put("keyword", keyword);
-        model.put("cities", Lists.newArrayList(cityMap.values()));
-        model.put("categories", Lists.newArrayList(categoryMap.values()));
-        model.put("skus", Lists.transform(seachSku(keyword, cityId, categoryId, rowBounds), (input) -> parse(input, cityMap, categoryMap)));
+        model.put("cityMap", cityMap);
+        model.put("categoryMap", categoryMap);
+        model.put("skus", Lists.transform(searchSku(keyword, cityId, categoryId, rowBounds), (input) -> parse(input, cityMap, categoryMap)));
         model.put("pageSize", pageSize);
         model.put("pageNumber", pageNumber);
         return "skus";
     }
 
-    private List<Sku> seachSku(String keyword, int cityId, int categoryId, RowBounds rowBounds) {
-        if (!StringUtils.isEmpty(keyword)) {
-            return skuMapper.findAllByName(keyword, rowBounds);
-        } else {
-            return skuMapper.findAll(rowBounds);
-        }
+    private List<Sku> searchSku(String keyword, int cityId, int categoryId, RowBounds rowBounds) {
+        return skuMapper.findAllByMultiFields(keyword, cityId, categoryId, rowBounds);
     }
 
     @RequestMapping("create_vendor")
