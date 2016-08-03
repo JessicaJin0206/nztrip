@@ -1,5 +1,8 @@
 package io.qhzhou.nztrip.model;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Created by qianhao.zhou on 7/24/16.
  */
@@ -69,6 +72,14 @@ public class Sku extends ModelObject {
         this.gatheringPlace = gatheringPlace;
     }
 
+    public List<SkuTicket> getTickets() {
+        return tickets;
+    }
+
+    public void setTickets(List<SkuTicket> tickets) {
+        this.tickets = tickets;
+    }
+
     private String uuid;
     private String name;
     private int cityId;
@@ -77,4 +88,6 @@ public class Sku extends ModelObject {
     private String description;
     private boolean pickupService;
     private String gatheringPlace;
+    private List<SkuTicket> tickets = Collections.emptyList();
+
 }

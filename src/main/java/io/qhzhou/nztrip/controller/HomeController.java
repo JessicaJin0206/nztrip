@@ -16,15 +16,16 @@
 
 package io.qhzhou.nztrip.controller;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import io.qhzhou.nztrip.constants.CommonConstants;
 import io.qhzhou.nztrip.mapper.SkuMapper;
 import io.qhzhou.nztrip.mapper.VendorMapper;
-import io.qhzhou.nztrip.model.Category;
-import io.qhzhou.nztrip.model.City;
-import io.qhzhou.nztrip.model.Sku;
+import io.qhzhou.nztrip.model.*;
 import io.qhzhou.nztrip.service.CategoryService;
 import io.qhzhou.nztrip.service.CityService;
+import io.qhzhou.nztrip.service.VendorService;
+import io.qhzhou.nztrip.vo.SkuTicketVo;
 import io.qhzhou.nztrip.vo.SkuVo;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +56,7 @@ public class HomeController {
     private CategoryService categoryService;
 
     @Autowired
-    private VendorMapper vendorMapper;
+    private VendorService vendorService;
 
     @Autowired
     private SkuMapper skuMapper;
@@ -83,9 +84,26 @@ public class HomeController {
         model.put("module", MODULE_CREATE_SKU);
         model.put("cities", Lists.newArrayList(cityService.findAll().values()));
         model.put("categories", Lists.newArrayList(categoryService.findAll().values()));
-        model.put("vendors", vendorMapper.findAll());
+        model.put("vendors", vendorService.findAll());
         return "create_sku";
     }
+
+    @RequestMapping("skus/{id}")
+    public String skuDetail(@PathVariable("id") int id, Map<String, Object> model) {
+        model.put("module", MODULE_SKU_DETAIL);
+        model.put("sku", parse(skuMapper.findById(id), cityService.findAll(), categoryService.findAll(), vendorService.findAll()));
+        model.put("editing", false);
+        return "sku_detail";
+    }
+
+    @RequestMapping("skus/{id}/_edit")
+    public String editSku(@PathVariable("id") int id, Map<String, Object> model) {
+        model.put("module", MODULE_SKU_DETAIL);
+        model.put("sku", parse(skuMapper.findById(id), cityService.findAll(), categoryService.findAll(), vendorService.findAll()));
+        model.put("editing", true);
+        return "sku_detail";
+    }
+
 
     @RequestMapping("skus")
     public String querySku(@RequestParam(value = "keyword", defaultValue = "") String keyword,
@@ -96,6 +114,7 @@ public class HomeController {
                            Map<String, Object> model) {
         Map<Integer, City> cityMap = cityService.findAll();
         Map<Integer, Category> categoryMap = categoryService.findAll();
+        Map<Integer, Vendor> vendorMap = vendorService.findAll();
         RowBounds rowBounds = new RowBounds(pageNumber * pageSize, pageSize);
         model.put("module", MODULE_QUERY_SKU);
         model.put("cityId", cityId);
@@ -103,7 +122,7 @@ public class HomeController {
         model.put("keyword", keyword);
         model.put("cityMap", cityMap);
         model.put("categoryMap", categoryMap);
-        model.put("skus", Lists.transform(searchSku(keyword, cityId, categoryId, rowBounds), (input) -> parse(input, cityMap, categoryMap)));
+        model.put("skus", Lists.transform(searchSku(keyword, cityId, categoryId, rowBounds), (input) -> parse(input, cityMap, categoryMap, vendorMap)));
         model.put("pageSize", pageSize);
         model.put("pageNumber", pageNumber);
         return "skus";
@@ -111,12 +130,6 @@ public class HomeController {
 
     private List<Sku> searchSku(String keyword, int cityId, int categoryId, RowBounds rowBounds) {
         return skuMapper.findAllByMultiFields(keyword, cityId, categoryId, rowBounds);
-    }
-
-    @RequestMapping("skus/{id}")
-    public String skuDetail(@PathVariable("id") int id, Map<String, Object> model) {
-        model.put("module", MODULE_SKU_DETAIL);
-        return "sku_detail";
     }
 
     @RequestMapping("create_vendor")
@@ -131,12 +144,13 @@ public class HomeController {
         return "vendors";
     }
 
-    private static SkuVo parse(Sku sku, Map<Integer, City> cityMap, Map<Integer, Category> categoryMap) {
+    private static SkuVo parse(Sku sku, Map<Integer, City> cityMap, Map<Integer, Category> categoryMap, Map<Integer, Vendor> vendorMap) {
         SkuVo result = new SkuVo();
         result.setId(sku.getId());
         result.setName(sku.getName());
         result.setUuid(sku.getUuid());
         result.setVendorId(sku.getVendorId());
+        result.setVendor(vendorMap.get(sku.getVendorId()).getName());
         result.setDescription(sku.getDescription());
         result.setCategoryId(sku.getCategoryId());
         result.setCategory(categoryMap.get(sku.getCategoryId()).getName());
@@ -144,6 +158,23 @@ public class HomeController {
         result.setCity(cityMap.get(sku.getCityId()).getName());
         result.setGatheringPlace(Lists.newArrayList(sku.getGatheringPlace().split(CommonConstants.SEPERATOR)));
         result.setPickupService(sku.hasPickupService());
+        result.setTickets(Lists.transform(sku.getTickets(), new Function<SkuTicket, SkuTicketVo>() {
+            @Override
+            public SkuTicketVo apply(SkuTicket input) {
+                SkuTicketVo ticket = new SkuTicketVo();
+                ticket.setDescription(input.getDescription());
+                ticket.setName(input.getName());
+                ticket.setId(input.getId());
+                ticket.setCount(Integer.parseInt(input.getCountConstraint()));
+                String[] ages = input.getAgeConstraint().split("-");
+                ticket.setMinAge(Integer.parseInt(ages[0]));
+                ticket.setMaxAge(Integer.parseInt(ages[1]));
+                String[] weights = input.getWeightConstraint().split("-");
+                ticket.setMinWeight(Integer.parseInt(weights[0]));
+                ticket.setMaxWeight(Integer.parseInt(weights[1]));
+                return ticket;
+            }
+        }));
         return result;
     }
 

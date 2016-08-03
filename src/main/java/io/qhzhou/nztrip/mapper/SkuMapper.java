@@ -27,6 +27,8 @@ public interface SkuMapper {
             @Result(column = "vendor_id", property = "vendorId"),
             @Result(column = "gathering_place", property = "gatheringPlace"),
             @Result(column = "pickup_service", property = "pickupService"),
+            @Result(column = "id", property = "tickets", javaType = List.class, many
+                    = @Many(select = "io.qhzhou.nztrip.mapper.SkuTicketMapper.findBySkuId"))
     })
     Sku findById(int id);
 
