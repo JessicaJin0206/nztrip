@@ -95,6 +95,13 @@ public class SkuVo {
         this.category = category;
     }
 
+    public List<SkuTicketVo> getTickets() {
+        return tickets;
+    }
+    public void setTickets(List<SkuTicketVo> tickets) {
+        this.tickets = tickets;
+    }
+
     private int id;
     private String uuid;
     private String name;
@@ -106,4 +113,5 @@ public class SkuVo {
     private List<String> gatheringPlace;
     private boolean pickupService;
     private String description;
+    private List<SkuTicketVo> tickets;
 }

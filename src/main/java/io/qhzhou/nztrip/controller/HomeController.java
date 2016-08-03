@@ -29,6 +29,7 @@ import io.qhzhou.nztrip.vo.SkuVo;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -45,6 +46,7 @@ public class HomeController {
     public static final String MODULE_QUERY_SKU = "query_sku";
     public static final String MODULE_QUERY_VENDOR = "query_vendor";
     public static final String MODULE_CREATE_VENDOR = "create_vendor";
+    public static final String MODULE_SKU_DETAIL = "sku_detail";
 
     @Autowired
     private CityService cityService;
@@ -109,6 +111,12 @@ public class HomeController {
 
     private List<Sku> searchSku(String keyword, int cityId, int categoryId, RowBounds rowBounds) {
         return skuMapper.findAllByMultiFields(keyword, cityId, categoryId, rowBounds);
+    }
+
+    @RequestMapping("skus/{id}")
+    public String skuDetail(@PathVariable("id") int id, Map<String, Object> model) {
+        model.put("module", MODULE_SKU_DETAIL);
+        return "sku_detail";
     }
 
     @RequestMapping("create_vendor")

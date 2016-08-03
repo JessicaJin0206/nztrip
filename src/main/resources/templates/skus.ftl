@@ -117,7 +117,7 @@
                                 <a href="#">
                                     <span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span>
                                 </a>
-                                <a href="#">
+                                <a href="skus/${sku.id}">
                                     <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
                                 </a>
                             </div>

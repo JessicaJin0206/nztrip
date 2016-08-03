@@ -42,23 +42,32 @@ var create_alert = function (message) {
 var warn = function (message) {
     var alert = create_alert(message);
     alert.addClass('alert-warning');
-    $('.main form').prepend(alert);
+    $('.main').prepend(alert);
 };
 var success = function(message) {
     var alert = create_alert(message);
     alert.addClass('alert-success');
-    $('.main form').prepend(alert);
+    $('.main').prepend(alert);
 };
 var error = function(message) {
     var alert = create_alert(message);
     alert.addClass('alert-danger');
-    $('.main form').prepend(alert);
+    $('.main').prepend(alert);
 };
 
 var gatheringPlace = $('#j_gathering_place');
 gatheringPlace.find('a').on('click', function() {
     $('.j_gathering_place_input').parent().last().after($('<div class="form-group"><input type="text" class="form-control j_gathering_place_input" placeholder="请输入集合地点..."></div>'));
-})
+});
+
+$('#j_add_ticket').on('click', function(){
+    var element = $('<tr><td><input id="j_ticket_name" type="text" class="form-control form-group" /></td><td><input id="j_ticket_count" type="number" class="form-control form-group" /></td><td><input id="j_ticket_min_age" type="number" class="form-control form-group" /></td><td><input id="j_ticket_max_age" type="number" class="form-control form-group" /></td><td><input id="j_ticket_min_weight" type="number" class="form-control form-group" /></td><td><input id="j_ticket_max_weight" type="number" class="form-control form-group" /></td><td><input id="j_ticket_description" type="text" class="form-control form-group" /></td><td><a id="j_ticket_delete"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td></tr>');
+    var container = $('#j_ticket_container');
+    container.append(element);
+    element.find('#j_ticket_delete').on('click', function(e) {
+        element.remove();
+    })
+});
 
 $('#j_submit').on('click', function () {
     var uuid = $('#j_uuid').val();
@@ -95,6 +104,55 @@ $('#j_submit').on('click', function () {
     });
     var description = $('#j_description').val();
     var pickupService = $('#j_pickup_service label.active input').val();
+    var tickets = [];
+    $('#j_ticket_container tr').each(function(idx, element){
+        var container = $(element);
+        var name = container.find("#j_ticket_name").val();
+        if (!name) {
+            warn("名称不能为空");
+            return;
+        }
+        var count = parseInt(container.find("#j_ticket_count").val());
+        if (!count) {
+            warn("人数不能为空");
+            return;
+        }
+        var minAge = parseInt(container.find("#j_ticket_min_age").val());
+        if (isNaN(minAge)) {
+            warn("最小年龄不能为空");
+            return;
+        }
+        var maxAge = parseInt(container.find("#j_ticket_max_age").val());
+        if (isNaN(maxAge)) {
+            warn("最大年龄不能为空");
+            return;
+        }
+        var minWeight = parseInt(container.find("#j_ticket_min_weight").val());
+        if (isNaN(minWeight)) {
+            warn("最小体重不能为空");
+            return;
+        }
+        var maxWeight = parseInt(container.find("#j_ticket_max_weight").val());
+        if (isNaN(maxWeight)) {
+            warn("最大体重不能为空");
+            return;
+        }
+        var description = container.find("#j_ticket_description").val();
+        var ticket = {
+            name: name,
+            count: count,
+            minAge: minAge,
+            maxAge: maxAge,
+            minWeight: minWeight,
+            maxWeight: maxWeight,
+            description: description
+        };
+        tickets.push(ticket);
+    });
+    if (tickets.length == 0) {
+        warn("至少添加一个票种")
+        return;
+    }
     var data = {
         uuid: uuid,
         name: name,
@@ -103,7 +161,8 @@ $('#j_submit').on('click', function () {
         vendorId: vendorId,
         pickupService: !!pickupService,
         gatheringPlace: gatheringPlace,
-        description: description
+        description: description,
+        tickets: tickets
     };
     $.ajax({
         type: 'POST',

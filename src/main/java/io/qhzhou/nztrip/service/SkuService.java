@@ -10,4 +10,5 @@ public class SkuService {
 
     @Autowired
     private SkuMapper skuMapper;
+
 }
