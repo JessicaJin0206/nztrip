@@ -16,6 +16,18 @@ public interface SkuMapper {
     @Options(useGeneratedKeys = true, keyColumn = "id", keyProperty = "id", flushCache = Options.FlushCachePolicy.DEFAULT)
     int create(Sku sku);
 
+    @Update("update sku set " +
+            "uuid = #{uuid}, " +
+            "name = #{name}, " +
+            "city_id = #{cityId}, " +
+            "category_id = #{categoryId}, " +
+            "description = #{description}, " +
+            "vendor_id = #{vendorId}, " +
+            "pickup_service = #{pickupService}, " +
+            "gathering_place = #{gatheringPlace} " +
+            "where id = #{id}")
+    int update(Sku sku);
+
     @Select("select * from sku where id = #{id}")
     @Results({
             @Result(column = "id", property = "id"),

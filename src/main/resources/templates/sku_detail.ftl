@@ -7,7 +7,7 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="icon" href="favicon.ico">
+    <link rel="icon" href="/favicon.ico">
 
     <title>Dashboard Template for Bootstrap</title>
 
@@ -52,6 +52,11 @@
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" id="j_city_drop_down" aria-labelledby="selected_city_button">
+                <#if editing = true>
+                    <#list cities as city>
+                        <li><a value="${city.id}">${city.name}</a></li>
+                    </#list>
+                </#if>
                 </ul>
             </div>
             <div class="form-group dropdown">
@@ -62,6 +67,11 @@
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" id="j_category_drop_down" aria-labelledby="selected_category_button">
+                <#if editing = true>
+                    <#list categories as category>
+                        <li><a value="${category.id}">${category.name}</a></li>
+                    </#list>
+                </#if>
                 </ul>
             </div>
             <div class="form-group dropdown">
@@ -72,17 +82,25 @@
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" id="j_vendor_drop_down" aria-labelledby="selected_vendor_button">
+                <#if editing = true>
+                    <#list vendors as vendor>
+                        <li><a value="${vendor.id}">${vendor.name}</a></li>
+                    </#list>
+                </#if>
                 </ul>
             </div>
             <div class="form-group" id="j_gathering_place">
                 <span>集合地点</span>
-                <a <#if editing = false>disabled</#if>>
+            <#if editing = true>
+                <a>
                     <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
                 </a>
+            </#if>
             </div>
             <div class="form-group">
             <#list sku.gatheringPlace as place>
-                <input type="text" class="form-control j_gathering_place_input" placeholder="请输入集合地点..." value="${place}" <#if editing = false>disabled</#if>>
+                <input type="text" class="form-control j_gathering_place_input" placeholder="请输入集合地点..."
+                       value="${place}" <#if editing = false>disabled</#if>>
             </#list>
             </div>
             <div class="form-group"><input type="text" id="j_description" class="form-control"
@@ -103,9 +121,11 @@
 
             <div class="form-group">
                 <span>票种</span>
+            <#if editing = true>
                 <a id="j_add_ticket">
                     <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
                 </a>
+            </#if>
             </div>
             <div class="form-group">
                 <table class="table">
@@ -138,7 +158,11 @@
                                    value="${ticket.maxWeight}" <#if editing = false>disabled</#if>/></td>
                         <td><input id="j_ticket_description" type="text" class="form-control form-group"
                                    value="${ticket.description}" <#if editing = false>disabled</#if>/></td>
-                        <td><a id="j_ticket_delete"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+                        <td>
+                            <#if editing = true>
+                                <a id="j_ticket_delete"><span class="glyphicon glyphicon-remove"
+                                                              aria-hidden="true"></span></a>
+                            </#if>
                         </td>
                     </tr>
                     </#list>
@@ -149,13 +173,13 @@
         <#if editing = false>
             <button id="j_edit" class="btn btn-default form-group">修改</button>
         <#else>
-            <button id="j_submit" class="btn btn-default form-group">提交</button>
+            <button id="j_update" class="btn btn-default form-group">提交</button>
         </#if>
         </div>
     </div>
 </div>
 
 <#include "third_party_file.ftl"/>
-<script src="js/sku_detail.js"></script>
+<script src="/js/create_sku.js"></script>
 </body>
 </html>

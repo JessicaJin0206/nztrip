@@ -60,16 +60,26 @@ gatheringPlace.find('a').on('click', function() {
     $('.j_gathering_place_input').parent().last().after($('<div class="form-group"><input type="text" class="form-control j_gathering_place_input" placeholder="请输入集合地点..."></div>'));
 });
 
-$('#j_add_ticket').on('click', function(){
+$('#j_add_ticket').on('click', function(e){
+    if ($(e.target).attr('disabled')) {
+        return;
+    }
     var element = $('<tr><td><input id="j_ticket_name" type="text" class="form-control form-group" /></td><td><input id="j_ticket_count" type="number" class="form-control form-group" /></td><td><input id="j_ticket_min_age" type="number" class="form-control form-group" /></td><td><input id="j_ticket_max_age" type="number" class="form-control form-group" /></td><td><input id="j_ticket_min_weight" type="number" class="form-control form-group" /></td><td><input id="j_ticket_max_weight" type="number" class="form-control form-group" /></td><td><input id="j_ticket_description" type="text" class="form-control form-group" /></td><td><a id="j_ticket_delete"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td></tr>');
     var container = $('#j_ticket_container');
     container.append(element);
-    element.find('#j_ticket_delete').on('click', function(e) {
+    element.find('#j_ticket_delete').on('click', function() {
         element.remove();
     })
 });
 
-$('#j_submit').on('click', function () {
+$('#j_ticket_container tr').each(function(index, e){
+    var row = $(e);
+    row.find('td a').on('click', function(){
+        row.remove();
+    });
+});
+
+var validate = function() {
     var uuid = $('#j_uuid').val();
     if (uuid.length == 0) {
         warn("请填写编号");
@@ -103,7 +113,7 @@ $('#j_submit').on('click', function () {
         }
     });
     var description = $('#j_description').val();
-    var pickupService = $('#j_pickup_service label.active input').val();
+    var pickupService = parseInt($('#j_pickup_service label.active input').val());
     var tickets = [];
     $('#j_ticket_container tr').each(function(idx, element){
         var container = $(element);
@@ -153,7 +163,7 @@ $('#j_submit').on('click', function () {
         warn("至少添加一个票种")
         return;
     }
-    var data = {
+    return {
         uuid: uuid,
         name: name,
         cityId: cityId,
@@ -164,14 +174,42 @@ $('#j_submit').on('click', function () {
         description: description,
         tickets: tickets
     };
-    $.ajax({
-        type: 'POST',
-        contentType:"application/json; charset=utf-8",
-        url: 'v1/api/skus',
-        data: JSON.stringify(data)
-    }).success(function () {
-        success("添加成功");
-    }).error(function (){
-        error("添加失败");
-    });
+};
+
+$('#j_submit').on('click', function () {
+    var data = validate();
+    if (data) {
+        $.ajax({
+            type: 'POST',
+            contentType:"application/json; charset=utf-8",
+            url: '/v1/api/skus',
+            data: JSON.stringify(data)
+        }).success(function () {
+            success("添加成功");
+        }).error(function (){
+            error("添加失败");
+        });
+    }
 });
+
+$('#j_update').on('click', function() {
+    var data = validate();
+    var path = window.location.pathname.split('/');
+    var id = parseInt(path[path.length - 2]);
+    if (data) {
+        $.ajax({
+            type: 'PUT',
+            contentType:"application/json; charset=utf-8",
+            url: '/v1/api/skus/' + id,
+            data: JSON.stringify(data)
+        }).success(function () {
+            success("添加成功");
+        }).error(function (){
+            error("添加失败");
+        });
+    }
+});
+
+$('#j_edit').on('click', function(){
+    window.location.href = window.location.pathname + "/_edit";
+})

@@ -19,6 +19,7 @@ package io.qhzhou.nztrip.controller;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import io.qhzhou.nztrip.constants.CommonConstants;
+import io.qhzhou.nztrip.exception.ResourceNotFoundException;
 import io.qhzhou.nztrip.mapper.SkuMapper;
 import io.qhzhou.nztrip.mapper.VendorMapper;
 import io.qhzhou.nztrip.model.*;
@@ -30,6 +31,7 @@ import io.qhzhou.nztrip.vo.SkuVo;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -61,6 +63,11 @@ public class HomeController {
     @Autowired
     private SkuMapper skuMapper;
 
+    @ExceptionHandler
+    public String handleException(ResourceNotFoundException ex) {
+        return "404";
+    }
+
     @RequestMapping("dashboard")
     public String dashboard(Map<String, Object> model) {
         model.put("module", MODULE_DASHBOARD);
@@ -84,22 +91,33 @@ public class HomeController {
         model.put("module", MODULE_CREATE_SKU);
         model.put("cities", Lists.newArrayList(cityService.findAll().values()));
         model.put("categories", Lists.newArrayList(categoryService.findAll().values()));
-        model.put("vendors", vendorService.findAll());
+        model.put("vendors", Lists.newArrayList(vendorService.findAll().values()));
         return "create_sku";
     }
 
     @RequestMapping("skus/{id}")
     public String skuDetail(@PathVariable("id") int id, Map<String, Object> model) {
         model.put("module", MODULE_SKU_DETAIL);
-        model.put("sku", parse(skuMapper.findById(id), cityService.findAll(), categoryService.findAll(), vendorService.findAll()));
+        Sku sku = skuMapper.findById(id);
+        if (sku == null) {
+            throw new ResourceNotFoundException();
+        }
+        model.put("sku", parse(sku, cityService.findAll(), categoryService.findAll(), vendorService.findAll()));
         model.put("editing", false);
         return "sku_detail";
     }
 
     @RequestMapping("skus/{id}/_edit")
     public String editSku(@PathVariable("id") int id, Map<String, Object> model) {
+        Sku sku = skuMapper.findById(id);
+        if (sku == null) {
+            throw new ResourceNotFoundException();
+        }
         model.put("module", MODULE_SKU_DETAIL);
-        model.put("sku", parse(skuMapper.findById(id), cityService.findAll(), categoryService.findAll(), vendorService.findAll()));
+        model.put("sku", parse(sku, cityService.findAll(), categoryService.findAll(), vendorService.findAll()));
+        model.put("cities", Lists.newArrayList(cityService.findAll().values()));
+        model.put("categories", Lists.newArrayList(categoryService.findAll().values()));
+        model.put("vendors", Lists.newArrayList(vendorService.findAll().values()));
         model.put("editing", true);
         return "sku_detail";
     }

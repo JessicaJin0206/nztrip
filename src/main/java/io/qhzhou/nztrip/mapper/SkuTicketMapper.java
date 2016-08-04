@@ -1,10 +1,7 @@
 package io.qhzhou.nztrip.mapper;
 
 import io.qhzhou.nztrip.model.SkuTicket;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Result;
-import org.apache.ibatis.annotations.Results;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -23,6 +20,10 @@ public interface SkuTicketMapper {
             "</script>"
     })
     int batchCreate(List<SkuTicket> skuTickets);
+
+
+    @Delete("delete from sku_ticket where id = #{skuId}")
+    int deleteBySkuId(int skuId);
 
     @Select("select * from sku_ticket where sku_id = #{id}")
     @Results({

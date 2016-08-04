@@ -12,12 +12,7 @@ import io.qhzhou.nztrip.vo.SkuTicketVo;
 import io.qhzhou.nztrip.vo.SkuVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Created by qianhao.zhou on 7/29/16.
@@ -42,6 +37,22 @@ public class RestApiController {
             @Override
             public SkuTicket apply(SkuTicketVo input) {
                 return parse(skuId, input);
+            }
+        }));
+        return skuVo;
+    }
+
+    @RequestMapping(value = "v1/api/skus/{id}", method = RequestMethod.PUT)
+    @Transactional(rollbackFor = Exception.class)
+    public SkuVo updateSku(@PathVariable("id") int id, @RequestBody SkuVo skuVo) {
+        Sku sku = parse(skuVo);
+        skuMapper.update(sku);
+        skuVo.setId(id);
+        skuTicketMapper.deleteBySkuId(id);
+        skuTicketMapper.batchCreate(Lists.transform(skuVo.getTickets(), new Function<SkuTicketVo, SkuTicket>() {
+            @Override
+            public SkuTicket apply(SkuTicketVo input) {
+                return parse(id, input);
             }
         }));
         return skuVo;
