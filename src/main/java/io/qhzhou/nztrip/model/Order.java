@@ -143,6 +143,14 @@ public class Order extends ModelObject {
         this.sku = sku;
     }
 
+    public String getReferenceNumber() {
+        return referenceNumber;
+    }
+
+    public void setReferenceNumber(String referenceNumber) {
+        this.referenceNumber = referenceNumber;
+    }
+
     private int skuId;
     private String sku;
     private int agentId;
@@ -160,4 +168,5 @@ public class Order extends ModelObject {
     private String secondaryContactPhone;
     private String secondaryContactWechat;
     private String gatheringInfo;
+    private String referenceNumber;
 }

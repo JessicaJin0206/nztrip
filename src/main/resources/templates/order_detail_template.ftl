@@ -1,6 +1,8 @@
 <div class="form-group"><label>订单详情</label></div>
 <div class="form-group"><input type="text" id="j_name" class="form-control" disabled placeholder="项目" value="${order.sku}">
 </div>
+<div class="form-group"><label>价格:</label><span>   ${order.price}</span></div>
+<div class="form-group"><label>Reference Number:</label><span>   ${order.referenceNumber}</span></div>
 <div class="form-group"><label>游客信息</label></div>
 <div class="form-group">
     <table class="table">

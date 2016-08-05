@@ -14,7 +14,8 @@ public interface OrderMapper {
     @Select("select o.id, sku_id, s.name as sku, agent_id, remark, status, create_time, " +
             "update_time, price, gathering_info, primary_contact, primary_contact_email, " +
             "primary_contact_phone, primary_contact_wechat, secondary_contact, " +
-            "secondary_contact_email, secondary_contact_phone, secondary_contact_wechat" +
+            "secondary_contact_email, secondary_contact_phone, secondary_contact_wechat," +
+            "reference_number" +
             " from `order` o left join `sku` s on o.sku_id = s.id where o.id = #{id}")
     @Results({
             @Result(column = "id", property = "id"),
@@ -34,6 +35,7 @@ public interface OrderMapper {
             @Result(column = "secondary_contact_email", property = "secondaryContactEmail"),
             @Result(column = "secondary_contact_phone", property = "secondaryContactPhone"),
             @Result(column = "secondary_contact_wechat", property = "secondaryContactWechat"),
+            @Result(column = "reference_number", property = "referenceNumber"),
     })
     Order findById(int id);
 
@@ -56,6 +58,7 @@ public interface OrderMapper {
             @Result(column = "secondary_contact_email", property = "secondaryContactEmail"),
             @Result(column = "secondary_contact_phone", property = "secondaryContactPhone"),
             @Result(column = "secondary_contact_wechat", property = "secondaryContactWechat"),
+            @Result(column = "reference_number", property = "referenceNumber"),
     })
     List<Order> findByAgentId(@Param("agentId") int agentId, RowBounds rowBounds);
 
@@ -81,11 +84,18 @@ public interface OrderMapper {
             @Result(column = "secondary_contact_email", property = "secondaryContactEmail"),
             @Result(column = "secondary_contact_phone", property = "secondaryContactPhone"),
             @Result(column = "secondary_contact_wechat", property = "secondaryContactWechat"),
+            @Result(column = "reference_number", property = "referenceNumber"),
     })
     List<Order> findByAgentIdAndStatus(@Param("agentId") int agentId, @Param("status") int status, RowBounds rowBounds);
 
-    @Insert("insert into `order` (sku_id, agent_id, remark, status, price, gathering_info, primary_contact, primary_contact_email, primary_contact_phone, primary_contact_wechat, secondary_contact, secondary_contact_email, secondary_contact_phone, secondary_contact_wechat) " +
-            "values(#{skuId}, #{agentId}, #{remark}, #{status}, #{price}, #{gatheringInfo}, #{primaryContact}, #{primaryContactEmail}, #{primaryContactPhone}, #{primaryContactWechat}, #{secondaryContact}, #{secondaryContactEmail}, #{secondaryContactPhone}, #{secondaryContactWechat})")
+    @Insert("insert into `order` (sku_id, agent_id, remark, status, price, gathering_info, " +
+            "primary_contact, primary_contact_email, primary_contact_phone, primary_contact_wechat, " +
+            "secondary_contact, secondary_contact_email, secondary_contact_phone, " +
+            "secondary_contact_wechat, reference_number) " +
+            "values(#{skuId}, #{agentId}, #{remark}, #{status}, #{price}, #{gatheringInfo}, " +
+            "#{primaryContact}, #{primaryContactEmail}, #{primaryContactPhone}, #{primaryContactWechat}, " +
+            "#{secondaryContact}, #{secondaryContactEmail}, #{secondaryContactPhone}, " +
+            "#{secondaryContactWechat}, #{referenceNumber})")
     @Options(useGeneratedKeys = true, keyColumn = "id", keyProperty = "id", flushCache = Options.FlushCachePolicy.DEFAULT)
     int create(Order order);
 }
