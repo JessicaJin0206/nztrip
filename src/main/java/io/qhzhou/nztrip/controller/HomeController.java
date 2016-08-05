@@ -20,8 +20,9 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import io.qhzhou.nztrip.constants.CommonConstants;
 import io.qhzhou.nztrip.exception.ResourceNotFoundException;
+import io.qhzhou.nztrip.mapper.OrderMapper;
+import io.qhzhou.nztrip.mapper.OrderTicketMapper;
 import io.qhzhou.nztrip.mapper.SkuMapper;
-import io.qhzhou.nztrip.mapper.VendorMapper;
 import io.qhzhou.nztrip.model.*;
 import io.qhzhou.nztrip.service.CategoryService;
 import io.qhzhou.nztrip.service.CityService;
@@ -45,6 +46,7 @@ public class HomeController {
     public static final String MODULE_DASHBOARD = "dashboard";
     public static final String MODULE_CREATE_ORDER = "create_order";
     public static final String MODULE_QUERY_ORDER = "query_order";
+    public static final String MODULE_ORDER_DETAIL = "order_detail";
     public static final String MODULE_CREATE_SKU = "create_sku";
     public static final String MODULE_QUERY_SKU = "query_sku";
     public static final String MODULE_QUERY_VENDOR = "query_vendor";
@@ -63,9 +65,26 @@ public class HomeController {
     @Autowired
     private SkuMapper skuMapper;
 
+    @Autowired
+    private OrderMapper orderMapper;
+
+    @Autowired
+    private OrderTicketMapper orderTicketMapper;
+
     @ExceptionHandler
     public String handleException(ResourceNotFoundException ex) {
         return "404";
+    }
+
+    @RequestMapping("signin")
+    public String signin(Map<String, Object> model) {
+        return "signin";
+    }
+
+    @RequestMapping("")
+    public String home(Map<String, Object> model) {
+        model.put("module", MODULE_DASHBOARD);
+        return "dashboard";
     }
 
     @RequestMapping("dashboard")
@@ -84,6 +103,19 @@ public class HomeController {
     public String queryOrder(Map<String, Object> model) {
         model.put("module", MODULE_QUERY_ORDER);
         return "orders";
+    }
+
+    @RequestMapping("orders/{id}")
+    public String orderDetail(@PathVariable("id") int id, Map<String, Object> model) {
+        Order order = orderMapper.findById(id);
+        if (order == null) {
+            throw new ResourceNotFoundException();
+        }
+        model.put("order", order);
+        model.put("tickets", orderTicketMapper.findByOrderId(order.getId()));
+        model.put("module", MODULE_ORDER_DETAIL);
+        model.put("editing", false);
+        return "order_detail";
     }
 
     @RequestMapping("create_sku")

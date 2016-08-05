@@ -135,7 +135,16 @@ public class Order extends ModelObject {
         this.gatheringInfo = gatheringInfo;
     }
 
+    public String getSku() {
+        return sku;
+    }
+
+    public void setSku(String sku) {
+        this.sku = sku;
+    }
+
     private int skuId;
+    private String sku;
     private int agentId;
     private String remark;
     private int status;

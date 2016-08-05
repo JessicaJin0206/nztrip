@@ -6,11 +6,13 @@ package io.qhzhou.nztrip.constants;
 public final class OrderStatus {
 
 
-    public static final int PENDING = 10;
-    public static final int CONFIRMED = 20;
-    public static final int CANCELLED = 30;
-    public static final int CLOSED = 40;
-    public static final int DELETED = 90;
+    public static final int NEW = 10;
+    public static final int PENDING = 20;
+    public static final int FULL = 30;
+    public static final int CONFIRMED = 40;
+    public static final int MODIFYING = 50;
+    public static final int CANCELLED = 60;
+    public static final int CLOSED = 90;
 
     private OrderStatus(){}
 
