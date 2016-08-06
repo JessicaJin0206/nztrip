@@ -94,7 +94,12 @@ public class HomeController {
     }
 
     @RequestMapping("create_order")
-    public String createOrder(Map<String, Object> model) {
+    public String createOrder(@RequestParam("skuId")int skuId, Map<String, Object> model) {
+        Sku sku = skuMapper.findById(skuId);
+        if (sku == null) {
+            throw new ResourceNotFoundException();
+        }
+        model.put("sku", sku);
         model.put("module", MODULE_CREATE_ORDER);
         return "create_order";
     }

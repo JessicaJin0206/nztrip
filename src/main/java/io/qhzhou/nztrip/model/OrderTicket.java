@@ -1,5 +1,7 @@
 package io.qhzhou.nztrip.model;
 
+import java.util.List;
+
 /**
  * Created by qianhao.zhou on 8/5/16.
  */
@@ -37,30 +39,6 @@ public class OrderTicket {
         this.skuTicket = skuTicket;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public int getWeight() {
-        return weight;
-    }
-
-    public void setWeight(int weight) {
-        this.weight = weight;
-    }
-
     public int getOrderId() {
         return orderId;
     }
@@ -69,12 +47,18 @@ public class OrderTicket {
         this.orderId = orderId;
     }
 
+    public List<OrderTicketUser> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<OrderTicketUser> users) {
+        this.users = users;
+    }
+
     private int id;
     private int skuId;
     private int orderId;
     private int skuTicketId;
     private String skuTicket;
-    private String name;
-    private int age;
-    private int weight;
+    private List<OrderTicketUser> users;
 }

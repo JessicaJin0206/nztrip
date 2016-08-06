@@ -114,10 +114,10 @@
                         <td>${sku.description}</td>
                         <td>
                             <div>
-                                <a href="#">
+                                <a href="/skus/${sku.id}">
                                     <span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span>
                                 </a>
-                                <a href="/skus/${sku.id}">
+                                <a href="/create_order?skuId=${sku.id}">
                                     <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
                                 </a>
                             </div>
