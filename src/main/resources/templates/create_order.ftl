@@ -41,5 +41,6 @@
 </div>
 
 <#include "third_party_file.ftl"/>
+<script src="/js/create_order.js"></script>
 </body>
 </html>

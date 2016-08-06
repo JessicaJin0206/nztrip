@@ -1,7 +1,8 @@
 <div class="form-group"><label>订单详情</label></div>
 <div class="form-group"><label>名称:</label><span>   ${order.sku}</span></div>
 <div class="form-group"><label>价格:</label><span>   ${order.price}</span></div>
-<div class="form-group"><label>Reference Number:</label><span>   ${order.referenceNumber}</span></div>
+<div class="form-group"><label>Reference Number:</label><span>   <#if order.referenceNumber??>${order.referenceNumber}</#if></span></div>
+<div class="form-group"><label>集合信息:</label><span>   <#if order.gatheringInfo??>${order.gatheringInfo}</#if></span></div>
 <div class="form-group"><label>游客信息</label></div>
 <div class="form-group">
     <table class="table">

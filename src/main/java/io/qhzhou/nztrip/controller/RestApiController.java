@@ -4,10 +4,13 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import io.qhzhou.nztrip.constants.CommonConstants;
+import io.qhzhou.nztrip.mapper.OrderMapper;
 import io.qhzhou.nztrip.mapper.SkuMapper;
 import io.qhzhou.nztrip.mapper.SkuTicketMapper;
+import io.qhzhou.nztrip.model.Order;
 import io.qhzhou.nztrip.model.Sku;
 import io.qhzhou.nztrip.model.SkuTicket;
+import io.qhzhou.nztrip.vo.OrderVo;
 import io.qhzhou.nztrip.vo.SkuTicketVo;
 import io.qhzhou.nztrip.vo.SkuVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +28,9 @@ public class RestApiController {
 
     @Autowired
     private SkuTicketMapper skuTicketMapper;
+
+    @Autowired
+    private OrderMapper orderMapper;
 
     @RequestMapping(value = "v1/api/skus", method = RequestMethod.POST)
     @Transactional(rollbackFor = Exception.class)
@@ -57,6 +63,35 @@ public class RestApiController {
         }));
         return skuVo;
     }
+
+    @RequestMapping(value = "v1/api/orders", method = RequestMethod.POST)
+    @Transactional(rollbackFor = Exception.class)
+    public OrderVo createOrder(@RequestBody OrderVo order) {
+        Order o = parse(order, 1);
+        orderMapper.create(o);
+        order.setId(o.getId());
+        return order;
+    }
+
+    private static Order parse(OrderVo order, int agentId) {
+        Order result = new Order();
+        result.setSkuId(order.getSkuId());
+        result.setAgentId(agentId);
+        result.setRemark(order.getRemark());
+        result.setReferenceNumber(order.getReferenceNumber());
+        result.setPrimaryContact(order.getPrimaryContact());
+        result.setPrimaryContactEmail(order.getPrimaryContactEmail());
+        result.setPrimaryContactPhone(order.getPrimaryContactPhone());
+        result.setPrimaryContactWechat(order.getPrimaryContactWechat());
+        result.setSecondaryContact(order.getSecondaryContact());
+        result.setSecondaryContactEmail(order.getSecondaryContactEmail());
+        result.setSecondaryContactPhone(order.getSecondaryContactPhone());
+        result.setSecondaryContactWechat(order.getSecondaryContactWechat());
+        result.setReferenceNumber(order.getReferenceNumber());
+        result.setGatheringInfo(order.getGatheringInfo());
+        return result;
+    }
+
 
     private static Sku parse(SkuVo skuVo) {
         Sku result = new Sku();
