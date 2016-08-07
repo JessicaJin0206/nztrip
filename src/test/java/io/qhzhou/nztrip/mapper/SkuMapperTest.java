@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -41,5 +42,13 @@ public class SkuMapperTest extends BaseTest {
         assertTrue(skuMapper.create(sku) == 1);
         assertTrue(sku.getId() > 0);
         testEquals(sku, skuMapper.findById(sku.getId()));
+    }
+
+    @Test
+    public void testUpdate() {
+        Sku sku = skuMapper.findById(1);
+        assertNotNull(sku);
+        sku.setUuid("abcdefg");
+        assertEquals(skuMapper.update(sku), 1);
     }
 }

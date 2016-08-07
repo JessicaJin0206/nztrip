@@ -5,8 +5,8 @@
     <ul class="nav nav-sidebar">
         <li <#if module == "query_order">class="active"</#if>><a href="/orders">查询订单</a>
         </li>
-        <li <#if module == "create_order">class="active"</#if>><a href="/create_order">创建订单</a>
-        </li>
+        <#--<li <#if module == "create_order">class="active"</#if>><a href="/create_order">创建订单</a>-->
+        <#--</li>-->
     </ul>
     <ul class="nav nav-sidebar">
         <li <#if module == "query_sku">class="active"</#if>><a href="/skus">查询库存</a></li>

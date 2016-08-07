@@ -53,8 +53,8 @@ public class RestApiController {
     @Transactional(rollbackFor = Exception.class)
     public SkuVo updateSku(@PathVariable("id") int id, @RequestBody SkuVo skuVo) {
         Sku sku = parse(skuVo);
+        sku.setId(id);
         skuMapper.update(sku);
-        skuVo.setId(id);
         skuTicketMapper.deleteBySkuId(id);
         skuTicketMapper.batchCreate(Lists.transform(skuVo.getTickets(), new Function<SkuTicketVo, SkuTicket>() {
             @Override

@@ -22,7 +22,7 @@ public interface SkuTicketMapper {
     int batchCreate(List<SkuTicket> skuTickets);
 
 
-    @Delete("delete from sku_ticket where id = #{skuId}")
+    @Delete("delete from sku_ticket where sku_id = #{skuId}")
     int deleteBySkuId(int skuId);
 
     @Select("select * from sku_ticket where sku_id = #{id}")

@@ -18,7 +18,7 @@
         <#list tickets as ticket>
             <#list ticket.users as user>
             <tr>
-                <td>${ticket.skuTicket}</td>
+                <td><#if ticket.skuTicket??>${ticket.skuTicket}</#if></td>
                 <td>${user.name}</td>
                 <td>${user.age}</td>
                 <td>${user.weight}</td>
