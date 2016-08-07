@@ -10,6 +10,7 @@ import io.qhzhou.nztrip.mapper.SkuTicketMapper;
 import io.qhzhou.nztrip.model.Order;
 import io.qhzhou.nztrip.model.Sku;
 import io.qhzhou.nztrip.model.SkuTicket;
+import io.qhzhou.nztrip.util.GuidGenerator;
 import io.qhzhou.nztrip.vo.OrderVo;
 import io.qhzhou.nztrip.vo.SkuTicketVo;
 import io.qhzhou.nztrip.vo.SkuVo;
@@ -68,6 +69,7 @@ public class RestApiController {
     @Transactional(rollbackFor = Exception.class)
     public OrderVo createOrder(@RequestBody OrderVo order) {
         Order o = parse(order, 1);
+        o.setUuid(GuidGenerator.generate(14));
         orderMapper.create(o);
         order.setId(o.getId());
         return order;

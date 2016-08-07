@@ -34,7 +34,52 @@
 <div class="container-fluid">
     <div class="row">
     <#include "menu.ftl"/>
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main"></div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <div>
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>编号</th>
+                        <th>主联系人</th>
+                        <th>Email</th>
+                        <th>Reference Number</th>
+                        <th>备注</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <#list orders as order>
+                    <tr>
+                        <th scope="row">${order.uuid}</th>
+                        <td>${order.primaryContact}</td>
+                        <td>${order.primaryContactEmail}</td>
+                        <td><#if order.referenceNumber??>${order.referenceNumber}</#if></td>
+                        <td>${order.remark}</td>
+                        <td>
+                            <div>
+                                <a href="/orders/${order.id}">
+                                    <span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    </#list>
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <nav aria-label="...">
+                    <ul class="pager">
+                        <li class="<#if (pageNumber <= 0)>disabled</#if>">
+                            <a href="/orders?<#if (status??)>status=${status}&</#if><#if (pageNumber > 0)>pagenumber=${pageNumber-1}&pagesize=${pageSize}</#if>">上一页</a>
+                        </li>
+                        <li>
+                            <a href="/orders?<#if (status??)>status=${status}&</#if>pagenumber=${pageNumber+1}&pagesize=${pageSize}">下一页</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
     </div>
 </div>
 

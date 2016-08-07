@@ -31,8 +31,9 @@ DROP TABLE IF EXISTS `order`;
 CREATE TABLE `order` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `sku_id` int(11) NOT NULL,
+  `uuid` varchar(20) NOT NULL DEFAULT '',
   `agent_id` int(11) NOT NULL,
-  `remark` text NOT NULL COMMENT 'user remark',
+  `remark` text NOT NULL COMMENT 'store in json format according to sku_remark',
   `status` tinyint(2) NOT NULL COMMENT '10 - pending\n20 - confirmed\n30 - cancelled\n40 - closed\n90 - deleted',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -46,9 +47,9 @@ CREATE TABLE `order` (
   `secondary_contact_phone` varchar(30) DEFAULT NULL,
   `secondary_contact_wechat` varchar(30) DEFAULT NULL,
   `gathering_info` varchar(50) DEFAULT NULL,
-  `reference_number` VARCHAR(30) NULL,
+  `reference_number` varchar(30) DEFAULT '',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `sku`;
 CREATE TABLE `sku` (

@@ -105,8 +105,18 @@ public class HomeController {
     }
 
     @RequestMapping("orders")
-    public String queryOrder(Map<String, Object> model) {
+    public String queryOrder(@RequestParam(value = "keyword", defaultValue = "") String keyword,
+                             @RequestParam(value = "status", defaultValue = "0") int status,
+                             @RequestParam(value = "pagesize", defaultValue = "10") int pageSize,
+                             @RequestParam(value = "pagenumber", defaultValue = "0") int pageNumber,
+                             Map<String, Object> model) {
         model.put("module", MODULE_QUERY_ORDER);
+        if (status > 0) {
+            model.put("status", status);
+        }
+        model.put("pageSize", pageSize);
+        model.put("pageNumber", pageNumber);
+        model.put("orders", orderMapper.findByAgentId(1, new RowBounds(pageNumber * pageSize, pageSize)));
         return "orders";
     }
 

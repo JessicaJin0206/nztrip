@@ -11,7 +11,7 @@ import java.util.List;
  */
 public interface OrderMapper {
 
-    @Select("select o.id, sku_id, s.name as sku, agent_id, remark, status, create_time, " +
+    @Select("select o.id, sku_id, o.uuid, s.name as sku, agent_id, remark, status, create_time, " +
             "update_time, price, gathering_info, primary_contact, primary_contact_email, " +
             "primary_contact_phone, primary_contact_wechat, secondary_contact, " +
             "secondary_contact_email, secondary_contact_phone, secondary_contact_wechat," +
@@ -20,6 +20,7 @@ public interface OrderMapper {
     @Results({
             @Result(column = "id", property = "id"),
             @Result(column = "sku_id", property = "skuId"),
+            @Result(column = "uuid", property = "uuid"),
             @Result(column = "agent_id", property = "agentId"),
             @Result(column = "remark", property = "remark"),
             @Result(column = "status", property = "status"),
@@ -43,6 +44,7 @@ public interface OrderMapper {
     @Results({
             @Result(column = "id", property = "id"),
             @Result(column = "sku_id", property = "skuId"),
+            @Result(column = "uuid", property = "uuid"),
             @Result(column = "agent_id", property = "agentId"),
             @Result(column = "remark", property = "remark"),
             @Result(column = "status", property = "status"),
@@ -69,6 +71,7 @@ public interface OrderMapper {
     @Results({
             @Result(column = "id", property = "id"),
             @Result(column = "sku_id", property = "skuId"),
+            @Result(column = "uuid", property = "uuid"),
             @Result(column = "agent_id", property = "agentId"),
             @Result(column = "remark", property = "remark"),
             @Result(column = "status", property = "status"),
@@ -88,11 +91,11 @@ public interface OrderMapper {
     })
     List<Order> findByAgentIdAndStatus(@Param("agentId") int agentId, @Param("status") int status, RowBounds rowBounds);
 
-    @Insert("insert into `order` (sku_id, agent_id, remark, status, price, gathering_info, " +
+    @Insert("insert into `order` (sku_id, uuid, agent_id, remark, status, price, gathering_info, " +
             "primary_contact, primary_contact_email, primary_contact_phone, primary_contact_wechat, " +
             "secondary_contact, secondary_contact_email, secondary_contact_phone, " +
             "secondary_contact_wechat, reference_number) " +
-            "values(#{skuId}, #{agentId}, #{remark}, #{status}, #{price}, #{gatheringInfo}, " +
+            "values(#{skuId}, #{uuid}, #{agentId}, #{remark}, #{status}, #{price}, #{gatheringInfo}, " +
             "#{primaryContact}, #{primaryContactEmail}, #{primaryContactPhone}, #{primaryContactWechat}, " +
             "#{secondaryContact}, #{secondaryContactEmail}, #{secondaryContactPhone}, " +
             "#{secondaryContactWechat}, #{referenceNumber})")

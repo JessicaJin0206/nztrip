@@ -2,6 +2,7 @@ package io.qhzhou.nztrip.mapper;
 
 import io.qhzhou.nztrip.constants.OrderStatus;
 import io.qhzhou.nztrip.model.Order;
+import io.qhzhou.nztrip.util.GuidGenerator;
 import org.apache.ibatis.session.RowBounds;
 import org.junit.After;
 import org.junit.Before;
@@ -31,6 +32,7 @@ public class OrderMapperTest extends BaseTest {
         order1.setPrimaryContactEmail("will@abc.com");
         order1.setPrimaryContactWechat("123124523");
         order1.setPrimaryContactPhone("1342323456");
+        order1.setUuid(GuidGenerator.generate(14));
         assertEquals(orderMapper.create(order1), 1);
 
         Order order2 = new Order();
@@ -43,12 +45,14 @@ public class OrderMapperTest extends BaseTest {
         order2.setPrimaryContactEmail("phil@abc.com");
         order2.setPrimaryContactWechat("1234124523");
         order2.setPrimaryContactPhone("1342123456");
+        order2.setUuid(GuidGenerator.generate(14));
         assertEquals(orderMapper.create(order2), 1);
 
     }
 
     private static void testEquals(Order order, Order other) {
         assertEquals(order.getSkuId(), other.getSkuId());
+        assertEquals(order.getUuid(), other.getUuid());
         assertEquals(order.getAgentId(), other.getAgentId());
         assertEquals(order.getCreateTime(), other.getCreateTime());
         assertEquals(order.getUpdateTime(), other.getUpdateTime());

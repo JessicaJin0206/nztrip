@@ -15,6 +15,14 @@ public class Order extends ModelObject {
         this.skuId = skuId;
     }
 
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
     public int getAgentId() {
         return agentId;
     }
@@ -152,6 +160,7 @@ public class Order extends ModelObject {
     }
 
     private int skuId;
+    private String uuid;
     private String sku;
     private int agentId;
     private String remark;
