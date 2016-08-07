@@ -185,8 +185,8 @@ public class HomeController {
         model.put("cityId", cityId);
         model.put("categoryId", categoryId);
         model.put("keyword", keyword);
-        model.put("cityMap", cityMap);
-        model.put("categoryMap", categoryMap);
+        model.put("cities", Lists.newArrayList(cityMap.values()));
+        model.put("categories", Lists.newArrayList(categoryMap.values()));
         model.put("skus", Lists.transform(searchSku(keyword, cityId, categoryId, rowBounds), (input) -> parse(input, cityMap, categoryMap, vendorMap)));
         model.put("pageSize", pageSize);
         model.put("pageNumber", pageNumber);

@@ -41,7 +41,7 @@
                             aria-haspopup="true" aria-expanded="true">
                     <#assign hasCity = 0>
                     <#if (cityId > 0)>
-                        <#list cityMap?values as city>
+                        <#list cities as city>
                             <#if (city.id = cityId)>
                                 <#assign hasCity = 1>
                                 <span id="j_selected_city" value="${city.id}">${city.name}</span>
@@ -55,7 +55,7 @@
                     </button>
                     <ul class="dropdown-menu" id="j_city_drop_down" aria-labelledby="selected_city_button">
                         <li><a value="0">选择城市</a></li>
-                    <#list cityMap?values as city>
+                    <#list cities as city>
                         <li><a value="${city.id}">${city.name}</a></li>
                     </#list>
                     </ul>
@@ -66,7 +66,7 @@
                             aria-haspopup="true" aria-expanded="true">
                     <#assign hasCategory = 0>
                     <#if (categoryId > 0)>
-                        <#list categoryMap?values as category>
+                        <#list cities as category>
                             <#if (categoryId = category.id)>
                                 <#assign hasCategory = 1>
                                 <span id="j_selected_category" value="${category.id}">${category.name}</span>
@@ -80,7 +80,7 @@
                     </button>
                     <ul class="dropdown-menu" id="j_category_drop_down" aria-labelledby="selected_category_button">
                         <li><a value="0">选择类别</a></li>
-                    <#list categoryMap?values as category>
+                    <#list categories as category>
                         <li><a value="${category.id}">${category.name}</a></li>
                     </#list>
                     </ul>

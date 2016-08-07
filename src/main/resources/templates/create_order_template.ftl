@@ -2,30 +2,31 @@
 <div class="form-group"><label>名称:</label><span>   ${sku.name}</span></div>
 
 <div class="form-group"><label>主要联系人</label></div>
-<div class="form-group"><input type="text" id="j_primary_contact" class="form-control"
-                               placeholder="主要联系人">
-</div>
-<div class="form-group"><input type="text" id="j_primary_contact_email" class="form-control"
-                               placeholder="Email">
-</div>
-<div class="form-group"><input type="text" id="j_primary_contact_phone" class="form-control"
-                               placeholder="联系电话">
-</div>
-<div class="form-group"><input type="text" id="j_primary_contact_wechat" class="form-control"
-                               placeholder="微信">
+<div class="form-group">
+    <table class="table">
+        <thead>
+        <tr>
+            <th><input type="text" id="j_primary_contact" class="form-control" placeholder="姓名"/></th>
+            <th><input type="text" id="j_primary_contact_email" class="form-control" placeholder="Email"/></th>
+            <th><input type="text" id="j_primary_contact_phone" class="form-control" placeholder="联系电话"/></th>
+            <th><input type="text" id="j_primary_contact_wechat" class="form-control" placeholder="微信"/></th>
+        </tr>
+        </thead>
+    </table>
 </div>
 <div class="form-group"><label>备用联系人</label></div>
-<div class="form-group"><input type="text" id="j_secondary_contact" class="form-control"
-                               placeholder="备用联系人">
-</div>
-<div class="form-group"><input type="text" id="j_secondary_contact_email" class="form-control"
-                               placeholder="Email">
-</div>
-<div class="form-group"><input type="text" id="j_secondary_contact_phone" class="form-control"
-                               placeholder="联系电话">
-</div>
-<div class="form-group"><input type="text" id="j_secondary_contact_wechat" class="form-control"
-                               placeholder="微信">
+<div class="form-group">
+    <table class="table">
+        <thead>
+        <tr>
+            <th><input type="text" id="j_secondary_contact" class="form-control" placeholder="姓名"/></th>
+            <th><input type="text" id="j_secondary_contact_email" class="form-control" placeholder="Email"/></th>
+            <th><input type="text" id="j_secondary_contact_phone" class="form-control" placeholder="联系电话"/></th>
+            <th><input type="text" id="j_secondary_contact_wechat" class="form-control" placeholder="微信"/></th>
+        </tr>
+        </thead>
+    </table>
+
 </div>
 <div class="form-group"><input type="text" id="j_remark" class="form-control"
                                placeholder="备注">
