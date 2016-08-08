@@ -34,6 +34,33 @@ function getQueryString(name) {
     if (r != null) return unescape(r[2]); return null;
 }
 
+$('#j_ticket_type_selector li a').on('click', function(e){
+    var selected = $(e.target);
+    var ticket = $('#j_ticket');
+    ticket.attr('value', selected.attr("value"));
+    ticket.attr('count', selected.attr("count"));
+    ticket.html(selected.html());
+});
+
+
+$('#add_ticket').on('click', function(e){
+    var ticket = $('#j_ticket');
+    var ticketType = parseInt(ticket.attr('value'));
+    if (ticketType <= 0) {
+        return;
+    }
+    var ticketContainer = $('<div class="form-group"><table class="table"><thead><tr><th id="j_ticket_name"></th><th>姓名</th><th>年龄</th><th>体重</th><th>出发时间</th></tr></thead><tbody id="j_ticket_container"></tbody></table></div>');
+    var ticketName = ticket.html();
+    var ticketCount = parseInt(ticket.attr('count'));
+    $('#add_ticket').parent().after(ticketContainer);
+    ticketContainer.find('table').attr('value', ticketType);
+    ticketContainer.find('#j_ticket_name').html(ticketName);
+    for(var i = 0; i < ticketCount; i++) {
+        var ticketDetail = $('<tr><th></th><th><input type="text" id="j_user_name" class="form-control"/></th><th><input type="number" id="j_user_age" class="form-control"/></th><th><input type="number" id="j_user_weight" class="form-control"/></th><th><a>选择时间</a></th></tr>')
+        ticketContainer.find('tbody').append(ticketDetail);
+    }
+});
+
 $('#j_submit').on('click', function(){
     var skuId = parseInt(getQueryString("skuId"));
     var primaryContact = $('#j_primary_contact').val();

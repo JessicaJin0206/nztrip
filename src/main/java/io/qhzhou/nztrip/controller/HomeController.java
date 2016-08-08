@@ -16,7 +16,6 @@
 
 package io.qhzhou.nztrip.controller;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import io.qhzhou.nztrip.constants.CommonConstants;
 import io.qhzhou.nztrip.exception.ResourceNotFoundException;
@@ -94,12 +93,12 @@ public class HomeController {
     }
 
     @RequestMapping("create_order")
-    public String createOrder(@RequestParam("skuId")int skuId, Map<String, Object> model) {
+    public String createOrder(@RequestParam("skuId") int skuId, Map<String, Object> model) {
         Sku sku = skuMapper.findById(skuId);
         if (sku == null) {
             throw new ResourceNotFoundException();
         }
-        model.put("sku", sku);
+        model.put("sku", parse(sku, cityService.findAll(), categoryService.findAll(), vendorService.findAll()));
         model.put("module", MODULE_CREATE_ORDER);
         return "create_order";
     }
@@ -223,22 +222,19 @@ public class HomeController {
         result.setCity(cityMap.get(sku.getCityId()).getName());
         result.setGatheringPlace(Lists.newArrayList(sku.getGatheringPlace().split(CommonConstants.SEPERATOR)));
         result.setPickupService(sku.hasPickupService());
-        result.setTickets(Lists.transform(sku.getTickets(), new Function<SkuTicket, SkuTicketVo>() {
-            @Override
-            public SkuTicketVo apply(SkuTicket input) {
-                SkuTicketVo ticket = new SkuTicketVo();
-                ticket.setDescription(input.getDescription());
-                ticket.setName(input.getName());
-                ticket.setId(input.getId());
-                ticket.setCount(Integer.parseInt(input.getCountConstraint()));
-                String[] ages = input.getAgeConstraint().split("-");
-                ticket.setMinAge(Integer.parseInt(ages[0]));
-                ticket.setMaxAge(Integer.parseInt(ages[1]));
-                String[] weights = input.getWeightConstraint().split("-");
-                ticket.setMinWeight(Integer.parseInt(weights[0]));
-                ticket.setMaxWeight(Integer.parseInt(weights[1]));
-                return ticket;
-            }
+        result.setTickets(Lists.transform(sku.getTickets(), (input) -> {
+            SkuTicketVo ticket = new SkuTicketVo();
+            ticket.setDescription(input.getDescription());
+            ticket.setName(input.getName());
+            ticket.setId(input.getId());
+            ticket.setCount(Integer.parseInt(input.getCountConstraint()));
+            String[] ages = input.getAgeConstraint().split("-");
+            ticket.setMinAge(Integer.parseInt(ages[0]));
+            ticket.setMaxAge(Integer.parseInt(ages[1]));
+            String[] weights = input.getWeightConstraint().split("-");
+            ticket.setMinWeight(Integer.parseInt(weights[0]));
+            ticket.setMaxWeight(Integer.parseInt(weights[1]));
+            return ticket;
         }));
         return result;
     }

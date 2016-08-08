@@ -41,54 +41,13 @@
     <button class="btn btn-default dropdown-toggle" type="button"
             data-toggle="dropdown"
             aria-haspopup="true" aria-expanded="true">
-        <span value="0">选择票种</span>
+        <span value="0" id="j_ticket" count="0">选择票种</span>
         <span class="caret"></span>
     </button>
-    <ul class="dropdown-menu">
+    <ul class="dropdown-menu" id="j_ticket_type_selector">
     <#list sku.tickets as ticket>
-        <li><a value="${ticket.id}">${ticket.name}</a></li>
+        <li><a value="${ticket.id}" count="${ticket.count}">${ticket.name}</a></li>
     </#list>
     </ul>
-    <a><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"/></a>
-</div>
-<div class="form-group">
-
-    <table class="table">
-        <thead>
-        <tr>
-            <th></th>
-            <th>姓名</th>
-            <th>年龄</th>
-            <th>体重</th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody id="j_ticket_container">
-        <tr>
-            <th></th>
-            <th><input type="text" class=""/></th>
-            <th><input type="number" class=""/></th>
-            <th><input type="number"/></th>
-        </tr>
-        </tbody>
-    </table>
-    <table class="table">
-        <thead>
-        <tr>
-            <th>票种</th>
-            <th>姓名</th>
-            <th>年龄</th>
-            <th>体重</th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody id="j_ticket_container">
-        <tr>
-            <th></th>
-            <th><input type="text" class=""/></th>
-            <th><input type="number" class=""/></th>
-            <th><input type="number"/></th>
-        </tr>
-        </tbody>
-    </table>
+    <a id="add_ticket"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"/></a>
 </div>
