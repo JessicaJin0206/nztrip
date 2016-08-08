@@ -21,19 +21,33 @@ public interface SkuTicketMapper {
     })
     int batchCreate(List<SkuTicket> skuTickets);
 
+//    @Update({
+//            "<script>",
+//            "<foreach collection='list' item='item' open='begin' close='end;' separator=';'>",
+//            "update sku_ticket set name=#{item.name}, count_constraint=#{item.countConstraint}, age_constraint=#{item.ageConstraint}, weight_constraint=#{item.weightConstraint},description=#{item.description} where id=#{item.id}",
+//            "</foreach>",
+//            "</script>"
+//    })
+//    int batchUpdate(List<SkuTicket> skuTickets);
+
+    @Update({
+            "update sku_ticket set name=#{item.name}, count_constraint=#{item.countConstraint}, age_constraint=#{item.ageConstraint}, weight_constraint=#{item.weightConstraint},description=#{item.description} where id=#{item.id}",
+    })
+    int update(@Param("item") SkuTicket skuTicket);
+
 
     @Delete("delete from sku_ticket where sku_id = #{skuId}")
     int deleteBySkuId(int skuId);
 
     @Select("select * from sku_ticket where sku_id = #{id}")
     @Results({
-        @Result(column = "id", property = "id"),
-        @Result(column = "name", property = "name"),
-        @Result(column = "sku_id", property = "skuId"),
-        @Result(column = "count_constraint", property = "countConstraint"),
-        @Result(column = "age_constraint", property = "ageConstraint"),
-        @Result(column = "weight_constraint", property = "weightConstraint"),
-        @Result(column = "description", property = "description"),
+            @Result(column = "id", property = "id"),
+            @Result(column = "name", property = "name"),
+            @Result(column = "sku_id", property = "skuId"),
+            @Result(column = "count_constraint", property = "countConstraint"),
+            @Result(column = "age_constraint", property = "ageConstraint"),
+            @Result(column = "weight_constraint", property = "weightConstraint"),
+            @Result(column = "description", property = "description"),
     })
     List<SkuTicket> findBySkuId(int skuId);
 }

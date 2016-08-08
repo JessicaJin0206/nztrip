@@ -117,6 +117,7 @@ var validate = function() {
     var tickets = [];
     $('#j_ticket_container tr').each(function(idx, element){
         var container = $(element);
+        var id = parseInt(container.attr("value"));
         var name = container.find("#j_ticket_name").val();
         if (!name) {
             warn("名称不能为空");
@@ -149,6 +150,7 @@ var validate = function() {
         }
         var description = container.find("#j_ticket_description").val();
         var ticket = {
+            id: id,
             name: name,
             count: count,
             minAge: minAge,

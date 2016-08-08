@@ -55,13 +55,9 @@ public class RestApiController {
         Sku sku = parse(skuVo);
         sku.setId(id);
         skuMapper.update(sku);
-        skuTicketMapper.deleteBySkuId(id);
-        skuTicketMapper.batchCreate(Lists.transform(skuVo.getTickets(), new Function<SkuTicketVo, SkuTicket>() {
-            @Override
-            public SkuTicket apply(SkuTicketVo input) {
-                return parse(id, input);
-            }
-        }));
+        for (SkuTicket skuTicket : Lists.transform(skuVo.getTickets(), (input) -> parse(id, input))) {
+            skuTicketMapper.update(skuTicket);
+        }
         return skuVo;
     }
 
@@ -110,6 +106,7 @@ public class RestApiController {
 
     private static SkuTicket parse(int skuId, SkuTicketVo skuTicketVo) {
         SkuTicket result = new SkuTicket();
+        result.setId(skuTicketVo.getId());
         result.setSkuId(skuId);
         result.setName(skuTicketVo.getName());
         result.setAgeConstraint(skuTicketVo.getMinAge() + "-" + skuTicketVo.getMaxAge());

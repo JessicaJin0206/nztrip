@@ -143,7 +143,7 @@
                     </thead>
                     <tbody id="j_ticket_container">
                     <#list sku.tickets as ticket>
-                    <tr>
+                    <tr id = "j_ticket" value="${ticket.id}">
                         <td><input id="j_ticket_name" type="text" class="form-control form-group" value="${ticket.name}"
                                    <#if editing = false>disabled</#if>/></td>
                         <td><input id="j_ticket_count" type="number" class="form-control form-group"
