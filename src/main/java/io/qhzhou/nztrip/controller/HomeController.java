@@ -17,6 +17,7 @@
 package io.qhzhou.nztrip.controller;
 
 import com.google.common.collect.Lists;
+import io.qhzhou.nztrip.annotation.AuthenticationPass;
 import io.qhzhou.nztrip.constants.CommonConstants;
 import io.qhzhou.nztrip.exception.ResourceNotFoundException;
 import io.qhzhou.nztrip.mapper.OrderMapper;
@@ -81,6 +82,7 @@ public class HomeController {
     }
 
     @RequestMapping("")
+    @AuthenticationPass
     public String home(Map<String, Object> model) {
         model.put("module", MODULE_DASHBOARD);
         return "dashboard";

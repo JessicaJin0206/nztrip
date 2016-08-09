@@ -4,17 +4,23 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import io.qhzhou.nztrip.constants.CommonConstants;
+import io.qhzhou.nztrip.dto.Role;
+import io.qhzhou.nztrip.exception.AuthenticationFailureException;
+import io.qhzhou.nztrip.exception.ResourceNotFoundException;
+import io.qhzhou.nztrip.mapper.AgentMapper;
 import io.qhzhou.nztrip.mapper.OrderMapper;
 import io.qhzhou.nztrip.mapper.SkuMapper;
 import io.qhzhou.nztrip.mapper.SkuTicketMapper;
+import io.qhzhou.nztrip.model.Agent;
 import io.qhzhou.nztrip.model.Order;
 import io.qhzhou.nztrip.model.Sku;
 import io.qhzhou.nztrip.model.SkuTicket;
+import io.qhzhou.nztrip.service.TokenService;
 import io.qhzhou.nztrip.util.GuidGenerator;
-import io.qhzhou.nztrip.vo.OrderVo;
-import io.qhzhou.nztrip.vo.SkuTicketVo;
-import io.qhzhou.nztrip.vo.SkuVo;
+import io.qhzhou.nztrip.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +38,22 @@ public class RestApiController {
 
     @Autowired
     private OrderMapper orderMapper;
+
+    @Autowired
+    private AgentMapper agentMapper;
+
+    @Autowired
+    private TokenService tokenService;
+
+    @ExceptionHandler
+    public ResponseEntity handleException(AuthenticationFailureException ex) {
+        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity handleException(ResourceNotFoundException ex) {
+        return new ResponseEntity(HttpStatus.NOT_FOUND);
+    }
 
     @RequestMapping(value = "v1/api/skus", method = RequestMethod.POST)
     @Transactional(rollbackFor = Exception.class)
@@ -69,6 +91,21 @@ public class RestApiController {
         orderMapper.create(o);
         order.setId(o.getId());
         return order;
+    }
+
+    @RequestMapping(value = "v1/api/signin", method = RequestMethod.POST)
+    public AuthenticationResp signin(@RequestBody AuthenticationReq req) {
+        Agent agent = agentMapper.findByUserName(req.getUser());
+        if (agent == null) {
+            throw new ResourceNotFoundException();
+        }
+        if (agent.getPassword().equals(req.getPass())) {
+            AuthenticationResp result = new AuthenticationResp();
+            result.setToken(tokenService.generateToken(Role.Agent, agent.getId()));
+            return result;
+        } else {
+            throw new AuthenticationFailureException();
+        }
     }
 
     private static Order parse(OrderVo order, int agentId) {
@@ -115,4 +152,5 @@ public class RestApiController {
         result.setDescription(skuTicketVo.getDescription());
         return result;
     }
+
 }
