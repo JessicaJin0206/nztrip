@@ -27,3 +27,9 @@ VALUES
 	('NS9000', '皇后镇NZONE跳伞9000英尺', 1, 1, 1, '皇后镇不可错过的极限体验', 'NZONE Skydive Shop @ 35 Shotover St,Queenstown', 0),
 	('RJ100', '米尔福德峡湾景观游（仅游船）', 5, 2, 2, '世界第八大奇迹', 'the Real Journeys counter at the Milford Visitor Terminal, situated to the left as you enter through the main entrance', 0),
 	('PW001', '奇幻世界组合票', 2, 2, 3, '适合全家一起游玩的奇幻世界', '188 Wanaka-Luggate Hwy, Wanaka 9382', 0);
+
+INSERT INTO `category` (`name`, `parent_category_id`)
+VALUES
+	('刺激', 0),
+	('平稳', 0);
+
