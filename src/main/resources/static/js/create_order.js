@@ -49,7 +49,7 @@ $('#add_ticket').on('click', function(e){
     if (ticketType <= 0) {
         return;
     }
-    var ticketContainer = $('<div class="form-group"><table class="table"><thead><tr><th id="j_ticket_name"></th><th>姓名</th><th>年龄</th><th>体重</th><th>出发时间</th></tr></thead><tbody id="j_ticket_container"></tbody></table></div>');
+    var ticketContainer = $('<div class="form-group"><table class="table" id="j_ticket_container"><thead><tr><th id="j_ticket_name"></th><th>姓名</th><th>年龄</th><th>体重</th><th>出发时间</th></tr></thead><tbody></tbody></table></div>');
     var ticketName = ticket.html();
     var ticketCount = parseInt(ticket.attr('count'));
     $('#add_ticket').parent().after(ticketContainer);
@@ -64,22 +64,43 @@ $('#add_ticket').on('click', function(e){
 $('#j_submit').on('click', function(){
     var skuId = parseInt(getQueryString("skuId"));
     var primaryContact = $('#j_primary_contact').val();
-    if (primaryContact.length == 0) {
-        warn("缺少主要联系人信息")
-        return;
-    }
     var primaryContactEmail = $('#j_primary_contact_email').val();
-    if (primaryContactEmail.lenght == 0) {
-        warn("缺少主要联系人信息")
-        return;
-    }
     var primaryContactPhone = $('#j_primary_contact_phone').val();
     var primaryContactWechat = $('#j_primary_contact_wechat').val();
-    var secondaryContact = $('#j_secondary_contact_wechat').val();
-    var secondaryContactEmail = $('#j_secondary_contact_wechat').val();
-    var secondaryContactPhone = $('#j_secondary_contact_wechat').val();
+    var secondaryContact = $('#j_secondary_contact').val();
+    var secondaryContactEmail = $('#j_secondary_contact_email').val();
+    var secondaryContactPhone = $('#j_secondary_contact_phone').val();
     var secondaryContactWechat = $('#j_secondary_contact_wechat').val();
     var remark = $('#j_remark').val();
+    var orderTickets = [];
+
+    if (primaryContact.length == 0) {
+        warn("缺少主要联系人信息");
+        return;
+    }
+    if (primaryContactEmail.length == 0) {
+        warn("缺少主要联系人信息");
+        return;
+    }
+    $('div table#j_ticket_container').each(function(index, e){
+        var orderTicket = {};
+        var container = $(e);
+        orderTicket.skuTicketId = parseInt(container.attr('value'));
+        orderTicket.orderTicketUsers = [];
+        orderTickets.push(orderTicket);
+        container.find('tbody tr').each(function(index, e){
+            var ticketUserContainer = $(e);
+            var name = ticketUserContainer.find('#j_user_name').val();
+            var age = parseInt(ticketUserContainer.find('#j_user_age').val());
+            var weight = parseInt(ticketUserContainer.find('#j_user_weight').val());
+            orderTicket.orderTicketUsers.push({
+                name: name,
+                age: age,
+                weight: weight
+            })
+        });
+    });
+    console.log(JSON.stringify(orderTickets));
     var data = {
         skuId: skuId,
         primaryContact: primaryContact,
@@ -90,7 +111,8 @@ $('#j_submit').on('click', function(){
         secondaryContactEmail: secondaryContactEmail,
         secondaryContactPhone: secondaryContactPhone,
         secondaryContactWechat: secondaryContactWechat,
-        remark: remark
+        remark: remark,
+        orderTickets: orderTickets
     };
     $.ajax({
         type: 'POST',

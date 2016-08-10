@@ -2,26 +2,22 @@ package com.fitibo.aotearoa.controller;
 
 import com.fitibo.aotearoa.dto.Role;
 import com.fitibo.aotearoa.exception.AuthenticationFailureException;
+import com.fitibo.aotearoa.exception.InvalidParamException;
 import com.fitibo.aotearoa.exception.ResourceNotFoundException;
-import com.fitibo.aotearoa.mapper.AgentMapper;
-import com.fitibo.aotearoa.mapper.OrderMapper;
-import com.fitibo.aotearoa.mapper.SkuMapper;
-import com.fitibo.aotearoa.mapper.SkuTicketMapper;
-import com.fitibo.aotearoa.model.Order;
-import com.fitibo.aotearoa.model.Sku;
-import com.fitibo.aotearoa.model.SkuTicket;
+import com.fitibo.aotearoa.mapper.*;
+import com.fitibo.aotearoa.model.*;
 import com.fitibo.aotearoa.util.GuidGenerator;
 import com.fitibo.aotearoa.vo.*;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.fitibo.aotearoa.constants.CommonConstants;
-import com.fitibo.aotearoa.model.Agent;
 import com.fitibo.aotearoa.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -40,6 +36,12 @@ public class RestApiController {
     private OrderMapper orderMapper;
 
     @Autowired
+    private OrderTicketMapper orderTicketMapper;
+
+    @Autowired
+    private OrderTicketUserMapper orderTicketUserMapper;
+
+    @Autowired
     private AgentMapper agentMapper;
 
     @Autowired
@@ -53,6 +55,11 @@ public class RestApiController {
     @ExceptionHandler
     public ResponseEntity handleException(ResourceNotFoundException ex) {
         return new ResponseEntity(HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity handleException(InvalidParamException ex) {
+        return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
 
     @RequestMapping(value = "v1/api/skus", method = RequestMethod.POST)
@@ -90,6 +97,29 @@ public class RestApiController {
         o.setUuid(GuidGenerator.generate(14));
         orderMapper.create(o);
         order.setId(o.getId());
+        if (CollectionUtils.isEmpty(order.getOrderTickets())) {
+            throw new InvalidParamException();
+        }
+        for (OrderTicketVo orderTicketVo : order.getOrderTickets()) {
+            OrderTicket orderTicket = new OrderTicket();
+            orderTicket.setSkuId(order.getSkuId());
+            orderTicket.setSkuTicketId(orderTicketVo.getSkuTicketId());
+            orderTicket.setOrderId(order.getId());
+            orderTicketMapper.create(orderTicket);
+            orderTicketVo.setId(orderTicket.getId());
+            if (CollectionUtils.isEmpty(orderTicketVo.getOrderTicketUsers())) {
+                throw new InvalidParamException();
+            }
+            for (OrderTicketUserVo orderTicketUserVo : orderTicketVo.getOrderTicketUsers()) {
+                OrderTicketUser orderTicketUser = new OrderTicketUser();
+                orderTicketUser.setOrderTicketId(orderTicketVo.getId());
+                orderTicketUser.setName(orderTicketUserVo.getName());
+                orderTicketUser.setAge(orderTicketUserVo.getAge());
+                orderTicketUser.setWeight(orderTicketUserVo.getWeight());
+                orderTicketUserMapper.create(orderTicketUser);
+                orderTicketUserVo.setId(orderTicketUser.getId());
+            }
+        }
         return order;
     }
 

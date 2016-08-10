@@ -1,6 +1,7 @@
 package com.fitibo.aotearoa.vo;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by qianhao.zhou on 8/7/16.
@@ -159,6 +160,13 @@ public class OrderVo {
         this.referenceNumber = referenceNumber;
     }
 
+    public List<OrderTicketVo> getOrderTickets() {
+        return orderTickets;
+    }
+
+    public void setOrderTickets(List<OrderTicketVo> orderTickets) {
+        this.orderTickets = orderTickets;
+    }
 
     private int id;
     private int skuId;
@@ -179,5 +187,6 @@ public class OrderVo {
     private String secondaryContactWechat;
     private String gatheringInfo;
     private String referenceNumber;
+    private List<OrderTicketVo> orderTickets;
 
 }

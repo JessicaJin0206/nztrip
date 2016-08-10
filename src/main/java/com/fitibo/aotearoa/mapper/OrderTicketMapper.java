@@ -1,10 +1,7 @@
 package com.fitibo.aotearoa.mapper;
 
 import com.fitibo.aotearoa.model.OrderTicket;
-import org.apache.ibatis.annotations.Many;
-import org.apache.ibatis.annotations.Result;
-import org.apache.ibatis.annotations.Results;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -28,4 +25,10 @@ public interface OrderTicketMapper {
                     = @Many(select = "com.fitibo.aotearoa.mapper.OrderTicketUserMapper.findByOrderTicketId"))
     })
     List<OrderTicket> findByOrderId(int orderId);
+
+
+    @Insert("insert into order_ticket(`sku_id`, `sku_ticket_id`, `order_id`) " +
+            "values(#{skuId}, #{skuTicketId}, #{orderId})")
+    @Options(useGeneratedKeys = true, keyColumn = "id", keyProperty = "id", flushCache = Options.FlushCachePolicy.DEFAULT)
+    int create(OrderTicket orderTicket);
 }

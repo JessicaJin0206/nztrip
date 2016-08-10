@@ -1,9 +1,7 @@
 package com.fitibo.aotearoa.mapper;
 
 import com.fitibo.aotearoa.model.OrderTicketUser;
-import org.apache.ibatis.annotations.Result;
-import org.apache.ibatis.annotations.Results;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -22,4 +20,10 @@ public interface OrderTicketUserMapper {
             @Result(property = "weight", column = "weight"),
     })
     List<OrderTicketUser> findByOrderTicketId(int id);
+
+
+    @Insert("insert into order_ticket_user(`order_ticket_id`, `name`, `age`, `weight`) " +
+            "values(#{orderTicketId}, #{name}, #{age}, #{weight})")
+    @Options(useGeneratedKeys = true, keyColumn = "id", keyProperty = "id", flushCache = Options.FlushCachePolicy.DEFAULT)
+    int create(OrderTicketUser orderTicketUser);
 }

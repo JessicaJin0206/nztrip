@@ -1,33 +1,35 @@
 <div class="form-group"><label>订单详情</label></div>
 <div class="form-group"><label>名称:</label><span>   ${order.sku}</span></div>
 <div class="form-group"><label>价格:</label><span>   ${order.price}</span></div>
-<div class="form-group"><label>Reference Number:</label><span>   <#if order.referenceNumber??>${order.referenceNumber}</#if></span></div>
-<div class="form-group"><label>集合信息:</label><span>   <#if order.gatheringInfo??>${order.gatheringInfo}</#if></span></div>
+<div class="form-group"><label>Reference
+    Number:</label><span>   <#if order.referenceNumber??>${order.referenceNumber}</#if></span></div>
+<div class="form-group"><label>集合信息:</label><span>   <#if order.gatheringInfo??>${order.gatheringInfo}</#if></span>
+</div>
 <div class="form-group"><label>游客信息</label></div>
+<#list tickets as ticket>
 <div class="form-group">
     <table class="table">
         <thead>
         <tr>
-            <th>票种</th>
+            <th><#if ticket.skuTicket??>${ticket.skuTicket}</#if></th>
             <th>姓名</th>
             <th>年龄</th>
             <th>体重</th>
         </tr>
         </thead>
         <tbody id="j_ticket_container">
-        <#list tickets as ticket>
             <#list ticket.users as user>
             <tr>
-                <td><#if ticket.skuTicket??>${ticket.skuTicket}</#if></td>
-                <td>${user.name}</td>
-                <td>${user.age}</td>
-                <td>${user.weight}</td>
+                <td></td>
+                <td><input class="form-control" disabled value="${user.name}"/></td>
+                <td><input class="form-control" disabled value="${user.age}"/></td>
+                <td><input class="form-control" disabled value="${user.weight}"/></td>
             </tr>
             </#list>
-        </#list>
         </tbody>
     </table>
 </div>
+</#list>
 <div class="form-group"><label>主要联系人</label></div>
 <div class="form-group"><input type="text" id="j_primary_contact" class="form-control" <#if editing=false>disabled</#if>
                                placeholder="主要联系人" value="${order.primaryContact}">

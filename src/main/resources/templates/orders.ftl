@@ -40,6 +40,7 @@
                     <thead>
                     <tr>
                         <th>编号</th>
+                        <th>项目</th>
                         <th>主联系人</th>
                         <th>Email</th>
                         <th>Reference Number</th>
@@ -51,6 +52,7 @@
                     <#list orders as order>
                     <tr>
                         <th scope="row">${order.uuid}</th>
+                        <th>${order.sku}</th>
                         <td>${order.primaryContact}</td>
                         <td>${order.primaryContactEmail}</td>
                         <td><#if order.referenceNumber??>${order.referenceNumber}</#if></td>
