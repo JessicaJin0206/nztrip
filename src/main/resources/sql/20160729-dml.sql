@@ -2,17 +2,17 @@ insert into city(`name`, `name_en`) values('皇后镇', 'Queenstown'), ('瓦纳�
 
 INSERT INTO `agent` (`user_name`, `password`, `name`, `description`, `discount`, `email`)
 VALUES
-	('JINIAO', '123456', '上海极鸟网络科技发展有限公司', '', 40, 'dongrui@jibird.com'),
-	('7DOUFENG', '123456', '成都去兜风科技有限公司', '', 25, 'info@7doufeng.com'),
-	('SHIJIEBANG', '123456', '世界邦（北京）信息技术有限公司', '', 25, 'guanguang@shijiebang.net'),
-	('HUANTAOYOU', '123456', '北京环滔信息技术有限公司', '', 25, 'gloria@huantaoyou.com'),
-	('ROADBOOK', '123456', '北京一旅阳光文化传播有限公司', '', 25, 'ceo@roadbooks.com'),
-	('MIQU', '123456', 'Miqu Tour Co.,Ltd', '', 40, 'nzcntour@outlook.com'),
-	('GrahamWu', '123456', '新西兰司导', '', 25, 'mycandyou@sina.com'),
-	('RonZhang', '123456', '新西兰司导', '', 25, 'freshbluenz@gmail.com'),
-	('SongWang', '123456', '新西兰司导', '', 25, 'songwang51@gmail.com'),
-	('315MOTEL', '123456', '新西兰Motel', '', 40, 'georgezhou7551@gmail.com'),
-	('LINKTOUR', '123456', '北京游酷棒国际旅行社有限公司上海分公司', '', 25, '');
+	('JINIAO', 'e10adc3949ba59abbe56e057f20f883e', '上海极鸟网络科技发展有限公司', '', 40, 'dongrui@jibird.com'),
+	('7DOUFENG', 'e10adc3949ba59abbe56e057f20f883e', '成都去兜风科技有限公司', '', 25, 'info@7doufeng.com'),
+	('SHIJIEBANG', 'e10adc3949ba59abbe56e057f20f883e', '世界邦（北京）信息技术有限公司', '', 25, 'guanguang@shijiebang.net'),
+	('HUANTAOYOU', 'e10adc3949ba59abbe56e057f20f883e', '北京环滔信息技术有限公司', '', 25, 'gloria@huantaoyou.com'),
+	('ROADBOOK', 'e10adc3949ba59abbe56e057f20f883e', '北京一旅阳光文化传播有限公司', '', 25, 'ceo@roadbooks.com'),
+	('MIQU', 'e10adc3949ba59abbe56e057f20f883e', 'Miqu Tour Co.,Ltd', '', 40, 'nzcntour@outlook.com'),
+	('GrahamWu', 'e10adc3949ba59abbe56e057f20f883e', '新西兰司导', '', 25, 'mycandyou@sina.com'),
+	('RonZhang', 'e10adc3949ba59abbe56e057f20f883e', '新西兰司导', '', 25, 'freshbluenz@gmail.com'),
+	('SongWang', 'e10adc3949ba59abbe56e057f20f883e', '新西兰司导', '', 25, 'songwang51@gmail.com'),
+	('315MOTEL', 'e10adc3949ba59abbe56e057f20f883e', '新西兰Motel', '', 40, 'georgezhou7551@gmail.com'),
+	('LINKTOUR', 'e10adc3949ba59abbe56e057f20f883e', '北京游酷棒国际旅行社有限公司上海分公司', '', 25, '');
 
 INSERT INTO `vendor` (`name`, `email`)
 VALUES
