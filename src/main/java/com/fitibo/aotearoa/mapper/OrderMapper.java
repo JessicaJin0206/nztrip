@@ -70,6 +70,36 @@ public interface OrderMapper {
     })
     List<Order> findByAgentId(@Param("agentId") int agentId, RowBounds rowBounds);
 
+
+    @Select("select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
+            "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
+            "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
+            "o.secondary_contact_wechat, o.reference_number, s.name " +
+            "from `order` o left join `sku` s on o.sku_id = s.id ")
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "sku_id", property = "skuId"),
+            @Result(column = "uuid", property = "uuid"),
+            @Result(column = "agent_id", property = "agentId"),
+            @Result(column = "remark", property = "remark"),
+            @Result(column = "status", property = "status"),
+            @Result(column = "create_time", property = "createTime"),
+            @Result(column = "update_time", property = "updateTime"),
+            @Result(column = "price", property = "price"),
+            @Result(column = "gathering_info", property = "gatheringInfo"),
+            @Result(column = "primary_contact", property = "primaryContact"),
+            @Result(column = "primary_contact_email", property = "primaryContactEmail"),
+            @Result(column = "primary_contact_phone", property = "primaryContactPhone"),
+            @Result(column = "primary_contact_wechat", property = "primaryContactWechat"),
+            @Result(column = "secondary_contact", property = "secondaryContact"),
+            @Result(column = "secondary_contact_email", property = "secondaryContactEmail"),
+            @Result(column = "secondary_contact_phone", property = "secondaryContactPhone"),
+            @Result(column = "secondary_contact_wechat", property = "secondaryContactWechat"),
+            @Result(column = "reference_number", property = "referenceNumber"),
+            @Result(column = "name", property = "sku"),
+    })
+    List<Order> findAll(RowBounds rowBounds);
+
     @Select("select count(1) from `order` where agent_id = #{agentId}")
     int countByAgentId(int agentId);
 

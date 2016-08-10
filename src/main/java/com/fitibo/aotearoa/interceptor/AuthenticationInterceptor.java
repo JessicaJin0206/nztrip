@@ -1,8 +1,11 @@
 package com.fitibo.aotearoa.interceptor;
 
-import com.fitibo.aotearoa.annotation.AuthenticationPass;
+import com.fitibo.aotearoa.annotation.Authentication;
+import com.fitibo.aotearoa.controller.HomeController;
+import com.fitibo.aotearoa.controller.RestApiController;
 import com.fitibo.aotearoa.dto.Token;
 import com.fitibo.aotearoa.service.TokenService;
+import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.method.HandlerMethod;
@@ -24,17 +27,29 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object handler) throws Exception {
         if (handler.getClass().isAssignableFrom(HandlerMethod.class)) {
-            AuthenticationPass authPassport = ((HandlerMethod) handler).getMethodAnnotation(AuthenticationPass.class);
+            HandlerMethod handlerMethod = (HandlerMethod) handler;
+            Authentication authentication = ((HandlerMethod) handler).getMethodAnnotation(Authentication.class);
 
             //没有声明需要权限,或者声明不验证权限
-            if (authPassport == null || authPassport.validate() == false) {
+            if (authentication == null) {
                 return true;
             } else {
-                if (needAuthentication(httpServletRequest)) {
+                Token token = getToken(httpServletRequest);
+                if (handlerMethod.getBean() instanceof HomeController) {
+                    ((HomeController) handlerMethod.getBean()).setToken(token);
+                }
+                if (handlerMethod.getBean() instanceof RestApiController) {
+                    ((RestApiController) handlerMethod.getBean()).setToken(token);
+                }
+                if (token == null || token.isExpired()) {
                     httpServletResponse.sendRedirect("/signin");
                     return false;
-                } else {
+                }
+                if (Lists.newArrayList(authentication.value()).contains(token.getRole())) {
                     return true;
+                } else {
+                    httpServletResponse.sendRedirect("/signin");
+                    return false;
                 }
             }
         } else {
@@ -42,33 +57,28 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
         }
     }
 
-    private String getToken(HttpServletRequest request) {
+    private String getCookie(HttpServletRequest request, String cookieName) {
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
             return null;
         }
         for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("X-TOKEN")) {
+            if (cookie.getName().equals(cookieName)) {
                 return cookie.getValue();
             }
         }
         return null;
     }
 
-    private boolean needAuthentication(HttpServletRequest request) {
-        String tokenString = getToken(request);
+    private Token getToken(HttpServletRequest request) {
+        String tokenString = getCookie(request, "X-TOKEN");
         if (tokenString == null) {
-            return true;
+            return null;
         }
         try {
-            Token token = tokenService.parseToken(tokenString);
-            if (token.isExpired()) {
-                return true;
-            } else {
-                return false;
-            }
+            return tokenService.parseToken(tokenString);
         } catch (RuntimeException e) {
-            return true;
+            return null;
         }
     }
 }

@@ -52,7 +52,6 @@
 <#include "third_party_file.ftl"/>
 <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
 <script src="/js/md5.js"></script>
-<script src="/js/jquery.cookie.js"></script>
 <script src="/js/signin.js"></script>
 </body>
 </html>

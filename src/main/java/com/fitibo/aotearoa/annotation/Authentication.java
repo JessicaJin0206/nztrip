@@ -1,5 +1,7 @@
 package com.fitibo.aotearoa.annotation;
 
+import com.fitibo.aotearoa.dto.Role;
+
 import java.lang.annotation.*;
 
 /**
@@ -9,6 +11,6 @@ import java.lang.annotation.*;
 @Inherited
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AuthenticationPass {
-    boolean validate() default true;
+public @interface Authentication {
+    Role[] value() default {Role.Agent, Role.Admin};
 }

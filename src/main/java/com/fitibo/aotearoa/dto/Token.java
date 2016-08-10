@@ -43,4 +43,8 @@ public final class Token {
     private long expireTime;
     private int id;
 
+    @Override
+    public String toString() {
+        return role.toString() + "_" + id + "_" + expireTime;
+    }
 }

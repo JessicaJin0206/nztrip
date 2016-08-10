@@ -1,18 +1,21 @@
 package com.fitibo.aotearoa.controller;
 
+import com.fitibo.aotearoa.annotation.Authentication;
+import com.fitibo.aotearoa.constants.CommonConstants;
 import com.fitibo.aotearoa.dto.Role;
+import com.fitibo.aotearoa.dto.Token;
 import com.fitibo.aotearoa.exception.AuthenticationFailureException;
 import com.fitibo.aotearoa.exception.InvalidParamException;
 import com.fitibo.aotearoa.exception.ResourceNotFoundException;
 import com.fitibo.aotearoa.mapper.*;
 import com.fitibo.aotearoa.model.*;
+import com.fitibo.aotearoa.service.TokenService;
 import com.fitibo.aotearoa.util.GuidGenerator;
 import com.fitibo.aotearoa.vo.*;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.fitibo.aotearoa.constants.CommonConstants;
-import com.fitibo.aotearoa.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +48,12 @@ public class RestApiController {
     private AgentMapper agentMapper;
 
     @Autowired
+    private AdminMapper adminMapper;
+
+    @Autowired
     private TokenService tokenService;
+
+    private ThreadLocal<Token> token = new ThreadLocal<>();
 
     @ExceptionHandler
     public ResponseEntity handleException(AuthenticationFailureException ex) {
@@ -64,6 +72,7 @@ public class RestApiController {
 
     @RequestMapping(value = "v1/api/skus", method = RequestMethod.POST)
     @Transactional(rollbackFor = Exception.class)
+    @Authentication(Role.Admin)
     public SkuVo createSku(@RequestBody SkuVo skuVo) {
         Sku sku = parse(skuVo);
         skuMapper.create(sku);
@@ -80,6 +89,7 @@ public class RestApiController {
 
     @RequestMapping(value = "v1/api/skus/{id}", method = RequestMethod.PUT)
     @Transactional(rollbackFor = Exception.class)
+    @Authentication(Role.Admin)
     public SkuVo updateSku(@PathVariable("id") int id, @RequestBody SkuVo skuVo) {
         Sku sku = parse(skuVo);
         sku.setId(id);
@@ -92,8 +102,11 @@ public class RestApiController {
 
     @RequestMapping(value = "v1/api/orders", method = RequestMethod.POST)
     @Transactional(rollbackFor = Exception.class)
+    @Authentication
     public OrderVo createOrder(@RequestBody OrderVo order) {
-        Order o = parse(order, 1);
+        Preconditions.checkNotNull(getToken());
+        final int agentId = getToken().getRole() == Role.Agent?getToken().getId():0;
+        Order o = parse(order, agentId);
         o.setUuid(GuidGenerator.generate(14));
         orderMapper.create(o);
         order.setId(o.getId());
@@ -126,16 +139,27 @@ public class RestApiController {
     @RequestMapping(value = "v1/api/signin", method = RequestMethod.POST)
     public AuthenticationResp signin(@RequestBody AuthenticationReq req) {
         Agent agent = agentMapper.findByUserName(req.getUser());
-        if (agent == null) {
-            throw new ResourceNotFoundException();
+        if (agent != null) {
+            if (agent.getPassword().equals(req.getPass())) {
+                AuthenticationResp result = new AuthenticationResp();
+                result.setToken(tokenService.generateToken(Role.Agent, agent.getId()));
+                return result;
+            } else {
+                throw new AuthenticationFailureException();
+            }
         }
-        if (agent.getPassword().equals(req.getPass())) {
-            AuthenticationResp result = new AuthenticationResp();
-            result.setToken(tokenService.generateToken(Role.Agent, agent.getId()));
-            return result;
-        } else {
-            throw new AuthenticationFailureException();
+        Admin admin = adminMapper.findByUser(req.getUser());
+        if (admin != null) {
+            if (admin.getPass().equalsIgnoreCase(req.getPass())) {
+                AuthenticationResp result = new AuthenticationResp();
+                result.setToken(tokenService.generateToken(Role.Admin, admin.getId()));
+                return result;
+            } else {
+                throw new AuthenticationFailureException();
+            }
         }
+        throw new ResourceNotFoundException();
+
     }
 
     private static Order parse(OrderVo order, int agentId) {
@@ -181,6 +205,14 @@ public class RestApiController {
         result.setCountConstraint(skuTicketVo.getCount() + "");
         result.setDescription(skuTicketVo.getDescription());
         return result;
+    }
+
+    public final void setToken(Token token) {
+        this.token.set(token);
+    }
+
+    public final Token getToken() {
+        return this.token.get();
     }
 
 }

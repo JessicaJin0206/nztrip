@@ -16,19 +16,22 @@
 
 package com.fitibo.aotearoa.controller;
 
+import com.fitibo.aotearoa.annotation.Authentication;
+import com.fitibo.aotearoa.constants.CommonConstants;
+import com.fitibo.aotearoa.dto.Role;
+import com.fitibo.aotearoa.dto.Token;
 import com.fitibo.aotearoa.exception.ResourceNotFoundException;
 import com.fitibo.aotearoa.mapper.OrderMapper;
 import com.fitibo.aotearoa.mapper.OrderTicketMapper;
-import com.fitibo.aotearoa.model.*;
-import com.fitibo.aotearoa.service.CityService;
-import com.google.common.collect.Lists;
-import com.fitibo.aotearoa.annotation.AuthenticationPass;
-import com.fitibo.aotearoa.constants.CommonConstants;
 import com.fitibo.aotearoa.mapper.SkuMapper;
+import com.fitibo.aotearoa.model.*;
 import com.fitibo.aotearoa.service.CategoryService;
+import com.fitibo.aotearoa.service.CityService;
 import com.fitibo.aotearoa.service.VendorService;
 import com.fitibo.aotearoa.vo.SkuTicketVo;
 import com.fitibo.aotearoa.vo.SkuVo;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -52,6 +55,8 @@ public class HomeController {
     public static final String MODULE_QUERY_VENDOR = "query_vendor";
     public static final String MODULE_CREATE_VENDOR = "create_vendor";
     public static final String MODULE_SKU_DETAIL = "sku_detail";
+
+    private ThreadLocal<Token> token = new ThreadLocal<>();
 
     @Autowired
     private CityService cityService;
@@ -82,19 +87,21 @@ public class HomeController {
     }
 
     @RequestMapping("")
-    @AuthenticationPass
+    @Authentication
     public String home(Map<String, Object> model) {
         model.put("module", MODULE_DASHBOARD);
         return "dashboard";
     }
 
     @RequestMapping("dashboard")
+    @Authentication
     public String dashboard(Map<String, Object> model) {
         model.put("module", MODULE_DASHBOARD);
         return "dashboard";
     }
 
     @RequestMapping("create_order")
+    @Authentication
     public String createOrder(@RequestParam("skuId") int skuId, Map<String, Object> model) {
         Sku sku = skuMapper.findById(skuId);
         if (sku == null) {
@@ -106,22 +113,34 @@ public class HomeController {
     }
 
     @RequestMapping("orders")
+    @Authentication
     public String queryOrder(@RequestParam(value = "keyword", defaultValue = "") String keyword,
                              @RequestParam(value = "status", defaultValue = "0") int status,
                              @RequestParam(value = "pagesize", defaultValue = "10") int pageSize,
                              @RequestParam(value = "pagenumber", defaultValue = "0") int pageNumber,
                              Map<String, Object> model) {
+        Preconditions.checkNotNull(getToken());
         model.put("module", MODULE_QUERY_ORDER);
         if (status > 0) {
             model.put("status", status);
         }
         model.put("pageSize", pageSize);
         model.put("pageNumber", pageNumber);
-        model.put("orders", orderMapper.findByAgentId(1, new RowBounds(pageNumber * pageSize, pageSize)));
+        switch (getToken().getRole()) {
+            case Admin:
+                model.put("orders", orderMapper.findAll(new RowBounds(pageNumber * pageSize, pageSize)));
+                break;
+            case Agent:
+                model.put("orders", orderMapper.findByAgentId(getToken().getId(), new RowBounds(pageNumber * pageSize, pageSize)));
+                break;
+            default:
+                throw new ResourceNotFoundException();
+        }
         return "orders";
     }
 
     @RequestMapping("orders/{id}")
+    @Authentication
     public String orderDetail(@PathVariable("id") int id, Map<String, Object> model) {
         Order order = orderMapper.findById(id);
         if (order == null) {
@@ -135,6 +154,7 @@ public class HomeController {
     }
 
     @RequestMapping("create_sku")
+    @Authentication(Role.Admin)
     public String createSku(Map<String, Object> model) {
         model.put("module", MODULE_CREATE_SKU);
         model.put("cities", Lists.newArrayList(cityService.findAll().values()));
@@ -144,6 +164,7 @@ public class HomeController {
     }
 
     @RequestMapping("skus/{id}")
+    @Authentication
     public String skuDetail(@PathVariable("id") int id, Map<String, Object> model) {
         model.put("module", MODULE_SKU_DETAIL);
         Sku sku = skuMapper.findById(id);
@@ -156,6 +177,7 @@ public class HomeController {
     }
 
     @RequestMapping("skus/{id}/_edit")
+    @Authentication(Role.Admin)
     public String editSku(@PathVariable("id") int id, Map<String, Object> model) {
         Sku sku = skuMapper.findById(id);
         if (sku == null) {
@@ -172,6 +194,7 @@ public class HomeController {
 
 
     @RequestMapping("skus")
+    @Authentication
     public String querySku(@RequestParam(value = "keyword", defaultValue = "") String keyword,
                            @RequestParam(value = "cityid", defaultValue = "0") int cityId,
                            @RequestParam(value = "categoryid", defaultValue = "0") int categoryId,
@@ -194,20 +217,22 @@ public class HomeController {
         return "skus";
     }
 
-    private List<Sku> searchSku(String keyword, int cityId, int categoryId, RowBounds rowBounds) {
-        return skuMapper.findAllByMultiFields(keyword, cityId, categoryId, rowBounds);
-    }
-
     @RequestMapping("create_vendor")
+    @Authentication(Role.Admin)
     public String createVendor(Map<String, Object> model) {
         model.put("module", MODULE_CREATE_VENDOR);
         return "create_vendor";
     }
 
     @RequestMapping("vendors")
+    @Authentication(Role.Admin)
     public String queryVendor(Map<String, Object> model) {
         model.put("module", MODULE_QUERY_VENDOR);
         return "vendors";
+    }
+
+    private List<Sku> searchSku(String keyword, int cityId, int categoryId, RowBounds rowBounds) {
+        return skuMapper.findAllByMultiFields(keyword, cityId, categoryId, rowBounds);
     }
 
     private static SkuVo parse(Sku sku, Map<Integer, City> cityMap, Map<Integer, Category> categoryMap, Map<Integer, Vendor> vendorMap) {
@@ -239,6 +264,14 @@ public class HomeController {
             return ticket;
         }));
         return result;
+    }
+
+    public final void setToken(Token token) {
+        this.token.set(token);
+    }
+
+    public final Token getToken() {
+        return this.token.get();
     }
 
 }
