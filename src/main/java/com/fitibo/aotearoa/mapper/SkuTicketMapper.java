@@ -64,4 +64,18 @@ public interface SkuTicketMapper {
             @Result(column = "status", property = "status")
     })
     List<SkuTicket> findOnlineBySkuId(int skuId);
+
+
+    @Select("select * from sku_ticket where id = #{id}")
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "name", property = "name"),
+            @Result(column = "sku_id", property = "skuId"),
+            @Result(column = "count_constraint", property = "countConstraint"),
+            @Result(column = "age_constraint", property = "ageConstraint"),
+            @Result(column = "weight_constraint", property = "weightConstraint"),
+            @Result(column = "description", property = "description"),
+            @Result(column = "status", property = "status")
+    })
+    SkuTicket findById(int ticketId);
 }

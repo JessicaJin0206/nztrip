@@ -21,9 +21,7 @@ import com.fitibo.aotearoa.constants.CommonConstants;
 import com.fitibo.aotearoa.dto.Role;
 import com.fitibo.aotearoa.dto.Token;
 import com.fitibo.aotearoa.exception.ResourceNotFoundException;
-import com.fitibo.aotearoa.mapper.OrderMapper;
-import com.fitibo.aotearoa.mapper.OrderTicketMapper;
-import com.fitibo.aotearoa.mapper.SkuMapper;
+import com.fitibo.aotearoa.mapper.*;
 import com.fitibo.aotearoa.model.*;
 import com.fitibo.aotearoa.service.CategoryService;
 import com.fitibo.aotearoa.service.CityService;
@@ -57,6 +55,7 @@ public class HomeController {
     public static final String MODULE_CREATE_VENDOR = "create_vendor";
     public static final String MODULE_SKU_DETAIL = "sku_detail";
 	public static final String MODULE_VENDOR_DETAIL = "vendor_detail";
+    public static final String MODULE_SKU_TICKET_DETAIL = "sku_ticket_detail";
 
     private ThreadLocal<Token> token = new ThreadLocal<>();
 
@@ -71,6 +70,12 @@ public class HomeController {
 
     @Autowired
     private SkuMapper skuMapper;
+
+    @Autowired
+    private SkuTicketMapper skuTicketMapper;
+
+    @Autowired
+    private SkuTicketPriceMapper skuTicketPriceMapper;
 
     @Autowired
     private OrderMapper orderMapper;
@@ -192,6 +197,20 @@ public class HomeController {
         model.put("vendors", Lists.newArrayList(vendorService.findAll().values()));
         model.put("editing", true);
         return "sku_detail";
+    }
+
+    @RequestMapping("skus/{skuId}/tickets/{ticketId}")
+    @Authentication(Role.Admin)
+    public String skuTicketDetail(@PathVariable("ticketId") int ticketId, Map<String, Object> model) {
+        SkuTicket ticket = skuTicketMapper.findById(ticketId);
+        if (ticket == null) {
+            throw new ResourceNotFoundException();
+        }
+        List<SkuTicketPrice> skuTicketPrices = skuTicketPriceMapper.findBySkuId(ticket.getSkuId());
+        model.put("ticket", ticket);
+        model.put("ticketPrices", skuTicketPrices);
+        model.put("module", MODULE_SKU_TICKET_DETAIL);
+        return "sku_ticket_detail";
     }
 
 
