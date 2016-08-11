@@ -1,0 +1,1 @@
+ALTER TABLE sku_ticket ADD COLUMN `status` INT(4) DEFAULT 10;

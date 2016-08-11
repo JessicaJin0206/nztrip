@@ -40,6 +40,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -55,6 +56,7 @@ public class HomeController {
     public static final String MODULE_QUERY_VENDOR = "query_vendor";
     public static final String MODULE_CREATE_VENDOR = "create_vendor";
     public static final String MODULE_SKU_DETAIL = "sku_detail";
+	public static final String MODULE_VENDOR_DETAIL = "vendor_detail";
 
     private ThreadLocal<Token> token = new ThreadLocal<>();
 
@@ -227,9 +229,24 @@ public class HomeController {
     @RequestMapping("vendors")
     @Authentication(Role.Admin)
     public String queryVendor(Map<String, Object> model) {
+        Map<Integer, Vendor> vendorMap = vendorService.findAll();
         model.put("module", MODULE_QUERY_VENDOR);
+        model.put("vendors", vendorMap.values());
         return "vendors";
     }
+
+	@RequestMapping("vendors/{id}")
+	@Authentication(Role.Admin)
+	public String vendorDetail(@PathVariable("id") int id, Map<String, Object> model) {
+		model.put("module", MODULE_VENDOR_DETAIL);
+		Vendor vendor = vendorService.findById(id);
+		if (vendor == null) {
+			throw new ResourceNotFoundException();
+		}
+		model.put("vendor", vendor);
+		model.put("editing", false);
+		return "vendor_detail";
+	}
 
     private List<Sku> searchSku(String keyword, int cityId, int categoryId, RowBounds rowBounds) {
         return skuMapper.findAllByMultiFields(keyword, cityId, categoryId, rowBounds);
