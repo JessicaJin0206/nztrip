@@ -24,13 +24,13 @@ public class VendorService {
     @Autowired
     private UtilityService utilityService;
 
-    private volatile LinkedHashMap<Integer, Vendor> cityMap = null;
+    private volatile LinkedHashMap<Integer, Vendor> vendorMap = null;
 
     @PostConstruct
     public void init() {
-        cityMap = convert();
+        vendorMap = convert();
         utilityService.getScheduledExecutorService().scheduleAtFixedRate(() -> {
-            cityMap = convert();
+            vendorMap = convert();
         }, 5, 5, TimeUnit.MINUTES);
 
     }
@@ -45,6 +45,16 @@ public class VendorService {
     }
 
     public Map<Integer, Vendor> findAll() {
-        return cityMap;
+        return vendorMap;
+    }
+
+    public int createVendor(Vendor vendor) {
+        final int vendorId = vendorMapper.create(vendor);
+        vendorMap = convert();
+        return vendorId;
+    }
+
+    public Vendor findById(int id) {
+        return vendorMapper.findById(id);
     }
 }

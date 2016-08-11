@@ -7,18 +7,18 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="icon" href="favicon.ico">
+    <link rel="icon" href="/favicon.ico">
 
     <title>Dashboard Template for Bootstrap</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <link href="assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+    <link href="/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="css/dashboard.css" rel="stylesheet">
+    <link href="/css/dashboard.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -34,17 +34,27 @@
     <div class="row">
     <#include "menu.ftl"/>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-            <div class="form-group"><label>创建行程商</label></div>
-            <div class="form-group"><input type="text" id="j_name" class="form-control" placeholder="请输入行程商名称...">
+
+            <div class="form-group"><label>查看行程商</label></div>
+            <div class="form-group"><input type="text" id="j_uuid" class="form-control"
+                                           <#if editing = false>disabled</#if> placeholder="请输入行程商名称"
+                                           value="${vendor.name}">
             </div>
-            <div class="form-group"><input type="text" id="j_email" class="form-control" placeholder="请输入行程商邮箱...">
+            <div class="form-group"><input type="text" id="j_name" class="form-control"
+                                           <#if editing = false>disabled</#if> placeholder="请输入行程商邮箱"
+                                           value="${vendor.email}">
             </div>
-            <button id="j_submit" class="btn btn-default form-group">提交</button>
+
+        <#--<#if editing = false>-->
+            <#--<button id="j_edit" class="btn btn-default form-group">修改</button>-->
+        <#--<#else>-->
+            <#--<button id="j_update" class="btn btn-default form-group">提交</button>-->
+        <#--</#if>-->
         </div>
     </div>
 </div>
 
 <#include "third_party_file.ftl"/>
-<script src="js/create_vendor.js"></script>
+<script src="/js/create_sku.js"></script>
 </body>
 </html>

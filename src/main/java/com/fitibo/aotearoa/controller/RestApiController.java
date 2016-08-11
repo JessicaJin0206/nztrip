@@ -2,6 +2,7 @@ package com.fitibo.aotearoa.controller;
 
 import com.fitibo.aotearoa.annotation.Authentication;
 import com.fitibo.aotearoa.constants.CommonConstants;
+import com.fitibo.aotearoa.constants.SkuTicketStatus;
 import com.fitibo.aotearoa.dto.Role;
 import com.fitibo.aotearoa.dto.Token;
 import com.fitibo.aotearoa.exception.AuthenticationFailureException;
@@ -10,18 +11,25 @@ import com.fitibo.aotearoa.exception.ResourceNotFoundException;
 import com.fitibo.aotearoa.mapper.*;
 import com.fitibo.aotearoa.model.*;
 import com.fitibo.aotearoa.service.TokenService;
+import com.fitibo.aotearoa.service.VendorService;
 import com.fitibo.aotearoa.util.GuidGenerator;
 import com.fitibo.aotearoa.vo.*;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import org.apache.ibatis.ognl.IntHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by qianhao.zhou on 7/29/16.
@@ -49,6 +57,9 @@ public class RestApiController {
 
     @Autowired
     private AdminMapper adminMapper;
+
+    @Autowired
+    private VendorService vendorService;
 
     @Autowired
     private TokenService tokenService;
@@ -94,8 +105,39 @@ public class RestApiController {
         Sku sku = parse(skuVo);
         sku.setId(id);
         skuMapper.update(sku);
+        List<SkuTicket> ticketList = skuTicketMapper.findOnlineBySkuId(id);
+        Map<Integer, SkuTicket> ticketMap = new HashMap<>();
+        if(!ticketList.isEmpty()) {
+            for(SkuTicket ticket : ticketList) {
+                ticketMap.put(ticket.getId(), ticket);
+            }
+        }
+        List<SkuTicket> updateList = new ArrayList<>();
+        List<SkuTicket> createList = new ArrayList<>();
+        List<SkuTicket> deleteList = new ArrayList<>();
         for (SkuTicket skuTicket : Lists.transform(skuVo.getTickets(), (input) -> parse(id, input))) {
-            skuTicketMapper.update(skuTicket);
+            if(skuTicket.getId() > 0) {
+                updateList.add(skuTicket);
+                ticketMap.remove(skuTicket.getId());
+            } else {
+                createList.add(skuTicket);
+            }
+        }
+        if(!ticketMap.isEmpty()) {
+            for(SkuTicket skuTicket : ticketMap.values()) {
+                skuTicket.setStatus(SkuTicketStatus.OFFLINE);
+                deleteList.add(skuTicket);
+            }
+        }
+
+        if(!createList.isEmpty()) {
+            skuTicketMapper.batchCreate(createList);
+        }
+        if(!updateList.isEmpty()) {
+            skuTicketMapper.batchUpdate(updateList);
+        }
+        if(!deleteList.isEmpty()) {
+            skuTicketMapper.batchUpdate(deleteList);
         }
         return skuVo;
     }
@@ -162,6 +204,14 @@ public class RestApiController {
 
     }
 
+    @RequestMapping(value = "v1/api/vendors", method = RequestMethod.POST)
+    @Authentication(Role.Admin)
+    public Vendor createVendor(@RequestBody Vendor vendor) {
+        final int vendorId = vendorService.createVendor(vendor);
+        vendor.setId(vendorId);
+        return vendor;
+    }
+
     private static Order parse(OrderVo order, int agentId) {
         Order result = new Order();
         result.setSkuId(order.getSkuId());
@@ -204,14 +254,16 @@ public class RestApiController {
         result.setWeightConstraint(skuTicketVo.getMinWeight() + "-" + skuTicketVo.getMaxWeight());
         result.setCountConstraint(skuTicketVo.getCount() + "");
         result.setDescription(skuTicketVo.getDescription());
+        //Sku页面展示TicketVo的目前都是在线的
+        result.setStatus(SkuTicketStatus.ONLINE);
         return result;
     }
 
-    public final void setToken(Token token) {
+    public void setToken(Token token) {
         this.token.set(token);
     }
 
-    public final Token getToken() {
+    public Token getToken() {
         return this.token.get();
     }
 

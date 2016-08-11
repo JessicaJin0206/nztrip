@@ -53,10 +53,19 @@ public class SkuTicket extends ModelObject {
         this.description = description;
     }
 
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
     private int skuId;
     private String name;
     private String countConstraint;
     private String ageConstraint;
     private String weightConstraint;
     private String description;
+    private int status;
 }

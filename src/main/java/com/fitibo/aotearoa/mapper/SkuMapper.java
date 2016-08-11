@@ -40,7 +40,7 @@ public interface SkuMapper {
             @Result(column = "gathering_place", property = "gatheringPlace"),
             @Result(column = "pickup_service", property = "pickupService"),
             @Result(column = "id", property = "tickets", javaType = List.class, many
-                    = @Many(select = "com.fitibo.aotearoa.mapper.SkuTicketMapper.findBySkuId"))
+                    = @Many(select = "com.fitibo.aotearoa.mapper.SkuTicketMapper.findOnlineBySkuId"))
     })
     Sku findById(int id);
 
