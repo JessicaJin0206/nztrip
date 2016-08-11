@@ -161,7 +161,7 @@
                         <td>
                             <#if editing = true>
                                 <a id="j_ticket_delete"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
-                                <a id="j_ticket_price"><span class="glyphicon glyphicon-calendar"></span></a>
+                                <a id="j_ticket_price" href="/skus/${sku.id}/tickets/${ticket.id}"><span class="glyphicon glyphicon-calendar"></span></a>
                             </#if>
                         </td>
                     </tr>
