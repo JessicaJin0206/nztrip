@@ -64,7 +64,7 @@ $('#j_add_ticket').on('click', function(e){
     if ($(e.target).attr('disabled')) {
         return;
     }
-    var element = $('<tr><td><input id="j_ticket_name" type="text" class="form-control form-group" /></td><td><input id="j_ticket_count" type="number" class="form-control form-group" /></td><td><input id="j_ticket_min_age" type="number" class="form-control form-group" /></td><td><input id="j_ticket_max_age" type="number" class="form-control form-group" /></td><td><input id="j_ticket_min_weight" type="number" class="form-control form-group" /></td><td><input id="j_ticket_max_weight" type="number" class="form-control form-group" /></td><td><input id="j_ticket_description" type="text" class="form-control form-group" /></td><td><a id="j_ticket_delete"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td></tr>');
+    var element = $('<tr><td><input id="j_ticket_name" type="text" class="form-control form-group" /></td><td><input id="j_ticket_count" type="number" class="form-control form-group" /></td><td><input id="j_ticket_min_age" type="number" class="form-control form-group" /></td><td><input id="j_ticket_max_age" type="number" class="form-control form-group" /></td><td><input id="j_ticket_min_weight" type="number" class="form-control form-group" /></td><td><input id="j_ticket_max_weight" type="number" class="form-control form-group" /></td><td><input id="j_ticket_description" type="text" class="form-control form-group" /></td><td><a id="j_ticket_delete"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a><a id="j_ticket_price"><span class="glyphicon glyphicon-calendar"></span></a></td></tr>');
     var container = $('#j_ticket_container');
     container.append(element);
     element.find('#j_ticket_delete').on('click', function() {
@@ -74,7 +74,7 @@ $('#j_add_ticket').on('click', function(e){
 
 $('#j_ticket_container tr').each(function(index, e){
     var row = $(e);
-    row.find('td a').on('click', function(){
+    row.find('td a#j_ticket_delete').on('click', function(){
         row.remove();
     });
 });
