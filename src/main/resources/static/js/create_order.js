@@ -39,6 +39,7 @@ $('#j_ticket_type_selector li a').on('click', function(e){
     var ticket = $('#j_ticket');
     ticket.attr('value', selected.attr("value"));
     ticket.attr('count', selected.attr("count"));
+    ticket.attr('available_date', selected.attr("available_date"));
     ticket.html(selected.html());
 });
 
@@ -49,16 +50,40 @@ $('#add_ticket').on('click', function(e){
     if (ticketType <= 0) {
         return;
     }
-    var ticketContainer = $('<div class="form-group"><table class="table" id="j_ticket_container"><thead><tr><th id="j_ticket_name"></th><th>姓名</th><th>年龄</th><th>体重</th><th>出发时间</th></tr></thead><tbody></tbody></table></div>');
+    var availableDate = ticket.attr('available_date').split("|").filter(function(value){
+        return value.length > 0;
+    }).sort();
+    if (availableDate.length == 0) {
+        warn("无可选日期");
+        return;
+    }
+    var ticketContainer = $('<div class="form-group"><div class="input-group date col-md-3 col-sm-3 col-xs-3 form-group" id="j_ticket_date"><input type="text" class="form-control"/><span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span></div><div class="form-group dropdown"><button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><span value="0" id="j_ticket_time_span" count="0">选择票种</span><span class="caret"></span></button><ul class="dropdown-menu" id="j_ticket_time_selector"></ul></div><table class="table" id="j_ticket_container"><thead><tr><th id="j_ticket_name"></th><th>姓名</th><th>年龄</th><th>体重</th></tr></thead><tbody></tbody></table></div>');
     var ticketName = ticket.html();
     var ticketCount = parseInt(ticket.attr('count'));
     $('#add_ticket').parent().after(ticketContainer);
     ticketContainer.find('table').attr('value', ticketType);
     ticketContainer.find('#j_ticket_name').html(ticketName);
     for(var i = 0; i < ticketCount; i++) {
-        var ticketDetail = $('<tr><th></th><th><input type="text" id="j_user_name" class="form-control"/></th><th><input type="number" id="j_user_age" class="form-control"/></th><th><input type="number" id="j_user_weight" class="form-control"/></th><th><a>选择时间</a></th></tr>')
+        var ticketDetail = $('<tr><th></th><th><input type="text" id="j_user_name" class="form-control"/></th><th><input type="number" id="j_user_age" class="form-control"/></th><th><input type="number" id="j_user_weight" class="form-control"/></th></tr>')
         ticketContainer.find('tbody').append(ticketDetail);
     }
+    var minDate = moment(availableDate[0]);
+    var maxDate = moment(availableDate[availableDate.length - 1]);
+    var disabledDates = [];
+    for (var d = minDate.clone(); d.isBefore(maxDate) || d.isSame(maxDate); d.add(1, 'days')) {
+        if (availableDate.indexOf(d.format('YYYY-MM-DD')) < 0) {
+            disabledDates.push(d.clone());
+        }
+    }
+    ticketContainer.find('#j_ticket_date').datetimepicker({
+        disabledDates: disabledDates,
+        minDate: minDate,
+        maxDate: maxDate,
+        format: "YYYY-MM-DD"
+    }).change(function(date, oldDate){
+        console.log(date);
+        console.log(oldDate);
+    });
 });
 
 $('#j_submit').on('click', function(){

@@ -1,5 +1,7 @@
 package com.fitibo.aotearoa.vo;
 
+import java.util.List;
+
 /**
  * Created by qianhao.zhou on 8/3/16.
  */
@@ -70,6 +72,14 @@ public class SkuTicketVo {
         this.description = description;
     }
 
+    public List<SkuTicketPriceVo> getTicketPrices() {
+        return ticketPrices;
+    }
+
+    public void setTicketPrices(List<SkuTicketPriceVo> ticketPrices) {
+        this.ticketPrices = ticketPrices;
+    }
+
     private int id;
     private String name;
     private int count;
@@ -78,5 +88,6 @@ public class SkuTicketVo {
     private int minWeight;
     private int maxWeight;
     private String description;
+    private List<SkuTicketPriceVo> ticketPrices;
 
 }

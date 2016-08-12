@@ -46,7 +46,9 @@
     </button>
     <ul class="dropdown-menu" id="j_ticket_type_selector">
     <#list sku.tickets as ticket>
-        <li><a value="${ticket.id}" count="${ticket.count}">${ticket.name}</a></li>
+        <li><a value="${ticket.id}" count="${ticket.count}"
+               available_date="<#list ticket.ticketPrices as ticketPrice>${ticketPrice.date}|</#list>">${ticket.name}</a>
+        </li>
     </#list>
     </ul>
     <a id="add_ticket"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"/></a>
