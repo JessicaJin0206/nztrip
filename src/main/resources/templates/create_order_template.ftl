@@ -51,5 +51,21 @@
         </li>
     </#list>
     </ul>
-    <a id="add_ticket"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"/></a>
+
+</div>
+
+<div class="form-group">
+    <div class="input-group date col-md-3 col-sm-3 col-xs-3 form-group" id="j_ticket_date">
+        <input type="text" class="form-control"/>
+        <span class="input-group-addon">
+            <span class="glyphicon glyphicon-calendar"/>
+        </span>
+    </div>
+    <div class="form-group dropdown">
+        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true"
+                aria-expanded="true"><span value="0" id="j_ticket_time_span" count="0">选择时间</span><span
+                class="caret"></span></button>
+        <ul class="dropdown-menu" id="j_ticket_time_selector"></ul>
+        <a id="add_ticket"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"/></a>
+    </div>
 </div>
