@@ -1,0 +1,11 @@
+ALTER TABLE order_ticket ADD COLUMN sku_ticket_name VARCHAR(20) NOT NULL;
+ALTER TABLE order_ticket ADD COLUMN count_constraint VARCHAR(15) NOT NULL DEFAULT 1;
+ALTER TABLE order_ticket ADD COLUMN age_constraint VARCHAR(15);
+ALTER TABLE order_ticket ADD COLUMN weight_constraint VARCHAR(15);
+ALTER TABLE order_ticket ADD COLUMN ticket_description VARCHAR(100);
+ALTER TABLE order_ticket ADD COLUMN ticket_price_id int(11) NOT NULL;
+ALTER TABLE order_ticket ADD COLUMN ticket_date DATETIME NOT NULL;
+ALTER TABLE order_ticket ADD COLUMN ticket_time VARCHAR(20) NOT NULL;
+ALTER TABLE order_ticket ADD COLUMN sale_price INT(11) DEFAULT 0;
+ALTER TABLE order_ticket ADD COLUMN cost_price INT(11) DEFAULT 0;
+ALTER TABLE order_ticket ADD COLUMN price_description VARCHAR(100);

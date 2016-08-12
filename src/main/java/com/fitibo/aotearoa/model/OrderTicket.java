@@ -1,5 +1,6 @@
 package com.fitibo.aotearoa.model;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -55,10 +56,100 @@ public class OrderTicket {
         this.users = users;
     }
 
-    private int id;
+    public String getCountConstraint() {
+        return countConstraint;
+    }
+
+    public void setCountConstraint(String countConstraint) {
+        this.countConstraint = countConstraint;
+    }
+
+    public String getAgeConstraint() {
+        return ageConstraint;
+    }
+
+    public void setAgeConstraint(String ageConstraint) {
+        this.ageConstraint = ageConstraint;
+    }
+
+    public String getWeightConstraint() {
+        return weightConstraint;
+    }
+
+    public void setWeightConstraint(String weightConstraint) {
+        this.weightConstraint = weightConstraint;
+    }
+
+    public String getTicketDescription() {
+        return ticketDescription;
+    }
+
+    public void setTicketDescription(String ticketDescription) {
+        this.ticketDescription = ticketDescription;
+    }
+
+    public Date getTicketDate() {
+        return ticketDate;
+    }
+
+    public void setTicketDate(Date ticketDate) {
+        this.ticketDate = ticketDate;
+    }
+
+    public String getTicketTime() {
+        return ticketTime;
+    }
+
+    public void setTicketTime(String ticketTime) {
+        this.ticketTime = ticketTime;
+    }
+
+	public int getSalePrice() {
+		return salePrice;
+	}
+
+	public void setSalePrice(int salePrice) {
+		this.salePrice = salePrice;
+	}
+
+	public int getCostPrice() {
+		return costPrice;
+	}
+
+	public void setCostPrice(int costPrice) {
+		this.costPrice = costPrice;
+	}
+
+	public String getPriceDescription() {
+        return priceDescription;
+    }
+
+    public void setPriceDescription(String priceDescription) {
+        this.priceDescription = priceDescription;
+    }
+
+	public int getTicketPriceId() {
+		return ticketPriceId;
+	}
+
+	public void setTicketPriceId(int ticketPriceId) {
+		this.ticketPriceId = ticketPriceId;
+	}
+
+	private int id;
     private int skuId;
     private int orderId;
     private int skuTicketId;
     private String skuTicket;
+    private String countConstraint;
+    private String ageConstraint;
+    private String weightConstraint;
+    private String ticketDescription;
+	private int ticketPriceId;
+    private Date ticketDate;
+    private String ticketTime;
+    private int salePrice;
+    private int costPrice;
+    private String priceDescription;
     private List<OrderTicketUser> users;
 }
