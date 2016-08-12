@@ -40,6 +40,26 @@ $('#j_ticket_type_selector li a').on('click', function(e){
     ticket.attr('value', selected.attr("value"));
     ticket.attr('count', selected.attr("count"));
     ticket.html(selected.html());
+    var availableDate = selected.attr('available_date').split("|").filter(function(value) {
+        return value.length > 0;
+    }).sort();
+    var minDate = moment(availableDate[0]);
+    var maxDate = moment(availableDate[availableDate.length - 1]);
+    var disabledDates = [];
+    for (var d = minDate.clone(); d.isBefore(maxDate) || d.isSame(maxDate); d.add(1, 'days')) {
+        if (availableDate.indexOf(d.format('YYYY-MM-DD')) < 0) {
+            disabledDates.push(d.clone());
+        }
+    }
+    if ($('#j_ticket_date').data('DateTimePicker')) {
+        $('#j_ticket_date').data('DateTimePicker').destroy();
+    }
+    $('#j_ticket_date').datetimepicker({
+        disabledDates: disabledDates,
+        minDate: minDate,
+        maxDate: maxDate,
+        format: "YYYY-MM-DD"
+    });
 });
 
 
@@ -49,14 +69,14 @@ $('#add_ticket').on('click', function(e){
     if (ticketType <= 0) {
         return;
     }
-    var ticketContainer = $('<div class="form-group"><table class="table" id="j_ticket_container"><thead><tr><th id="j_ticket_name"></th><th>姓名</th><th>年龄</th><th>体重</th><th>出发时间</th></tr></thead><tbody></tbody></table></div>');
+    var ticketContainer = $('<div class="form-group"><table class="table" id="j_ticket_container"><thead><tr><th id="j_ticket_name"></th><th>姓名</th><th>年龄</th><th>体重</th></tr></thead><tbody></tbody></table></div>');
     var ticketName = ticket.html();
     var ticketCount = parseInt(ticket.attr('count'));
     $('#add_ticket').parent().after(ticketContainer);
     ticketContainer.find('table').attr('value', ticketType);
     ticketContainer.find('#j_ticket_name').html(ticketName);
     for(var i = 0; i < ticketCount; i++) {
-        var ticketDetail = $('<tr><th></th><th><input type="text" id="j_user_name" class="form-control"/></th><th><input type="number" id="j_user_age" class="form-control"/></th><th><input type="number" id="j_user_weight" class="form-control"/></th><th><a>选择时间</a></th></tr>')
+        var ticketDetail = $('<tr><th></th><th><input type="text" id="j_user_name" class="form-control"/></th><th><input type="number" id="j_user_age" class="form-control"/></th><th><input type="number" id="j_user_weight" class="form-control"/></th></tr>')
         ticketContainer.find('tbody').append(ticketDetail);
     }
 });

@@ -1,5 +1,6 @@
 package com.fitibo.aotearoa.mapper;
 
+import com.fitibo.aotearoa.constants.SkuTicketStatus;
 import com.fitibo.aotearoa.model.SkuTicket;
 import org.apache.ibatis.annotations.*;
 
@@ -52,7 +53,7 @@ public interface SkuTicketMapper {
     })
     List<SkuTicket> findBySkuId(int skuId);
 
-    @Select("select * from sku_ticket where sku_id = #{id} and status = 10")
+    @Select("select * from sku_ticket where sku_id = #{id} and status = " + SkuTicketStatus.ONLINE)
     @Results({
             @Result(column = "id", property = "id"),
             @Result(column = "name", property = "name"),
@@ -61,7 +62,9 @@ public interface SkuTicketMapper {
             @Result(column = "age_constraint", property = "ageConstraint"),
             @Result(column = "weight_constraint", property = "weightConstraint"),
             @Result(column = "description", property = "description"),
-            @Result(column = "status", property = "status")
+            @Result(column = "status", property = "status"),
+            @Result(column = "id", property = "ticketPrices", javaType = List.class,
+                    many = @Many(select = "com.fitibo.aotearoa.mapper.SkuTicketPriceMapper.findBySkuTicketId"))
     })
     List<SkuTicket> findOnlineBySkuId(int skuId);
 

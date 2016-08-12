@@ -1,5 +1,7 @@
 package com.fitibo.aotearoa.model;
 
+import java.util.List;
+
 /**
  * Created by qianhao.zhou on 7/27/16.
  */
@@ -61,6 +63,14 @@ public class SkuTicket extends ModelObject {
         this.status = status;
     }
 
+    public List<SkuTicketPrice> getTicketPrices() {
+        return ticketPrices;
+    }
+
+    public void setTicketPrices(List<SkuTicketPrice> ticketPrices) {
+        this.ticketPrices = ticketPrices;
+    }
+
     private int skuId;
     private String name;
     private String countConstraint;
@@ -68,4 +78,5 @@ public class SkuTicket extends ModelObject {
     private String weightConstraint;
     private String description;
     private int status;
+    private List<SkuTicketPrice> ticketPrices;
 }

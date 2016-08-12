@@ -26,6 +26,8 @@ import com.fitibo.aotearoa.model.*;
 import com.fitibo.aotearoa.service.CategoryService;
 import com.fitibo.aotearoa.service.CityService;
 import com.fitibo.aotearoa.service.VendorService;
+import com.fitibo.aotearoa.util.DateUtils;
+import com.fitibo.aotearoa.vo.SkuTicketPriceVo;
 import com.fitibo.aotearoa.vo.SkuTicketVo;
 import com.fitibo.aotearoa.vo.SkuVo;
 import com.google.common.base.Preconditions;
@@ -297,6 +299,16 @@ public class HomeController {
             String[] weights = input.getWeightConstraint().split("-");
             ticket.setMinWeight(Integer.parseInt(weights[0]));
             ticket.setMaxWeight(Integer.parseInt(weights[1]));
+            ticket.setTicketPrices(Lists.transform(input.getTicketPrices(), (price) -> {
+                SkuTicketPriceVo priceVo = new SkuTicketPriceVo();
+                priceVo.setCostPrice(price.getCostPrice());
+                priceVo.setSalePrice(price.getSalePrice());
+                priceVo.setId(price.getId());
+                priceVo.setTime(price.getTime());
+                priceVo.setDate(DateUtils.formatDate(price.getDate()));
+                priceVo.setDescription(price.getDescription());
+                return priceVo;
+            }));
             return ticket;
         }));
         return result;

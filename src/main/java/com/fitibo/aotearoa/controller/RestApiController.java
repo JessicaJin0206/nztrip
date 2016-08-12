@@ -12,6 +12,7 @@ import com.fitibo.aotearoa.mapper.*;
 import com.fitibo.aotearoa.model.*;
 import com.fitibo.aotearoa.service.TokenService;
 import com.fitibo.aotearoa.service.VendorService;
+import com.fitibo.aotearoa.util.DateUtils;
 import com.fitibo.aotearoa.util.GuidGenerator;
 import com.fitibo.aotearoa.vo.*;
 import com.google.common.base.Function;
@@ -42,6 +43,9 @@ public class RestApiController {
 
     @Autowired
     private SkuTicketMapper skuTicketMapper;
+
+    @Autowired
+    private SkuTicketPriceMapper skuTicketPriceMapper;
 
     @Autowired
     private OrderMapper orderMapper;
@@ -208,6 +212,23 @@ public class RestApiController {
         final int vendorId = vendorService.createVendor(vendor);
         vendor.setId(vendorId);
         return vendor;
+    }
+
+    @RequestMapping(value = "v1/api/tickets/{ticketId}/price")
+    public List<SkuTicketPriceVo> getPrice(@PathVariable("ticketId") int ticketId) {
+        List<SkuTicketPrice> bySkuTicketId = skuTicketPriceMapper.findBySkuTicketId(ticketId);
+        return Lists.transform(bySkuTicketId, (input) -> {
+            SkuTicketPriceVo result = new SkuTicketPriceVo();
+            result.setId(input.getId());
+            result.setCostPrice(input.getCostPrice());
+            result.setSalePrice(input.getSalePrice());
+            result.setSkuId(input.getSkuId());
+            result.setSkuTicketId(input.getSkuTicketId());
+            result.setDescription(input.getDescription());
+            result.setDate(DateUtils.formatDate(input.getDate()));
+            result.setTime(input.getTime());
+            return result;
+        });
     }
 
     private static Order parse(OrderVo order, int agentId) {
