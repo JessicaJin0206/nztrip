@@ -11,6 +11,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
-@Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/20160724-ddl.sql", "classpath:sql/20160729-dml.sql"})
+@Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = {"classpath:sql/20160724-ddl.sql", "classpath:sql/20160729-dml.sql", "classpath:sql/20160806-ddl.sql", "classpath:sql/20160810-ddl.sql", "classpath:sql/20160810-dml.sql", "classpath:sql/20160811-ddl.sql", "classpath:sql/20160812-ddl.sql"})
 public abstract class BaseTest {
 }

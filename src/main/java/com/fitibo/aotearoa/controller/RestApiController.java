@@ -156,10 +156,8 @@ public class RestApiController {
             throw new InvalidParamException();
         }
         for (OrderTicketVo orderTicketVo : order.getOrderTickets()) {
-            OrderTicket orderTicket = new OrderTicket();
-            orderTicket.setSkuId(order.getSkuId());
-            orderTicket.setSkuTicketId(orderTicketVo.getSkuTicketId());
-            orderTicket.setOrderId(order.getId());
+			//need to verify params?
+            OrderTicket orderTicket = parse(orderTicketVo, order);
             orderTicketMapper.create(orderTicket);
             orderTicketVo.setId(orderTicket.getId());
             if (CollectionUtils.isEmpty(orderTicketVo.getOrderTicketUsers())) {
@@ -258,6 +256,25 @@ public class RestApiController {
         result.setStatus(SkuTicketStatus.ONLINE);
         return result;
     }
+
+	private static OrderTicket parse(OrderTicketVo ticketVo, OrderVo orderVo) {
+		OrderTicket result = new OrderTicket();
+		result.setSkuId(orderVo.getSkuId());
+		result.setOrderId(orderVo.getId());
+		result.setSkuTicketId(ticketVo.getSkuTicketId());
+		result.setSkuTicket(ticketVo.getSkuTicket());
+		result.setCountConstraint(ticketVo.getCountConstraint());
+		result.setAgeConstraint(ticketVo.getAgeConstraint());
+		result.setWeightConstraint(ticketVo.getWeightConstraint());
+		result.setTicketDescription(ticketVo.getTicketDescription());
+		result.setTicketPriceId(ticketVo.getTicketPriceId());
+		result.setTicketDate(ticketVo.getTicketDate());
+		result.setTicketTime(ticketVo.getTicketTime());
+		result.setSalePrice(ticketVo.getSalePrice());
+		result.setCostPrice(ticketVo.getCostPrice());
+		result.setPriceDescription(ticketVo.getPriceDescription());
+		return result;
+	}
 
     public void setToken(Token token) {
         this.token.set(token);

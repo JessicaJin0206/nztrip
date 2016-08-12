@@ -49,9 +49,9 @@ public class VendorService {
     }
 
     public int createVendor(Vendor vendor) {
-        final int vendorId = vendorMapper.create(vendor);
+        vendorMapper.create(vendor);
         vendorMap = convert();
-        return vendorId;
+        return vendor.getId();
     }
 
     public Vendor findById(int id) {

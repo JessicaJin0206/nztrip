@@ -1,5 +1,6 @@
 package com.fitibo.aotearoa.vo;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -31,8 +32,110 @@ public class OrderTicketVo {
         this.orderTicketUsers = orderTicketUsers;
     }
 
+    public String getSkuTicket() {
+        return skuTicket;
+    }
+
+    public void setSkuTicket(String skuTicket) {
+        this.skuTicket = skuTicket;
+    }
+
+    public String getCountConstraint() {
+        return countConstraint;
+    }
+
+    public void setCountConstraint(String countConstraint) {
+        this.countConstraint = countConstraint;
+    }
+
+    public String getAgeConstraint() {
+        return ageConstraint;
+    }
+
+    public void setAgeConstraint(String ageConstraint) {
+        this.ageConstraint = ageConstraint;
+    }
+
+    public String getWeightConstraint() {
+        return weightConstraint;
+    }
+
+    public void setWeightConstraint(String weightConstraint) {
+        this.weightConstraint = weightConstraint;
+    }
+
+    public String getTicketDescription() {
+        return ticketDescription;
+    }
+
+    public void setTicketDescription(String ticketDescription) {
+        this.ticketDescription = ticketDescription;
+    }
+
+    public int getTicketPriceId() {
+        return ticketPriceId;
+    }
+
+    public void setTicketPriceId(int ticketPriceId) {
+        this.ticketPriceId = ticketPriceId;
+    }
+
+    public Date getTicketDate() {
+        return ticketDate;
+    }
+
+    public void setTicketDate(Date ticketDate) {
+        this.ticketDate = ticketDate;
+    }
+
+    public String getTicketTime() {
+        return ticketTime;
+    }
+
+    public void setTicketTime(String ticketTime) {
+        this.ticketTime = ticketTime;
+    }
+
+    public int getSalePrice() {
+        return salePrice;
+    }
+
+    public void setSalePrice(int salePrice) {
+        this.salePrice = salePrice;
+    }
+
+    public int getCostPrice() {
+        return costPrice;
+    }
+
+    public void setCostPrice(int costPrice) {
+        this.costPrice = costPrice;
+    }
+
+    public String getPriceDescription() {
+        return priceDescription;
+    }
+
+    public void setPriceDescription(String priceDescription) {
+        this.priceDescription = priceDescription;
+    }
+
     private int id;
+    //sku_ticket
     private int skuTicketId;
+    private String skuTicket;
+    private String countConstraint;
+    private String ageConstraint;
+    private String weightConstraint;
+    private String ticketDescription;
+    //sku_ticket_price
+    private int ticketPriceId;
+    private Date ticketDate;
+    private String ticketTime;
+    private int salePrice;
+    private int costPrice;
+    private String priceDescription;
+    //order_ticket_user
     private List<OrderTicketUserVo> orderTicketUsers;
 
 }

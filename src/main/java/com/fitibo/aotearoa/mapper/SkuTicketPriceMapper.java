@@ -47,4 +47,6 @@ public interface SkuTicketPriceMapper {
             @Result(column = "description", property = "description"),
     })
     List<SkuTicketPrice> findBySkuId(@Param("skuId") int skuId);
+
+
 }
