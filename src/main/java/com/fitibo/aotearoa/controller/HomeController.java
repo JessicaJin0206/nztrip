@@ -31,6 +31,7 @@ import com.fitibo.aotearoa.vo.AgentVo;
 import com.fitibo.aotearoa.vo.SkuTicketPriceVo;
 import com.fitibo.aotearoa.vo.SkuTicketVo;
 import com.fitibo.aotearoa.vo.SkuVo;
+import com.fitibo.aotearoa.vo.*;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.apache.ibatis.session.RowBounds;
@@ -163,7 +164,31 @@ public class HomeController {
             throw new ResourceNotFoundException();
         }
         model.put("order", order);
-        model.put("tickets", orderTicketMapper.findByOrderId(order.getId()));
+        model.put("tickets", Lists.transform(orderTicketMapper.findByOrderId(order.getId()), (input) -> {
+            OrderTicketVo result = new OrderTicketVo();
+            result.setId(input.getId());
+            result.setAgeConstraint(input.getAgeConstraint());
+            result.setCountConstraint(input.getAgeConstraint());
+            result.setWeightConstraint(input.getWeightConstraint());
+            result.setPriceDescription(input.getPriceDescription());
+            result.setSalePrice(input.getSalePrice());
+            result.setTicketDate(DateUtils.formatDate(input.getTicketDate()));
+            result.setTicketTime(input.getTicketTime());
+            result.setSkuTicket(input.getSkuTicket());
+            result.setSkuTicketId(input.getSkuTicketId());
+            result.setTicketPriceId(input.getTicketPriceId());
+            result.setOrderTicketUsers(Lists.transform(input.getUsers(), (input2) -> {
+                OrderTicketUserVo userVo = new OrderTicketUserVo();
+                userVo.setAge(input2.getAge());
+                userVo.setId(input2.getId());
+                userVo.setName(input2.getName());
+                userVo.setOrderTicketId(input2.getOrderTicketId());
+                userVo.setWeight(input2.getWeight());
+                return userVo;
+            }));
+            result.setCostPrice(input.getCostPrice());
+            return result;
+        }));
         model.put("module", MODULE_ORDER_DETAIL);
         model.put("editing", false);
         return "order_detail";

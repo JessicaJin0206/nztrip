@@ -236,8 +236,9 @@ public class RestApiController {
     }
 
     @RequestMapping(value = "v1/api/tickets/{ticketId}/price")
-    public List<SkuTicketPriceVo> getPrice(@PathVariable("ticketId") int ticketId) {
-        List<SkuTicketPrice> bySkuTicketId = skuTicketPriceMapper.findBySkuTicketId(ticketId);
+    public List<SkuTicketPriceVo> getPrice(@PathVariable("ticketId") int ticketId,
+                                           @RequestParam("date")String date) {
+        List<SkuTicketPrice> bySkuTicketId = skuTicketPriceMapper.findBySkuTicketIdAndDate(ticketId, DateUtils.parseDate(date));
         return Lists.transform(bySkuTicketId, (input) -> {
             SkuTicketPriceVo result = new SkuTicketPriceVo();
             result.setId(input.getId());
@@ -310,7 +311,7 @@ public class RestApiController {
 		result.setWeightConstraint(ticketVo.getWeightConstraint());
 		result.setTicketDescription(ticketVo.getTicketDescription());
 		result.setTicketPriceId(ticketVo.getTicketPriceId());
-		result.setTicketDate(ticketVo.getTicketDate());
+		result.setTicketDate(DateUtils.parseDate(ticketVo.getTicketDate()));
 		result.setTicketTime(ticketVo.getTicketTime());
 		result.setSalePrice(ticketVo.getSalePrice());
 		result.setCostPrice(ticketVo.getCostPrice());

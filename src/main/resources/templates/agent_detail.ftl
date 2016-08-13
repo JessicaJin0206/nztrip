@@ -48,7 +48,7 @@
                                            <#if action != "edit">disabled</#if> placeholder="请输入代理商备注"
                                            value="${agent.description}">
             </div>
-            <div class="form-group"><input type="text" id="j_discount" class="form-control"
+            <div class="form-group"><input type="number" id="j_discount" class="form-control"
                                            <#if action != "edit">disabled</#if> placeholder="请输入代理商折扣"
                                            value="${agent.discount}">
             </div>
@@ -57,7 +57,7 @@
                                            value="${agent.email}">
             </div>
             <#if action = "reset"><div class="form-group"><input type="text" id="j_password" class="form-control"
-                                           placeholder="请输入代理商邮箱"></div>
+                                           placeholder="请输入代理商用户密码"></div>
             </#if>
 
         <#if action = "check">

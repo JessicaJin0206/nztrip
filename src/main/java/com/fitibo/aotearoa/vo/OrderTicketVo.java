@@ -80,11 +80,11 @@ public class OrderTicketVo {
         this.ticketPriceId = ticketPriceId;
     }
 
-    public Date getTicketDate() {
+    public String getTicketDate() {
         return ticketDate;
     }
 
-    public void setTicketDate(Date ticketDate) {
+    public void setTicketDate(String ticketDate) {
         this.ticketDate = ticketDate;
     }
 
@@ -130,7 +130,7 @@ public class OrderTicketVo {
     private String ticketDescription;
     //sku_ticket_price
     private int ticketPriceId;
-    private Date ticketDate;
+    private String ticketDate;
     private String ticketTime;
     private int salePrice;
     private int costPrice;
