@@ -7,20 +7,21 @@
 </div>
 <div class="form-group"><label>游客信息</label></div>
 <#list tickets as ticket>
-<div class="form-group">
+<div class="form-group" id="j_ticket_container">
+    <div class="form-group"><label>票种:</label><span id="j_ticket_name_span"><#if ticket.skuTicket??>${ticket.skuTicket}</#if></span></div>
+    <div class="form-group"><label>日期:</label><span id="j_ticket_date_span">${ticket.ticketDate}</span></div>
+    <div class="form-group"><label>时间:</label><span id="j_ticket_time_span">${ticket.ticketTime}</span></div>
     <table class="table">
         <thead>
         <tr>
-            <th><#if ticket.skuTicket??>${ticket.skuTicket}</#if></th>
             <th>姓名</th>
             <th>年龄</th>
             <th>体重</th>
         </tr>
         </thead>
         <tbody id="j_ticket_container">
-            <#list ticket.users as user>
+            <#list ticket.orderTicketUsers as user>
             <tr>
-                <td></td>
                 <td><input class="form-control" disabled value="${user.name}"/></td>
                 <td><input class="form-control" disabled value="${user.age}"/></td>
                 <td><input class="form-control" disabled value="${user.weight}"/></td>

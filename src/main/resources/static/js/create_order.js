@@ -142,13 +142,29 @@ $('#j_submit').on('click', function(){
         warn("缺少主要联系人信息");
         return;
     }
-    $('#j_ticket_container table').each(function(index, e){
+    var ticketContainer = $('#j_ticket_container');
+    if (ticketContainer.length == 0) {
+        warn("至少需要添加一张票");
+        return;
+    }
+    ticketContainer.each(function(index, e){
         var orderTicket = {};
-        var container = $(e);
-        orderTicket.skuTicketId = parseInt(container.attr('value'));
+        var node = $(e);
+        orderTicket.skuTicketId = parseInt(node.attr('ticketid'));
+        orderTicket.skuTicket = node.find("#j_ticket_name_span").html();
+        orderTicket.countConstraint = "";
+        orderTicket.ageConstraint = "";
+        orderTicket.weightConstraint = "";
+        orderTicket.ticketDescription = "";
+        orderTicket.ticketPriceId = parseInt(node.attr('priceid'));
+        orderTicket.ticketDate = node.find("#j_ticket_date_span").html();
+        orderTicket.ticketTime = node.find("#j_ticket_time_span").html();
+        orderTicket.salePrice = 0;
+        orderTicket.costPrice = 0;
+        orderTicket.priceDescription = "";
         orderTicket.orderTicketUsers = [];
         orderTickets.push(orderTicket);
-        container.find('tbody tr').each(function(index, e){
+        ticketContainer.find('tbody tr').each(function(index, e){
             var ticketUserContainer = $(e);
             var name = ticketUserContainer.find('#j_user_name').val();
             var age = parseInt(ticketUserContainer.find('#j_user_age').val());
@@ -160,7 +176,6 @@ $('#j_submit').on('click', function(){
             })
         });
     });
-    console.log(JSON.stringify(orderTickets));
     var data = {
         skuId: skuId,
         primaryContact: primaryContact,

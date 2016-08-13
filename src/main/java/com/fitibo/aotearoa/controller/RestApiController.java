@@ -290,7 +290,7 @@ public class RestApiController {
 		result.setWeightConstraint(ticketVo.getWeightConstraint());
 		result.setTicketDescription(ticketVo.getTicketDescription());
 		result.setTicketPriceId(ticketVo.getTicketPriceId());
-		result.setTicketDate(ticketVo.getTicketDate());
+		result.setTicketDate(DateUtils.parseDate(ticketVo.getTicketDate()));
 		result.setTicketTime(ticketVo.getTicketTime());
 		result.setSalePrice(ticketVo.getSalePrice());
 		result.setCostPrice(ticketVo.getCostPrice());
