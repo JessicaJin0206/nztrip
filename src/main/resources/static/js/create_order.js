@@ -34,6 +34,8 @@ function getQueryString(name) {
     if (r != null) return unescape(r[2]); return null;
 }
 
+var timeSelector = $('#j_ticket_time_selector');
+var timeSpan = $('#j_ticket_time_span');
 $('#j_ticket_type_selector li a').on('click', function(e){
     var selected = $(e.target);
     var ticket = $('#j_ticket');
@@ -51,14 +53,40 @@ $('#j_ticket_type_selector li a').on('click', function(e){
             disabledDates.push(d.clone());
         }
     }
-    if ($('#j_ticket_date').data('DateTimePicker')) {
-        $('#j_ticket_date').data('DateTimePicker').destroy();
+    var selector = $('#j_ticket_date');
+    if (selector.data('DateTimePicker')) {
+        selector.data('DateTimePicker').destroy();
     }
-    $('#j_ticket_date').datetimepicker({
+    selector.find('input').val("");
+    timeSpan.html('选择时间');
+    timeSpan.attr('value', "0");
+    selector.datetimepicker({
         disabledDates: disabledDates,
         minDate: minDate,
         maxDate: maxDate,
         format: "YYYY-MM-DD"
+    }).on('dp.change', function(e){
+        var url = 'v1/api/tickets/' + ticket.attr('value') + '/price?date=' + e.date.format('YYYY-MM-DD');
+        $.ajax({
+            type: 'GET',
+            contentType:"application/json; charset=utf-8",
+            url: url
+        }).success(function(data){
+            if (data && data.length > 0) {
+                timeSelector.empty();
+                for (var i= 0; i < data.length; ++i) {
+                    var price = data[i];
+                    var item = $('<li><a value="' + price.id + '">' + price.time + '</a></li>');
+                    item.on('click', function(){
+                        timeSpan.html(price.time);
+                        timeSpan.attr('value', price.id);
+                    });
+                    timeSelector.append(item);
+                }
+            }
+        }).error(function(){
+            timeSelector.empty();
+        });
     });
 });
 
@@ -67,6 +95,15 @@ $('#add_ticket').on('click', function(e){
     var ticket = $('#j_ticket');
     var ticketType = parseInt(ticket.attr('value'));
     if (ticketType <= 0) {
+        return;
+    }
+    var date = $('#j_ticket_date input').val();
+    if (!(date && date.length > 0)) {
+        return;
+    }
+    var time = timeSpan.html();
+    var priceId = parseInt(timeSpan.attr('value'));
+    if (priceId <= 0) {
         return;
     }
     var ticketContainer = $('<div class="form-group"><table class="table" id="j_ticket_container"><thead><tr><th id="j_ticket_name"></th><th>姓名</th><th>年龄</th><th>体重</th></tr></thead><tbody></tbody></table></div>');

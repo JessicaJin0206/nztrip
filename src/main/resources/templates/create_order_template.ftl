@@ -65,7 +65,8 @@
         <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true"
                 aria-expanded="true"><span value="0" id="j_ticket_time_span" count="0">选择时间</span><span
                 class="caret"></span></button>
-        <ul class="dropdown-menu" id="j_ticket_time_selector"></ul>
+        <ul class="dropdown-menu" id="j_ticket_time_selector">
+        </ul>
         <a id="add_ticket"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"/></a>
     </div>
 </div>

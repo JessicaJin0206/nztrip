@@ -1,7 +1,9 @@
 package com.fitibo.aotearoa.util;
 
 import com.fitibo.aotearoa.constants.DateFormatConstants;
+import com.fitibo.aotearoa.exception.InvalidDateFormatException;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -22,5 +24,13 @@ public final class DateUtils {
 
     public static final String formatDate(Date date) {
         return getDateFormat().format(date);
+    }
+
+    public static final Date parseDate(String dateString) {
+        try {
+            return getDateFormat().parse(dateString);
+        } catch (ParseException e) {
+            throw new InvalidDateFormatException();
+        }
     }
 }

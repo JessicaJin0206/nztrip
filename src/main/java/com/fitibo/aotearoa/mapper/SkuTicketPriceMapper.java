@@ -48,7 +48,20 @@ public interface SkuTicketPriceMapper {
     })
     List<SkuTicketPrice> findBySkuId(@Param("skuId") int skuId);
 
-    @Select("select * from sku_ticket_price where sku_ticket_id = #{skuTicketId} and date > now()")
+    @Select("select * from sku_ticket_price where sku_ticket_id = #{skuTicketId} and date =#{date}")
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "sku_id", property = "skuId"),
+            @Result(column = "sku_ticket_id", property = "skuTicketId"),
+            @Result(column = "date", property = "date"),
+            @Result(column = "time", property = "time"),
+            @Result(column = "cost_price", property = "costPrice"),
+            @Result(column = "sale_price", property = "salePrice"),
+            @Result(column = "description", property = "description"),
+    })
+    List<SkuTicketPrice> findBySkuTicketIdAndDate(@Param("skuTicketId") int skuTicketId, @Param("date") Date date);
+
+    @Select("select * from sku_ticket_price where sku_ticket_id = #{skuTicketId}")
     @Results({
             @Result(column = "id", property = "id"),
             @Result(column = "sku_id", property = "skuId"),
