@@ -34,17 +34,4 @@ public final class DateUtils {
         }
     }
 
-    public static void main(String[] args) {
-        System.out.println("<script>" +
-                "select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
-                "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
-                "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
-                "o.secondary_contact_wechat, o.reference_number, s.name " +
-                "from `order` o left join `sku` s on o.sku_id = s.id " +
-                "where 1 = 1" +
-                "<if test=\"uuid != null && uuid != ''\">and o.uuid = #{uuid} </if>" +
-                "<if test=\"keyword != null && keyword != ''\">and s.name = #{keyword} </if>" +
-                "<if test=\"referenceNumber != null && referenceNumber != ''\">and o.reference_number = #{referenceNumber} </if>" +
-                "</script>");
-    }
 }
