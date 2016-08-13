@@ -31,11 +31,6 @@
 <div class="form-group"><input type="text" id="j_remark" class="form-control"
                                placeholder="备注">
 </div>
-<div class="form-group">
-    <button id="j_submit" class="btn btn-default">提交</button>
-</div>
-
-
 <div class="form-group"><label>游客信息</label></div>
 <div class="form-group dropdown">
     <button class="btn btn-default dropdown-toggle" type="button"
@@ -69,4 +64,8 @@
         </ul>
         <a id="add_ticket"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"/></a>
     </div>
+</div>
+
+<div class="form-group">
+    <button id="j_submit" class="btn btn-primary">提交</button>
 </div>
