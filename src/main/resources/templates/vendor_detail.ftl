@@ -36,11 +36,11 @@
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
 
             <div class="form-group"><label>查看行程商</label></div>
-            <div class="form-group"><input type="text" id="j_uuid" class="form-control"
+            <div class="form-group"><input type="text" id="j_name" class="form-control"
                                            <#if editing = false>disabled</#if> placeholder="请输入行程商名称"
                                            value="${vendor.name}">
             </div>
-            <div class="form-group"><input type="text" id="j_name" class="form-control"
+            <div class="form-group"><input type="text" id="j_email" class="form-control"
                                            <#if editing = false>disabled</#if> placeholder="请输入行程商邮箱"
                                            value="${vendor.email}">
             </div>

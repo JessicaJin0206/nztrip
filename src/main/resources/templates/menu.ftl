@@ -19,5 +19,9 @@
         <li <#if module == "query_vendor">class="active"</#if>><a href="/vendors">查询行程商</a></li>
         <li <#if module == "create_vendor">class="active"</#if>><a href="/create_vendor">创建行程商</a></li>
     </ul>
+    <ul class="nav nav-sidebar">
+        <li <#if module == "query_agent">class="active"</#if>><a href="/agents">查询代理商</a></li>
+        <li <#if module == "create_agent">class="active"</#if>><a href="/create_agent">创建代理商</a></li>
+    </ul>
 <#--</#if>-->
 </div>

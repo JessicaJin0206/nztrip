@@ -14,10 +14,12 @@ import com.fitibo.aotearoa.service.TokenService;
 import com.fitibo.aotearoa.service.VendorService;
 import com.fitibo.aotearoa.util.DateUtils;
 import com.fitibo.aotearoa.util.GuidGenerator;
+import com.fitibo.aotearoa.util.Md5Utils;
 import com.fitibo.aotearoa.vo.*;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import org.apache.ibatis.ognl.IntHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -146,7 +148,17 @@ public class RestApiController {
         return skuVo;
     }
 
-    @RequestMapping(value = "v1/api/orders", method = RequestMethod.POST)
+    @RequestMapping(value = "v1/api/agents/{id}", method = RequestMethod.PUT)
+	@Authentication(Role.Admin)
+	public AgentVo updateAgent(@PathVariable("id") int id, @RequestBody AgentVo agentVo) {
+		Agent agent = parse(agentVo);
+		agent.setId(id);
+		agentMapper.update(agent);
+		agentVo.setId(id);
+		return agentVo;
+	}
+
+	@RequestMapping(value = "v1/api/orders", method = RequestMethod.POST)
     @Transactional(rollbackFor = Exception.class)
     @Authentication
     public OrderVo createOrder(@RequestBody OrderVo order) {
@@ -212,6 +224,15 @@ public class RestApiController {
         final int vendorId = vendorService.createVendor(vendor);
         vendor.setId(vendorId);
         return vendor;
+    }
+
+    @RequestMapping(value = "v1/api/agents", method = RequestMethod.POST)
+    @Authentication(Role.Admin)
+    public AgentVo createAgent(@RequestBody AgentVo agentVo) {
+        Agent agent = parse(agentVo);
+        agentMapper.create(agent);
+        agentVo.setId(agent.getId());
+        return agentVo;
     }
 
     @RequestMapping(value = "v1/api/tickets/{ticketId}/price")
@@ -297,6 +318,19 @@ public class RestApiController {
 		result.setPriceDescription(ticketVo.getPriceDescription());
 		return result;
 	}
+
+    private static Agent parse(AgentVo agentVo) {
+        Agent result = new Agent();
+        result.setUserName(agentVo.getUserName());
+		if(!Strings.isNullOrEmpty(agentVo.getPassword())) {
+			result.setPassword(Md5Utils.md5(agentVo.getPassword()));
+		}
+        result.setName(agentVo.getName());
+        result.setDescription(agentVo.getDescription());
+        result.setDiscount(agentVo.getDiscount());
+        result.setEmail(agentVo.getEmail());
+        return result;
+    }
 
     public void setToken(Token token) {
         this.token.set(token);
