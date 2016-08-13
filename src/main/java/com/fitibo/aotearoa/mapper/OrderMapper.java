@@ -70,6 +70,45 @@ public interface OrderMapper {
     })
     List<Order> findByAgentId(@Param("agentId") int agentId, RowBounds rowBounds);
 
+    @Select("<script>" +
+            "select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
+            "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
+            "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
+            "o.secondary_contact_wechat, o.reference_number, s.name " +
+            "from `order` o left join `sku` s on o.sku_id = s.id " +
+            "where agent_id = #{agentId} " +
+            "<if test =\"keyword != null and keyword != ''\">and s.name like CONCAT('%',#{keyword},'%') </if> " +
+            "<if test =\"uuid != null and uuid != ''\">and o.uuid = #{uuid} </if> " +
+            "<if test =\"referenceNumber != null and referenceNumber != ''\">and o.reference_number = #{referenceNumber} </if> " +
+            "</script>")
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "sku_id", property = "skuId"),
+            @Result(column = "uuid", property = "uuid"),
+            @Result(column = "agent_id", property = "agentId"),
+            @Result(column = "remark", property = "remark"),
+            @Result(column = "status", property = "status"),
+            @Result(column = "create_time", property = "createTime"),
+            @Result(column = "update_time", property = "updateTime"),
+            @Result(column = "price", property = "price"),
+            @Result(column = "gathering_info", property = "gatheringInfo"),
+            @Result(column = "primary_contact", property = "primaryContact"),
+            @Result(column = "primary_contact_email", property = "primaryContactEmail"),
+            @Result(column = "primary_contact_phone", property = "primaryContactPhone"),
+            @Result(column = "primary_contact_wechat", property = "primaryContactWechat"),
+            @Result(column = "secondary_contact", property = "secondaryContact"),
+            @Result(column = "secondary_contact_email", property = "secondaryContactEmail"),
+            @Result(column = "secondary_contact_phone", property = "secondaryContactPhone"),
+            @Result(column = "secondary_contact_wechat", property = "secondaryContactWechat"),
+            @Result(column = "reference_number", property = "referenceNumber"),
+            @Result(column = "name", property = "sku"),
+    })
+    List<Order> findByAgentIdAndMultiFields(@Param("agentId") int agentId,
+                                            @Param("uuid") String uuid,
+                                            @Param("keyword") String keyword,
+                                            @Param("referenceNumber") String referenceNumber,
+                                            RowBounds rowBounds);
+
 
     @Select("select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
@@ -99,6 +138,44 @@ public interface OrderMapper {
             @Result(column = "name", property = "sku"),
     })
     List<Order> findAll(RowBounds rowBounds);
+
+    @Select("<script>" +
+            "select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
+            "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
+            "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
+            "o.secondary_contact_wechat, o.reference_number, s.name " +
+            "from `order` o left join `sku` s on o.sku_id = s.id " +
+            "where 1 = 1 " +
+            "<if test =\"keyword != null and keyword != ''\">and s.name like CONCAT('%',#{keyword},'%') </if> " +
+            "<if test =\"uuid != null and uuid != ''\">and o.uuid = #{uuid} </if> " +
+            "<if test =\"referenceNumber != null and referenceNumber != ''\">and o.reference_number = #{referenceNumber} </if> " +
+            "</script>")
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "sku_id", property = "skuId"),
+            @Result(column = "uuid", property = "uuid"),
+            @Result(column = "agent_id", property = "agentId"),
+            @Result(column = "remark", property = "remark"),
+            @Result(column = "status", property = "status"),
+            @Result(column = "create_time", property = "createTime"),
+            @Result(column = "update_time", property = "updateTime"),
+            @Result(column = "price", property = "price"),
+            @Result(column = "gathering_info", property = "gatheringInfo"),
+            @Result(column = "primary_contact", property = "primaryContact"),
+            @Result(column = "primary_contact_email", property = "primaryContactEmail"),
+            @Result(column = "primary_contact_phone", property = "primaryContactPhone"),
+            @Result(column = "primary_contact_wechat", property = "primaryContactWechat"),
+            @Result(column = "secondary_contact", property = "secondaryContact"),
+            @Result(column = "secondary_contact_email", property = "secondaryContactEmail"),
+            @Result(column = "secondary_contact_phone", property = "secondaryContactPhone"),
+            @Result(column = "secondary_contact_wechat", property = "secondaryContactWechat"),
+            @Result(column = "reference_number", property = "referenceNumber"),
+            @Result(column = "name", property = "sku"),
+    })
+    List<Order> findAllByMultiFields(@Param("uuid") String uuid,
+                                     @Param("keyword") String keyword,
+                                     @Param("referenceNumber") String referenceNumber,
+                                     RowBounds rowBounds);
 
     @Select("select count(1) from `order` where agent_id = #{agentId}")
     int countByAgentId(int agentId);

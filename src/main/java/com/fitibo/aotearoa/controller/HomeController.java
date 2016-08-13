@@ -132,6 +132,8 @@ public class HomeController {
     @RequestMapping("orders")
     @Authentication
     public String queryOrder(@RequestParam(value = "keyword", defaultValue = "") String keyword,
+                             @RequestParam(value = "uuid", defaultValue = "") String uuid,
+                             @RequestParam(value = "referencenumber", defaultValue = "") String referenceNumber,
                              @RequestParam(value = "status", defaultValue = "0") int status,
                              @RequestParam(value = "pagesize", defaultValue = "10") int pageSize,
                              @RequestParam(value = "pagenumber", defaultValue = "0") int pageNumber,
@@ -143,12 +145,15 @@ public class HomeController {
         }
         model.put("pageSize", pageSize);
         model.put("pageNumber", pageNumber);
+        model.put("keyword", keyword);
+        model.put("uuid", uuid);
+        model.put("referenceNumber", referenceNumber);
         switch (getToken().getRole()) {
             case Admin:
-                model.put("orders", orderMapper.findAll(new RowBounds(pageNumber * pageSize, pageSize)));
+                model.put("orders", orderMapper.findAllByMultiFields(uuid, keyword, referenceNumber, new RowBounds(pageNumber * pageSize, pageSize)));
                 break;
             case Agent:
-                model.put("orders", orderMapper.findByAgentId(getToken().getId(), new RowBounds(pageNumber * pageSize, pageSize)));
+                model.put("orders", orderMapper.findByAgentIdAndMultiFields(getToken().getId(), uuid, keyword, referenceNumber, new RowBounds(pageNumber * pageSize, pageSize)));
                 break;
             default:
                 throw new ResourceNotFoundException();

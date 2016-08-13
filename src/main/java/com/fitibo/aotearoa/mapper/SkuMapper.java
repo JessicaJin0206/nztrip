@@ -76,8 +76,8 @@ public interface SkuMapper {
     @Select("<script>" +
             "select * from sku where 1 = 1 " +
             "<if test =\"name != null and name != ''\">and name like CONCAT('%',#{name},'%') </if> " +
-            "<if test =\"categoryId > 0\">and category_id = #{categoryId}</if> " +
-            "<if test =\"cityId > 0\">and city_id = #{cityId}</if> " +
+            "<if test =\"categoryId > 0\">and category_id = #{categoryId} </if> " +
+            "<if test =\"cityId > 0\">and city_id = #{cityId} </if> " +
             "</script>")
     @Results({
             @Result(column = "id", property = "id"),

@@ -30,4 +30,4 @@ $('#j_search').on('click', function(){
         seachString += "keyword=" + encodeURI(keyword) + "&";
     }
     window.location.href = "skus?" + seachString;
-})
+});

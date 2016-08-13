@@ -35,6 +35,17 @@
     <div class="row">
     <#include "menu.ftl"/>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <div class="row">
+                <div class="col-md-3"><input type="text" id="j_keyword" class="form-control" placeholder="请输入关键词..." value="${keyword}">
+                </div>
+                <div class="col-md-3"><input type="text" id="j_uuid" class="form-control" placeholder="请输入编号..." value="${uuid}">
+                </div>
+                <div class="col-md-3"><input type="text" id="j_reference_number" class="form-control" placeholder="请输入Reference Number" value="${referenceNumber}">
+                </div>
+                <div class="col-md-2">
+                    <button id="j_search" class="btn btn-primary">搜索</button>
+                </div>
+            </div>
             <div>
                 <table class="table table-hover">
                     <thead>
@@ -73,10 +84,10 @@
                 <nav aria-label="...">
                     <ul class="pager">
                         <li class="<#if (pageNumber <= 0)>disabled</#if>">
-                            <a href="/orders?<#if (status??)>status=${status}&</#if><#if (pageNumber > 0)>pagenumber=${pageNumber-1}&pagesize=${pageSize}</#if>">上一页</a>
+                            <a href="/orders?<#if (keyword != "")>keyword=${keyword}&</#if><#if (uuid != "")>uuid=${uuid}&</#if><#if (referenceNumber != "")>referencenumber=${referenceNumber}&</#if><#if (status??)>status=${status}&</#if><#if (pageNumber > 0)>pagenumber=${pageNumber-1}&pagesize=${pageSize}</#if>">上一页</a>
                         </li>
                         <li>
-                            <a href="/orders?<#if (status??)>status=${status}&</#if>pagenumber=${pageNumber+1}&pagesize=${pageSize}">下一页</a>
+                            <a href="/orders?<#if (keyword != "")>keyword=${keyword}&</#if><#if (uuid != "")>uuid=${uuid}&</#if><#if (referenceNumber != "")>referencenumber=${referenceNumber}&</#if><#if (status??)>status=${status}&</#if>pagenumber=${pageNumber+1}&pagesize=${pageSize}">下一页</a>
                         </li>
                     </ul>
                 </nav>
@@ -86,5 +97,6 @@
 </div>
 
 <#include "third_party_file.ftl"/>
+<script src="/js/orders.js"></script>
 </body>
 </html>
