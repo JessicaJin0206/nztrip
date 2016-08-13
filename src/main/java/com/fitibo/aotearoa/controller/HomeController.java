@@ -27,6 +27,7 @@ import com.fitibo.aotearoa.service.CategoryService;
 import com.fitibo.aotearoa.service.CityService;
 import com.fitibo.aotearoa.service.VendorService;
 import com.fitibo.aotearoa.util.DateUtils;
+import com.fitibo.aotearoa.vo.AgentVo;
 import com.fitibo.aotearoa.vo.SkuTicketPriceVo;
 import com.fitibo.aotearoa.vo.SkuTicketVo;
 import com.fitibo.aotearoa.vo.SkuVo;
@@ -58,6 +59,9 @@ public class HomeController {
     public static final String MODULE_SKU_DETAIL = "sku_detail";
 	public static final String MODULE_VENDOR_DETAIL = "vendor_detail";
     public static final String MODULE_SKU_TICKET_DETAIL = "sku_ticket_detail";
+    public static final String MODULE_QUERY_AGENT = "query_agent";
+	public static final String MODULE_AGENT_DETAIL = "agent_detail";
+	public static final String MODULE_CREATE_AGENT = "create_agent";
 
     private ThreadLocal<Token> token = new ThreadLocal<>();
 
@@ -84,6 +88,9 @@ public class HomeController {
 
     @Autowired
     private OrderTicketMapper orderTicketMapper;
+
+    @Autowired
+    private AgentMapper agentMapper;
 
     @ExceptionHandler
     public String handleException(ResourceNotFoundException ex) {
@@ -269,6 +276,61 @@ public class HomeController {
 		return "vendor_detail";
 	}
 
+	@RequestMapping("create_agent")
+	@Authentication(Role.Admin)
+	public String createAgent(Map<String, Object> model) {
+		model.put("module", MODULE_CREATE_AGENT);
+		return "create_agent";
+	}
+
+    @RequestMapping("agents")
+    @Authentication(Role.Admin)
+    public String queryAgent(Map<String, Object> model) {
+        List<Agent> agents = agentMapper.findAll();
+        model.put("module", MODULE_QUERY_AGENT);
+        model.put("agents", Lists.transform(agents, (input) -> parse(input)));
+        return "agents";
+    }
+
+	@RequestMapping("agents/{id}")
+	@Authentication(Role.Admin)
+	public String agentDetail(@PathVariable("id") int id, Map<String, Object> model) {
+		model.put("module", MODULE_AGENT_DETAIL);
+		Agent agent = agentMapper.findById(id);
+		if (agent == null) {
+			throw new ResourceNotFoundException();
+		}
+		model.put("agent", parse(agent));
+		model.put("action", "check");
+		return "agent_detail";
+	}
+
+	@RequestMapping("agents/{id}/_edit")
+	@Authentication(Role.Admin)
+	public String editAgent(@PathVariable("id") int id, Map<String, Object> model) {
+		model.put("module", MODULE_AGENT_DETAIL);
+		Agent agent = agentMapper.findById(id);
+		if (agent == null) {
+			throw new ResourceNotFoundException();
+		}
+		model.put("agent", parse(agent));
+		model.put("action", "edit");
+		return "agent_detail";
+	}
+
+	@RequestMapping("agents/{id}/_reset")
+	@Authentication(Role.Admin)
+	public String resetPasswordAgent(@PathVariable("id") int id, Map<String, Object> model) {
+		model.put("module", MODULE_AGENT_DETAIL);
+		Agent agent = agentMapper.findById(id);
+		if (agent == null) {
+			throw new ResourceNotFoundException();
+		}
+		model.put("agent", parse(agent));
+		model.put("action", "reset");
+		return "agent_detail";
+	}
+
     private List<Sku> searchSku(String keyword, int cityId, int categoryId, RowBounds rowBounds) {
         return skuMapper.findAllByMultiFields(keyword, cityId, categoryId, rowBounds);
     }
@@ -312,6 +374,18 @@ public class HomeController {
             return ticket;
         }));
         return result;
+    }
+
+    public static AgentVo parse(Agent agent) {
+        AgentVo vo = new AgentVo();
+        vo.setId(agent.getId());
+        vo.setUserName(agent.getUserName());
+        vo.setPassword(agent.getPassword());
+        vo.setName(agent.getName());
+        vo.setDescription(agent.getDescription());
+        vo.setDiscount(agent.getDiscount());
+        vo.setEmail(agent.getEmail());
+        return vo;
     }
 
     public final void setToken(Token token) {
