@@ -93,8 +93,8 @@ $('#j_ticket_type_selector li a').on('click', function(e){
 
 $('#add_ticket').on('click', function(e){
     var ticket = $('#j_ticket');
-    var ticketType = parseInt(ticket.attr('value'));
-    if (ticketType <= 0) {
+    var ticketId = parseInt(ticket.attr('value'));
+    if (ticketId <= 0) {
         return;
     }
     var date = $('#j_ticket_date input').val();
@@ -106,14 +106,17 @@ $('#add_ticket').on('click', function(e){
     if (priceId <= 0) {
         return;
     }
-    var ticketContainer = $('<div class="form-group"><table class="table" id="j_ticket_container"><thead><tr><th id="j_ticket_name"></th><th>姓名</th><th>年龄</th><th>体重</th></tr></thead><tbody></tbody></table></div>');
+    var ticketContainer = $('<div class="form-group" id="j_ticket_container"><div class="form-group"><label>票种:</label><span id="j_ticket_name_span"></span></div><div class="form-group"><label>日期:</label><span id="j_ticket_date_span"></span></div><div class="form-group"><label>时间:</label><span id="j_ticket_time_span"></span></div><table class="table"><thead><tr><th>姓名</th><th>年龄</th><th>体重</th></tr></thead><tbody></tbody></table></div>');
     var ticketName = ticket.html();
     var ticketCount = parseInt(ticket.attr('count'));
+    ticketContainer.attr('ticketId', ticketId);
+    ticketContainer.attr('priceId', priceId);
     $('#add_ticket').parent().after(ticketContainer);
-    ticketContainer.find('table').attr('value', ticketType);
-    ticketContainer.find('#j_ticket_name').html(ticketName);
+    ticketContainer.find('#j_ticket_name_span').html(ticketName);
+    ticketContainer.find('#j_ticket_date_span').html(date);
+    ticketContainer.find('#j_ticket_time_span').html(time);
     for(var i = 0; i < ticketCount; i++) {
-        var ticketDetail = $('<tr><th></th><th><input type="text" id="j_user_name" class="form-control"/></th><th><input type="number" id="j_user_age" class="form-control"/></th><th><input type="number" id="j_user_weight" class="form-control"/></th></tr>')
+        var ticketDetail = $('<tr><th><input type="text" id="j_user_name" class="form-control"/></th><th><input type="number" id="j_user_age" class="form-control"/></th><th><input type="number" id="j_user_weight" class="form-control"/></th></tr>')
         ticketContainer.find('tbody').append(ticketDetail);
     }
 });
@@ -139,7 +142,7 @@ $('#j_submit').on('click', function(){
         warn("缺少主要联系人信息");
         return;
     }
-    $('div table#j_ticket_container').each(function(index, e){
+    $('#j_ticket_container table').each(function(index, e){
         var orderTicket = {};
         var container = $(e);
         orderTicket.skuTicketId = parseInt(container.attr('value'));
