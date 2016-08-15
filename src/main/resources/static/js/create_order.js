@@ -106,7 +106,7 @@ $('#add_ticket').on('click', function(e){
     if (priceId <= 0) {
         return;
     }
-    var ticketContainer = $('<div class="form-group" id="j_ticket_container"><div class="form-group"><label>票种:</label><span id="j_ticket_name_span"></span></div><div class="form-group"><label>日期:</label><span id="j_ticket_date_span"></span></div><div class="form-group"><label>时间:</label><span id="j_ticket_time_span"></span></div><table class="table"><thead><tr><th>姓名</th><th>年龄</th><th>体重</th></tr></thead><tbody></tbody></table></div>');
+    var ticketContainer = $('<div class="form-group j_ticket_container" id="j_ticket_container"><div class="form-group"><label>票种:</label><span id="j_ticket_name_span"></span></div><div class="form-group"><label>日期:</label><span id="j_ticket_date_span"></span></div><div class="form-group"><label>时间:</label><span id="j_ticket_time_span"></span></div><table class="table"><thead><tr><th>姓名</th><th>年龄</th><th>体重</th></tr></thead><tbody></tbody></table></div>');
     var ticketName = ticket.html();
     var ticketCount = parseInt(ticket.attr('count'));
     ticketContainer.attr('ticketId', ticketId);
@@ -142,7 +142,7 @@ $('#j_submit').on('click', function(){
         warn("缺少主要联系人信息");
         return;
     }
-    var ticketContainer = $('#j_ticket_container');
+    var ticketContainer = $('.j_ticket_container');
     if (ticketContainer.length == 0) {
         warn("至少需要添加一张票");
         return;
@@ -164,7 +164,7 @@ $('#j_submit').on('click', function(){
         orderTicket.priceDescription = "";
         orderTicket.orderTicketUsers = [];
         orderTickets.push(orderTicket);
-        ticketContainer.find('tbody tr').each(function(index, e){
+        node.find('tbody tr').each(function(index, e){
             var ticketUserContainer = $(e);
             var name = ticketUserContainer.find('#j_user_name').val();
             var age = parseInt(ticketUserContainer.find('#j_user_age').val());
