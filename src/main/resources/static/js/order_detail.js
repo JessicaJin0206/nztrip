@@ -90,7 +90,6 @@ $('#j_ticket_type_selector li a').on('click', function(e){
     });
 });
 
-
 $('#add_ticket').on('click', function(e){
     var ticket = $('#j_ticket');
     var ticketId = parseInt(ticket.attr('value'));
@@ -121,8 +120,12 @@ $('#add_ticket').on('click', function(e){
     }
 });
 
-$('#j_submit').on('click', function(){
-    var skuId = parseInt(getQueryString("skuId"));
+$('#j_edit').on('click', function () {
+    window.location.href = window.location.pathname + "/_edit";
+})
+
+$('#j_update').on('click', function () {
+    var skuId = parseInt($('#j_order_sku').attr("skuid"));
     var primaryContact = $('#j_primary_contact').val();
     var primaryContactEmail = $('#j_primary_contact_email').val();
     var primaryContactPhone = $('#j_primary_contact_phone').val();
@@ -131,7 +134,7 @@ $('#j_submit').on('click', function(){
     var secondaryContactEmail = $('#j_secondary_contact_email').val();
     var secondaryContactPhone = $('#j_secondary_contact_phone').val();
     var secondaryContactWechat = $('#j_secondary_contact_wechat').val();
-    var remark = $('#j_remark').val();
+    // var remark = $('#j_remark').val();
     var orderTickets = [];
 
     if (primaryContact.length == 0) {
@@ -142,6 +145,8 @@ $('#j_submit').on('click', function(){
         warn("缺少主要联系人信息");
         return;
     }
+    
+    //ticket
     var ticketContainer = $('.j_ticket_container');
     if (ticketContainer.length == 0) {
         warn("至少需要添加一张票");
@@ -150,15 +155,16 @@ $('#j_submit').on('click', function(){
     ticketContainer.each(function(index, e){
         var orderTicket = {};
         var node = $(e);
-        orderTicket.skuTicketId = parseInt(node.attr('ticketid'));
+        orderTicket.id = parseInt(node.attr("value"))
         orderTicket.skuTicket = node.find("#j_ticket_name_span").html();
+        orderTicket.ticketDate = node.find("#j_ticket_date_span").html();
+        orderTicket.ticketTime = node.find("#j_ticket_time_span").html();
+        orderTicket.skuTicketId = parseInt(node.attr('ticketId'));
         orderTicket.countConstraint = "";
         orderTicket.ageConstraint = "";
         orderTicket.weightConstraint = "";
         orderTicket.ticketDescription = "";
-        orderTicket.ticketPriceId = parseInt(node.attr('priceid'));
-        orderTicket.ticketDate = node.find("#j_ticket_date_span").html();
-        orderTicket.ticketTime = node.find("#j_ticket_time_span").html();
+        orderTicket.ticketPriceId = parseInt(node.attr('priceId'));
         orderTicket.salePrice = 0;
         orderTicket.costPrice = 0;
         orderTicket.priceDescription = "";
@@ -166,17 +172,35 @@ $('#j_submit').on('click', function(){
         orderTickets.push(orderTicket);
         node.find('tbody tr').each(function(index, e){
             var ticketUserContainer = $(e);
+            var id = ticketUserContainer.attr("value");
             var name = ticketUserContainer.find('#j_user_name').val();
+            if(name.length == 0) {
+                warn("请添加姓名");
+                return;
+            }
             var age = parseInt(ticketUserContainer.find('#j_user_age').val());
+            if(age <= 0) {
+                warn("请填写正确的年龄");
+                return;
+            }
             var weight = parseInt(ticketUserContainer.find('#j_user_weight').val());
+            if(weight <= 0) {
+                warn("请填写正确的体重");
+                return;
+            } 
             orderTicket.orderTicketUsers.push({
+                id: id,
                 name: name,
                 age: age,
                 weight: weight
             })
         });
     });
+    
+    var path = window.location.pathname.split('/');
+    var id = parseInt(path[path.length - 2]);
     var data = {
+        id: id,
         skuId: skuId,
         primaryContact: primaryContact,
         primaryContactEmail: primaryContactEmail,
@@ -186,17 +210,18 @@ $('#j_submit').on('click', function(){
         secondaryContactEmail: secondaryContactEmail,
         secondaryContactPhone: secondaryContactPhone,
         secondaryContactWechat: secondaryContactWechat,
-        remark: remark,
+        // remark: remark,
         orderTickets: orderTickets
     };
     $.ajax({
-        type: 'POST',
-        contentType:"application/json; charset=utf-8",
-        url: '/v1/api/orders/',
+        type: 'PUT',
+        contentType: "application/json; charset=utf-8",
+        url: '/v1/api/orders/' + id,
         data: JSON.stringify(data)
     }).success(function () {
-        success("添加成功");
-    }).error(function (){
-        error("添加失败");
-    });
+        success("修改成功");
+        // $('#j_update').attr("disabled", true);
+    }).error(function () {
+        error("修改失败");
+    })
 });

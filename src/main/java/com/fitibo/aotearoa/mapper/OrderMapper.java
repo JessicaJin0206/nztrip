@@ -214,4 +214,15 @@ public interface OrderMapper {
             "#{secondaryContactWechat}, #{referenceNumber})")
     @Options(useGeneratedKeys = true, keyColumn = "id", keyProperty = "id", flushCache = Options.FlushCachePolicy.DEFAULT)
     int create(Order order);
+
+    @Update("update `order` set primary_contact = #{primaryContact}, "+
+            "primary_contact_email = #{primaryContactEmail}, " +
+            "primary_contact_phone = #{primaryContactPhone}, " +
+            "primary_contact_wechat = #{primaryContactWechat}, " +
+            "secondary_contact = #{secondaryContact}, " +
+            "secondary_contact_email = #{secondaryContactEmail}, " +
+            "secondary_contact_phone = #{secondaryContactPhone}, " +
+            "secondary_contact_wechat = #{secondaryContactWechat}" +
+            "where id = #{id}")
+    int updateOrderInfo(Order order);
 }

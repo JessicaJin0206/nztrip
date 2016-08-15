@@ -26,4 +26,7 @@ public interface OrderTicketUserMapper {
             "values(#{orderTicketId}, #{name}, #{age}, #{weight})")
     @Options(useGeneratedKeys = true, keyColumn = "id", keyProperty = "id", flushCache = Options.FlushCachePolicy.DEFAULT)
     int create(OrderTicketUser orderTicketUser);
+
+    @Update("update order_ticket_user set name = #{name}, age = #{age}, weight = #{weight} where id = #{id}")
+    int updateInfo(OrderTicketUser orderTicketUser);
 }

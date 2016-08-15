@@ -199,6 +199,49 @@ public class HomeController {
         return "order_detail";
     }
 
+    @RequestMapping("orders/{id}/_edit")
+    @Authentication
+    public String editOrder(@PathVariable("id") int id, Map<String, Object> model) {
+        Order order = orderMapper.findById(id);
+        if (order == null) {
+            throw new ResourceNotFoundException();
+        }
+        model.put("order", order);
+        model.put("tickets", Lists.transform(orderTicketMapper.findByOrderId(order.getId()), (input) -> {
+            OrderTicketVo result = new OrderTicketVo();
+            result.setId(input.getId());
+            result.setAgeConstraint(input.getAgeConstraint());
+            result.setCountConstraint(input.getAgeConstraint());
+            result.setWeightConstraint(input.getWeightConstraint());
+            result.setPriceDescription(input.getPriceDescription());
+            result.setSalePrice(input.getSalePrice());
+            result.setTicketDate(DateUtils.formatDate(input.getTicketDate()));
+            result.setTicketTime(input.getTicketTime());
+            result.setSkuTicket(input.getSkuTicket());
+            result.setSkuTicketId(input.getSkuTicketId());
+            result.setTicketPriceId(input.getTicketPriceId());
+            result.setOrderTicketUsers(Lists.transform(input.getUsers(), (input2) -> {
+                OrderTicketUserVo userVo = new OrderTicketUserVo();
+                userVo.setAge(input2.getAge());
+                userVo.setId(input2.getId());
+                userVo.setName(input2.getName());
+                userVo.setOrderTicketId(input2.getOrderTicketId());
+                userVo.setWeight(input2.getWeight());
+                return userVo;
+            }));
+            result.setCostPrice(input.getCostPrice());
+            return result;
+        }));
+		Sku sku = skuMapper.findById(order.getSkuId());
+		if (sku == null) {
+			throw new ResourceNotFoundException();
+		}
+		model.put("sku", parse(sku, cityService.findAll(), categoryService.findAll(), vendorService.findAll()));
+        model.put("module", MODULE_ORDER_DETAIL);
+		model.put("editing", true);
+        return "order_detail";
+    }
+
     @RequestMapping("create_sku")
     @Authentication(Role.Admin)
     public String createSku(Map<String, Object> model) {

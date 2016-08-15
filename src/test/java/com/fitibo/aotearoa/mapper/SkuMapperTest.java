@@ -1,6 +1,7 @@
 package com.fitibo.aotearoa.mapper;
 
 import com.fitibo.aotearoa.model.Sku;
+import com.fitibo.aotearoa.model.SkuTicket;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -50,4 +51,5 @@ public class SkuMapperTest extends BaseTest {
         sku.setUuid("abcdefg");
         assertEquals(skuMapper.update(sku), 1);
     }
+
 }

@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by qianhao.zhou on 7/24/16.
@@ -59,4 +60,5 @@ public class SkuTicketPriceMapperTest extends BaseTest {
         testEquals(result.get(1), price2);
 
     }
+
 }
