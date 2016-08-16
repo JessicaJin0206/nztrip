@@ -223,6 +223,68 @@ public class RestApiController {
         return orderVo;
     }
 
+    @RequestMapping(value = "/v1/api/orders/{id}", method = RequestMethod.PUT)
+    @Transactional(rollbackFor = Exception.class)
+    @Authentication
+    public OrderVo updateOrder(@RequestBody OrderVo order) {
+        Preconditions.checkNotNull(getToken());
+        Order o = parse4Update(order);
+        orderMapper.updateOrderInfo(o);
+        //update ticket
+        if (CollectionUtils.isEmpty(order.getOrderTickets())) {
+            throw new InvalidParamException();
+        }
+        for (OrderTicketVo orderTicketVo : order.getOrderTickets()) {
+
+			if (orderTicketVo.getId() > 0) {
+				OrderTicket orderTicket = new OrderTicket();
+				orderTicket.setSkuTicket(orderTicketVo.getSkuTicket());
+				orderTicket.setTicketDate(DateUtils.parseDate(orderTicketVo.getTicketDate()));
+				orderTicket.setTicketTime(orderTicketVo.getTicketTime());
+				orderTicket.setId(orderTicketVo.getId());
+//            orderTicketMapper.updateOrderTicketInfo(orderTicket);
+			} else {
+				OrderTicket orderTicket = parse(orderTicketVo, order);
+				orderTicketMapper.create(orderTicket);
+				orderTicketVo.setId(orderTicket.getId());
+			}
+            if (CollectionUtils.isEmpty(orderTicketVo.getOrderTicketUsers())) {
+                throw new InvalidParamException();
+            }
+			for (OrderTicketUserVo orderTicketUserVo : orderTicketVo.getOrderTicketUsers()) {
+				OrderTicketUser orderTicketUser = new OrderTicketUser();
+				orderTicketUser.setOrderTicketId(orderTicketVo.getId());
+				orderTicketUser.setName(orderTicketUserVo.getName());
+				orderTicketUser.setAge(orderTicketUserVo.getAge());
+				orderTicketUser.setWeight(orderTicketUserVo.getWeight());
+				if (orderTicketUserVo.getId() > 0) {
+					orderTicketUser.setId(orderTicketUserVo.getId());
+					orderTicketUserMapper.updateInfo(orderTicketUser);
+				} else {
+					orderTicketUserMapper.create(orderTicketUser);
+					orderTicketUserVo.setId(orderTicketUser.getId());
+				}
+			}
+        }
+        return order;
+    }
+
+	@RequestMapping(value = "/v1/api/orders/tickets/{id}", method = RequestMethod.DELETE)
+	@Transactional(rollbackFor = Exception.class)
+	@Authentication
+	public boolean deleteTicket(@PathVariable("id") int id, @RequestBody OrderTicketVo ticketVo) {
+		//后续是否添加验证
+		int rowTicket = orderTicketMapper.deleteTicket(id, ticketVo.getOrderId());
+		if (rowTicket == 0) {
+			return false;
+		}
+		int rowUser = orderTicketUserMapper.deleteByOrderTicketId(id);
+		if (rowUser == 0) {
+			return false;
+		}
+		return true;
+	}
+
     @RequestMapping(value = "v1/api/signin", method = RequestMethod.POST)
     public AuthenticationResp signin(@RequestBody AuthenticationReq req) {
         Agent agent = agentMapper.findByUserName(req.getUser());
@@ -303,6 +365,26 @@ public class RestApiController {
         return result;
     }
 
+    private static Order parse4Update(OrderVo order) {
+        Order result = new Order();
+		result.setId(order.getId());
+        result.setSku(order.getSku());
+        result.setPrice(order.getPrice());
+        result.setStatus(order.getStatus());
+        result.setReferenceNumber(order.getReferenceNumber());
+        result.setGatheringInfo(order.getGatheringInfo());
+        result.setRemark(order.getRemark());
+        result.setReferenceNumber(order.getReferenceNumber());
+        result.setPrimaryContact(order.getPrimaryContact());
+        result.setPrimaryContactEmail(order.getPrimaryContactEmail());
+        result.setPrimaryContactPhone(order.getPrimaryContactPhone());
+        result.setPrimaryContactWechat(order.getPrimaryContactWechat());
+        result.setSecondaryContact(order.getSecondaryContact());
+        result.setSecondaryContactEmail(order.getSecondaryContactEmail());
+        result.setSecondaryContactPhone(order.getSecondaryContactPhone());
+        result.setSecondaryContactWechat(order.getSecondaryContactWechat());
+        return result;
+    }
 
     private static Sku parse(SkuVo skuVo) {
         Sku result = new Sku();

@@ -28,6 +28,15 @@ var error = function(message) {
     $('.main').prepend(alert);
 };
 
+var statusDropDown = $('#j_selected_status');
+$.each($('#j_status_drop_down li a'), function (idx, item) {
+    var status = $(item);
+    status.on('click', function(){
+        statusDropDown.html(status.html());
+        statusDropDown.attr('value', status.attr('value'));
+    })
+})
+
 function getQueryString(name) {
     var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
     var r = window.location.search.substr(1).match(reg);
@@ -90,7 +99,6 @@ $('#j_ticket_type_selector li a').on('click', function(e){
     });
 });
 
-
 $('#add_ticket').on('click', function(e){
     var ticket = $('#j_ticket');
     var ticketId = parseInt(ticket.attr('value'));
@@ -106,7 +114,7 @@ $('#add_ticket').on('click', function(e){
     if (priceId <= 0) {
         return;
     }
-    var ticketContainer = $('<div class="form-group j_ticket_container" id="j_ticket_container"><div class="form-group"><label>票种:</label><span id="j_ticket_name_span"></span></div><div class="form-group"><label>日期:</label><span id="j_ticket_date_span"></span></div><div class="form-group"><label>时间:</label><span id="j_ticket_time_span"></span></div><table class="table"><thead><tr><th>姓名</th><th>年龄</th><th>体重</th></tr></thead><tbody></tbody></table></div>');
+    var ticketContainer = $('<div class="form-group j_ticket_container" id="j_ticket_container"><a id="j_ticket_delete"><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span></a><div class="form-group"><label>票种:</label><span id="j_ticket_name_span"></span></div><div class="form-group"><label>日期:</label><span id="j_ticket_date_span"></span></div><div class="form-group"><label>时间:</label><span id="j_ticket_time_span"></span></div><table class="table"><thead><tr><th>姓名</th><th>年龄</th><th>体重</th></tr></thead><tbody></tbody></table></div>');
     var ticketName = ticket.html();
     var ticketCount = parseInt(ticket.attr('count'));
     ticketContainer.attr('ticketId', ticketId);
@@ -119,10 +127,54 @@ $('#add_ticket').on('click', function(e){
         var ticketDetail = $('<tr><th><input type="text" id="j_user_name" class="form-control"/></th><th><input type="number" id="j_user_age" class="form-control"/></th><th><input type="number" id="j_user_weight" class="form-control"/></th></tr>')
         ticketContainer.find('tbody').append(ticketDetail);
     }
+    ticketContainer.find("a#j_ticket_delete").on('click', function () {
+        ticketContainer.remove();
+    })
 });
 
-$('#j_submit').on('click', function(){
-    var skuId = parseInt(getQueryString("skuId"));
+$('.j_ticket_container').each(function (index, e) {
+    var row = $(e);
+    row.find("a#j_ticket_delete").on('click', function () {
+        var result = confirm("确认删除订单的该张票的信息?");
+        if (result == true) {
+            var id = row.attr("value");
+            var skuTicketId = row.attr("ticketId");
+            var path = window.location.pathname.split('/');
+            var orderId = parseInt(path[path.length - 2]);
+            var data = {
+                id: id,
+                skuTicketId: skuTicketId,
+                orderId: orderId
+            }
+            $.ajax({
+                type: 'DELETE',
+                contentType: "application/json; charset=utf-8",
+                url: '/v1/api/orders/tickets/' + id,
+                data: JSON.stringify(data)
+            }).success(function (data) {
+                if (data == true) {
+                    row.remove();
+                    success("删除成功");
+                } else {
+                    error("修改失败");
+                }
+            }).error(function () {
+                error("修改失败");
+            })
+        }
+    })
+})
+
+$('#j_edit').on('click', function () {
+    window.location.href = window.location.pathname + "/_edit";
+})
+
+$('#j_update').on('click', function () {
+    var skuId = parseInt($('#j_order_sku').attr("skuid"));
+    var price = parseInt($('#j_order_price').val());
+    var status = parseInt(statusDropDown.attr("value"));
+    var referenceNumber = $('#j_referencenumber').val();
+    var gatheringInfo = $('#j_gatheringinfo').val();
     var primaryContact = $('#j_primary_contact').val();
     var primaryContactEmail = $('#j_primary_contact_email').val();
     var primaryContactPhone = $('#j_primary_contact_phone').val();
@@ -134,6 +186,10 @@ $('#j_submit').on('click', function(){
     var remark = $('#j_remark').val();
     var orderTickets = [];
 
+    if(price <= 0) {
+        warn("订单价格有误");
+        return;
+    }
     if (primaryContact.length == 0) {
         warn("缺少主要联系人信息");
         return;
@@ -142,6 +198,8 @@ $('#j_submit').on('click', function(){
         warn("缺少主要联系人信息");
         return;
     }
+    
+    //ticket
     var ticketContainer = $('.j_ticket_container');
     if (ticketContainer.length == 0) {
         warn("至少需要添加一张票");
@@ -150,15 +208,16 @@ $('#j_submit').on('click', function(){
     ticketContainer.each(function(index, e){
         var orderTicket = {};
         var node = $(e);
-        orderTicket.skuTicketId = parseInt(node.attr('ticketid'));
+        orderTicket.id = parseInt(node.attr("value"))
         orderTicket.skuTicket = node.find("#j_ticket_name_span").html();
+        orderTicket.ticketDate = node.find("#j_ticket_date_span").html();
+        orderTicket.ticketTime = node.find("#j_ticket_time_span").html();
+        orderTicket.skuTicketId = parseInt(node.attr('ticketId'));
         orderTicket.countConstraint = "";
         orderTicket.ageConstraint = "";
         orderTicket.weightConstraint = "";
         orderTicket.ticketDescription = "";
-        orderTicket.ticketPriceId = parseInt(node.attr('priceid'));
-        orderTicket.ticketDate = node.find("#j_ticket_date_span").html();
-        orderTicket.ticketTime = node.find("#j_ticket_time_span").html();
+        orderTicket.ticketPriceId = parseInt(node.attr('priceId'));
         orderTicket.salePrice = 0;
         orderTicket.costPrice = 0;
         orderTicket.priceDescription = "";
@@ -166,18 +225,40 @@ $('#j_submit').on('click', function(){
         orderTickets.push(orderTicket);
         node.find('tbody tr').each(function(index, e){
             var ticketUserContainer = $(e);
+            var id = ticketUserContainer.attr("value");
             var name = ticketUserContainer.find('#j_user_name').val();
+            if(name.length == 0) {
+                warn("请添加姓名");
+                return;
+            }
             var age = parseInt(ticketUserContainer.find('#j_user_age').val());
+            if(age <= 0) {
+                warn("请填写正确的年龄");
+                return;
+            }
             var weight = parseInt(ticketUserContainer.find('#j_user_weight').val());
+            if(weight <= 0) {
+                warn("请填写正确的体重");
+                return;
+            } 
             orderTicket.orderTicketUsers.push({
+                id: id,
                 name: name,
                 age: age,
                 weight: weight
             })
         });
     });
+    
+    var path = window.location.pathname.split('/');
+    var id = parseInt(path[path.length - 2]);
     var data = {
+        id: id,
         skuId: skuId,
+        price: price,
+        status: status,
+        referenceNumber: referenceNumber,
+        gatheringInfo: gatheringInfo,
         primaryContact: primaryContact,
         primaryContactEmail: primaryContactEmail,
         primaryContactPhone: primaryContactPhone,
@@ -190,14 +271,14 @@ $('#j_submit').on('click', function(){
         orderTickets: orderTickets
     };
     $.ajax({
-        type: 'POST',
-        contentType:"application/json; charset=utf-8",
-        url: '/v1/api/orders/',
+        type: 'PUT',
+        contentType: "application/json; charset=utf-8",
+        url: '/v1/api/orders/' + id,
         data: JSON.stringify(data)
-    }).success(function (data) {
-        success("添加成功");
-        window.location.href = "/orders/" + data.id;
-    }).error(function (){
-        error("添加失败");
-    });
+    }).success(function () {
+        success("修改成功");
+        $('#j_update').attr("disabled", true);
+    }).error(function () {
+        error("修改失败");
+    })
 });

@@ -120,7 +120,16 @@ public class OrderTicketVo {
         this.priceDescription = priceDescription;
     }
 
+    public int getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(int orderId) {
+        this.orderId = orderId;
+    }
+
     private int id;
+    private int orderId;
     //sku_ticket
     private int skuTicketId;
     private String skuTicket;

@@ -1,13 +1,113 @@
 <div class="form-group"><label>订单详情</label></div>
-<div class="form-group"><label>名称:</label><span>   ${order.sku}</span></div>
-<div class="form-group"><label>价格:</label><span>   ${order.price}</span></div>
-<div class="form-group"><label>Reference
-    Number:</label><span>   <#if order.referenceNumber??>${order.referenceNumber}</#if></span></div>
-<div class="form-group"><label>集合信息:</label><span>   <#if order.gatheringInfo??>${order.gatheringInfo}</#if></span>
+<div class="form-group" id="j_order_sku" skuid="${order.skuId}">
+    <label>名称:</label>
+    <span>  ${order.sku}</span>
+</div>
+<div class="form-group">
+    <div class="row">
+        <label class="col-md-2">价格:</label>
+        <div class="col-md-offset-2">
+            <input type="number" id="j_order_price" class="form-control" <#if editing=false>disabled</#if> placeholder="请输入价格..." value="${order.price}">
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <div class="row">
+        <label class="col-md-2">Reference Number:</label>
+        <div class="col-md-offset-2">
+            <input type="text" id="j_referencenumber" class="form-control" <#if editing=false>disabled</#if> placeholder="请输入Reference Number..." value="${order.referenceNumber!''}">
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <div class="row">
+        <label class="col-md-2">集合信息:</label>
+        <div class="col-md-offset-2">
+            <input type="text" id="j_gatheringinfo" class="form-control" <#if editing=false>disabled</#if> placeholder="请输入集合信息..." value="${order.gatheringInfo!''}">
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <div class="row">
+        <label class="col-md-2">备注:</label>
+        <div class="col-md-offset-2">
+            <input type="text" id="j_remark" class="form-control" <#if editing=false>disabled</#if> placeholder="请输入备注..." value="${order.remark!''}">
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <div class="row">
+        <label class="col-md-2">订单状态:</label>
+        <#if editing=false>
+            <div class="col-md-offset-2">
+                <#list statusList as s>
+                    <#if (s.id == order.status)>
+                        <input type="text" id="j_status" disabled class="form-control"  value="${s.desc}">
+                    </#if>
+                </#list>
+            </div>
+        <#else>
+            <div class="dropdown col-md-3">
+                <button class="btn btn-default dropdown-toggle" type="button" id="selected_status_button"
+                        data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="true">
+                    <#list statusList as s>
+                        <#if (s.id == order.status)>
+                            <span id="j_selected_status" value="${s.id}">${s.desc}</span>
+                        </#if>
+                    </#list>
+
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" id="j_status_drop_down" aria-labelledby="selected_status_button">
+                    <li><a value="0">修改订单状态</a></li>
+                    <#list statusList as s>
+                        <li><a value="${s.id}">${s.desc}</a></li>
+                    </#list>
+                </ul>
+            </div>
+        </#if>
+    </div>
 </div>
 <div class="form-group"><label>游客信息</label></div>
+<#if editing=true>
+<div class="form-group dropdown">
+    <button class="btn btn-default dropdown-toggle" type="button"
+            data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="true">
+        <span value="0" id="j_ticket" count="0">选择票种</span>
+        <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" id="j_ticket_type_selector">
+        <#list sku.tickets as ticket>
+            <li><a value="${ticket.id}" count="${ticket.count}"
+                   available_date="<#list ticket.ticketPrices as ticketPrice>${ticketPrice.date}|</#list>">${ticket.name}</a>
+            </li>
+        </#list>
+    </ul>
+</div>
+
+<div class="form-group">
+    <div class="input-group date col-md-3 col-sm-3 col-xs-3 form-group" id="j_ticket_date">
+        <input type="text" class="form-control"/>
+        <span class="input-group-addon">
+            <span class="glyphicon glyphicon-calendar"/>
+        </span>
+    </div>
+    <div class="form-group dropdown">
+        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true"
+                aria-expanded="true"><span value="0" id="j_ticket_time_span" count="0">选择时间</span><span
+                class="caret"></span></button>
+        <ul class="dropdown-menu" id="j_ticket_time_selector">
+        </ul>
+        <a id="add_ticket"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"/></a>
+    </div>
+</div>
+
+</#if>
 <#list tickets as ticket>
-<div class="form-group" id="j_ticket_container">
+<div class="form-group j_ticket_container" value="${ticket.id}" ticketId="${ticket.skuTicketId}" priceId="${ticket.ticketPriceId}">
+    <a id="j_ticket_delete"><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span></a>
     <div class="form-group"><label>票种:</label><span id="j_ticket_name_span"><#if ticket.skuTicket??>${ticket.skuTicket}</#if></span></div>
     <div class="form-group"><label>日期:</label><span id="j_ticket_date_span">${ticket.ticketDate}</span></div>
     <div class="form-group"><label>时间:</label><span id="j_ticket_time_span">${ticket.ticketTime}</span></div>
@@ -21,10 +121,10 @@
         </thead>
         <tbody id="j_ticket_container">
             <#list ticket.orderTicketUsers as user>
-            <tr>
-                <td><input class="form-control" disabled value="${user.name}"/></td>
-                <td><input class="form-control" disabled value="${user.age}"/></td>
-                <td><input class="form-control" disabled value="${user.weight}"/></td>
+            <tr value="${user.id}">
+                <td><input class="form-control" id="j_user_name" <#if editing=false>disabled</#if> value="${user.name}"/></td>
+                <td><input class="form-control" id="j_user_age" <#if editing=false>disabled</#if> value="${user.age}"/></td>
+                <td><input class="form-control" id="j_user_weight" <#if editing=false>disabled</#if> value="${user.weight}"/></td>
             </tr>
             </#list>
         </tbody>
@@ -61,4 +161,11 @@
 <div class="form-group"><input type="text" id="j_secondary_contact_wechat" class="form-control"
                                <#if editing=false>disabled</#if> placeholder="微信"
                                value="${order.secondaryContactWechat}">
+</div>
+
+<#if editing = false>
+<button id="j_edit" class="btn btn-default form-group">修改</button>
+<#else>
+<button id="j_update" class="btn btn-default form-group">提交</button>
+</#if>
 </div>

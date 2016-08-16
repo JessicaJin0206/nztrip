@@ -64,4 +64,5 @@ public class SkuTicketPriceMapperTest extends BaseTest {
         assertEquals(prices.size(), 2);
 
     }
+
 }

@@ -102,5 +102,7 @@ public interface SkuTicketPriceMapper {
             @Result(column = "sale_price", property = "salePrice"),
             @Result(column = "description", property = "description"),
     })
-    List<SkuTicketPrice> findBySkuTicketId(@Param("skuTicketId") int skuTicketId);
+    List<SkuTicketPrice> findBySkuTicketId(int skuTicketId);
+//    List<SkuTicketPrice> findBySkuTicketId(@Param("skuTicketId") int skuTicketId);
+
 }
