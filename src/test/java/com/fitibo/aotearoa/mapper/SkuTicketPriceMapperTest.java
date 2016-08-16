@@ -1,6 +1,7 @@
 package com.fitibo.aotearoa.mapper;
 
 import com.fitibo.aotearoa.model.SkuTicketPrice;
+import com.google.common.collect.Lists;
 import org.joda.time.DateTime;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by qianhao.zhou on 7/24/16.
@@ -57,6 +59,9 @@ public class SkuTicketPriceMapperTest extends BaseTest {
         assertEquals(result.size(), 2);
         testEquals(result.get(0), price1);
         testEquals(result.get(1), price2);
+
+        List<SkuTicketPrice> prices = skuTicketPriceMapper.findByIds(Lists.asList(1, new Integer[]{2}));
+        assertEquals(prices.size(), 2);
 
     }
 }

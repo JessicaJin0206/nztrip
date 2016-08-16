@@ -2,6 +2,7 @@ package com.fitibo.aotearoa.controller;
 
 import com.fitibo.aotearoa.annotation.Authentication;
 import com.fitibo.aotearoa.constants.CommonConstants;
+import com.fitibo.aotearoa.constants.OrderStatus;
 import com.fitibo.aotearoa.constants.SkuTicketStatus;
 import com.fitibo.aotearoa.dto.Role;
 import com.fitibo.aotearoa.dto.Token;
@@ -21,6 +22,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.ibatis.ognl.IntHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -161,19 +163,48 @@ public class RestApiController {
 	@RequestMapping(value = "v1/api/orders", method = RequestMethod.POST)
     @Transactional(rollbackFor = Exception.class)
     @Authentication
-    public OrderVo createOrder(@RequestBody OrderVo order) {
+    public OrderVo createOrder(@RequestBody OrderVo orderVo) {
         Preconditions.checkNotNull(getToken());
         final int agentId = getToken().getRole() == Role.Agent?getToken().getId():0;
-        Order o = parse(order, agentId);
-        o.setUuid(GuidGenerator.generate(14));
-        orderMapper.create(o);
-        order.setId(o.getId());
-        if (CollectionUtils.isEmpty(order.getOrderTickets())) {
+        int discount = 50;
+        if (agentId > 0) {
+            Agent agent = agentMapper.findById(agentId);
+            Preconditions.checkNotNull(agent);
+            discount = agent.getDiscount();
+        }
+        int price = 0;
+        for (OrderTicketVo orderTicketVo : orderVo.getOrderTickets()) {
+            SkuTicketPrice ticketPrice = skuTicketPriceMapper.findById(orderTicketVo.getTicketPriceId());
+            price += ticketPrice.getCostPrice() + ((ticketPrice.getSalePrice() - ticketPrice.getCostPrice()) * discount / 100);
+        }
+        Order order = parse(orderVo, agentId);
+        order.setPrice(price);
+        order.setUuid(GuidGenerator.generate(14));
+        order.setStatus(OrderStatus.NEW);
+        orderMapper.create(order);
+        orderVo.setId(order.getId());
+        if (CollectionUtils.isEmpty(orderVo.getOrderTickets())) {
             throw new InvalidParamException();
         }
-        for (OrderTicketVo orderTicketVo : order.getOrderTickets()) {
-			//need to verify params?
-            OrderTicket orderTicket = parse(orderTicketVo, order);
+        List<SkuTicketPrice> prices = skuTicketPriceMapper.findByIds(Lists.transform(orderVo.getOrderTickets(), (orderTicket) -> orderTicket.getTicketPriceId()));
+        Map<Integer, SkuTicketPrice> priceMap = Maps.newHashMap();
+        for (SkuTicketPrice skuTicketPrice : prices) {
+            priceMap.put(skuTicketPrice.getId(), skuTicketPrice);
+        }
+        SkuTicket skuTicket = skuTicketMapper.findById(orderVo.getSkuId());
+        Preconditions.checkNotNull(skuTicket, "invalid sku id:" + orderVo.getSkuId());
+        for (OrderTicketVo orderTicketVo : orderVo.getOrderTickets()) {
+            //need to verify params?
+            OrderTicket orderTicket = parse(orderTicketVo, orderVo);
+            SkuTicketPrice skuTicketPrice = priceMap.get(orderTicket.getTicketPriceId());
+            Preconditions.checkNotNull(skuTicketPrice, "invalid sku ticket price id:" + orderTicket.getTicketPriceId());
+            orderTicket.setWeightConstraint(skuTicket.getWeightConstraint());
+            orderTicket.setAgeConstraint(skuTicket.getAgeConstraint());
+            orderTicket.setCountConstraint(skuTicket.getCountConstraint());
+            orderTicket.setTicketDescription(skuTicket.getDescription());
+            orderTicket.setSalePrice(skuTicketPrice.getSalePrice());
+            orderTicket.setCostPrice(skuTicketPrice.getCostPrice());
+            orderTicket.setTicketDescription(skuTicketPrice.getDescription());
             orderTicketMapper.create(orderTicket);
             orderTicketVo.setId(orderTicket.getId());
             if (CollectionUtils.isEmpty(orderTicketVo.getOrderTicketUsers())) {
@@ -189,7 +220,7 @@ public class RestApiController {
                 orderTicketUserVo.setId(orderTicketUser.getId());
             }
         }
-        return order;
+        return orderVo;
     }
 
     @RequestMapping(value = "v1/api/signin", method = RequestMethod.POST)

@@ -194,8 +194,9 @@ $('#j_submit').on('click', function(){
         contentType:"application/json; charset=utf-8",
         url: '/v1/api/orders/',
         data: JSON.stringify(data)
-    }).success(function () {
+    }).success(function (data) {
         success("添加成功");
+        window.location.href = "/orders/" + data.id;
     }).error(function (){
         error("添加失败");
     });

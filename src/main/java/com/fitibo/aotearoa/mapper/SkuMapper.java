@@ -13,7 +13,6 @@ public interface SkuMapper {
 
     @Insert("insert into sku(uuid, name, city_id, category_id, description, vendor_id, pickup_service, gathering_place) " +
             "values(#{uuid}, #{name}, #{cityId}, #{categoryId}, #{description}, #{vendorId}, #{pickupService}, #{gatheringPlace})")
-    @Options(useGeneratedKeys = true, keyColumn = "id", keyProperty = "id", flushCache = Options.FlushCachePolicy.DEFAULT)
     int create(Sku sku);
 
     @Update("update sku set " +

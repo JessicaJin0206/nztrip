@@ -113,7 +113,7 @@
                     <thead>
                     <tr>
                         <th>名称</th>
-                        <th>人数,格式为X+X</th>
+                        <th>人数</th>
                         <th>最小年龄</th>
                         <th>最大年龄</th>
                         <th>最小体重(KG)</th>

@@ -35,6 +35,36 @@ public interface SkuTicketPriceMapper {
     })
     List<SkuTicketPrice> findBySkuIdAndStartTime(@Param("skuId") int skuId, @Param("start") Date start, @Param("end") Date end);
 
+    @Select("select * from sku_ticket_price where id = #{id}")
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "sku_id", property = "skuId"),
+            @Result(column = "sku_ticket_id", property = "skuTicketId"),
+            @Result(column = "date", property = "date"),
+            @Result(column = "time", property = "time"),
+            @Result(column = "cost_price", property = "costPrice"),
+            @Result(column = "sale_price", property = "salePrice"),
+            @Result(column = "description", property = "description"),
+    })
+    SkuTicketPrice findById(int id);
+
+    @Select({"<script>",
+            "select * from sku_ticket_price where id in ",
+            "<foreach collection='ids' item='id' index='index' open='(' separator=',' close=')'>#{id}",
+            "</foreach>",
+            "</script>"})
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "sku_id", property = "skuId"),
+            @Result(column = "sku_ticket_id", property = "skuTicketId"),
+            @Result(column = "date", property = "date"),
+            @Result(column = "time", property = "time"),
+            @Result(column = "cost_price", property = "costPrice"),
+            @Result(column = "sale_price", property = "salePrice"),
+            @Result(column = "description", property = "description"),
+    })
+    List<SkuTicketPrice> findByIds(@Param("ids") List<Integer> ids);
+
     @Select("select * from sku_ticket_price where sku_id = #{skuId} and date > now()")
     @Results({
             @Result(column = "id", property = "id"),
