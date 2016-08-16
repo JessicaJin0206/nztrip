@@ -80,6 +80,7 @@ public interface OrderMapper {
             "<if test =\"keyword != null and keyword != ''\">and s.name like CONCAT('%',#{keyword},'%') </if> " +
             "<if test =\"uuid != null and uuid != ''\">and o.uuid = #{uuid} </if> " +
             "<if test =\"referenceNumber != null and referenceNumber != ''\">and o.reference_number = #{referenceNumber} </if> " +
+            "<if test =\"status != null and status > 0\">and o.status = #{status} </if> " +
             "</script>")
     @Results({
             @Result(column = "id", property = "id"),
@@ -107,6 +108,7 @@ public interface OrderMapper {
                                             @Param("uuid") String uuid,
                                             @Param("keyword") String keyword,
                                             @Param("referenceNumber") String referenceNumber,
+                                            @Param("status") int status,
                                             RowBounds rowBounds);
 
 
@@ -149,6 +151,7 @@ public interface OrderMapper {
             "<if test =\"keyword != null and keyword != ''\">and s.name like CONCAT('%',#{keyword},'%') </if> " +
             "<if test =\"uuid != null and uuid != ''\">and o.uuid = #{uuid} </if> " +
             "<if test =\"referenceNumber != null and referenceNumber != ''\">and o.reference_number = #{referenceNumber} </if> " +
+            "<if test =\"status != null and status > 0\">and o.status = #{status} </if> " +
             "</script>")
     @Results({
             @Result(column = "id", property = "id"),
@@ -175,6 +178,7 @@ public interface OrderMapper {
     List<Order> findAllByMultiFields(@Param("uuid") String uuid,
                                      @Param("keyword") String keyword,
                                      @Param("referenceNumber") String referenceNumber,
+                                     @Param("status") int status,
                                      RowBounds rowBounds);
 
     @Select("select count(1) from `order` where agent_id = #{agentId}")
@@ -215,7 +219,13 @@ public interface OrderMapper {
     @Options(useGeneratedKeys = true, keyColumn = "id", keyProperty = "id", flushCache = Options.FlushCachePolicy.DEFAULT)
     int create(Order order);
 
-    @Update("update `order` set primary_contact = #{primaryContact}, "+
+    @Update("update `order` set " +
+            "remark = #{remark} ," +
+            "price = #{price}, " +
+            "status = #{status}, " +
+            "gathering_info = #{gatheringInfo}, " +
+            "reference_number = #{referenceNumber}, " +
+            "primary_contact = #{primaryContact}, "+
             "primary_contact_email = #{primaryContactEmail}, " +
             "primary_contact_phone = #{primaryContactPhone}, " +
             "primary_contact_wechat = #{primaryContactWechat}, " +

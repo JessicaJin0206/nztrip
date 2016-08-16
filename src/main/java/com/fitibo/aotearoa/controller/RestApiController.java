@@ -238,6 +238,22 @@ public class RestApiController {
         return order;
     }
 
+	@RequestMapping(value = "/v1/api/orders/tickets/{id}", method = RequestMethod.DELETE)
+	@Transactional(rollbackFor = Exception.class)
+	@Authentication
+	public boolean deleteTicket(@PathVariable("id") int id, @RequestBody OrderTicketVo ticketVo) {
+		//后续是否添加验证
+		int rowTicket = orderTicketMapper.deleteTicket(id, ticketVo.getOrderId());
+		if (rowTicket == 0) {
+			return false;
+		}
+		int rowUser = orderTicketUserMapper.deleteByOrderTicketId(id);
+		if (rowUser == 0) {
+			return false;
+		}
+		return true;
+	}
+
     @RequestMapping(value = "v1/api/signin", method = RequestMethod.POST)
     public AuthenticationResp signin(@RequestBody AuthenticationReq req) {
         Agent agent = agentMapper.findByUserName(req.getUser());
@@ -321,6 +337,11 @@ public class RestApiController {
     private static Order parse4Update(OrderVo order) {
         Order result = new Order();
 		result.setId(order.getId());
+        result.setSku(order.getSku());
+        result.setPrice(order.getPrice());
+        result.setStatus(order.getStatus());
+        result.setReferenceNumber(order.getReferenceNumber());
+        result.setGatheringInfo(order.getGatheringInfo());
         result.setRemark(order.getRemark());
         result.setReferenceNumber(order.getReferenceNumber());
         result.setPrimaryContact(order.getPrimaryContact());

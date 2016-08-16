@@ -28,6 +28,15 @@ var error = function(message) {
     $('.main').prepend(alert);
 };
 
+var statusDropDown = $('#j_selected_status');
+$.each($('#j_status_drop_down li a'), function (idx, item) {
+    var status = $(item);
+    status.on('click', function(){
+        statusDropDown.html(status.html());
+        statusDropDown.attr('value', status.attr('value'));
+    })
+})
+
 function getQueryString(name) {
     var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
     var r = window.location.search.substr(1).match(reg);
@@ -105,7 +114,7 @@ $('#add_ticket').on('click', function(e){
     if (priceId <= 0) {
         return;
     }
-    var ticketContainer = $('<div class="form-group j_ticket_container" id="j_ticket_container"><div class="form-group"><label>票种:</label><span id="j_ticket_name_span"></span></div><div class="form-group"><label>日期:</label><span id="j_ticket_date_span"></span></div><div class="form-group"><label>时间:</label><span id="j_ticket_time_span"></span></div><table class="table"><thead><tr><th>姓名</th><th>年龄</th><th>体重</th></tr></thead><tbody></tbody></table></div>');
+    var ticketContainer = $('<div class="form-group j_ticket_container" id="j_ticket_container"><a id="j_ticket_delete"><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span></a><div class="form-group"><label>票种:</label><span id="j_ticket_name_span"></span></div><div class="form-group"><label>日期:</label><span id="j_ticket_date_span"></span></div><div class="form-group"><label>时间:</label><span id="j_ticket_time_span"></span></div><table class="table"><thead><tr><th>姓名</th><th>年龄</th><th>体重</th></tr></thead><tbody></tbody></table></div>');
     var ticketName = ticket.html();
     var ticketCount = parseInt(ticket.attr('count'));
     ticketContainer.attr('ticketId', ticketId);
@@ -118,7 +127,43 @@ $('#add_ticket').on('click', function(e){
         var ticketDetail = $('<tr><th><input type="text" id="j_user_name" class="form-control"/></th><th><input type="number" id="j_user_age" class="form-control"/></th><th><input type="number" id="j_user_weight" class="form-control"/></th></tr>')
         ticketContainer.find('tbody').append(ticketDetail);
     }
+    ticketContainer.find("a#j_ticket_delete").on('click', function () {
+        ticketContainer.remove();
+    })
 });
+
+$('.j_ticket_container').each(function (index, e) {
+    var row = $(e);
+    row.find("a#j_ticket_delete").on('click', function () {
+        var result = confirm("确认删除订单的该张票的信息?");
+        if (result == true) {
+            var id = row.attr("value");
+            var skuTicketId = row.attr("ticketId");
+            var path = window.location.pathname.split('/');
+            var orderId = parseInt(path[path.length - 2]);
+            var data = {
+                id: id,
+                skuTicketId: skuTicketId,
+                orderId: orderId
+            }
+            $.ajax({
+                type: 'DELETE',
+                contentType: "application/json; charset=utf-8",
+                url: '/v1/api/orders/tickets/' + id,
+                data: JSON.stringify(data)
+            }).success(function (data) {
+                if (data == true) {
+                    row.remove();
+                    success("删除成功");
+                } else {
+                    error("修改失败");
+                }
+            }).error(function () {
+                error("修改失败");
+            })
+        }
+    })
+})
 
 $('#j_edit').on('click', function () {
     window.location.href = window.location.pathname + "/_edit";
@@ -126,6 +171,10 @@ $('#j_edit').on('click', function () {
 
 $('#j_update').on('click', function () {
     var skuId = parseInt($('#j_order_sku').attr("skuid"));
+    var price = parseInt($('#j_order_price').val());
+    var status = parseInt(statusDropDown.attr("value"));
+    var referenceNumber = $('#j_referencenumber').val();
+    var gatheringInfo = $('#j_gatheringinfo').val();
     var primaryContact = $('#j_primary_contact').val();
     var primaryContactEmail = $('#j_primary_contact_email').val();
     var primaryContactPhone = $('#j_primary_contact_phone').val();
@@ -134,9 +183,13 @@ $('#j_update').on('click', function () {
     var secondaryContactEmail = $('#j_secondary_contact_email').val();
     var secondaryContactPhone = $('#j_secondary_contact_phone').val();
     var secondaryContactWechat = $('#j_secondary_contact_wechat').val();
-    // var remark = $('#j_remark').val();
+    var remark = $('#j_remark').val();
     var orderTickets = [];
 
+    if(price <= 0) {
+        warn("订单价格有误");
+        return;
+    }
     if (primaryContact.length == 0) {
         warn("缺少主要联系人信息");
         return;
@@ -202,6 +255,10 @@ $('#j_update').on('click', function () {
     var data = {
         id: id,
         skuId: skuId,
+        price: price,
+        status: status,
+        referenceNumber: referenceNumber,
+        gatheringInfo: gatheringInfo,
         primaryContact: primaryContact,
         primaryContactEmail: primaryContactEmail,
         primaryContactPhone: primaryContactPhone,
@@ -210,7 +267,7 @@ $('#j_update').on('click', function () {
         secondaryContactEmail: secondaryContactEmail,
         secondaryContactPhone: secondaryContactPhone,
         secondaryContactWechat: secondaryContactWechat,
-        // remark: remark,
+        remark: remark,
         orderTickets: orderTickets
     };
     $.ajax({
@@ -220,7 +277,7 @@ $('#j_update').on('click', function () {
         data: JSON.stringify(data)
     }).success(function () {
         success("修改成功");
-        // $('#j_update').attr("disabled", true);
+        $('#j_update').attr("disabled", true);
     }).error(function () {
         error("修改失败");
     })

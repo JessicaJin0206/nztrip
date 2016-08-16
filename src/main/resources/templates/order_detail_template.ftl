@@ -1,9 +1,73 @@
 <div class="form-group"><label>订单详情</label></div>
-<div class="form-group" id="j_order_sku" skuid="${order.skuId}"><label>名称:</label><span>   ${order.sku}</span></div>
-<div class="form-group"><label>价格:</label><span>   ${order.price}</span></div>
-<div class="form-group"><label>Reference
-    Number:</label><span>   <#if order.referenceNumber??>${order.referenceNumber}</#if></span></div>
-<div class="form-group"><label>集合信息:</label><span>   <#if order.gatheringInfo??>${order.gatheringInfo}</#if></span>
+<div class="form-group" id="j_order_sku" skuid="${order.skuId}">
+    <label>名称:</label>
+    <span>  ${order.sku}</span>
+</div>
+<div class="form-group">
+    <div class="row">
+        <label class="col-md-2">价格:</label>
+        <div class="col-md-offset-2">
+            <input type="number" id="j_order_price" class="form-control" <#if editing=false>disabled</#if> placeholder="请输入价格..." value="${order.price}">
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <div class="row">
+        <label class="col-md-2">Reference Number:</label>
+        <div class="col-md-offset-2">
+            <input type="text" id="j_referencenumber" class="form-control" <#if editing=false>disabled</#if> placeholder="请输入Reference Number..." value="${order.referenceNumber!''}">
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <div class="row">
+        <label class="col-md-2">集合信息:</label>
+        <div class="col-md-offset-2">
+            <input type="text" id="j_gatheringinfo" class="form-control" <#if editing=false>disabled</#if> placeholder="请输入集合信息..." value="${order.gatheringInfo!''}">
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <div class="row">
+        <label class="col-md-2">备注:</label>
+        <div class="col-md-offset-2">
+            <input type="text" id="j_remark" class="form-control" <#if editing=false>disabled</#if> placeholder="请输入备注..." value="${order.remark!''}">
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <div class="row">
+        <label class="col-md-2">订单状态:</label>
+        <#if editing=false>
+            <div class="col-md-offset-2">
+                <#list statusList as s>
+                    <#if (s.id == order.status)>
+                        <input type="text" id="j_status" disabled class="form-control"  value="${s.desc}">
+                    </#if>
+                </#list>
+            </div>
+        <#else>
+            <div class="dropdown col-md-3">
+                <button class="btn btn-default dropdown-toggle" type="button" id="selected_status_button"
+                        data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="true">
+                    <#list statusList as s>
+                        <#if (s.id == order.status)>
+                            <span id="j_selected_status" value="${s.id}">${s.desc}</span>
+                        </#if>
+                    </#list>
+
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" id="j_status_drop_down" aria-labelledby="selected_status_button">
+                    <li><a value="0">修改订单状态</a></li>
+                    <#list statusList as s>
+                        <li><a value="${s.id}">${s.desc}</a></li>
+                    </#list>
+                </ul>
+            </div>
+        </#if>
+    </div>
 </div>
 <div class="form-group"><label>游客信息</label></div>
 <#if editing=true>
@@ -43,6 +107,7 @@
 </#if>
 <#list tickets as ticket>
 <div class="form-group j_ticket_container" value="${ticket.id}" ticketId="${ticket.skuTicketId}" priceId="${ticket.ticketPriceId}">
+    <a id="j_ticket_delete"><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span></a>
     <div class="form-group"><label>票种:</label><span id="j_ticket_name_span"><#if ticket.skuTicket??>${ticket.skuTicket}</#if></span></div>
     <div class="form-group"><label>日期:</label><span id="j_ticket_date_span">${ticket.ticketDate}</span></div>
     <div class="form-group"><label>时间:</label><span id="j_ticket_time_span">${ticket.ticketTime}</span></div>
@@ -97,6 +162,7 @@
                                <#if editing=false>disabled</#if> placeholder="微信"
                                value="${order.secondaryContactWechat}">
 </div>
+
 <#if editing = false>
 <button id="j_edit" class="btn btn-default form-group">修改</button>
 <#else>

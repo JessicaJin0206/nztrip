@@ -36,11 +36,36 @@
     <#include "menu.ftl"/>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
             <div class="row">
-                <div class="col-md-3"><input type="text" id="j_keyword" class="form-control" placeholder="请输入关键词..." value="${keyword}">
+                <div class="col-md-2"><input type="text" id="j_keyword" class="form-control" placeholder="请输入关键词..." value="${keyword}">
                 </div>
-                <div class="col-md-3"><input type="text" id="j_uuid" class="form-control" placeholder="请输入编号..." value="${uuid}">
+                <div class="col-md-2"><input type="text" id="j_uuid" class="form-control" placeholder="请输入编号..." value="${uuid}">
                 </div>
                 <div class="col-md-3"><input type="text" id="j_reference_number" class="form-control" placeholder="请输入Reference Number" value="${referenceNumber}">
+                </div>
+                <div class="dropdown col-md-3">
+                    <button class="btn btn-default dropdown-toggle" type="button" id="selected_status_button"
+                            data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="true">
+                    <#assign hasStatus = 0>
+                    <#if (status > 0)>
+                        <#list statusList as s>
+                            <#if (s.id == status)>
+                                <#assign hasStatus = 1>
+                                <span id="j_selected_status" value="${s.id}">${s.desc}</span>
+                            </#if>
+                        </#list>
+                    </#if>
+                    <#if (hasStatus = 0)>
+                        <span id="j_selected_status" value="0">选择订单状态</span>
+                    </#if>
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" id="j_status_drop_down" aria-labelledby="selected_status_button">
+                        <li><a value="0">选择订单状态</a></li>
+                    <#list statusList as s>
+                        <li><a value="${s.id}">${s.desc}</a></li>
+                    </#list>
+                    </ul>
                 </div>
                 <div class="col-md-2">
                     <button id="j_search" class="btn btn-primary">搜索</button>
@@ -52,6 +77,7 @@
                     <tr>
                         <th>编号</th>
                         <th>项目</th>
+                        <th>订单状态</th>
                         <th>主联系人</th>
                         <th>Email</th>
                         <th>Reference Number</th>
@@ -64,6 +90,13 @@
                     <tr>
                         <th scope="row">${order.uuid}</th>
                         <th>${order.sku}</th>
+                        <td>
+                        <#list statusList as s>
+                            <#if (s.id == order.status)>
+                                ${s.desc}
+                            </#if>
+                        </#list>
+                        </td>
                         <td>${order.primaryContact}</td>
                         <td>${order.primaryContactEmail}</td>
                         <td><#if order.referenceNumber??>${order.referenceNumber}</#if></td>

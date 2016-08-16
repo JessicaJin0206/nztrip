@@ -18,6 +18,7 @@ package com.fitibo.aotearoa.controller;
 
 import com.fitibo.aotearoa.annotation.Authentication;
 import com.fitibo.aotearoa.constants.CommonConstants;
+import com.fitibo.aotearoa.constants.OrderStatus;
 import com.fitibo.aotearoa.dto.Role;
 import com.fitibo.aotearoa.dto.Token;
 import com.fitibo.aotearoa.exception.ResourceNotFoundException;
@@ -27,6 +28,7 @@ import com.fitibo.aotearoa.service.CategoryService;
 import com.fitibo.aotearoa.service.CityService;
 import com.fitibo.aotearoa.service.VendorService;
 import com.fitibo.aotearoa.util.DateUtils;
+import com.fitibo.aotearoa.util.StatusUtil;
 import com.fitibo.aotearoa.vo.AgentVo;
 import com.fitibo.aotearoa.vo.SkuTicketPriceVo;
 import com.fitibo.aotearoa.vo.SkuTicketVo;
@@ -42,6 +44,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -140,9 +143,8 @@ public class HomeController {
                              Map<String, Object> model) {
         Preconditions.checkNotNull(getToken());
         model.put("module", MODULE_QUERY_ORDER);
-        if (status > 0) {
-            model.put("status", status);
-        }
+        model.put("statusList", StatusUtil.getStatusList());
+        model.put("status", status);
         model.put("pageSize", pageSize);
         model.put("pageNumber", pageNumber);
         model.put("keyword", keyword);
@@ -150,10 +152,10 @@ public class HomeController {
         model.put("referenceNumber", referenceNumber);
         switch (getToken().getRole()) {
             case Admin:
-                model.put("orders", orderMapper.findAllByMultiFields(uuid, keyword, referenceNumber, new RowBounds(pageNumber * pageSize, pageSize)));
+                model.put("orders", orderMapper.findAllByMultiFields(uuid, keyword, referenceNumber, status, new RowBounds(pageNumber * pageSize, pageSize)));
                 break;
             case Agent:
-                model.put("orders", orderMapper.findByAgentIdAndMultiFields(getToken().getId(), uuid, keyword, referenceNumber, new RowBounds(pageNumber * pageSize, pageSize)));
+                model.put("orders", orderMapper.findByAgentIdAndMultiFields(getToken().getId(), uuid, keyword, referenceNumber, status, new RowBounds(pageNumber * pageSize, pageSize)));
                 break;
             default:
                 throw new ResourceNotFoundException();
@@ -195,6 +197,7 @@ public class HomeController {
             return result;
         }));
         model.put("module", MODULE_ORDER_DETAIL);
+		model.put("statusList", StatusUtil.getStatusList());
         model.put("editing", false);
         return "order_detail";
     }
@@ -238,6 +241,7 @@ public class HomeController {
 		}
 		model.put("sku", parse(sku, cityService.findAll(), categoryService.findAll(), vendorService.findAll()));
         model.put("module", MODULE_ORDER_DETAIL);
+		model.put("statusList", StatusUtil.getStatusList());
 		model.put("editing", true);
         return "order_detail";
     }

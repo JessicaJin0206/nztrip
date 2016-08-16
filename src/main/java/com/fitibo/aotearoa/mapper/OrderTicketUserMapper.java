@@ -29,4 +29,7 @@ public interface OrderTicketUserMapper {
 
     @Update("update order_ticket_user set name = #{name}, age = #{age}, weight = #{weight} where id = #{id}")
     int updateInfo(OrderTicketUser orderTicketUser);
+
+    @Delete("delete from order_ticket_user where order_ticket_id = #{orderTicketId}")
+    int deleteByOrderTicketId(int orderTicketId);
 }

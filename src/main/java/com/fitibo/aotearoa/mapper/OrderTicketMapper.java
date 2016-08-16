@@ -1,6 +1,7 @@
 package com.fitibo.aotearoa.mapper;
 
 import com.fitibo.aotearoa.model.OrderTicket;
+import com.fitibo.aotearoa.vo.OrderTicketVo;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -59,4 +60,7 @@ public interface OrderTicketMapper {
                     = @Many(select = "com.fitibo.aotearoa.mapper.OrderTicketUserMapper.findByOrderTicketId"))
     })
     List<OrderTicket> findByOrderId(int orderId);
+
+    @Delete("delete from order_ticket where id = #{id} and order_id = #{orderId}")
+    int deleteTicket(@Param("id") int id, @Param("orderId") int orderId);
 }
