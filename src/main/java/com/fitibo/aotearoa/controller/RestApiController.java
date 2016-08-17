@@ -24,6 +24,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -115,8 +116,8 @@ public class RestApiController {
         skuMapper.update(sku);
         List<SkuTicket> ticketList = skuTicketMapper.findOnlineBySkuId(id);
         Map<Integer, SkuTicket> ticketMap = new HashMap<>();
-        if(!ticketList.isEmpty()) {
-            for(SkuTicket ticket : ticketList) {
+        if (!ticketList.isEmpty()) {
+            for (SkuTicket ticket : ticketList) {
                 ticketMap.put(ticket.getId(), ticket);
             }
         }
@@ -124,48 +125,48 @@ public class RestApiController {
         List<SkuTicket> createList = new ArrayList<>();
         List<SkuTicket> deleteList = new ArrayList<>();
         for (SkuTicket skuTicket : Lists.transform(skuVo.getTickets(), (input) -> parse(id, input))) {
-            if(skuTicket.getId() > 0) {
+            if (skuTicket.getId() > 0) {
                 updateList.add(skuTicket);
                 ticketMap.remove(skuTicket.getId());
             } else {
                 createList.add(skuTicket);
             }
         }
-        if(!ticketMap.isEmpty()) {
-            for(SkuTicket skuTicket : ticketMap.values()) {
+        if (!ticketMap.isEmpty()) {
+            for (SkuTicket skuTicket : ticketMap.values()) {
                 skuTicket.setStatus(SkuTicketStatus.OFFLINE);
                 deleteList.add(skuTicket);
             }
         }
 
-        if(!createList.isEmpty()) {
+        if (!createList.isEmpty()) {
             skuTicketMapper.batchCreate(createList);
         }
-        if(!updateList.isEmpty()) {
+        if (!updateList.isEmpty()) {
             skuTicketMapper.batchUpdate(updateList);
         }
-        if(!deleteList.isEmpty()) {
+        if (!deleteList.isEmpty()) {
             skuTicketMapper.batchUpdate(deleteList);
         }
         return skuVo;
     }
 
     @RequestMapping(value = "v1/api/agents/{id}", method = RequestMethod.PUT)
-	@Authentication(Role.Admin)
-	public AgentVo updateAgent(@PathVariable("id") int id, @RequestBody AgentVo agentVo) {
-		Agent agent = parse(agentVo);
-		agent.setId(id);
-		agentMapper.update(agent);
-		agentVo.setId(id);
-		return agentVo;
-	}
+    @Authentication(Role.Admin)
+    public AgentVo updateAgent(@PathVariable("id") int id, @RequestBody AgentVo agentVo) {
+        Agent agent = parse(agentVo);
+        agent.setId(id);
+        agentMapper.update(agent);
+        agentVo.setId(id);
+        return agentVo;
+    }
 
-	@RequestMapping(value = "v1/api/orders", method = RequestMethod.POST)
+    @RequestMapping(value = "v1/api/orders", method = RequestMethod.POST)
     @Transactional(rollbackFor = Exception.class)
     @Authentication
     public OrderVo createOrder(@RequestBody OrderVo orderVo) {
         Preconditions.checkNotNull(getToken());
-        final int agentId = getToken().getRole() == Role.Agent?getToken().getId():0;
+        final int agentId = getToken().getRole() == Role.Agent ? getToken().getId() : 0;
         int discount = 50;
         if (agentId > 0) {
             Agent agent = agentMapper.findById(agentId);
@@ -236,54 +237,54 @@ public class RestApiController {
         }
         for (OrderTicketVo orderTicketVo : order.getOrderTickets()) {
 
-			if (orderTicketVo.getId() > 0) {
-				OrderTicket orderTicket = new OrderTicket();
-				orderTicket.setSkuTicket(orderTicketVo.getSkuTicket());
-				orderTicket.setTicketDate(DateUtils.parseDate(orderTicketVo.getTicketDate()));
-				orderTicket.setTicketTime(orderTicketVo.getTicketTime());
-				orderTicket.setId(orderTicketVo.getId());
+            if (orderTicketVo.getId() > 0) {
+                OrderTicket orderTicket = new OrderTicket();
+                orderTicket.setSkuTicket(orderTicketVo.getSkuTicket());
+                orderTicket.setTicketDate(DateUtils.parseDate(orderTicketVo.getTicketDate()));
+                orderTicket.setTicketTime(orderTicketVo.getTicketTime());
+                orderTicket.setId(orderTicketVo.getId());
 //            orderTicketMapper.updateOrderTicketInfo(orderTicket);
-			} else {
-				OrderTicket orderTicket = parse(orderTicketVo, order);
-				orderTicketMapper.create(orderTicket);
-				orderTicketVo.setId(orderTicket.getId());
-			}
+            } else {
+                OrderTicket orderTicket = parse(orderTicketVo, order);
+                orderTicketMapper.create(orderTicket);
+                orderTicketVo.setId(orderTicket.getId());
+            }
             if (CollectionUtils.isEmpty(orderTicketVo.getOrderTicketUsers())) {
                 throw new InvalidParamException();
             }
-			for (OrderTicketUserVo orderTicketUserVo : orderTicketVo.getOrderTicketUsers()) {
-				OrderTicketUser orderTicketUser = new OrderTicketUser();
-				orderTicketUser.setOrderTicketId(orderTicketVo.getId());
-				orderTicketUser.setName(orderTicketUserVo.getName());
-				orderTicketUser.setAge(orderTicketUserVo.getAge());
-				orderTicketUser.setWeight(orderTicketUserVo.getWeight());
-				if (orderTicketUserVo.getId() > 0) {
-					orderTicketUser.setId(orderTicketUserVo.getId());
-					orderTicketUserMapper.updateInfo(orderTicketUser);
-				} else {
-					orderTicketUserMapper.create(orderTicketUser);
-					orderTicketUserVo.setId(orderTicketUser.getId());
-				}
-			}
+            for (OrderTicketUserVo orderTicketUserVo : orderTicketVo.getOrderTicketUsers()) {
+                OrderTicketUser orderTicketUser = new OrderTicketUser();
+                orderTicketUser.setOrderTicketId(orderTicketVo.getId());
+                orderTicketUser.setName(orderTicketUserVo.getName());
+                orderTicketUser.setAge(orderTicketUserVo.getAge());
+                orderTicketUser.setWeight(orderTicketUserVo.getWeight());
+                if (orderTicketUserVo.getId() > 0) {
+                    orderTicketUser.setId(orderTicketUserVo.getId());
+                    orderTicketUserMapper.updateInfo(orderTicketUser);
+                } else {
+                    orderTicketUserMapper.create(orderTicketUser);
+                    orderTicketUserVo.setId(orderTicketUser.getId());
+                }
+            }
         }
         return order;
     }
 
-	@RequestMapping(value = "/v1/api/orders/tickets/{id}", method = RequestMethod.DELETE)
-	@Transactional(rollbackFor = Exception.class)
-	@Authentication
-	public boolean deleteTicket(@PathVariable("id") int id, @RequestBody OrderTicketVo ticketVo) {
-		//后续是否添加验证
-		int rowTicket = orderTicketMapper.deleteTicket(id, ticketVo.getOrderId());
-		if (rowTicket == 0) {
-			return false;
-		}
-		int rowUser = orderTicketUserMapper.deleteByOrderTicketId(id);
-		if (rowUser == 0) {
-			return false;
-		}
-		return true;
-	}
+    @RequestMapping(value = "/v1/api/orders/tickets/{id}", method = RequestMethod.DELETE)
+    @Transactional(rollbackFor = Exception.class)
+    @Authentication
+    public boolean deleteTicket(@PathVariable("id") int id, @RequestBody OrderTicketVo ticketVo) {
+        //后续是否添加验证
+        int rowTicket = orderTicketMapper.deleteTicket(id, ticketVo.getOrderId());
+        if (rowTicket == 0) {
+            return false;
+        }
+        int rowUser = orderTicketUserMapper.deleteByOrderTicketId(id);
+        if (rowUser == 0) {
+            return false;
+        }
+        return true;
+    }
 
     @RequestMapping(value = "v1/api/signin", method = RequestMethod.POST)
     public AuthenticationResp signin(@RequestBody AuthenticationReq req) {
@@ -328,13 +329,36 @@ public class RestApiController {
         return agentVo;
     }
 
-    @RequestMapping(value = "v1/api/tickets/{ticketId}/price")
+    @RequestMapping(value = "v1/api/skus/{skuId}/tickets/{ticketId}/prices")
     public List<SkuTicketPriceVo> getPrice(@PathVariable("ticketId") int ticketId,
-                                           @RequestParam("date")String date) {
+                                           @RequestParam("date") String date) {
         List<SkuTicketPrice> bySkuTicketId = skuTicketPriceMapper.findBySkuTicketIdAndDate(ticketId, DateUtils.parseDate(date));
         return Lists.transform(bySkuTicketId, ObjectParser::parse);
     }
 
+    @RequestMapping(value = "v1/api/skus/{skuId}/tickets/{ticketId}/prices", method = RequestMethod.POST)
+    @Authentication(Role.Admin)
+    public int addPrice(@PathVariable("skuId") int skuId,
+                        @PathVariable("ticketId") int ticketId,
+                        @RequestBody AddPriceRequest request) {
+        DateTime start = DateUtils.parseDateTime(request.getStartDate());
+        DateTime end = DateUtils.parseDateTime(request.getEndDate());
+        List<SkuTicketPrice> prices = Lists.newArrayList();
+        for (DateTime date = start.toDateTime(); !date.isAfter(end); date = date.plusDays(1)) {
+            if (request.getDayOfWeek().contains(date.getDayOfWeek())) {
+                SkuTicketPrice price = new SkuTicketPrice();
+                price.setCostPrice(request.getCostPrice());
+                price.setSalePrice(request.getSalePrice());
+                price.setDate(date.toDate());
+                price.setDescription(request.getDescription());
+                price.setSkuId(skuId);
+                price.setSkuTicketId(ticketId);
+                price.setTime(request.getTime());
+                prices.add(price);
+            }
+        }
+        return skuTicketPriceMapper.batchCreate(prices);
+    }
 
     private static Order parse(OrderVo order, int agentId) {
         Order result = new Order();
@@ -357,7 +381,7 @@ public class RestApiController {
 
     private static Order parse4Update(OrderVo order) {
         Order result = new Order();
-		result.setId(order.getId());
+        result.setId(order.getId());
         result.setSku(order.getSku());
         result.setPrice(order.getPrice());
         result.setStatus(order.getStatus());
@@ -403,31 +427,31 @@ public class RestApiController {
         return result;
     }
 
-	private static OrderTicket parse(OrderTicketVo ticketVo, OrderVo orderVo) {
-		OrderTicket result = new OrderTicket();
-		result.setSkuId(orderVo.getSkuId());
-		result.setOrderId(orderVo.getId());
-		result.setSkuTicketId(ticketVo.getSkuTicketId());
-		result.setSkuTicket(ticketVo.getSkuTicket());
-		result.setCountConstraint(ticketVo.getCountConstraint());
-		result.setAgeConstraint(ticketVo.getAgeConstraint());
-		result.setWeightConstraint(ticketVo.getWeightConstraint());
-		result.setTicketDescription(ticketVo.getTicketDescription());
-		result.setTicketPriceId(ticketVo.getTicketPriceId());
-		result.setTicketDate(DateUtils.parseDate(ticketVo.getTicketDate()));
-		result.setTicketTime(ticketVo.getTicketTime());
-		result.setSalePrice(ticketVo.getSalePrice());
-		result.setCostPrice(ticketVo.getCostPrice());
-		result.setPriceDescription(ticketVo.getPriceDescription());
-		return result;
-	}
+    private static OrderTicket parse(OrderTicketVo ticketVo, OrderVo orderVo) {
+        OrderTicket result = new OrderTicket();
+        result.setSkuId(orderVo.getSkuId());
+        result.setOrderId(orderVo.getId());
+        result.setSkuTicketId(ticketVo.getSkuTicketId());
+        result.setSkuTicket(ticketVo.getSkuTicket());
+        result.setCountConstraint(ticketVo.getCountConstraint());
+        result.setAgeConstraint(ticketVo.getAgeConstraint());
+        result.setWeightConstraint(ticketVo.getWeightConstraint());
+        result.setTicketDescription(ticketVo.getTicketDescription());
+        result.setTicketPriceId(ticketVo.getTicketPriceId());
+        result.setTicketDate(DateUtils.parseDate(ticketVo.getTicketDate()));
+        result.setTicketTime(ticketVo.getTicketTime());
+        result.setSalePrice(ticketVo.getSalePrice());
+        result.setCostPrice(ticketVo.getCostPrice());
+        result.setPriceDescription(ticketVo.getPriceDescription());
+        return result;
+    }
 
     private static Agent parse(AgentVo agentVo) {
         Agent result = new Agent();
         result.setUserName(agentVo.getUserName());
-		if(!Strings.isNullOrEmpty(agentVo.getPassword())) {
-			result.setPassword(Md5Utils.md5(agentVo.getPassword()));
-		}
+        if (!Strings.isNullOrEmpty(agentVo.getPassword())) {
+            result.setPassword(Md5Utils.md5(agentVo.getPassword()));
+        }
         result.setName(agentVo.getName());
         result.setDescription(agentVo.getDescription());
         result.setDiscount(agentVo.getDiscount());
