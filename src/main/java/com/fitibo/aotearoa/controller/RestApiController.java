@@ -16,6 +16,7 @@ import com.fitibo.aotearoa.service.VendorService;
 import com.fitibo.aotearoa.util.DateUtils;
 import com.fitibo.aotearoa.util.GuidGenerator;
 import com.fitibo.aotearoa.util.Md5Utils;
+import com.fitibo.aotearoa.util.ObjectParser;
 import com.fitibo.aotearoa.vo.*;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -23,7 +24,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.apache.ibatis.ognl.IntHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -332,19 +332,9 @@ public class RestApiController {
     public List<SkuTicketPriceVo> getPrice(@PathVariable("ticketId") int ticketId,
                                            @RequestParam("date")String date) {
         List<SkuTicketPrice> bySkuTicketId = skuTicketPriceMapper.findBySkuTicketIdAndDate(ticketId, DateUtils.parseDate(date));
-        return Lists.transform(bySkuTicketId, (input) -> {
-            SkuTicketPriceVo result = new SkuTicketPriceVo();
-            result.setId(input.getId());
-            result.setCostPrice(input.getCostPrice());
-            result.setSalePrice(input.getSalePrice());
-            result.setSkuId(input.getSkuId());
-            result.setSkuTicketId(input.getSkuTicketId());
-            result.setDescription(input.getDescription());
-            result.setDate(DateUtils.formatDate(input.getDate()));
-            result.setTime(input.getTime());
-            return result;
-        });
+        return Lists.transform(bySkuTicketId, ObjectParser::parse);
     }
+
 
     private static Order parse(OrderVo order, int agentId) {
         Order result = new Order();
