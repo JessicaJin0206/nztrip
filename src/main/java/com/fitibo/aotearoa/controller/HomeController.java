@@ -172,31 +172,7 @@ public class HomeController {
             throw new ResourceNotFoundException();
         }
         model.put("order", order);
-        model.put("tickets", Lists.transform(orderTicketMapper.findByOrderId(order.getId()), (input) -> {
-            OrderTicketVo result = new OrderTicketVo();
-            result.setId(input.getId());
-            result.setAgeConstraint(input.getAgeConstraint());
-            result.setCountConstraint(input.getAgeConstraint());
-            result.setWeightConstraint(input.getWeightConstraint());
-            result.setPriceDescription(input.getPriceDescription());
-            result.setSalePrice(input.getSalePrice());
-            result.setTicketDate(DateUtils.formatDate(input.getTicketDate()));
-            result.setTicketTime(input.getTicketTime());
-            result.setSkuTicket(input.getSkuTicket());
-            result.setSkuTicketId(input.getSkuTicketId());
-            result.setTicketPriceId(input.getTicketPriceId());
-            result.setOrderTicketUsers(Lists.transform(input.getUsers(), (input2) -> {
-                OrderTicketUserVo userVo = new OrderTicketUserVo();
-                userVo.setAge(input2.getAge());
-                userVo.setId(input2.getId());
-                userVo.setName(input2.getName());
-                userVo.setOrderTicketId(input2.getOrderTicketId());
-                userVo.setWeight(input2.getWeight());
-                return userVo;
-            }));
-            result.setCostPrice(input.getCostPrice());
-            return result;
-        }));
+        model.put("tickets", Lists.transform(orderTicketMapper.findByOrderId(order.getId()), ObjectParser::parse));
         model.put("module", MODULE_ORDER_DETAIL);
 		model.put("statusList", StatusUtil.getStatusList());
         model.put("editing", false);
@@ -211,31 +187,7 @@ public class HomeController {
             throw new ResourceNotFoundException();
         }
         model.put("order", order);
-        model.put("tickets", Lists.transform(orderTicketMapper.findByOrderId(order.getId()), (input) -> {
-            OrderTicketVo result = new OrderTicketVo();
-            result.setId(input.getId());
-            result.setAgeConstraint(input.getAgeConstraint());
-            result.setCountConstraint(input.getAgeConstraint());
-            result.setWeightConstraint(input.getWeightConstraint());
-            result.setPriceDescription(input.getPriceDescription());
-            result.setSalePrice(input.getSalePrice());
-            result.setTicketDate(DateUtils.formatDate(input.getTicketDate()));
-            result.setTicketTime(input.getTicketTime());
-            result.setSkuTicket(input.getSkuTicket());
-            result.setSkuTicketId(input.getSkuTicketId());
-            result.setTicketPriceId(input.getTicketPriceId());
-            result.setOrderTicketUsers(Lists.transform(input.getUsers(), (input2) -> {
-                OrderTicketUserVo userVo = new OrderTicketUserVo();
-                userVo.setAge(input2.getAge());
-                userVo.setId(input2.getId());
-                userVo.setName(input2.getName());
-                userVo.setOrderTicketId(input2.getOrderTicketId());
-                userVo.setWeight(input2.getWeight());
-                return userVo;
-            }));
-            result.setCostPrice(input.getCostPrice());
-            return result;
-        }));
+        model.put("tickets", Lists.transform(orderTicketMapper.findByOrderId(order.getId()), ObjectParser::parse));
 		Sku sku = skuMapper.findById(order.getSkuId());
 		if (sku == null) {
 			throw new ResourceNotFoundException();
@@ -299,7 +251,7 @@ public class HomeController {
         }
         Sku sku = skuMapper.findById(skuId);
         Preconditions.checkArgument(sku != null && skuId == ticket.getSkuId(), "invalid skuId:" + skuId);
-        List<SkuTicketPrice> skuTicketPrices = skuTicketPriceMapper.findBySkuTicketId(ticket.getId());
+        List<SkuTicketPrice> skuTicketPrices = skuTicketPriceMapper.findBySkuTicketId(ticket.getId(), new RowBounds(pageNumber * pageSize, pageSize));
         model.put("sku", sku);
         model.put("ticket", ticket);
         model.put("ticketPrices", Lists.transform(skuTicketPrices, ObjectParser::parse));

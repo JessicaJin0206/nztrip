@@ -14,6 +14,38 @@ $('#j_submit').on('click', function(){
     if (startDate.length == 0 || endDate.length == 0) {
         return;
     }
-    console.log('start date:' + startDate);
-    console.log('end date:' + endDate);
+    var dayOfWeek = [];
+    $('.j_day_of_week').each(function(){
+        var item = $(this);
+        if (item.hasClass('active')) {
+            dayOfWeek.push(parseInt(item.find('input').val()));
+        }
+    });
+    var time = $('#j_ticket_time').val();
+    var salePrice = parseInt($('#j_ticket_sale_price').val());
+    var costPrice = parseInt($('#j_ticket_cost_price').val());
+    var description = $('#j_ticket_description').val();
+    var skuId = $('.main').attr('skuId');
+    var ticketId = $('.main').attr('ticketId');
+    var data = {
+        startDate: startDate,
+        endDate: endDate,
+        dayOfWeek: dayOfWeek,
+        time: time,
+        salePrice: salePrice,
+        costPrice: costPrice,
+        description: description
+    };
+    console.log(JSON.stringify(data));
+    $.ajax({
+        type: 'POST',
+        contentType: "application/json; charset=utf-8",
+        url: '/v1/api/skus/' + skuId + '/tickets/' + ticketId + '/prices',
+        data: JSON.stringify(data)
+    }).success(function () {
+        window.location.reload();
+    }).error(function () {
+
+    });
+
 });

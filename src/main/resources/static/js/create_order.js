@@ -66,7 +66,7 @@ $('#j_ticket_type_selector li a').on('click', function(e){
         maxDate: maxDate,
         format: "YYYY-MM-DD"
     }).on('dp.change', function(e){
-        var url = '/v1/api/tickets/' + ticket.attr('value') + '/price?date=' + e.date.format('YYYY-MM-DD');
+        var url = '/v1/api/skus/' + $('.main').attr('skuId') + '/tickets/' + ticket.attr('value') + '/prices?date=' + e.date.format('YYYY-MM-DD');
         $.ajax({
             type: 'GET',
             contentType:"application/json; charset=utf-8",

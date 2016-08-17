@@ -33,7 +33,7 @@
 <div class="container-fluid">
     <div class="row">
     <#include "menu.ftl"/>
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" skuId="${skuId}" ticketId="${ticketId}">
             <div class="form-group">
                 <div class="row">
                     <label>项目名称:</label>
@@ -63,30 +63,39 @@
             </div>
 
             <div class="form-group">
-                <div class="input-group">
-                    <input id="j_mon" type="checkbox">
-                    <span>  星期一  </span>
-                    <input id="j_tue" type="checkbox">
-                    <span>  星期二  </span>
-                    <input id="j_wed" type="checkbox">
-                    <span>  星期三  </span>
-                    <input id="j_thu" type="checkbox">
-                    <span>  星期四  </span>
-                    <input id="j_fri" type="checkbox">
-                    <span>  星期五  </span>
-                    <input id="j_sat" type="checkbox">
-                    <span>  星期六  </span>
-                    <input id="j_sun" type="checkbox">
-                    <span>  星期日  </span>
+                <div class="btn-group" data-toggle="buttons">
+                    <label class="j_day_of_week btn btn-primary">
+                        <input type="checkbox" value="1">星期一
+                    </label>
+                    <label class="j_day_of_week btn btn-primary">
+                        <input type="checkbox" value="2">星期二
+                    </label>
+                    <label class="j_day_of_week btn btn-primary">
+                        <input type="checkbox" value="3">星期三
+                    </label>
+                    <label class="j_day_of_week btn btn-primary">
+                        <input type="checkbox" value="4">星期四
+                    </label>
+                    <label class="j_day_of_week btn btn-primary">
+                        <input type="checkbox" value="5">星期五
+                    </label>
+                    <label class="j_day_of_week btn btn-primary">
+                        <input type="checkbox" value="6">星期六
+                    </label>
+                    <label class="j_day_of_week btn btn-primary">
+                        <input type="checkbox" value="7">星期日
+                    </label>
                 </div>
             </div>
 
             <div class="form-group row">
-                <div class="col-md-2"><input type="number" id="j_keyword" class="form-control" placeholder="成本价">
+                <div class="col-md-2"><input type="text" id="j_ticket_time" class="form-control" placeholder="时间">
                 </div>
-                <div class="col-md-2"><input type="number" id="j_uuid" class="form-control" placeholder="销售价">
+                <div class="col-md-2"><input type="number" id="j_ticket_cost_price" class="form-control" placeholder="成本价">
                 </div>
-                <div class="col-md-4"><input type="text" id="j_reference_number" class="form-control" placeholder="描述">
+                <div class="col-md-2"><input type="number" id="j_ticket_sale_price" class="form-control" placeholder="销售价">
+                </div>
+                <div class="col-md-4"><input type="text" id="j_ticket_description" class="form-control" placeholder="描述">
                 </div>
             </div>
 

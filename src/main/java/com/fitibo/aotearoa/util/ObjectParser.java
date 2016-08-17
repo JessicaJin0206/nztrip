@@ -1,7 +1,11 @@
 package com.fitibo.aotearoa.util;
 
+import com.fitibo.aotearoa.model.OrderTicket;
+import com.fitibo.aotearoa.model.OrderTicketUser;
 import com.fitibo.aotearoa.model.SkuTicket;
 import com.fitibo.aotearoa.model.SkuTicketPrice;
+import com.fitibo.aotearoa.vo.OrderTicketUserVo;
+import com.fitibo.aotearoa.vo.OrderTicketVo;
 import com.fitibo.aotearoa.vo.SkuTicketPriceVo;
 import com.fitibo.aotearoa.vo.SkuTicketVo;
 import com.google.common.collect.Lists;
@@ -40,5 +44,33 @@ public final class ObjectParser {
         ticket.setMaxWeight(Integer.parseInt(weights[1]));
         ticket.setTicketPrices(Lists.transform(input.getTicketPrices(), ObjectParser::parse));
         return ticket;
+    }
+
+    public static OrderTicketVo parse(OrderTicket orderTicket) {
+        OrderTicketVo result = new OrderTicketVo();
+        result.setId(orderTicket.getId());
+        result.setAgeConstraint(orderTicket.getAgeConstraint());
+        result.setCountConstraint(orderTicket.getAgeConstraint());
+        result.setWeightConstraint(orderTicket.getWeightConstraint());
+        result.setPriceDescription(orderTicket.getPriceDescription());
+        result.setSalePrice(orderTicket.getSalePrice());
+        result.setTicketDate(DateUtils.formatDate(orderTicket.getTicketDate()));
+        result.setTicketTime(orderTicket.getTicketTime());
+        result.setSkuTicket(orderTicket.getSkuTicket());
+        result.setSkuTicketId(orderTicket.getSkuTicketId());
+        result.setTicketPriceId(orderTicket.getTicketPriceId());
+        result.setOrderTicketUsers(Lists.transform(orderTicket.getUsers(), ObjectParser::parse));
+        result.setCostPrice(orderTicket.getCostPrice());
+        return result;
+    }
+
+    public static OrderTicketUserVo parse(OrderTicketUser input2) {
+        OrderTicketUserVo userVo = new OrderTicketUserVo();
+        userVo.setAge(input2.getAge());
+        userVo.setId(input2.getId());
+        userVo.setName(input2.getName());
+        userVo.setOrderTicketId(input2.getOrderTicketId());
+        userVo.setWeight(input2.getWeight());
+        return userVo;
     }
 }
