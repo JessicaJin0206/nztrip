@@ -107,7 +107,7 @@
 </#if>
 <#list tickets as ticket>
 <div class="form-group j_ticket_container" value="${ticket.id}" ticketId="${ticket.skuTicketId}" priceId="${ticket.ticketPriceId}">
-    <a id="j_ticket_delete"><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span></a>
+    <#if editing == true><a id="j_ticket_delete"><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span></a></#if>
     <div class="form-group"><label>票种:</label><span id="j_ticket_name_span"><#if ticket.skuTicket??>${ticket.skuTicket}</#if></span></div>
     <div class="form-group"><label>日期:</label><span id="j_ticket_date_span">${ticket.ticketDate}</span></div>
     <div class="form-group"><label>时间:</label><span id="j_ticket_time_span">${ticket.ticketTime}</span></div>
@@ -167,5 +167,8 @@
 <button id="j_edit" class="btn btn-default form-group">修改</button>
 <#else>
 <button id="j_update" class="btn btn-default form-group">提交</button>
+</#if>
+<#if editing = false>
+<button id="j_email" class="btn btn-default form-group">发送邮件</button>
 </#if>
 </div>

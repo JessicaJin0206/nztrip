@@ -6,6 +6,7 @@ import com.fitibo.aotearoa.constants.OrderStatus;
 import com.fitibo.aotearoa.constants.SkuTicketStatus;
 import com.fitibo.aotearoa.dto.Role;
 import com.fitibo.aotearoa.dto.Token;
+import com.fitibo.aotearoa.email.EmailService;
 import com.fitibo.aotearoa.exception.AuthenticationFailureException;
 import com.fitibo.aotearoa.exception.InvalidParamException;
 import com.fitibo.aotearoa.exception.ResourceNotFoundException;
@@ -71,6 +72,9 @@ public class RestApiController {
 
     @Autowired
     private TokenService tokenService;
+
+    @Autowired
+    private EmailService emailService;
 
     private ThreadLocal<Token> token = new ThreadLocal<>();
 
@@ -284,6 +288,26 @@ public class RestApiController {
 		}
 		return true;
 	}
+
+    @RequestMapping(value = "/v1/api/orders/{id}/email", method = RequestMethod.PUT)
+    @Authentication
+    public boolean sendEmail(@PathVariable("id") int id) {
+        Order order = orderMapper.findById(id);
+        if(order == null) {
+            throw new ResourceNotFoundException();
+        }
+        List<OrderTicket> ticketList = orderTicketMapper.findByOrderId(id);
+        if(ticketList.isEmpty()) {
+            throw new ResourceNotFoundException();
+        }
+        Sku sku = skuMapper.findById(ticketList.get(0).getSkuId());
+        if(ticketList.isEmpty()) {
+            throw new ResourceNotFoundException();
+        }
+        Vendor vendor = vendorService.findById(sku.getVendorId());
+        boolean result = emailService.sendEmail(vendor, order, ticketList);
+        return result;
+    }
 
     @RequestMapping(value = "v1/api/signin", method = RequestMethod.POST)
     public AuthenticationResp signin(@RequestBody AuthenticationReq req) {

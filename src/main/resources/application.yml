@@ -22,3 +22,12 @@ debug: true
 ---
 spring:
   profiles: production
+
+---
+email:
+    host: smtp.126.com
+    port: 25
+    username: zi___yue@126.com
+    password: *****
+    javaMailProperties:
+      mail.smtp.auth: true

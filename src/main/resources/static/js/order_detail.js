@@ -282,3 +282,21 @@ $('#j_update').on('click', function () {
         error("修改失败");
     })
 });
+
+$('#j_email').on('click', function () {
+    var path = window.location.pathname.split('/');
+    var id = parseInt(path[path.length - 1]);
+    $.ajax({
+        type: 'PUT',
+        contentType: "application/json; charset=utf-8",
+        url: '/v1/api/orders/' + id + "/email"
+    }).success(function (data) {
+        if(data == true) {
+            success("发送成功");
+        } else {
+            error("发送失败");
+        }
+    }).error(function () {
+        error("发送失败");
+    })
+})
