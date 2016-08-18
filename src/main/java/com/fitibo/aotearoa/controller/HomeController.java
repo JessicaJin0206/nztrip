@@ -21,8 +21,8 @@ import com.google.common.collect.Lists;
 
 import com.fitibo.aotearoa.annotation.Authentication;
 import com.fitibo.aotearoa.constants.CommonConstants;
+import com.fitibo.aotearoa.constants.OrderStatus;
 import com.fitibo.aotearoa.dto.Role;
-import com.fitibo.aotearoa.dto.Token;
 import com.fitibo.aotearoa.exception.ResourceNotFoundException;
 import com.fitibo.aotearoa.mapper.AgentMapper;
 import com.fitibo.aotearoa.mapper.OrderMapper;
@@ -42,7 +42,6 @@ import com.fitibo.aotearoa.service.CategoryService;
 import com.fitibo.aotearoa.service.CityService;
 import com.fitibo.aotearoa.service.VendorService;
 import com.fitibo.aotearoa.util.ObjectParser;
-import com.fitibo.aotearoa.util.StatusUtils;
 import com.fitibo.aotearoa.vo.AgentVo;
 import com.fitibo.aotearoa.vo.SkuVo;
 
@@ -149,7 +148,7 @@ public class HomeController extends AuthenticationRequiredController {
                              Map<String, Object> model) {
         Preconditions.checkNotNull(getToken());
         model.put("module", MODULE_QUERY_ORDER);
-        model.put("statusList", StatusUtils.getStatusList());
+        model.put("statusList", OrderStatus.values());
         model.put("status", status);
         model.put("pageSize", pageSize);
         model.put("pageNumber", pageNumber);
@@ -179,7 +178,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("order", order);
         model.put("tickets", Lists.transform(orderTicketMapper.findByOrderId(order.getId()), ObjectParser::parse));
         model.put("module", MODULE_ORDER_DETAIL);
-        model.put("statusList", StatusUtils.getStatusList());
+        model.put("statusList", OrderStatus.values());
         model.put("editing", false);
         return "order_detail";
     }
@@ -199,7 +198,7 @@ public class HomeController extends AuthenticationRequiredController {
         }
         model.put("sku", parse(sku, cityService.findAll(), categoryService.findAll(), vendorService.findAll()));
         model.put("module", MODULE_ORDER_DETAIL);
-        model.put("statusList", StatusUtils.getStatusList());
+        model.put("statusList", OrderStatus.values());
         model.put("editing", true);
         return "order_detail";
     }

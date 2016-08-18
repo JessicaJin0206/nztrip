@@ -210,7 +210,7 @@ public class RestApiController extends AuthenticationRequiredController {
         Order order = parse(orderVo, agentId);
         order.setPrice(price);
         order.setUuid(GuidGenerator.generate(14));
-        order.setStatus(OrderStatus.NEW);
+        order.setStatus(OrderStatus.NEW.getValue());
         orderMapper.create(order);
         orderVo.setId(order.getId());
         if (CollectionUtils.isEmpty(orderVo.getOrderTickets())) {

@@ -41,7 +41,7 @@
         <#if editing=false>
             <div class="col-md-offset-2">
                 <#list statusList as s>
-                    <#if (s.id == order.status)>
+                    <#if (s.getValue() == order.status)>
                         <input type="text" id="j_status" disabled class="form-control"  value="${s.desc}">
                     </#if>
                 </#list>
@@ -52,7 +52,7 @@
                         data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="true">
                     <#list statusList as s>
-                        <#if (s.id == order.status)>
+                        <#if (s.getValue() == order.status)>
                             <span id="j_selected_status" value="${s.id}">${s.desc}</span>
                         </#if>
                     </#list>
@@ -62,7 +62,7 @@
                 <ul class="dropdown-menu" id="j_status_drop_down" aria-labelledby="selected_status_button">
                     <li><a value="0">修改订单状态</a></li>
                     <#list statusList as s>
-                        <li><a value="${s.id}">${s.desc}</a></li>
+                        <li><a value="${s.getValue()}">${s.getDesc()}</a></li>
                     </#list>
                 </ul>
             </div>

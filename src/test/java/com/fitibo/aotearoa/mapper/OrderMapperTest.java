@@ -1,8 +1,9 @@
 package com.fitibo.aotearoa.mapper;
 
 import com.fitibo.aotearoa.constants.OrderStatus;
-import com.fitibo.aotearoa.util.GuidGenerator;
 import com.fitibo.aotearoa.model.Order;
+import com.fitibo.aotearoa.util.GuidGenerator;
+
 import org.apache.ibatis.session.RowBounds;
 import org.junit.After;
 import org.junit.Before;
@@ -27,7 +28,7 @@ public class OrderMapperTest extends BaseTest {
         order1.setAgentId(AGENT_ID);
         order1.setPrice(1024);
         order1.setRemark("{}");
-        order1.setStatus(OrderStatus.PENDING);
+        order1.setStatus(OrderStatus.PENDING.getValue());
         order1.setPrimaryContact("will");
         order1.setPrimaryContactEmail("will@abc.com");
         order1.setPrimaryContactWechat("123124523");
@@ -40,7 +41,7 @@ public class OrderMapperTest extends BaseTest {
         order2.setAgentId(AGENT_ID);
         order2.setPrice(1000);
         order2.setRemark("{}");
-        order2.setStatus(OrderStatus.CONFIRMED);
+        order2.setStatus(OrderStatus.CONFIRMED.getValue());
         order2.setPrimaryContact("phil");
         order2.setPrimaryContactEmail("phil@abc.com");
         order2.setPrimaryContactWechat("1234124523");
@@ -80,8 +81,8 @@ public class OrderMapperTest extends BaseTest {
         assertEquals(orderMapper.findByAgentId(AGENT_ID, new RowBounds(0, 1)).size(), 1);
         assertEquals(orderMapper.findByAgentId(AGENT_ID, new RowBounds(0, 2)).size(), 2);
         assertEquals(orderMapper.findByAgentId(AGENT_ID, new RowBounds(0, 100)).size(), 2);
-        assertEquals(orderMapper.findByAgentIdAndStatus(AGENT_ID, OrderStatus.CONFIRMED, new RowBounds(0, 100)).size(), 1);
-        assertEquals(orderMapper.findByAgentIdAndStatus(AGENT_ID, OrderStatus.PENDING, new RowBounds(0, 100)).size(), 1);
-        assertEquals(orderMapper.findByAgentIdAndStatus(AGENT_ID, OrderStatus.CLOSED, new RowBounds(0, 100)).size(), 0);
+        assertEquals(orderMapper.findByAgentIdAndStatus(AGENT_ID, OrderStatus.CONFIRMED.getValue(), new RowBounds(0, 100)).size(), 1);
+        assertEquals(orderMapper.findByAgentIdAndStatus(AGENT_ID, OrderStatus.PENDING.getValue(), new RowBounds(0, 100)).size(), 1);
+        assertEquals(orderMapper.findByAgentIdAndStatus(AGENT_ID, OrderStatus.CLOSED.getValue(), new RowBounds(0, 100)).size(), 0);
     }
 }
