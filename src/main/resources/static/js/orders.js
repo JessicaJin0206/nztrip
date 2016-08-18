@@ -12,18 +12,18 @@ $('#j_search').on('click', function(){
     var uuid = $('#j_uuid').val();
     var referenceNumber = $('#j_reference_number').val();
     var status = parseInt(statusDropDown.attr("value"));
-    var seachString = "";
+    var searchString = "";
     if (keyword.length > 0) {
-        seachString += "keyword=" + encodeURI(keyword) + "&";
+        searchString += "keyword=" + encodeURI(keyword) + "&";
     }
     if (uuid.length > 0) {
-        seachString += "uuid=" + uuid + "&";
+        searchString += "uuid=" + uuid + "&";
     }
     if (referenceNumber.length > 0) {
-        seachString += "referencenumber=" + referenceNumber + "&";
+        searchString += "referencenumber=" + referenceNumber + "&";
     }
     if(status > 0) {
-        seachString += "status=" + status + "&";
+        searchString += "status=" + status + "&";
     }
-    window.location.href = "orders?" + seachString;
+    window.location.href = "/orders?" + searchString;
 });

@@ -17,6 +17,7 @@ import com.fitibo.aotearoa.service.VendorService;
 import com.fitibo.aotearoa.util.DateUtils;
 import com.fitibo.aotearoa.util.GuidGenerator;
 import com.fitibo.aotearoa.util.Md5Utils;
+import com.fitibo.aotearoa.util.ObjectParser;
 import com.fitibo.aotearoa.vo.*;
 
 import com.google.common.base.Function;
@@ -26,6 +27,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -353,22 +355,35 @@ public class RestApiController {
         return agentVo;
     }
 
-    @RequestMapping(value = "v1/api/tickets/{ticketId}/price")
+    @RequestMapping(value = "v1/api/skus/{skuId}/tickets/{ticketId}/prices")
     public List<SkuTicketPriceVo> getPrice(@PathVariable("ticketId") int ticketId,
                                            @RequestParam("date") String date) {
         List<SkuTicketPrice> bySkuTicketId = skuTicketPriceMapper.findBySkuTicketIdAndDate(ticketId, DateUtils.parseDate(date));
-        return Lists.transform(bySkuTicketId, (input) -> {
-            SkuTicketPriceVo result = new SkuTicketPriceVo();
-            result.setId(input.getId());
-            result.setCostPrice(input.getCostPrice());
-            result.setSalePrice(input.getSalePrice());
-            result.setSkuId(input.getSkuId());
-            result.setSkuTicketId(input.getSkuTicketId());
-            result.setDescription(input.getDescription());
-            result.setDate(DateUtils.formatDate(input.getDate()));
-            result.setTime(input.getTime());
-            return result;
-        });
+        return Lists.transform(bySkuTicketId, ObjectParser::parse);
+    }
+
+    @RequestMapping(value = "v1/api/skus/{skuId}/tickets/{ticketId}/prices", method = RequestMethod.POST)
+    @Authentication(Role.Admin)
+    public int addPrice(@PathVariable("skuId") int skuId,
+                        @PathVariable("ticketId") int ticketId,
+                        @RequestBody AddPriceRequest request) {
+        DateTime start = DateUtils.parseDateTime(request.getStartDate());
+        DateTime end = DateUtils.parseDateTime(request.getEndDate());
+        List<SkuTicketPrice> prices = Lists.newArrayList();
+        for (DateTime date = start.toDateTime(); !date.isAfter(end); date = date.plusDays(1)) {
+            if (request.getDayOfWeek().contains(date.getDayOfWeek())) {
+                SkuTicketPrice price = new SkuTicketPrice();
+                price.setCostPrice(request.getCostPrice());
+                price.setSalePrice(request.getSalePrice());
+                price.setDate(date.toDate());
+                price.setDescription(request.getDescription());
+                price.setSkuId(skuId);
+                price.setSkuTicketId(ticketId);
+                price.setTime(request.getTime());
+                prices.add(price);
+            }
+        }
+        return skuTicketPriceMapper.batchCreate(prices);
     }
 
     private static Order parse(OrderVo order, int agentId) {

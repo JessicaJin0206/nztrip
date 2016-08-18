@@ -1,9 +1,5 @@
 package com.fitibo.aotearoa.vo;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
-import java.util.Date;
-
 /**
  * Created by qianhao.zhou on 8/11/16.
  */

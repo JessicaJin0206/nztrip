@@ -3,6 +3,7 @@ package com.fitibo.aotearoa.mapper;
 import com.fitibo.aotearoa.model.SkuTicketPrice;
 
 import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.session.RowBounds;
 
 import java.util.Date;
 import java.util.List;
@@ -92,7 +93,7 @@ public interface SkuTicketPriceMapper {
     })
     List<SkuTicketPrice> findBySkuTicketIdAndDate(@Param("skuTicketId") int skuTicketId, @Param("date") Date date);
 
-    @Select("select * from sku_ticket_price where sku_ticket_id = #{skuTicketId}")
+    @Select("select * from sku_ticket_price where sku_ticket_id = #{skuTicketId} and date > now() order by date desc")
     @Results({
             @Result(column = "id", property = "id"),
             @Result(column = "sku_id", property = "skuId"),
@@ -103,7 +104,6 @@ public interface SkuTicketPriceMapper {
             @Result(column = "sale_price", property = "salePrice"),
             @Result(column = "description", property = "description"),
     })
-    List<SkuTicketPrice> findBySkuTicketId(int skuTicketId);
-//    List<SkuTicketPrice> findBySkuTicketId(@Param("skuTicketId") int skuTicketId);
+    List<SkuTicketPrice> findBySkuTicketId(int skuTicketId, RowBounds rowBounds);
 
 }

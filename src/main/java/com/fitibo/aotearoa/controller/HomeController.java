@@ -16,27 +16,35 @@
 
 package com.fitibo.aotearoa.controller;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+
 import com.fitibo.aotearoa.annotation.Authentication;
 import com.fitibo.aotearoa.constants.CommonConstants;
-import com.fitibo.aotearoa.constants.OrderStatus;
 import com.fitibo.aotearoa.dto.Role;
 import com.fitibo.aotearoa.dto.Token;
 import com.fitibo.aotearoa.exception.ResourceNotFoundException;
-import com.fitibo.aotearoa.mapper.*;
-import com.fitibo.aotearoa.model.*;
+import com.fitibo.aotearoa.mapper.AgentMapper;
+import com.fitibo.aotearoa.mapper.OrderMapper;
+import com.fitibo.aotearoa.mapper.OrderTicketMapper;
+import com.fitibo.aotearoa.mapper.SkuMapper;
+import com.fitibo.aotearoa.mapper.SkuTicketMapper;
+import com.fitibo.aotearoa.mapper.SkuTicketPriceMapper;
+import com.fitibo.aotearoa.model.Agent;
+import com.fitibo.aotearoa.model.Category;
+import com.fitibo.aotearoa.model.City;
+import com.fitibo.aotearoa.model.Order;
+import com.fitibo.aotearoa.model.Sku;
+import com.fitibo.aotearoa.model.SkuTicket;
+import com.fitibo.aotearoa.model.SkuTicketPrice;
+import com.fitibo.aotearoa.model.Vendor;
 import com.fitibo.aotearoa.service.CategoryService;
 import com.fitibo.aotearoa.service.CityService;
 import com.fitibo.aotearoa.service.VendorService;
-import com.fitibo.aotearoa.util.DateUtils;
+import com.fitibo.aotearoa.util.ObjectParser;
 import com.fitibo.aotearoa.util.StatusUtil;
 import com.fitibo.aotearoa.vo.AgentVo;
-import com.fitibo.aotearoa.vo.SkuTicketPriceVo;
-import com.fitibo.aotearoa.vo.SkuTicketVo;
 import com.fitibo.aotearoa.vo.SkuVo;
-import com.fitibo.aotearoa.vo.*;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,8 +54,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -173,31 +179,7 @@ public class HomeController {
             throw new ResourceNotFoundException();
         }
         model.put("order", order);
-        model.put("tickets", Lists.transform(orderTicketMapper.findByOrderId(order.getId()), (input) -> {
-            OrderTicketVo result = new OrderTicketVo();
-            result.setId(input.getId());
-            result.setAgeConstraint(input.getAgeConstraint());
-            result.setCountConstraint(input.getAgeConstraint());
-            result.setWeightConstraint(input.getWeightConstraint());
-            result.setPriceDescription(input.getPriceDescription());
-            result.setSalePrice(input.getSalePrice());
-            result.setTicketDate(DateUtils.formatDate(input.getTicketDate()));
-            result.setTicketTime(input.getTicketTime());
-            result.setSkuTicket(input.getSkuTicket());
-            result.setSkuTicketId(input.getSkuTicketId());
-            result.setTicketPriceId(input.getTicketPriceId());
-            result.setOrderTicketUsers(Lists.transform(input.getUsers(), (input2) -> {
-                OrderTicketUserVo userVo = new OrderTicketUserVo();
-                userVo.setAge(input2.getAge());
-                userVo.setId(input2.getId());
-                userVo.setName(input2.getName());
-                userVo.setOrderTicketId(input2.getOrderTicketId());
-                userVo.setWeight(input2.getWeight());
-                return userVo;
-            }));
-            result.setCostPrice(input.getCostPrice());
-            return result;
-        }));
+        model.put("tickets", Lists.transform(orderTicketMapper.findByOrderId(order.getId()), ObjectParser::parse));
         model.put("module", MODULE_ORDER_DETAIL);
         model.put("statusList", StatusUtil.getStatusList());
         model.put("editing", false);
@@ -212,31 +194,7 @@ public class HomeController {
             throw new ResourceNotFoundException();
         }
         model.put("order", order);
-        model.put("tickets", Lists.transform(orderTicketMapper.findByOrderId(order.getId()), (input) -> {
-            OrderTicketVo result = new OrderTicketVo();
-            result.setId(input.getId());
-            result.setAgeConstraint(input.getAgeConstraint());
-            result.setCountConstraint(input.getAgeConstraint());
-            result.setWeightConstraint(input.getWeightConstraint());
-            result.setPriceDescription(input.getPriceDescription());
-            result.setSalePrice(input.getSalePrice());
-            result.setTicketDate(DateUtils.formatDate(input.getTicketDate()));
-            result.setTicketTime(input.getTicketTime());
-            result.setSkuTicket(input.getSkuTicket());
-            result.setSkuTicketId(input.getSkuTicketId());
-            result.setTicketPriceId(input.getTicketPriceId());
-            result.setOrderTicketUsers(Lists.transform(input.getUsers(), (input2) -> {
-                OrderTicketUserVo userVo = new OrderTicketUserVo();
-                userVo.setAge(input2.getAge());
-                userVo.setId(input2.getId());
-                userVo.setName(input2.getName());
-                userVo.setOrderTicketId(input2.getOrderTicketId());
-                userVo.setWeight(input2.getWeight());
-                return userVo;
-            }));
-            result.setCostPrice(input.getCostPrice());
-            return result;
-        }));
+        model.put("tickets", Lists.transform(orderTicketMapper.findByOrderId(order.getId()), ObjectParser::parse));
         Sku sku = skuMapper.findById(order.getSkuId());
         if (sku == null) {
             throw new ResourceNotFoundException();
@@ -289,15 +247,26 @@ public class HomeController {
 
     @RequestMapping("skus/{skuId}/tickets/{ticketId}")
     @Authentication(Role.Admin)
-    public String skuTicketDetail(@PathVariable("ticketId") int ticketId, Map<String, Object> model) {
+    public String skuTicketDetail(@PathVariable("skuId") int skuId,
+                                  @PathVariable("ticketId") int ticketId,
+                                  @RequestParam(value = "pagesize", defaultValue = "10") int pageSize,
+                                  @RequestParam(value = "pagenumber", defaultValue = "0") int pageNumber,
+                                  Map<String, Object> model) {
         SkuTicket ticket = skuTicketMapper.findById(ticketId);
         if (ticket == null) {
             throw new ResourceNotFoundException();
         }
-        List<SkuTicketPrice> skuTicketPrices = skuTicketPriceMapper.findBySkuId(ticket.getSkuId());
+        Sku sku = skuMapper.findById(skuId);
+        Preconditions.checkArgument(sku != null && skuId == ticket.getSkuId(), "invalid skuId:" + skuId);
+        List<SkuTicketPrice> skuTicketPrices = skuTicketPriceMapper.findBySkuTicketId(ticket.getId(), new RowBounds(pageNumber * pageSize, pageSize));
+        model.put("sku", sku);
         model.put("ticket", ticket);
-        model.put("ticketPrices", skuTicketPrices);
+        model.put("ticketPrices", Lists.transform(skuTicketPrices, ObjectParser::parse));
         model.put("module", MODULE_SKU_TICKET_DETAIL);
+        model.put("pageSize", pageSize);
+        model.put("pageNumber", pageNumber);
+        model.put("skuId", skuId);
+        model.put("ticketId", ticketId);
         return "sku_ticket_detail";
     }
 
@@ -429,30 +398,7 @@ public class HomeController {
         result.setGatheringPlace(Lists.newArrayList(sku.getGatheringPlace().split(CommonConstants.SEPERATOR)));
         result.setPickupService(sku.hasPickupService());
         result.setDuration(sku.getDuration());
-        result.setTickets(Lists.transform(sku.getTickets(), (input) -> {
-            SkuTicketVo ticket = new SkuTicketVo();
-            ticket.setDescription(input.getDescription());
-            ticket.setName(input.getName());
-            ticket.setId(input.getId());
-            ticket.setCount(Integer.parseInt(input.getCountConstraint()));
-            String[] ages = input.getAgeConstraint().split("-");
-            ticket.setMinAge(Integer.parseInt(ages[0]));
-            ticket.setMaxAge(Integer.parseInt(ages[1]));
-            String[] weights = input.getWeightConstraint().split("-");
-            ticket.setMinWeight(Integer.parseInt(weights[0]));
-            ticket.setMaxWeight(Integer.parseInt(weights[1]));
-            ticket.setTicketPrices(Lists.transform(input.getTicketPrices(), (price) -> {
-                SkuTicketPriceVo priceVo = new SkuTicketPriceVo();
-                priceVo.setCostPrice(price.getCostPrice());
-                priceVo.setSalePrice(price.getSalePrice());
-                priceVo.setId(price.getId());
-                priceVo.setTime(price.getTime());
-                priceVo.setDate(DateUtils.formatDate(price.getDate()));
-                priceVo.setDescription(price.getDescription());
-                return priceVo;
-            }));
-            return ticket;
-        }));
+        result.setTickets(Lists.transform(sku.getTickets(), ObjectParser::parse));
         return result;
     }
 
