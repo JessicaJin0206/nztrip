@@ -101,6 +101,9 @@
                     </label>
                 </div>
             </div>
+            <div class="form-group"><input type="text" id="j_duration" class="form-control"
+                                           placeholder="请输入行程时长"">
+            </div>
 
             <div class="form-group">
                 <span>票种</span>

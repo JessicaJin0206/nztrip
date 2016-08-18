@@ -1,6 +1,7 @@
 package com.fitibo.aotearoa.mapper;
 
 import com.fitibo.aotearoa.model.Agent;
+
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -54,18 +55,18 @@ public interface AgentMapper {
     @Delete("delete from agent")
     int deleteAll();
 
-	@Update("<script>" +
-			"update agent " +
-			"<set> " +
-			"<if test = \"userName != null and userName != ''\">user_name = #{userName},</if>" +
-			"<if test = \"name != null and name != ''\">name = #{name},</if>" +
-			"<if test = \"email != null and email != ''\">email = #{email},</if>" +
-			"<if test = \"description != null and description != ''\">description = #{description},</if>" +
-			"<if test = \"discount != null and discount != 0\">discount = #{discount},</if>" +
-			"<if test = \"password != null and password != ''\">password = #{password},</if>" +
-			"</set>" +
-			"where id = #{id}" +
-			"</script>")
-	int update(Agent agent);
+    @Update("<script>" +
+            "update agent " +
+            "<set> " +
+            "<if test = \"userName != null and userName != ''\">user_name = #{userName},</if>" +
+            "<if test = \"name != null and name != ''\">name = #{name},</if>" +
+            "<if test = \"email != null and email != ''\">email = #{email},</if>" +
+            "<if test = \"description != null and description != ''\">description = #{description},</if>" +
+            "<if test = \"discount != null and discount != 0\">discount = #{discount},</if>" +
+            "<if test = \"password != null and password != ''\">password = #{password},</if>" +
+            "</set>" +
+            "where id = #{id}" +
+            "</script>")
+    int update(Agent agent);
 
 }

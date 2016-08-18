@@ -101,6 +101,7 @@
                         <th>类别</th>
                         <th>名称</th>
                         <th>描述</th>
+                        <th>时长</th>
                         <th>操作</th>
                     </tr>
                     </thead>
@@ -112,6 +113,7 @@
                         <td>${sku.category}</td>
                         <td>${sku.name}</td>
                         <td>${sku.description}</td>
+                        <td>${sku.duration}</td>
                         <td>
                             <div>
                                 <a href="/skus/${sku.id}">

@@ -11,7 +11,8 @@ import java.util.Date;
  * Created by qianhao.zhou on 8/12/16.
  */
 public final class DateUtils {
-    private DateUtils(){}
+    private DateUtils() {
+    }
 
     private static ThreadLocal<SimpleDateFormat> DATE_FORMAT = new ThreadLocal<>();
 

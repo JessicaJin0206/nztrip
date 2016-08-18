@@ -1,6 +1,7 @@
 package com.fitibo.aotearoa.mapper;
 
 import com.fitibo.aotearoa.model.Vendor;
+
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -27,7 +28,7 @@ public interface VendorMapper {
     List<Vendor> findAll();
 
     @Insert("insert into vendor(name, email) values(#{name}, #{email})")
-	@SelectKey(statement = "select last_insert_id() as id", keyProperty = "id", keyColumn = "id", before = false, resultType = Integer.class)
+    @SelectKey(statement = "select last_insert_id() as id", keyProperty = "id", keyColumn = "id", before = false, resultType = Integer.class)
     @Options(useGeneratedKeys = true, keyColumn = "id", keyProperty = "id", flushCache = Options.FlushCachePolicy.DEFAULT)
     int create(Vendor vendor);
 }

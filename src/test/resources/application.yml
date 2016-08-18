@@ -31,6 +31,6 @@ email:
     host: smtp.126.com
     port: 25
     username: zi___yue@126.com
-    password: ****
+    password: Ilove126
     javaMailProperties:
       mail.smtp.auth: true

@@ -14,6 +14,7 @@ public final class OrderStatus {
     public static final int CANCELLED = 60;
     public static final int CLOSED = 90;
 
-    private OrderStatus(){}
+    private OrderStatus() {
+    }
 
 }

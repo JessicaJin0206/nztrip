@@ -2,6 +2,7 @@ package com.fitibo.aotearoa.mapper;
 
 import com.fitibo.aotearoa.model.OrderTicket;
 import com.fitibo.aotearoa.vo.OrderTicketVo;
+
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -50,7 +51,7 @@ public interface OrderTicketMapper {
             @Result(column = "age_constraint", property = "ageConstraint"),
             @Result(column = "weight_constraint", property = "weightConstraint"),
             @Result(column = "ticket_description", property = "ticketDescription"),
-			@Result(column = "ticket_price_id", property = "ticketPriceId"),
+            @Result(column = "ticket_price_id", property = "ticketPriceId"),
             @Result(column = "ticket_date", property = "ticketDate"),
             @Result(column = "ticket_time", property = "ticketTime"),
             @Result(column = "sale_price", property = "salePrice"),

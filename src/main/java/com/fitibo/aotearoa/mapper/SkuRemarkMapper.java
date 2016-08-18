@@ -1,6 +1,7 @@
 package com.fitibo.aotearoa.mapper;
 
 import com.fitibo.aotearoa.model.SkuRemark;
+
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;

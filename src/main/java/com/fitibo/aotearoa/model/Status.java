@@ -5,18 +5,18 @@ package com.fitibo.aotearoa.model;
  */
 public class Status extends ModelObject {
 
-	private String desc;
+    private String desc;
 
-	public String getDesc() {
-		return desc;
-	}
+    public String getDesc() {
+        return desc;
+    }
 
-	public void setDesc(String desc) {
-		this.desc = desc;
-	}
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
 
-	public Status(int id, String desc) {
-		this.desc = desc;
-		this.setId(id);
-	}
+    public Status(int id, String desc) {
+        this.desc = desc;
+        this.setId(id);
+    }
 }

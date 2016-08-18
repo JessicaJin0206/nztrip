@@ -2,6 +2,7 @@ package com.fitibo.aotearoa.mapper;
 
 import com.fitibo.aotearoa.constants.SkuTicketStatus;
 import com.fitibo.aotearoa.model.SkuTicket;
+
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -81,7 +82,7 @@ public interface SkuTicketMapper {
             @Result(column = "status", property = "status")
     })
     SkuTicket findById(int ticketId);
-    
+
     @Select("select * from sku_ticket where id = #{id}")
     @Results({
             @Result(column = "id", property = "id"),

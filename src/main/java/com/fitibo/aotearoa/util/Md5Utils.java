@@ -7,10 +7,11 @@ import java.security.MessageDigest;
  */
 public final class Md5Utils {
 
-    private Md5Utils(){}
+    private Md5Utils() {
+    }
 
     public final static String md5(String s) {
-        char hexDigits[]={'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
+        char hexDigits[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
         try {
             byte[] btInput = s.getBytes();
             MessageDigest mdInst = MessageDigest.getInstance("MD5");

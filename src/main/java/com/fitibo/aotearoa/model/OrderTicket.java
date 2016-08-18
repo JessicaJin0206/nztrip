@@ -104,23 +104,23 @@ public class OrderTicket {
         this.ticketTime = ticketTime;
     }
 
-	public int getSalePrice() {
-		return salePrice;
-	}
+    public int getSalePrice() {
+        return salePrice;
+    }
 
-	public void setSalePrice(int salePrice) {
-		this.salePrice = salePrice;
-	}
+    public void setSalePrice(int salePrice) {
+        this.salePrice = salePrice;
+    }
 
-	public int getCostPrice() {
-		return costPrice;
-	}
+    public int getCostPrice() {
+        return costPrice;
+    }
 
-	public void setCostPrice(int costPrice) {
-		this.costPrice = costPrice;
-	}
+    public void setCostPrice(int costPrice) {
+        this.costPrice = costPrice;
+    }
 
-	public String getPriceDescription() {
+    public String getPriceDescription() {
         return priceDescription;
     }
 
@@ -128,15 +128,15 @@ public class OrderTicket {
         this.priceDescription = priceDescription;
     }
 
-	public int getTicketPriceId() {
-		return ticketPriceId;
-	}
+    public int getTicketPriceId() {
+        return ticketPriceId;
+    }
 
-	public void setTicketPriceId(int ticketPriceId) {
-		this.ticketPriceId = ticketPriceId;
-	}
+    public void setTicketPriceId(int ticketPriceId) {
+        this.ticketPriceId = ticketPriceId;
+    }
 
-	private int id;
+    private int id;
     private int skuId;
     private int orderId;
     private int skuTicketId;
@@ -145,7 +145,7 @@ public class OrderTicket {
     private String ageConstraint;
     private String weightConstraint;
     private String ticketDescription;
-	private int ticketPriceId;
+    private int ticketPriceId;
     private Date ticketDate;
     private String ticketTime;
     private int salePrice;
