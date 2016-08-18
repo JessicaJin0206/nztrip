@@ -2,12 +2,13 @@ package com.fitibo.aotearoa.common;
 
 import com.fitibo.aotearoa.exception.EncryptionException;
 
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * Created by qianhao.zhou on 2/23/16.

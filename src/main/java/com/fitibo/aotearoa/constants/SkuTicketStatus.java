@@ -5,8 +5,9 @@ package com.fitibo.aotearoa.constants;
  */
 public class SkuTicketStatus {
 
-	public static final int ONLINE = 10;
-	public static final int OFFLINE = 20;
+    public static final int ONLINE = 10;
+    public static final int OFFLINE = 20;
 
-	private SkuTicketStatus() {}
+    private SkuTicketStatus() {
+    }
 }

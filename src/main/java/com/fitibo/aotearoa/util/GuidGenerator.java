@@ -9,7 +9,8 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public final class GuidGenerator {
 
-    private GuidGenerator() {}
+    private GuidGenerator() {
+    }
 
     private static ThreadLocal<SimpleDateFormat> dateFormat = new ThreadLocal<>();
     private static final String DATE_FORMAT = "yyyyMMddHHmm";

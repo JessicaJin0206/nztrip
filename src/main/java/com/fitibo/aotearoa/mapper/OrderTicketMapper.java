@@ -1,8 +1,15 @@
 package com.fitibo.aotearoa.mapper;
 
 import com.fitibo.aotearoa.model.OrderTicket;
-import com.fitibo.aotearoa.vo.OrderTicketVo;
-import org.apache.ibatis.annotations.*;
+
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Many;
+import org.apache.ibatis.annotations.Options;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -10,22 +17,6 @@ import java.util.List;
  * Created by qianhao.zhou on 8/5/16.
  */
 public interface OrderTicketMapper {
-
-//    @Select("select ot.id, ot.sku_id, ot.sku_ticket_id, ot.order_id, " +
-//            "st.name as sku_ticket " +
-//            "from order_ticket ot left join sku_ticket st on ot.sku_ticket_id = st.id " +
-//            "where ot.order_id = #{orderId}")
-//    @Results({
-//            @Result(column = "id", property = "id"),
-//            @Result(column = "sku_id", property = "skuId"),
-//            @Result(column = "sku_ticket_id", property = "skuTicketId"),
-//            @Result(column = "sku_ticket", property = "skuTicket"),
-//            @Result(column = "order_id", property = "orderId"),
-//            @Result(column = "id", property = "users", javaType = List.class, many
-//                    = @Many(select = "com.fitibo.aotearoa.mapper.OrderTicketUserMapper.findByOrderTicketId"))
-//    })
-//    List<OrderTicket> findByOrderId(int orderId);
-
 
     @Insert("insert into order_ticket(`sku_id`, `sku_ticket_id`, `order_id`, `sku_ticket_name`, " +
             "`count_constraint`, `age_constraint`, `weight_constraint`, `ticket_description`, " +
@@ -50,7 +41,7 @@ public interface OrderTicketMapper {
             @Result(column = "age_constraint", property = "ageConstraint"),
             @Result(column = "weight_constraint", property = "weightConstraint"),
             @Result(column = "ticket_description", property = "ticketDescription"),
-			@Result(column = "ticket_price_id", property = "ticketPriceId"),
+            @Result(column = "ticket_price_id", property = "ticketPriceId"),
             @Result(column = "ticket_date", property = "ticketDate"),
             @Result(column = "ticket_time", property = "ticketTime"),
             @Result(column = "sale_price", property = "salePrice"),

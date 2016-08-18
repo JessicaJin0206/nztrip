@@ -1,7 +1,14 @@
 package com.fitibo.aotearoa.mapper;
 
 import com.fitibo.aotearoa.model.Order;
-import org.apache.ibatis.annotations.*;
+
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Options;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.apache.ibatis.session.RowBounds;
 
 import java.util.List;
@@ -225,7 +232,7 @@ public interface OrderMapper {
             "status = #{status}, " +
             "gathering_info = #{gatheringInfo}, " +
             "reference_number = #{referenceNumber}, " +
-            "primary_contact = #{primaryContact}, "+
+            "primary_contact = #{primaryContact}, " +
             "primary_contact_email = #{primaryContactEmail}, " +
             "primary_contact_phone = #{primaryContactPhone}, " +
             "primary_contact_wechat = #{primaryContactWechat}, " +

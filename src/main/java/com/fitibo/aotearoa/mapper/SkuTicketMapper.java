@@ -2,7 +2,14 @@ package com.fitibo.aotearoa.mapper;
 
 import com.fitibo.aotearoa.constants.SkuTicketStatus;
 import com.fitibo.aotearoa.model.SkuTicket;
-import org.apache.ibatis.annotations.*;
+
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Many;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -36,9 +43,6 @@ public interface SkuTicketMapper {
     })
     int update(@Param("item") SkuTicket skuTicket);
 
-
-//    @Delete("delete from sku_ticket where sku_id = #{skuId}")
-//    int deleteBySkuId(int skuId);
 
     @Select("select * from sku_ticket where sku_id = #{id}")
     @Results({
@@ -81,7 +85,7 @@ public interface SkuTicketMapper {
             @Result(column = "status", property = "status")
     })
     SkuTicket findById(int ticketId);
-    
+
     @Select("select * from sku_ticket where id = #{id}")
     @Results({
             @Result(column = "id", property = "id"),

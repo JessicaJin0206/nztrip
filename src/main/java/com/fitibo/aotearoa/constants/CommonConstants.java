@@ -5,7 +5,8 @@ package com.fitibo.aotearoa.constants;
  */
 public final class CommonConstants {
 
-    private CommonConstants(){}
+    private CommonConstants() {
+    }
 
-    public static final String SEPERATOR = "&&";
+    public static final String SEPARATOR = "&&";
 }

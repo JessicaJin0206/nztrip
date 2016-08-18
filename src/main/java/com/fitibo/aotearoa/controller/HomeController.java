@@ -42,7 +42,7 @@ import com.fitibo.aotearoa.service.CategoryService;
 import com.fitibo.aotearoa.service.CityService;
 import com.fitibo.aotearoa.service.VendorService;
 import com.fitibo.aotearoa.util.ObjectParser;
-import com.fitibo.aotearoa.util.StatusUtil;
+import com.fitibo.aotearoa.util.StatusUtils;
 import com.fitibo.aotearoa.vo.AgentVo;
 import com.fitibo.aotearoa.vo.SkuVo;
 
@@ -58,7 +58,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-public class HomeController {
+public class HomeController extends AuthenticationRequiredController {
 
     public static final String MODULE_DASHBOARD = "dashboard";
     public static final String MODULE_CREATE_ORDER = "create_order";
@@ -74,8 +74,6 @@ public class HomeController {
     public static final String MODULE_QUERY_AGENT = "query_agent";
     public static final String MODULE_AGENT_DETAIL = "agent_detail";
     public static final String MODULE_CREATE_AGENT = "create_agent";
-
-    private ThreadLocal<Token> token = new ThreadLocal<>();
 
     @Autowired
     private CityService cityService;
@@ -151,7 +149,7 @@ public class HomeController {
                              Map<String, Object> model) {
         Preconditions.checkNotNull(getToken());
         model.put("module", MODULE_QUERY_ORDER);
-        model.put("statusList", StatusUtil.getStatusList());
+        model.put("statusList", StatusUtils.getStatusList());
         model.put("status", status);
         model.put("pageSize", pageSize);
         model.put("pageNumber", pageNumber);
@@ -181,7 +179,7 @@ public class HomeController {
         model.put("order", order);
         model.put("tickets", Lists.transform(orderTicketMapper.findByOrderId(order.getId()), ObjectParser::parse));
         model.put("module", MODULE_ORDER_DETAIL);
-        model.put("statusList", StatusUtil.getStatusList());
+        model.put("statusList", StatusUtils.getStatusList());
         model.put("editing", false);
         return "order_detail";
     }
@@ -201,7 +199,7 @@ public class HomeController {
         }
         model.put("sku", parse(sku, cityService.findAll(), categoryService.findAll(), vendorService.findAll()));
         model.put("module", MODULE_ORDER_DETAIL);
-        model.put("statusList", StatusUtil.getStatusList());
+        model.put("statusList", StatusUtils.getStatusList());
         model.put("editing", true);
         return "order_detail";
     }
@@ -395,7 +393,7 @@ public class HomeController {
         result.setCategory(categoryMap.get(sku.getCategoryId()).getName());
         result.setCityId(sku.getCityId());
         result.setCity(cityMap.get(sku.getCityId()).getName());
-        result.setGatheringPlace(Lists.newArrayList(sku.getGatheringPlace().split(CommonConstants.SEPERATOR)));
+        result.setGatheringPlace(Lists.newArrayList(sku.getGatheringPlace().split(CommonConstants.SEPARATOR)));
         result.setPickupService(sku.hasPickupService());
         result.setTickets(Lists.transform(sku.getTickets(), ObjectParser::parse));
         return result;
@@ -411,14 +409,6 @@ public class HomeController {
         vo.setDiscount(agent.getDiscount());
         vo.setEmail(agent.getEmail());
         return vo;
-    }
-
-    public final void setToken(Token token) {
-        this.token.set(token);
-    }
-
-    public final Token getToken() {
-        return this.token.get();
     }
 
 }
