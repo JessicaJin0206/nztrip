@@ -16,27 +16,36 @@
 
 package com.fitibo.aotearoa.controller;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+
 import com.fitibo.aotearoa.annotation.Authentication;
 import com.fitibo.aotearoa.constants.CommonConstants;
-import com.fitibo.aotearoa.constants.OrderStatus;
 import com.fitibo.aotearoa.dto.Role;
 import com.fitibo.aotearoa.dto.Token;
 import com.fitibo.aotearoa.exception.ResourceNotFoundException;
-import com.fitibo.aotearoa.mapper.*;
-import com.fitibo.aotearoa.model.*;
+import com.fitibo.aotearoa.mapper.AgentMapper;
+import com.fitibo.aotearoa.mapper.OrderMapper;
+import com.fitibo.aotearoa.mapper.OrderTicketMapper;
+import com.fitibo.aotearoa.mapper.SkuMapper;
+import com.fitibo.aotearoa.mapper.SkuTicketMapper;
+import com.fitibo.aotearoa.mapper.SkuTicketPriceMapper;
+import com.fitibo.aotearoa.model.Agent;
+import com.fitibo.aotearoa.model.Category;
+import com.fitibo.aotearoa.model.City;
+import com.fitibo.aotearoa.model.Order;
+import com.fitibo.aotearoa.model.Sku;
+import com.fitibo.aotearoa.model.SkuTicket;
+import com.fitibo.aotearoa.model.SkuTicketPrice;
+import com.fitibo.aotearoa.model.Vendor;
 import com.fitibo.aotearoa.service.CategoryService;
 import com.fitibo.aotearoa.service.CityService;
 import com.fitibo.aotearoa.service.VendorService;
-import com.fitibo.aotearoa.util.DateUtils;
 import com.fitibo.aotearoa.util.ObjectParser;
 import com.fitibo.aotearoa.util.StatusUtil;
 import com.fitibo.aotearoa.vo.AgentVo;
-import com.fitibo.aotearoa.vo.SkuTicketPriceVo;
-import com.fitibo.aotearoa.vo.SkuTicketVo;
 import com.fitibo.aotearoa.vo.SkuVo;
-import com.fitibo.aotearoa.vo.*;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
+
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -45,8 +54,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -62,11 +69,11 @@ public class HomeController {
     public static final String MODULE_QUERY_VENDOR = "query_vendor";
     public static final String MODULE_CREATE_VENDOR = "create_vendor";
     public static final String MODULE_SKU_DETAIL = "sku_detail";
-	public static final String MODULE_VENDOR_DETAIL = "vendor_detail";
+    public static final String MODULE_VENDOR_DETAIL = "vendor_detail";
     public static final String MODULE_SKU_TICKET_DETAIL = "sku_ticket_detail";
     public static final String MODULE_QUERY_AGENT = "query_agent";
-	public static final String MODULE_AGENT_DETAIL = "agent_detail";
-	public static final String MODULE_CREATE_AGENT = "create_agent";
+    public static final String MODULE_AGENT_DETAIL = "agent_detail";
+    public static final String MODULE_CREATE_AGENT = "create_agent";
 
     private ThreadLocal<Token> token = new ThreadLocal<>();
 
@@ -174,7 +181,7 @@ public class HomeController {
         model.put("order", order);
         model.put("tickets", Lists.transform(orderTicketMapper.findByOrderId(order.getId()), ObjectParser::parse));
         model.put("module", MODULE_ORDER_DETAIL);
-		model.put("statusList", StatusUtil.getStatusList());
+        model.put("statusList", StatusUtil.getStatusList());
         model.put("editing", false);
         return "order_detail";
     }
@@ -188,14 +195,14 @@ public class HomeController {
         }
         model.put("order", order);
         model.put("tickets", Lists.transform(orderTicketMapper.findByOrderId(order.getId()), ObjectParser::parse));
-		Sku sku = skuMapper.findById(order.getSkuId());
-		if (sku == null) {
-			throw new ResourceNotFoundException();
-		}
-		model.put("sku", parse(sku, cityService.findAll(), categoryService.findAll(), vendorService.findAll()));
+        Sku sku = skuMapper.findById(order.getSkuId());
+        if (sku == null) {
+            throw new ResourceNotFoundException();
+        }
+        model.put("sku", parse(sku, cityService.findAll(), categoryService.findAll(), vendorService.findAll()));
         model.put("module", MODULE_ORDER_DETAIL);
-		model.put("statusList", StatusUtil.getStatusList());
-		model.put("editing", true);
+        model.put("statusList", StatusUtil.getStatusList());
+        model.put("editing", true);
         return "order_detail";
     }
 
@@ -304,25 +311,25 @@ public class HomeController {
         return "vendors";
     }
 
-	@RequestMapping("vendors/{id}")
-	@Authentication(Role.Admin)
-	public String vendorDetail(@PathVariable("id") int id, Map<String, Object> model) {
-		model.put("module", MODULE_VENDOR_DETAIL);
-		Vendor vendor = vendorService.findById(id);
-		if (vendor == null) {
-			throw new ResourceNotFoundException();
-		}
-		model.put("vendor", vendor);
-		model.put("editing", false);
-		return "vendor_detail";
-	}
+    @RequestMapping("vendors/{id}")
+    @Authentication(Role.Admin)
+    public String vendorDetail(@PathVariable("id") int id, Map<String, Object> model) {
+        model.put("module", MODULE_VENDOR_DETAIL);
+        Vendor vendor = vendorService.findById(id);
+        if (vendor == null) {
+            throw new ResourceNotFoundException();
+        }
+        model.put("vendor", vendor);
+        model.put("editing", false);
+        return "vendor_detail";
+    }
 
-	@RequestMapping("create_agent")
-	@Authentication(Role.Admin)
-	public String createAgent(Map<String, Object> model) {
-		model.put("module", MODULE_CREATE_AGENT);
-		return "create_agent";
-	}
+    @RequestMapping("create_agent")
+    @Authentication(Role.Admin)
+    public String createAgent(Map<String, Object> model) {
+        model.put("module", MODULE_CREATE_AGENT);
+        return "create_agent";
+    }
 
     @RequestMapping("agents")
     @Authentication(Role.Admin)
@@ -333,44 +340,44 @@ public class HomeController {
         return "agents";
     }
 
-	@RequestMapping("agents/{id}")
-	@Authentication(Role.Admin)
-	public String agentDetail(@PathVariable("id") int id, Map<String, Object> model) {
-		model.put("module", MODULE_AGENT_DETAIL);
-		Agent agent = agentMapper.findById(id);
-		if (agent == null) {
-			throw new ResourceNotFoundException();
-		}
-		model.put("agent", parse(agent));
-		model.put("action", "check");
-		return "agent_detail";
-	}
+    @RequestMapping("agents/{id}")
+    @Authentication(Role.Admin)
+    public String agentDetail(@PathVariable("id") int id, Map<String, Object> model) {
+        model.put("module", MODULE_AGENT_DETAIL);
+        Agent agent = agentMapper.findById(id);
+        if (agent == null) {
+            throw new ResourceNotFoundException();
+        }
+        model.put("agent", parse(agent));
+        model.put("action", "check");
+        return "agent_detail";
+    }
 
-	@RequestMapping("agents/{id}/_edit")
-	@Authentication(Role.Admin)
-	public String editAgent(@PathVariable("id") int id, Map<String, Object> model) {
-		model.put("module", MODULE_AGENT_DETAIL);
-		Agent agent = agentMapper.findById(id);
-		if (agent == null) {
-			throw new ResourceNotFoundException();
-		}
-		model.put("agent", parse(agent));
-		model.put("action", "edit");
-		return "agent_detail";
-	}
+    @RequestMapping("agents/{id}/_edit")
+    @Authentication(Role.Admin)
+    public String editAgent(@PathVariable("id") int id, Map<String, Object> model) {
+        model.put("module", MODULE_AGENT_DETAIL);
+        Agent agent = agentMapper.findById(id);
+        if (agent == null) {
+            throw new ResourceNotFoundException();
+        }
+        model.put("agent", parse(agent));
+        model.put("action", "edit");
+        return "agent_detail";
+    }
 
-	@RequestMapping("agents/{id}/_reset")
-	@Authentication(Role.Admin)
-	public String resetPasswordAgent(@PathVariable("id") int id, Map<String, Object> model) {
-		model.put("module", MODULE_AGENT_DETAIL);
-		Agent agent = agentMapper.findById(id);
-		if (agent == null) {
-			throw new ResourceNotFoundException();
-		}
-		model.put("agent", parse(agent));
-		model.put("action", "reset");
-		return "agent_detail";
-	}
+    @RequestMapping("agents/{id}/_reset")
+    @Authentication(Role.Admin)
+    public String resetPasswordAgent(@PathVariable("id") int id, Map<String, Object> model) {
+        model.put("module", MODULE_AGENT_DETAIL);
+        Agent agent = agentMapper.findById(id);
+        if (agent == null) {
+            throw new ResourceNotFoundException();
+        }
+        model.put("agent", parse(agent));
+        model.put("action", "reset");
+        return "agent_detail";
+    }
 
     private List<Sku> searchSku(String keyword, int cityId, int categoryId, RowBounds rowBounds) {
         return skuMapper.findAllByMultiFields(keyword, cityId, categoryId, rowBounds);
