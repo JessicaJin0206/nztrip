@@ -53,7 +53,7 @@
                         aria-haspopup="true" aria-expanded="true">
                     <#list statusList as s>
                         <#if (s.getValue() == order.status)>
-                            <span id="j_selected_status" value="${s.id}">${s.desc}</span>
+                            <span id="j_selected_status" value="${s.getValue()}">${s.getDesc()}</span>
                         </#if>
                     </#list>
 
