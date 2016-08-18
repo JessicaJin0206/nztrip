@@ -1,12 +1,12 @@
 package com.fitibo.aotearoa.interceptor;
 
+import com.google.common.collect.Lists;
+
 import com.fitibo.aotearoa.annotation.Authentication;
 import com.fitibo.aotearoa.controller.HomeController;
 import com.fitibo.aotearoa.controller.RestApiController;
 import com.fitibo.aotearoa.dto.Token;
 import com.fitibo.aotearoa.service.TokenService;
-
-import com.google.common.collect.Lists;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

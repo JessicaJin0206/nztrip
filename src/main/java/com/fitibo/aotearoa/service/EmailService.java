@@ -1,29 +1,24 @@
 package com.fitibo.aotearoa.service;
 
+import com.google.common.collect.Lists;
+
 import com.fitibo.aotearoa.model.Order;
 import com.fitibo.aotearoa.model.OrderTicket;
 import com.fitibo.aotearoa.model.OrderTicketUser;
 import com.fitibo.aotearoa.model.Vendor;
 import com.fitibo.aotearoa.util.DateUtils;
 
-import com.google.common.collect.Lists;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Bean;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Properties;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 
 /**
  * Created by xiaozou on 8/17/16.

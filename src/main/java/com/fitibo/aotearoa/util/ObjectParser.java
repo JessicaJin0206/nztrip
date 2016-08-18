@@ -1,5 +1,7 @@
 package com.fitibo.aotearoa.util;
 
+import com.google.common.collect.Lists;
+
 import com.fitibo.aotearoa.model.OrderTicket;
 import com.fitibo.aotearoa.model.OrderTicketUser;
 import com.fitibo.aotearoa.model.SkuTicket;
@@ -8,8 +10,6 @@ import com.fitibo.aotearoa.vo.OrderTicketUserVo;
 import com.fitibo.aotearoa.vo.OrderTicketVo;
 import com.fitibo.aotearoa.vo.SkuTicketPriceVo;
 import com.fitibo.aotearoa.vo.SkuTicketVo;
-
-import com.google.common.collect.Lists;
 
 /**
  * Created by qianhao.zhou on 8/17/16.

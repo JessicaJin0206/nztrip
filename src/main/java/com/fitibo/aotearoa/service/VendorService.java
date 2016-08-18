@@ -1,19 +1,19 @@
 package com.fitibo.aotearoa.service;
 
+import com.google.common.collect.Maps;
+
 import com.fitibo.aotearoa.mapper.VendorMapper;
 import com.fitibo.aotearoa.model.Vendor;
 
-import com.google.common.collect.Maps;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import javax.annotation.PostConstruct;
 
 /**
  * Created by qianhao.zhou on 8/4/16.
