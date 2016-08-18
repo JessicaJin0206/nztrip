@@ -292,7 +292,8 @@ $('#j_email').on('click', function () {
         url: '/v1/api/orders/' + id + "/email"
     }).success(function (data) {
         if(data == true) {
-            success("发送成功");
+            alert("发送成功");
+            window.location.reload();
         } else {
             error("发送失败");
         }

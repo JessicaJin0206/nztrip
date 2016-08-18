@@ -1,20 +1,39 @@
 package com.fitibo.aotearoa.constants;
 
+import java.util.List;
+
 /**
- * Created by qianhao.zhou on 7/25/16.
+ * Created by qianhao.zhou on 8/18/16.
  */
-public final class OrderStatus {
+public enum OrderStatus {
+
+    NEW(10, "新建"),
+    PENDING(20, "待确认"),
+    FULL(30, "已满"),
+    CONFIRMED(40, "已确认"),
+    MODIFYING(50, "修改中"),
+    CANCELLED(60, "取消"),
+    CLOSED(90, "已关闭");
 
 
-    public static final int NEW = 10;
-    public static final int PENDING = 20;
-    public static final int FULL = 30;
-    public static final int CONFIRMED = 40;
-    public static final int MODIFYING = 50;
-    public static final int CANCELLED = 60;
-    public static final int CLOSED = 90;
-
-    private OrderStatus() {
+    OrderStatus(int value, String desc) {
+        this.value = value;
+        this.desc = desc;
     }
 
+    public int getValue() {
+        return value;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    private int value;
+    private String desc;
+
+    public static void main(String args[]) {
+        OrderStatus[] statuses = OrderStatus.values();
+        System.out.println(1);
+    }
 }

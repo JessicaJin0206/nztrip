@@ -12,7 +12,6 @@ import com.fitibo.aotearoa.constants.CommonConstants;
 import com.fitibo.aotearoa.constants.OrderStatus;
 import com.fitibo.aotearoa.constants.SkuTicketStatus;
 import com.fitibo.aotearoa.dto.Role;
-import com.fitibo.aotearoa.dto.Token;
 import com.fitibo.aotearoa.exception.AuthenticationFailureException;
 import com.fitibo.aotearoa.exception.InvalidParamException;
 import com.fitibo.aotearoa.exception.ResourceNotFoundException;
@@ -74,7 +73,7 @@ import java.util.Map;
  * Created by qianhao.zhou on 7/29/16.
  */
 @RestController
-public class RestApiController {
+public class RestApiController extends AuthenticationRequiredController {
 
     @Autowired
     private SkuMapper skuMapper;
@@ -108,8 +107,6 @@ public class RestApiController {
 
     @Autowired
     private EmailService emailService;
-
-    private ThreadLocal<Token> token = new ThreadLocal<>();
 
     @ExceptionHandler
     public ResponseEntity handleException(AuthenticationFailureException ex) {
@@ -217,7 +214,7 @@ public class RestApiController {
         Order order = parse(orderVo, agentId);
         order.setPrice(price);
         order.setUuid(GuidGenerator.generate(14));
-        order.setStatus(OrderStatus.NEW);
+        order.setStatus(OrderStatus.NEW.getValue());
         orderMapper.create(order);
         orderVo.setId(order.getId());
         if (CollectionUtils.isEmpty(orderVo.getOrderTickets())) {
@@ -329,6 +326,10 @@ public class RestApiController {
         if (order == null) {
             throw new ResourceNotFoundException();
         }
+        int oldStatus = order.getStatus();
+        if (oldStatus != OrderStatus.NEW.getValue()) {
+            throw new InvalidParamException();
+        }
         List<OrderTicket> ticketList = orderTicketMapper.findByOrderId(id);
         if (ticketList.isEmpty()) {
             throw new ResourceNotFoundException();
@@ -339,6 +340,12 @@ public class RestApiController {
         }
         Vendor vendor = vendorService.findById(sku.getVendorId());
         boolean result = emailService.sendEmail(vendor, order, ticketList);
+        if (result) {
+            int row = orderMapper.updateOrderStatus(id, oldStatus, OrderStatus.PENDING.getValue());
+            if (row != 1) {
+                //log
+            }
+        }
         return result;
     }
 
@@ -460,7 +467,7 @@ public class RestApiController {
         Sku result = new Sku();
         result.setUuid(skuVo.getUuid());
         result.setName(skuVo.getName());
-        result.setGatheringPlace(Joiner.on(CommonConstants.SEPERATOR).join(skuVo.getGatheringPlace()));
+        result.setGatheringPlace(Joiner.on(CommonConstants.SEPARATOR).join(skuVo.getGatheringPlace()));
         result.setPickupService(skuVo.hasPickupService());
         result.setDuration(skuVo.getDuration());
         result.setDescription(skuVo.getDescription());
@@ -514,14 +521,6 @@ public class RestApiController {
         result.setDiscount(agentVo.getDiscount());
         result.setEmail(agentVo.getEmail());
         return result;
-    }
-
-    public void setToken(Token token) {
-        this.token.set(token);
-    }
-
-    public Token getToken() {
-        return this.token.get();
     }
 
 }

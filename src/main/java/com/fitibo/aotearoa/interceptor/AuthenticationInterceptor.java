@@ -3,8 +3,7 @@ package com.fitibo.aotearoa.interceptor;
 import com.google.common.collect.Lists;
 
 import com.fitibo.aotearoa.annotation.Authentication;
-import com.fitibo.aotearoa.controller.HomeController;
-import com.fitibo.aotearoa.controller.RestApiController;
+import com.fitibo.aotearoa.controller.AuthenticationRequiredController;
 import com.fitibo.aotearoa.dto.Token;
 import com.fitibo.aotearoa.service.TokenService;
 
@@ -37,11 +36,8 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
                 return true;
             } else {
                 Token token = getToken(httpServletRequest);
-                if (handlerMethod.getBean() instanceof HomeController) {
-                    ((HomeController) handlerMethod.getBean()).setToken(token);
-                }
-                if (handlerMethod.getBean() instanceof RestApiController) {
-                    ((RestApiController) handlerMethod.getBean()).setToken(token);
+                if (handlerMethod.getBean() instanceof AuthenticationRequiredController) {
+                    ((AuthenticationRequiredController) handlerMethod.getBean()).setToken(token);
                 }
                 if (token == null || token.isExpired()) {
                     httpServletResponse.sendRedirect("/signin");

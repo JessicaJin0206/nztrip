@@ -49,9 +49,9 @@
                     <#assign hasStatus = 0>
                     <#if (status > 0)>
                         <#list statusList as s>
-                            <#if (s.id == status)>
+                            <#if (s.getValue() == status)>
                                 <#assign hasStatus = 1>
-                                <span id="j_selected_status" value="${s.id}">${s.desc}</span>
+                                <span id="j_selected_status" value="${s.getValue()}">${s.getDesc()}</span>
                             </#if>
                         </#list>
                     </#if>
@@ -63,7 +63,7 @@
                     <ul class="dropdown-menu" id="j_status_drop_down" aria-labelledby="selected_status_button">
                         <li><a value="0">选择订单状态</a></li>
                     <#list statusList as s>
-                        <li><a value="${s.id}">${s.desc}</a></li>
+                        <li><a value="${s.getValue()}">${s.getDesc()}</a></li>
                     </#list>
                     </ul>
                 </div>
@@ -92,8 +92,8 @@
                         <th>${order.sku}</th>
                         <td>
                         <#list statusList as s>
-                            <#if (s.id == order.status)>
-                                ${s.desc}
+                            <#if (s.getValue() == order.status)>
+                                ${s.getDesc()}
                             </#if>
                         </#list>
                         </td>

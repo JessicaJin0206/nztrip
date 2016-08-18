@@ -242,4 +242,7 @@ public interface OrderMapper {
             "secondary_contact_wechat = #{secondaryContactWechat}" +
             "where id = #{id}")
     int updateOrderInfo(Order order);
+
+    @Update("update `order` set status = #{newStatus} where id = #{id} and status = #{oldStatus}")
+    int updateOrderStatus(@Param("id") int id, @Param("oldStatus") int oldStatus, @Param("newStatus") int newStatus);
 }

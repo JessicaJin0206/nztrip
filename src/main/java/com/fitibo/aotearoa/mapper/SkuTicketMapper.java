@@ -44,9 +44,6 @@ public interface SkuTicketMapper {
     int update(@Param("item") SkuTicket skuTicket);
 
 
-//    @Delete("delete from sku_ticket where sku_id = #{skuId}")
-//    int deleteBySkuId(int skuId);
-
     @Select("select * from sku_ticket where sku_id = #{id}")
     @Results({
             @Result(column = "id", property = "id"),
