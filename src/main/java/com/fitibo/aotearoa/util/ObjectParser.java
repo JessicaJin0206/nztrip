@@ -8,6 +8,7 @@ import com.fitibo.aotearoa.vo.OrderTicketUserVo;
 import com.fitibo.aotearoa.vo.OrderTicketVo;
 import com.fitibo.aotearoa.vo.SkuTicketPriceVo;
 import com.fitibo.aotearoa.vo.SkuTicketVo;
+
 import com.google.common.collect.Lists;
 
 /**
@@ -15,7 +16,8 @@ import com.google.common.collect.Lists;
  */
 public final class ObjectParser {
 
-    private ObjectParser() {}
+    private ObjectParser() {
+    }
 
     public static SkuTicketPriceVo parse(SkuTicketPrice input) {
         SkuTicketPriceVo result = new SkuTicketPriceVo();
