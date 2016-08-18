@@ -118,6 +118,10 @@
                     </label>
                 </div>
             </div>
+            <div class="form-group"><input type="text" id="j_duration" class="form-control"
+                                           <#if editing = false>disabled</#if>
+                                           placeholder="请输入行程时长" value="${sku.duration}">
+            </div>
 
             <div class="form-group">
                 <span>票种</span>

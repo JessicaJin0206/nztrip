@@ -114,6 +114,11 @@ var validate = function() {
     });
     var description = $('#j_description').val();
     var pickupService = parseInt($('#j_pickup_service label.active input').val());
+    var duration = $('#j_duration').val();
+    if (duration.length == 0) {
+        warn("请填写行程时长");
+        return;
+    }
     var tickets = [];
     $('#j_ticket_container tr').each(function(idx, element){
         var container = $(element);
@@ -174,6 +179,7 @@ var validate = function() {
         pickupService: !!pickupService,
         gatheringPlace: gatheringPlace,
         description: description,
+        duration: duration,
         tickets: tickets
     };
 };

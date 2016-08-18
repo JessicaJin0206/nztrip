@@ -22,3 +22,36 @@ debug: true
 ---
 spring:
   profiles: production
+
+---
+email:
+    host: smtp.126.com
+    port: 25
+    username: zi___yue@126.com
+    password: Ilove126
+    javaMailProperties:
+      mail.smtp.auth: true
+
+---
+template:
+    email: |
+      <html><body><div>
+      <p>#VENDORNAME#,</p>
+      <br/>
+      <p>Please kindly help us to make the reservation as blew:</p>
+      <br/>
+      <p>TOUR: #TOUR#</p>
+      <p>NAME: #NAME#</p>
+      #TOURINFO#
+      <br/>
+      <p>A prompt replay would greatly oblige us.</p>
+      <br/>
+      <p>Many thanks for your support.</p>
+      <br/>
+      <p>Best Regards</p>
+      <br/>
+      <p>Reservation Team</p>
+      <p style="color: dodgerblue">the <span style="font-weight: bold">Easy Efficient Excellent</span> travel with <span style="font-weight: bold">EYOUNZ Limited</span></p>
+      <p>Tel & Fax: +64 (0)3 357 4405</p>
+      <p>Address: 30 Durey Rd, Christchurch Airport Internatinal Terminal Building, Christchurch 8053</p>
+      </div></body></html>

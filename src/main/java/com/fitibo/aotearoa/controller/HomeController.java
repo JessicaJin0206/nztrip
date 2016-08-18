@@ -180,6 +180,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("module", MODULE_ORDER_DETAIL);
         model.put("statusList", OrderStatus.values());
         model.put("editing", false);
+        model.put("sendEmail", order.getStatus() == OrderStatus.NEW.getValue());
         return "order_detail";
     }
 
@@ -394,6 +395,7 @@ public class HomeController extends AuthenticationRequiredController {
         result.setCity(cityMap.get(sku.getCityId()).getName());
         result.setGatheringPlace(Lists.newArrayList(sku.getGatheringPlace().split(CommonConstants.SEPARATOR)));
         result.setPickupService(sku.hasPickupService());
+        result.setDuration(sku.getDuration());
         result.setTickets(Lists.transform(sku.getTickets(), ObjectParser::parse));
         return result;
     }

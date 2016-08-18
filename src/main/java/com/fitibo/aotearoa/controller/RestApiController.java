@@ -32,6 +32,7 @@ import com.fitibo.aotearoa.model.Sku;
 import com.fitibo.aotearoa.model.SkuTicket;
 import com.fitibo.aotearoa.model.SkuTicketPrice;
 import com.fitibo.aotearoa.model.Vendor;
+import com.fitibo.aotearoa.service.EmailService;
 import com.fitibo.aotearoa.service.TokenService;
 import com.fitibo.aotearoa.service.VendorService;
 import com.fitibo.aotearoa.util.DateUtils;
@@ -103,6 +104,9 @@ public class RestApiController extends AuthenticationRequiredController {
 
     @Autowired
     private TokenService tokenService;
+
+    @Autowired
+    private EmailService emailService;
 
     @ExceptionHandler
     public ResponseEntity handleException(AuthenticationFailureException ex) {
@@ -315,6 +319,36 @@ public class RestApiController extends AuthenticationRequiredController {
         return true;
     }
 
+    @RequestMapping(value = "/v1/api/orders/{id}/email", method = RequestMethod.PUT)
+    @Authentication
+    public boolean sendEmail(@PathVariable("id") int id) {
+        Order order = orderMapper.findById(id);
+        if (order == null) {
+            throw new ResourceNotFoundException();
+        }
+        int oldStatus = order.getStatus();
+        if (oldStatus != OrderStatus.NEW.getValue()) {
+            throw new InvalidParamException();
+        }
+        List<OrderTicket> ticketList = orderTicketMapper.findByOrderId(id);
+        if (ticketList.isEmpty()) {
+            throw new ResourceNotFoundException();
+        }
+        Sku sku = skuMapper.findById(ticketList.get(0).getSkuId());
+        if (ticketList.isEmpty()) {
+            throw new ResourceNotFoundException();
+        }
+        Vendor vendor = vendorService.findById(sku.getVendorId());
+        boolean result = emailService.sendEmail(vendor, order, ticketList);
+        if (result) {
+            int row = orderMapper.updateOrderStatus(id, oldStatus, OrderStatus.PENDING.getValue());
+            if (row != 1) {
+                //log
+            }
+        }
+        return result;
+    }
+
     @RequestMapping(value = "v1/api/signin", method = RequestMethod.POST)
     public AuthenticationResp signin(@RequestBody AuthenticationReq req) {
         Agent agent = agentMapper.findByUserName(req.getUser());
@@ -435,6 +469,7 @@ public class RestApiController extends AuthenticationRequiredController {
         result.setName(skuVo.getName());
         result.setGatheringPlace(Joiner.on(CommonConstants.SEPARATOR).join(skuVo.getGatheringPlace()));
         result.setPickupService(skuVo.hasPickupService());
+        result.setDuration(skuVo.getDuration());
         result.setDescription(skuVo.getDescription());
         result.setVendorId(skuVo.getVendorId());
         result.setCityId(skuVo.getCityId());
