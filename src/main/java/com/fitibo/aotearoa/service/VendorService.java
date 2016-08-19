@@ -56,6 +56,14 @@ public class VendorService {
         return vendor.getId();
     }
 
+    public int update(Vendor vendor) {
+        int update = vendorMapper.update(vendor);
+        if (update > 0) {
+            vendorMap = convert();
+        }
+        return update;
+    }
+
     public Vendor findById(int id) {
         return vendorMapper.findById(id);
     }

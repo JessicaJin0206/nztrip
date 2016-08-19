@@ -332,6 +332,19 @@ public class HomeController extends AuthenticationRequiredController {
         return "vendor_detail";
     }
 
+    @RequestMapping("vendors/{id}/_edit")
+    @Authentication(Role.Admin)
+    public String editVendor(@PathVariable("id") int id, Map<String, Object> model) {
+        model.put("module", MODULE_VENDOR_DETAIL);
+        Vendor vendor = vendorService.findById(id);
+        if (vendor == null) {
+            throw new ResourceNotFoundException();
+        }
+        model.put("vendor", vendor);
+        model.put("editing", true);
+        return "vendor_detail";
+    }
+
     @RequestMapping("create_agent")
     @Authentication(Role.Admin)
     public String createAgent(Map<String, Object> model) {

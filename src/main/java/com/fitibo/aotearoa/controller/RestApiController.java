@@ -1,6 +1,5 @@
 package com.fitibo.aotearoa.controller;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -49,6 +48,7 @@ import com.fitibo.aotearoa.vo.OrderVo;
 import com.fitibo.aotearoa.vo.SkuTicketPriceVo;
 import com.fitibo.aotearoa.vo.SkuTicketVo;
 import com.fitibo.aotearoa.vo.SkuVo;
+import com.fitibo.aotearoa.vo.VendorVo;
 
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -187,6 +187,24 @@ public class RestApiController extends AuthenticationRequiredController {
         agentMapper.update(agent);
         agentVo.setId(id);
         return agentVo;
+    }
+
+    @RequestMapping(value = "v1/api/vendors/{id}", method = RequestMethod.PUT)
+    @Authentication(Role.Admin)
+    public VendorVo updateVendor(@PathVariable("id") int id, @RequestBody VendorVo vendorVo) {
+        Vendor vendor = parse(vendorVo);
+        vendor.setId(id);
+        vendorService.update(vendor);
+        vendorVo.setId(id);
+        return vendorVo;
+    }
+
+    private Vendor parse(VendorVo vendorVo) {
+        Vendor result = new Vendor();
+        result.setName(vendorVo.getName());
+        result.setPhone(vendorVo.getPhone());
+        result.setEmail(vendorVo.getEmail());
+        return result;
     }
 
     @RequestMapping(value = "v1/api/orders", method = RequestMethod.POST)

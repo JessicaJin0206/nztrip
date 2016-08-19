@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectKey;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -38,4 +39,7 @@ public interface VendorMapper {
     @SelectKey(statement = "select last_insert_id() as id", keyProperty = "id", keyColumn = "id", before = false, resultType = Integer.class)
     @Options(useGeneratedKeys = true, keyColumn = "id", keyProperty = "id", flushCache = Options.FlushCachePolicy.DEFAULT)
     int create(Vendor vendor);
+
+    @Update("update vendor set name=#{name}, email=#{email}, phone=#{phone} where id = #{id}")
+    int update(Vendor vendor);
 }

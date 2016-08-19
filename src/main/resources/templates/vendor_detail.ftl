@@ -49,16 +49,16 @@
                                            value="${vendor.phone!''}">
             </div>
 
-        <#--<#if editing = false>-->
-            <#--<button id="j_edit" class="btn btn-default form-group">修改</button>-->
-        <#--<#else>-->
-            <#--<button id="j_update" class="btn btn-default form-group">提交</button>-->
-        <#--</#if>-->
+        <#if editing = false>
+            <button id="j_edit" class="btn btn-primary form-group">修改</button>
+        <#else>
+            <button id="j_update" class="btn btn-primary form-group">提交</button>
+        </#if>
         </div>
     </div>
 </div>
 
 <#include "third_party_file.ftl"/>
-<script src="/js/create_sku.js"></script>
+<script src="/js/vendor_detail.js"></script>
 </body>
 </html>
