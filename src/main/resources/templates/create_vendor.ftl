@@ -39,6 +39,8 @@
             </div>
             <div class="form-group"><input type="text" id="j_email" class="form-control" placeholder="请输入行程商邮箱...">
             </div>
+            <div class="form-group"><input type="text" id="j_phone" class="form-control" placeholder="请输入行程商电话...">
+            </div>
             <button id="j_submit" class="btn btn-default form-group">提交</button>
         </div>
     </div>

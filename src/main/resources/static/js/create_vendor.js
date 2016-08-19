@@ -44,9 +44,11 @@ var validate = function() {
         warn("请输入有效的行程商邮箱");
         return;
     }
+    var phone = $('#j_phone').val();
     return {
         name: name,
-        email: email
+        email: email,
+        phone: phone
     };
 };
 

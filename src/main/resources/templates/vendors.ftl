@@ -40,6 +40,7 @@
                     <tr>
                         <th>名称</th>
                         <th>邮箱</th>
+                        <th>电话</th>
                         <th>操作</th>
                     </tr>
                     </thead>
@@ -49,6 +50,7 @@
                         <tr>
                             <td>${vendor.name}</td>
                             <td>${vendor.email}</td>
+                            <td><#if vendor.phone??>${vendor.phone}</#if></td>
                             <td>
                                 <div>
                                     <a href="/vendors/${vendor.id}">

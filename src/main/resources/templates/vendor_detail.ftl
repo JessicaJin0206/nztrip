@@ -44,6 +44,10 @@
                                            <#if editing = false>disabled</#if> placeholder="请输入行程商邮箱"
                                            value="${vendor.email}">
             </div>
+            <div class="form-group"><input type="text" id="j_phone" class="form-control"
+                                           <#if editing = false>disabled</#if> placeholder="请输入行程商邮箱"
+                                           value="<#if vendor.phone??>${vendor.phone}</#if>">
+            </div>
 
         <#--<#if editing = false>-->
             <#--<button id="j_edit" class="btn btn-default form-group">修改</button>-->

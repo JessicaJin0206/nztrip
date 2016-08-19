@@ -21,6 +21,7 @@ public interface VendorMapper {
             @Result(column = "id", property = "id"),
             @Result(column = "name", property = "name"),
             @Result(column = "email", property = "email"),
+            @Result(column = "phone", property = "phone"),
     })
     Vendor findById(int id);
 
@@ -29,10 +30,11 @@ public interface VendorMapper {
             @Result(column = "id", property = "id"),
             @Result(column = "name", property = "name"),
             @Result(column = "email", property = "email"),
+            @Result(column = "phone", property = "phone")
     })
     List<Vendor> findAll();
 
-    @Insert("insert into vendor(name, email) values(#{name}, #{email})")
+    @Insert("insert into vendor(name, email, phone) values(#{name}, #{email}, #{phone})")
     @SelectKey(statement = "select last_insert_id() as id", keyProperty = "id", keyColumn = "id", before = false, resultType = Integer.class)
     @Options(useGeneratedKeys = true, keyColumn = "id", keyProperty = "id", flushCache = Options.FlushCachePolicy.DEFAULT)
     int create(Vendor vendor);

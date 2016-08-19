@@ -32,9 +32,8 @@ public class VendorService {
     @PostConstruct
     public void init() {
         vendorMap = convert();
-        utilityService.getScheduledExecutorService().scheduleAtFixedRate(() -> {
-            vendorMap = convert();
-        }, 5, 5, TimeUnit.MINUTES);
+        utilityService.getScheduledExecutorService().scheduleAtFixedRate(() ->
+                vendorMap = convert(), 5, 5, TimeUnit.MINUTES);
 
     }
 

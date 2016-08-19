@@ -3,3 +3,5 @@ CREATE TABLE `duration` (
   `name` varchar(50) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE `vendor` ADD COLUMN phone VARCHAR(30);
