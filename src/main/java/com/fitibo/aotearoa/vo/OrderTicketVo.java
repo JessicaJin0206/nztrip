@@ -95,22 +95,6 @@ public class OrderTicketVo {
         this.ticketTime = ticketTime;
     }
 
-    public int getSalePrice() {
-        return salePrice;
-    }
-
-    public void setSalePrice(int salePrice) {
-        this.salePrice = salePrice;
-    }
-
-    public int getCostPrice() {
-        return costPrice;
-    }
-
-    public void setCostPrice(int costPrice) {
-        this.costPrice = costPrice;
-    }
-
     public String getPriceDescription() {
         return priceDescription;
     }
@@ -127,6 +111,14 @@ public class OrderTicketVo {
         this.orderId = orderId;
     }
 
+    public int getPrice() {
+        return price;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
+    }
+
     private int id;
     private int orderId;
     //sku_ticket
@@ -140,8 +132,7 @@ public class OrderTicketVo {
     private int ticketPriceId;
     private String ticketDate;
     private String ticketTime;
-    private int salePrice;
-    private int costPrice;
+    private int price;
     private String priceDescription;
     //order_ticket_user
     private List<OrderTicketUserVo> orderTicketUsers;

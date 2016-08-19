@@ -136,6 +136,14 @@ public class OrderTicket {
         this.ticketPriceId = ticketPriceId;
     }
 
+    public int getPrice() {
+        return price;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
+    }
+
     private int id;
     private int skuId;
     private int orderId;
@@ -150,6 +158,7 @@ public class OrderTicket {
     private String ticketTime;
     private int salePrice;
     private int costPrice;
+    private int price;
     private String priceDescription;
     private List<OrderTicketUser> users;
 }

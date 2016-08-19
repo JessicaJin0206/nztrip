@@ -53,14 +53,13 @@ public final class ObjectParser {
         result.setCountConstraint(orderTicket.getAgeConstraint());
         result.setWeightConstraint(orderTicket.getWeightConstraint());
         result.setPriceDescription(orderTicket.getPriceDescription());
-        result.setSalePrice(orderTicket.getSalePrice());
         result.setTicketDate(DateUtils.formatDate(orderTicket.getTicketDate()));
         result.setTicketTime(orderTicket.getTicketTime());
         result.setSkuTicket(orderTicket.getSkuTicket());
         result.setSkuTicketId(orderTicket.getSkuTicketId());
         result.setTicketPriceId(orderTicket.getTicketPriceId());
         result.setOrderTicketUsers(Lists.transform(orderTicket.getUsers(), ObjectParser::parse));
-        result.setCostPrice(orderTicket.getCostPrice());
+        result.setPrice(orderTicket.getPrice());
         return result;
     }
 

@@ -218,7 +218,8 @@ public class RestApiController extends AuthenticationRequiredController {
         int price = 0;
         for (OrderTicketVo orderTicketVo : orderVo.getOrderTickets()) {
             SkuTicketPrice ticketPrice = skuTicketPriceMapper.findById(orderTicketVo.getTicketPriceId());
-            price += ticketPrice.getCostPrice() + ((ticketPrice.getSalePrice() - ticketPrice.getCostPrice()) * discount / 100);
+            orderTicketVo.setPrice(ticketPrice.getCostPrice() + ((ticketPrice.getSalePrice() - ticketPrice.getCostPrice()) * discount / 100));
+            price += orderTicketVo.getPrice();
         }
         Order order = parse(orderVo, agentId);
         order.setPrice(price);
@@ -548,9 +549,8 @@ public class RestApiController extends AuthenticationRequiredController {
         result.setTicketPriceId(ticketVo.getTicketPriceId());
         result.setTicketDate(DateUtils.parseDate(ticketVo.getTicketDate()));
         result.setTicketTime(ticketVo.getTicketTime());
-        result.setSalePrice(ticketVo.getSalePrice());
-        result.setCostPrice(ticketVo.getCostPrice());
         result.setPriceDescription(ticketVo.getPriceDescription());
+        result.setPrice(ticketVo.getPrice());
         return result;
     }
 

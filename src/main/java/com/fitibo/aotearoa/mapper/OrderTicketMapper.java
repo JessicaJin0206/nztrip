@@ -20,16 +20,16 @@ public interface OrderTicketMapper {
 
     @Insert("insert into order_ticket(`sku_id`, `sku_ticket_id`, `order_id`, `sku_ticket_name`, " +
             "`count_constraint`, `age_constraint`, `weight_constraint`, `ticket_description`, " +
-            "`ticket_price_id`, `ticket_date`, `ticket_time`, `sale_price`, `cost_price`, `price_description`) " +
+            "`ticket_price_id`, `ticket_date`, `ticket_time`, `sale_price`, `cost_price`, `price_description`, `price`) " +
             "values(#{skuId}, #{skuTicketId}, #{orderId}, #{skuTicket}, " +
             "#{countConstraint}, #{ageConstraint}, #{weightConstraint}, #{ticketDescription}, " +
-            "#{ticketPriceId}, #{ticketDate}, #{ticketTime}, #{salePrice}, #{costPrice}, #{priceDescription})")
+            "#{ticketPriceId}, #{ticketDate}, #{ticketTime}, #{salePrice}, #{costPrice}, #{priceDescription}, #{price})")
     @Options(useGeneratedKeys = true, keyColumn = "id", keyProperty = "id", flushCache = Options.FlushCachePolicy.DEFAULT)
     int create(OrderTicket orderTicket);
 
     @Select("select id, sku_id, sku_ticket_id, order_id, sku_ticket_name, " +
             "count_constraint, age_constraint, weight_constraint, ticket_description, " +
-            "ticket_price_id, ticket_date, ticket_time, sale_price, cost_price, price_description " +
+            "ticket_price_id, ticket_date, ticket_time, sale_price, cost_price, price_description, price " +
             "from order_ticket where order_id = #{orderId}")
     @Results({
             @Result(column = "id", property = "id"),
@@ -47,6 +47,7 @@ public interface OrderTicketMapper {
             @Result(column = "sale_price", property = "salePrice"),
             @Result(column = "cost_price", property = "costPrice"),
             @Result(column = "price_description", property = "priceDescription"),
+            @Result(column = "price", property = "price"),
             @Result(column = "id", property = "users", javaType = List.class, many
                     = @Many(select = "com.fitibo.aotearoa.mapper.OrderTicketUserMapper.findByOrderTicketId"))
     })
