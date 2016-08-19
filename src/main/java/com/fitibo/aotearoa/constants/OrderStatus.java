@@ -1,7 +1,5 @@
 package com.fitibo.aotearoa.constants;
 
-import java.util.List;
-
 /**
  * Created by qianhao.zhou on 8/18/16.
  */
@@ -32,8 +30,4 @@ public enum OrderStatus {
     private int value;
     private String desc;
 
-    public static void main(String args[]) {
-        OrderStatus[] statuses = OrderStatus.values();
-        System.out.println(1);
-    }
 }
