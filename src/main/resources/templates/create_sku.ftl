@@ -78,6 +78,19 @@
                 </#list>
                 </ul>
             </div>
+            <div class="form-group dropdown">
+                <button class="btn btn-default dropdown-toggle" type="button" id="selected_duration_button"
+                        data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="true">
+                    <span id="j_selected_duration" value="0">选择时长</span>
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" id="j_duration_drop_down" aria-labelledby="selected_duration_button">
+                <#list durations as duration>
+                    <li><a value="${duration.id}">${duration.name}</a></li>
+                </#list>
+                </ul>
+            </div>
             <div class="form-group" id="j_gathering_place">
                 <span>集合地点</span>
                 <a>
@@ -101,10 +114,6 @@
                     </label>
                 </div>
             </div>
-            <div class="form-group"><input type="text" id="j_duration" class="form-control"
-                                           placeholder="请输入行程时长"">
-            </div>
-
             <div class="form-group">
                 <span>票种</span>
                 <a id="j_add_ticket">

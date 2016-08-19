@@ -89,6 +89,21 @@
                 </#if>
                 </ul>
             </div>
+            <div class="form-group dropdown">
+                <button class="btn btn-default dropdown-toggle" type="button" id="selected_duration_button"
+                        data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="true" <#if editing = false>disabled</#if>>
+                    <span id="j_selected_duration" value="${sku.durationId}">${sku.duration}</span>
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" id="j_duration_drop_down" aria-labelledby="selected_duration_button">
+                <#if editing = true>
+                    <#list durations as duration>
+                        <li><a value="${duration.id}">${duration.name}</a></li>
+                    </#list>
+                </#if>
+                </ul>
+            </div>
             <div class="form-group" id="j_gathering_place">
                 <span>集合地点</span>
             <#if editing = true>
@@ -117,10 +132,6 @@
                         <input type="radio" class="toggle" value="0">否
                     </label>
                 </div>
-            </div>
-            <div class="form-group"><input type="text" id="j_duration" class="form-control"
-                                           <#if editing = false>disabled</#if>
-                                           placeholder="请输入行程时长" value="${sku.duration}">
             </div>
 
             <div class="form-group">

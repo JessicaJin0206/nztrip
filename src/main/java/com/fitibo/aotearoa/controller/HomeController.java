@@ -33,6 +33,7 @@ import com.fitibo.aotearoa.mapper.SkuTicketPriceMapper;
 import com.fitibo.aotearoa.model.Agent;
 import com.fitibo.aotearoa.model.Category;
 import com.fitibo.aotearoa.model.City;
+import com.fitibo.aotearoa.model.Duration;
 import com.fitibo.aotearoa.model.Order;
 import com.fitibo.aotearoa.model.Sku;
 import com.fitibo.aotearoa.model.SkuTicket;
@@ -40,6 +41,7 @@ import com.fitibo.aotearoa.model.SkuTicketPrice;
 import com.fitibo.aotearoa.model.Vendor;
 import com.fitibo.aotearoa.service.CategoryService;
 import com.fitibo.aotearoa.service.CityService;
+import com.fitibo.aotearoa.service.DurationService;
 import com.fitibo.aotearoa.service.VendorService;
 import com.fitibo.aotearoa.util.ObjectParser;
 import com.fitibo.aotearoa.vo.AgentVo;
@@ -82,6 +84,9 @@ public class HomeController extends AuthenticationRequiredController {
 
     @Autowired
     private VendorService vendorService;
+
+    @Autowired
+    private DurationService durationService;
 
     @Autowired
     private SkuMapper skuMapper;
@@ -132,7 +137,7 @@ public class HomeController extends AuthenticationRequiredController {
         if (sku == null) {
             throw new ResourceNotFoundException();
         }
-        model.put("sku", parse(sku, cityService.findAll(), categoryService.findAll(), vendorService.findAll()));
+        model.put("sku", parse(sku, cityService.findAll(), categoryService.findAll(), vendorService.findAll(), durationService.findAll()));
         model.put("module", MODULE_CREATE_ORDER);
         return "create_order";
     }
@@ -197,7 +202,7 @@ public class HomeController extends AuthenticationRequiredController {
         if (sku == null) {
             throw new ResourceNotFoundException();
         }
-        model.put("sku", parse(sku, cityService.findAll(), categoryService.findAll(), vendorService.findAll()));
+        model.put("sku", parse(sku, cityService.findAll(), categoryService.findAll(), vendorService.findAll(), durationService.findAll()));
         model.put("module", MODULE_ORDER_DETAIL);
         model.put("statusList", OrderStatus.values());
         model.put("editing", true);
@@ -211,6 +216,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("cities", Lists.newArrayList(cityService.findAll().values()));
         model.put("categories", Lists.newArrayList(categoryService.findAll().values()));
         model.put("vendors", Lists.newArrayList(vendorService.findAll().values()));
+        model.put("durations", Lists.newArrayList(durationService.findAll().values()));
         return "create_sku";
     }
 
@@ -222,7 +228,7 @@ public class HomeController extends AuthenticationRequiredController {
         if (sku == null) {
             throw new ResourceNotFoundException();
         }
-        model.put("sku", parse(sku, cityService.findAll(), categoryService.findAll(), vendorService.findAll()));
+        model.put("sku", parse(sku, cityService.findAll(), categoryService.findAll(), vendorService.findAll(), durationService.findAll()));
         model.put("editing", false);
         return "sku_detail";
     }
@@ -235,10 +241,11 @@ public class HomeController extends AuthenticationRequiredController {
             throw new ResourceNotFoundException();
         }
         model.put("module", MODULE_SKU_DETAIL);
-        model.put("sku", parse(sku, cityService.findAll(), categoryService.findAll(), vendorService.findAll()));
+        model.put("sku", parse(sku, cityService.findAll(), categoryService.findAll(), vendorService.findAll(), durationService.findAll()));
         model.put("cities", Lists.newArrayList(cityService.findAll().values()));
         model.put("categories", Lists.newArrayList(categoryService.findAll().values()));
         model.put("vendors", Lists.newArrayList(vendorService.findAll().values()));
+        model.put("durations", Lists.newArrayList(durationService.findAll().values()));
         model.put("editing", true);
         return "sku_detail";
     }
@@ -280,6 +287,7 @@ public class HomeController extends AuthenticationRequiredController {
         Map<Integer, City> cityMap = cityService.findAll();
         Map<Integer, Category> categoryMap = categoryService.findAll();
         Map<Integer, Vendor> vendorMap = vendorService.findAll();
+        Map<Integer, Duration> durationMap = durationService.findAll();
         RowBounds rowBounds = new RowBounds(pageNumber * pageSize, pageSize);
         model.put("module", MODULE_QUERY_SKU);
         model.put("cityId", cityId);
@@ -287,7 +295,8 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("keyword", keyword);
         model.put("cities", Lists.newArrayList(cityMap.values()));
         model.put("categories", Lists.newArrayList(categoryMap.values()));
-        model.put("skus", Lists.transform(searchSku(keyword, cityId, categoryId, rowBounds), (input) -> parse(input, cityMap, categoryMap, vendorMap)));
+        model.put("durations", Lists.newArrayList(durationMap.values()));
+        model.put("skus", Lists.transform(searchSku(keyword, cityId, categoryId, rowBounds), (input) -> parse(input, cityMap, categoryMap, vendorMap, durationMap)));
         model.put("pageSize", pageSize);
         model.put("pageNumber", pageNumber);
         return "skus";
@@ -381,7 +390,10 @@ public class HomeController extends AuthenticationRequiredController {
         return skuMapper.findAllByMultiFields(keyword, cityId, categoryId, rowBounds);
     }
 
-    private static SkuVo parse(Sku sku, Map<Integer, City> cityMap, Map<Integer, Category> categoryMap, Map<Integer, Vendor> vendorMap) {
+    private static SkuVo parse(Sku sku, Map<Integer, City> cityMap,
+                               Map<Integer, Category> categoryMap,
+                               Map<Integer, Vendor> vendorMap,
+                               Map<Integer, Duration> durationMap) {
         SkuVo result = new SkuVo();
         result.setId(sku.getId());
         result.setName(sku.getName());
@@ -395,7 +407,9 @@ public class HomeController extends AuthenticationRequiredController {
         result.setCity(cityMap.get(sku.getCityId()).getName());
         result.setGatheringPlace(Lists.newArrayList(sku.getGatheringPlace().split(CommonConstants.SEPARATOR)));
         result.setPickupService(sku.hasPickupService());
-        result.setDuration(sku.getDuration());
+        result.setDurationId(sku.getDurationId());
+        Duration duration = durationMap.get(sku.getDurationId());
+        result.setDuration(duration != null?duration.getName():"");
         result.setTickets(Lists.transform(sku.getTickets(), ObjectParser::parse));
         return result;
     }

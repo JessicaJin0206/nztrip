@@ -115,6 +115,14 @@ public class SkuVo {
         return pickupService;
     }
 
+    public int getDurationId() {
+        return durationId;
+    }
+
+    public void setDurationId(int durationId) {
+        this.durationId = durationId;
+    }
+
     public String getDuration() {
         return duration;
     }
@@ -135,6 +143,7 @@ public class SkuVo {
     private List<String> gatheringPlace;
     private boolean pickupService;
     private String description;
+    private int durationId;
     private String duration;
     private List<SkuTicketVo> tickets;
 }

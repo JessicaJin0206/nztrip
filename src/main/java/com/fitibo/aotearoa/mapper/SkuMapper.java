@@ -19,8 +19,8 @@ import java.util.List;
  */
 public interface SkuMapper {
 
-    @Insert("insert into sku(uuid, name, city_id, category_id, description, vendor_id, pickup_service, gathering_place, duration) " +
-            "values(#{uuid}, #{name}, #{cityId}, #{categoryId}, #{description}, #{vendorId}, #{pickupService}, #{gatheringPlace}, #{duration})")
+    @Insert("insert into sku(uuid, name, city_id, category_id, description, vendor_id, pickup_service, gathering_place, duration_id) " +
+            "values(#{uuid}, #{name}, #{cityId}, #{categoryId}, #{description}, #{vendorId}, #{pickupService}, #{gatheringPlace}, #{durationId})")
     @Options(useGeneratedKeys = true, keyColumn = "id", keyProperty = "id", flushCache = Options.FlushCachePolicy.DEFAULT)
     int create(Sku sku);
 
@@ -32,8 +32,8 @@ public interface SkuMapper {
             "description = #{description}, " +
             "vendor_id = #{vendorId}, " +
             "pickup_service = #{pickupService}, " +
-            "gathering_place = #{gatheringPlace} " +
-            "duration = #{duration}" +
+            "gathering_place = #{gatheringPlace}, " +
+            "duration_id = #{durationId} " +
             "where id = #{id}")
     int update(Sku sku);
 
@@ -48,7 +48,7 @@ public interface SkuMapper {
             @Result(column = "vendor_id", property = "vendorId"),
             @Result(column = "gathering_place", property = "gatheringPlace"),
             @Result(column = "pickup_service", property = "pickupService"),
-            @Result(column = "duration", property = "duration"),
+            @Result(column = "duration_id", property = "durationId"),
             @Result(column = "id", property = "tickets", javaType = List.class, many
                     = @Many(select = "com.fitibo.aotearoa.mapper.SkuTicketMapper.findOnlineBySkuId"))
     })
@@ -65,7 +65,7 @@ public interface SkuMapper {
             @Result(column = "vendor_id", property = "vendorId"),
             @Result(column = "gathering_place", property = "gatheringPlace"),
             @Result(column = "pickup_service", property = "pickupService"),
-            @Result(column = "duration", property = "duration")
+            @Result(column = "duration_id", property = "durationId")
     })
     List<Sku> findAll(RowBounds rowBounds);
 
@@ -80,7 +80,7 @@ public interface SkuMapper {
             @Result(column = "vendor_id", property = "vendorId"),
             @Result(column = "gathering_place", property = "gatheringPlace"),
             @Result(column = "pickup_service", property = "pickupService"),
-            @Result(column = "duration", property = "duration")
+            @Result(column = "duration_id", property = "durationId")
     })
     List<Sku> findAllByName(String name, RowBounds rowBounds);
 
@@ -101,7 +101,7 @@ public interface SkuMapper {
             @Result(column = "vendor_id", property = "vendorId"),
             @Result(column = "gathering_place", property = "gatheringPlace"),
             @Result(column = "pickup_service", property = "pickupService"),
-            @Result(column = "duration", property = "duration")
+            @Result(column = "duration_id", property = "durationId")
     })
     List<Sku> findAllByMultiFields(@Param("name") String name, @Param("cityId") int cityId, @Param("categoryId") int categoryId, RowBounds rowBounds);
 }

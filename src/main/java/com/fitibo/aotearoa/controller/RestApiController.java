@@ -131,12 +131,7 @@ public class RestApiController extends AuthenticationRequiredController {
         skuMapper.create(sku);
         final int skuId = sku.getId();
         skuVo.setId(skuId);
-        skuTicketMapper.batchCreate(Lists.transform(skuVo.getTickets(), new Function<SkuTicketVo, SkuTicket>() {
-            @Override
-            public SkuTicket apply(SkuTicketVo input) {
-                return parse(skuId, input);
-            }
-        }));
+        skuTicketMapper.batchCreate(Lists.transform(skuVo.getTickets(), (input) -> parse(skuId, input)));
         return skuVo;
     }
 
@@ -420,7 +415,11 @@ public class RestApiController extends AuthenticationRequiredController {
                 prices.add(price);
             }
         }
-        return skuTicketPriceMapper.batchCreate(prices);
+        if (prices.isEmpty()) {
+            return 0;
+        } else {
+            return skuTicketPriceMapper.batchCreate(prices);
+        }
     }
 
     private static Order parse(OrderVo order, int agentId) {
@@ -469,7 +468,7 @@ public class RestApiController extends AuthenticationRequiredController {
         result.setName(skuVo.getName());
         result.setGatheringPlace(Joiner.on(CommonConstants.SEPARATOR).join(skuVo.getGatheringPlace()));
         result.setPickupService(skuVo.hasPickupService());
-        result.setDuration(skuVo.getDuration());
+        result.setDurationId(skuVo.getDurationId());
         result.setDescription(skuVo.getDescription());
         result.setVendorId(skuVo.getVendorId());
         result.setCityId(skuVo.getCityId());

@@ -25,6 +25,15 @@ $.each($('#j_vendor_drop_down li a'), function (idx, item) {
     })
 });
 
+var durationDropDown = $('#j_selected_duration');
+$.each($('#j_duration_drop_down li a'), function (idx, item) {
+    var duration = $(item);
+    duration.on('click', function () {
+        durationDropDown.html(duration.html());
+        durationDropDown.attr('value', duration.attr('value'));
+    })
+});
+
 var create_alert = function (message) {
     var alert = $('.main .alert');
     if (alert != null) {
@@ -114,11 +123,7 @@ var validate = function() {
     });
     var description = $('#j_description').val();
     var pickupService = parseInt($('#j_pickup_service label.active input').val());
-    var duration = $('#j_duration').val();
-    if (duration.length == 0) {
-        warn("请填写行程时长");
-        return;
-    }
+    var durationId = parseInt(durationDropDown.attr('value'));
     var tickets = [];
     $('#j_ticket_container tr').each(function(idx, element){
         var container = $(element);
@@ -179,7 +184,7 @@ var validate = function() {
         pickupService: !!pickupService,
         gatheringPlace: gatheringPlace,
         description: description,
-        duration: duration,
+        durationId: durationId,
         tickets: tickets
     };
 };
@@ -211,9 +216,9 @@ $('#j_update').on('click', function() {
             url: '/v1/api/skus/' + id,
             data: JSON.stringify(data)
         }).success(function () {
-            success("添加成功");
+            success("修改成功");
         }).error(function (){
-            error("添加失败");
+            error("修改失败");
         });
     }
 });

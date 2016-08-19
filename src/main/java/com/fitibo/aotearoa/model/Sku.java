@@ -80,12 +80,16 @@ public class Sku extends ModelObject {
         this.tickets = tickets;
     }
 
-    public String getDuration() {
-        return duration;
+    public boolean isPickupService() {
+        return pickupService;
     }
 
-    public void setDuration(String duration) {
-        this.duration = duration;
+    public int getDurationId() {
+        return durationId;
+    }
+
+    public void setDurationId(int durationId) {
+        this.durationId = durationId;
     }
 
     private String uuid;
@@ -96,7 +100,7 @@ public class Sku extends ModelObject {
     private String description;
     private boolean pickupService;
     private String gatheringPlace;
-    private String duration;
+    private int durationId;
     private List<SkuTicket> tickets = Collections.emptyList();
 
 }

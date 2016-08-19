@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -38,10 +37,9 @@ public class CategoryService {
     }
 
     private LinkedHashMap<Integer, Category> convert() {
-        List<Category> cities = categoryMapper.findAll();
         LinkedHashMap<Integer, Category> result = Maps.newLinkedHashMap();
-        for (Category city : cities) {
-            result.put(city.getId(), city);
+        for (Category category : categoryMapper.findAll()) {
+            result.put(category.getId(), category);
         }
         return result;
     }
