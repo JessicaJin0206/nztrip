@@ -27,6 +27,8 @@ public final class ObjectParser {
         result.setDescription(input.getDescription());
         result.setDate(DateUtils.formatDate(input.getDate()));
         result.setTime(input.getTime());
+        result.setSalePrice(input.getSalePrice());
+        result.setCostPrice(input.getCostPrice());
         return result;
     }
 

@@ -61,11 +61,30 @@ public class SkuTicketPriceVo {
         this.price = price;
     }
 
+    public int getSalePrice() {
+        return salePrice;
+    }
+
+    public void setSalePrice(int salePrice) {
+        this.salePrice = salePrice;
+    }
+
+    public int getCostPrice() {
+        return costPrice;
+    }
+
+    public void setCostPrice(int costPrice) {
+        this.costPrice = costPrice;
+    }
+
     private int id;
+
     private int skuId;
     private int skuTicketId;
     private String date;
     private String time;
+    private int salePrice;
+    private int costPrice;
     private int price;
     private String description;
 }
