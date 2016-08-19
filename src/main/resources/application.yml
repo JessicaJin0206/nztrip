@@ -24,6 +24,19 @@ spring:
   profiles: production
 
 ---
+spring:
+  profiles: test
+  datasource:
+    test-on-borrow: true
+    validation-query: SELECT 1
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://aotearoa.cktnjjqgvdei.ap-northeast-1.rds.amazonaws.com:3306/aotearoa?useUnicode=true&characterEncoding=UTF-8
+    username: aotearoa
+    password: Fitibo~1
+    type: com.zaxxer.hikari.HikariDataSource
+    initialize: false
+
+---
 email:
     host: smtp.126.com
     port: 25
