@@ -11,6 +11,7 @@ import com.fitibo.aotearoa.constants.CommonConstants;
 import com.fitibo.aotearoa.constants.OrderStatus;
 import com.fitibo.aotearoa.constants.SkuTicketStatus;
 import com.fitibo.aotearoa.dto.Role;
+import com.fitibo.aotearoa.dto.Token;
 import com.fitibo.aotearoa.exception.AuthenticationFailureException;
 import com.fitibo.aotearoa.exception.InvalidParamException;
 import com.fitibo.aotearoa.exception.ResourceNotFoundException;
@@ -213,12 +214,7 @@ public class RestApiController extends AuthenticationRequiredController {
     public OrderVo createOrder(@RequestBody OrderVo orderVo) {
         Preconditions.checkNotNull(getToken());
         final int agentId = getToken().getRole() == Role.Agent ? getToken().getId() : 0;
-        int discount = 50;
-        if (agentId > 0) {
-            Agent agent = agentMapper.findById(agentId);
-            Preconditions.checkNotNull(agent);
-            discount = agent.getDiscount();
-        }
+        int discount = getDiscount(getToken());
         int price = 0;
         for (OrderTicketVo orderTicketVo : orderVo.getOrderTickets()) {
             SkuTicketPrice ticketPrice = skuTicketPriceMapper.findById(orderTicketVo.getTicketPriceId());
@@ -319,7 +315,7 @@ public class RestApiController extends AuthenticationRequiredController {
 
     @RequestMapping(value = "/v1/api/orders/tickets/{id}", method = RequestMethod.DELETE)
     @Transactional(rollbackFor = Exception.class)
-    @Authentication
+    @Authentication(Role.Admin)
     public boolean deleteTicket(@PathVariable("id") int id, @RequestBody OrderTicketVo ticketVo) {
         //后续是否添加验证
         int rowTicket = orderTicketMapper.deleteTicket(id, ticketVo.getOrderId());
@@ -334,7 +330,7 @@ public class RestApiController extends AuthenticationRequiredController {
     }
 
     @RequestMapping(value = "/v1/api/orders/{id}/email", method = RequestMethod.PUT)
-    @Authentication
+    @Authentication(Role.Admin)
     public boolean sendEmail(@PathVariable("id") int id) {
         Order order = orderMapper.findById(id);
         if (order == null) {
@@ -407,10 +403,24 @@ public class RestApiController extends AuthenticationRequiredController {
     }
 
     @RequestMapping(value = "v1/api/skus/{skuId}/tickets/{ticketId}/prices")
+    @Authentication
     public List<SkuTicketPriceVo> getPrice(@PathVariable("ticketId") int ticketId,
                                            @RequestParam("date") String date) {
-        List<SkuTicketPrice> bySkuTicketId = skuTicketPriceMapper.findBySkuTicketIdAndDate(ticketId, DateUtils.parseDate(date));
-        return Lists.transform(bySkuTicketId, ObjectParser::parse);
+        List<SkuTicketPrice> ticketPrices = skuTicketPriceMapper.findBySkuTicketIdAndDate(ticketId, DateUtils.parseDate(date));
+        int discount = getDiscount(getToken());
+        return Lists.transform(ticketPrices, (input) -> {
+            SkuTicketPriceVo result = new SkuTicketPriceVo();
+            int cost = input.getCostPrice();
+            int sale = input.getSalePrice();
+            result.setPrice(cost + ((sale - cost) * discount / 100));
+            result.setId(input.getId());
+            result.setSkuId(input.getSkuId());
+            result.setSkuTicketId(input.getSkuTicketId());
+            result.setDescription(input.getDescription());
+            result.setDate(DateUtils.formatDate(input.getDate()));
+            result.setTime(input.getTime());
+            return result;
+        });
     }
 
     @RequestMapping(value = "v1/api/skus/{skuId}/tickets/{ticketId}/prices", method = RequestMethod.POST)
@@ -438,6 +448,21 @@ public class RestApiController extends AuthenticationRequiredController {
             return 0;
         } else {
             return skuTicketPriceMapper.batchCreate(prices);
+        }
+    }
+
+    private int getDiscount(Token token) {
+        if (token == null) {
+            new AuthenticationFailureException("token cannot be null");
+        }
+        Preconditions.checkArgument(token != null, "invalid token");
+        switch (token.getRole()) {
+            case Admin:
+                return adminMapper.findById(getToken().getId()).getDiscount();
+            case Agent:
+                return agentMapper.findById(getToken().getId()).getDiscount();
+            default:
+                throw new AuthenticationFailureException("invalid role:" + token.getRole());
         }
     }
 

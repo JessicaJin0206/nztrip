@@ -7,3 +7,5 @@ CREATE TABLE `duration` (
 ALTER TABLE `vendor` ADD COLUMN phone VARCHAR(30);
 
 ALTER TABLE `order` ADD COLUMN vendor_phone VARCHAR(30);
+
+ALTER TABLE `admin` ADD COLUMN discount INT default 50;

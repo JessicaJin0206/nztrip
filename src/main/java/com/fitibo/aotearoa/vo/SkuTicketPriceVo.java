@@ -37,22 +37,6 @@ public class SkuTicketPriceVo {
         this.time = time;
     }
 
-    public int getSalePrice() {
-        return salePrice;
-    }
-
-    public void setSalePrice(int salePrice) {
-        this.salePrice = salePrice;
-    }
-
-    public int getCostPrice() {
-        return costPrice;
-    }
-
-    public void setCostPrice(int costPrice) {
-        this.costPrice = costPrice;
-    }
-
     public int getSkuId() {
         return skuId;
     }
@@ -69,12 +53,19 @@ public class SkuTicketPriceVo {
         this.description = description;
     }
 
+    public int getPrice() {
+        return price;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
+    }
+
     private int id;
     private int skuId;
     private int skuTicketId;
     private String date;
     private String time;
-    private int salePrice;
-    private int costPrice;
+    private int price;
     private String description;
 }

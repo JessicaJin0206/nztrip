@@ -21,6 +21,15 @@ public class Admin extends ModelObject {
         this.pass = pass;
     }
 
+    public int getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(int discount) {
+        this.discount = discount;
+    }
+
     private String user;
     private String pass;
+    private int discount;
 }

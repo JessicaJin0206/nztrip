@@ -119,6 +119,7 @@
     <div class="form-group"><label>票种:</label><span id="j_ticket_name_span">${ticket.skuTicket!''}</span></div>
     <div class="form-group"><label>日期:</label><span id="j_ticket_date_span">${ticket.ticketDate!''}</span></div>
     <div class="form-group"><label>时间:</label><span id="j_ticket_time_span">${ticket.ticketTime!''}</span></div>
+    <div class="form-group"><label>时间:</label><span id="j_ticket_price_span">${ticket.price}</span></div>
     <table class="table">
         <thead>
         <tr>

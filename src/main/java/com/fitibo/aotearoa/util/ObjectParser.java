@@ -22,8 +22,6 @@ public final class ObjectParser {
     public static SkuTicketPriceVo parse(SkuTicketPrice input) {
         SkuTicketPriceVo result = new SkuTicketPriceVo();
         result.setId(input.getId());
-        result.setCostPrice(input.getCostPrice());
-        result.setSalePrice(input.getSalePrice());
         result.setSkuId(input.getSkuId());
         result.setSkuTicketId(input.getSkuTicketId());
         result.setDescription(input.getDescription());

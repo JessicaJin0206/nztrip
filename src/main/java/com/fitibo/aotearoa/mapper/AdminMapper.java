@@ -16,6 +16,16 @@ public interface AdminMapper {
             @Result(column = "id", property = "id"),
             @Result(column = "user", property = "user"),
             @Result(column = "pass", property = "pass"),
+            @Result(column = "discount", property = "discount"),
     })
     Admin findByUser(String user);
+
+    @Select("select * from admin where id=#{id}")
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "user", property = "user"),
+            @Result(column = "pass", property = "pass"),
+            @Result(column = "discount", property = "discount")
+    })
+    Admin findById(int id);
 }
