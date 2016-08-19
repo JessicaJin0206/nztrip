@@ -5,3 +5,5 @@ CREATE TABLE `duration` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 ALTER TABLE `vendor` ADD COLUMN phone VARCHAR(30);
+
+ALTER TABLE `order` ADD COLUMN vendor_phone VARCHAR(30);

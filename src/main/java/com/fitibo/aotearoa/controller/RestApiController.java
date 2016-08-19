@@ -208,6 +208,7 @@ public class RestApiController extends AuthenticationRequiredController {
         }
         Order order = parse(orderVo, agentId);
         order.setPrice(price);
+        order.setVendorPhone(vendorService.findById(skuMapper.findById(orderVo.getSkuId()).getVendorId()).getPhone());
         order.setUuid(GuidGenerator.generate(14));
         order.setStatus(OrderStatus.NEW.getValue());
         orderMapper.create(order);
@@ -459,6 +460,7 @@ public class RestApiController extends AuthenticationRequiredController {
         result.setSecondaryContactEmail(order.getSecondaryContactEmail());
         result.setSecondaryContactPhone(order.getSecondaryContactPhone());
         result.setSecondaryContactWechat(order.getSecondaryContactWechat());
+        result.setVendorPhone(order.getVendorPhone());
         return result;
     }
 

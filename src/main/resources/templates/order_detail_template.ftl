@@ -7,7 +7,7 @@
     <div class="row">
         <label class="col-md-2">价格:</label>
         <div class="col-md-offset-2">
-            <input type="number" id="j_order_price" class="form-control" <#if editing=false>disabled</#if> placeholder="请输入价格..." value="${order.price}">
+            <input type="number" id="j_order_price" class="form-control" <#if editing=false>disabled</#if> value="${order.price}">
         </div>
     </div>
 </div>
@@ -15,7 +15,7 @@
     <div class="row">
         <label class="col-md-2">Reference Number:</label>
         <div class="col-md-offset-2">
-            <input type="text" id="j_referencenumber" class="form-control" <#if editing=false>disabled</#if> placeholder="请输入Reference Number..." value="${order.referenceNumber!''}">
+            <input type="text" id="j_referencenumber" class="form-control" <#if editing=false>disabled</#if> value="${order.referenceNumber!''}">
         </div>
     </div>
 </div>
@@ -23,7 +23,15 @@
     <div class="row">
         <label class="col-md-2">集合信息:</label>
         <div class="col-md-offset-2">
-            <input type="text" id="j_gatheringinfo" class="form-control" <#if editing=false>disabled</#if> placeholder="请输入集合信息..." value="${order.gatheringInfo!''}">
+            <input type="text" id="j_gatheringinfo" class="form-control" <#if editing=false>disabled</#if> value="${order.gatheringInfo!''}">
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <div class="row">
+        <label class="col-md-2">行程商电话:</label>
+        <div class="col-md-offset-2">
+            <input type="text" id="j_vendor_phone" class="form-control" <#if editing=false>disabled</#if> value="${order.vendorPhone!''}">
         </div>
     </div>
 </div>
@@ -31,7 +39,7 @@
     <div class="row">
         <label class="col-md-2">备注:</label>
         <div class="col-md-offset-2">
-            <input type="text" id="j_remark" class="form-control" <#if editing=false>disabled</#if> placeholder="请输入备注..." value="${order.remark!''}">
+            <input type="text" id="j_remark" class="form-control" <#if editing=false>disabled</#if> value="${order.remark!''}">
         </div>
     </div>
 </div>

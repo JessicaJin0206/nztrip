@@ -138,6 +138,7 @@ public class HomeController extends AuthenticationRequiredController {
             throw new ResourceNotFoundException();
         }
         model.put("sku", parse(sku, cityService.findAll(), categoryService.findAll(), vendorService.findAll(), durationService.findAll()));
+        model.put("vendor", vendorService.findAll().get(sku.getVendorId()));
         model.put("module", MODULE_CREATE_ORDER);
         return "create_order";
     }

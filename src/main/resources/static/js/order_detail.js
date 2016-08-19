@@ -184,6 +184,7 @@ $('#j_update').on('click', function () {
     var secondaryContactPhone = $('#j_secondary_contact_phone').val();
     var secondaryContactWechat = $('#j_secondary_contact_wechat').val();
     var remark = $('#j_remark').val();
+    var vendorPhone = $('#j_vendor_phone').val();
     var orderTickets = [];
 
     if(price <= 0) {
@@ -268,7 +269,8 @@ $('#j_update').on('click', function () {
         secondaryContactPhone: secondaryContactPhone,
         secondaryContactWechat: secondaryContactWechat,
         remark: remark,
-        orderTickets: orderTickets
+        orderTickets: orderTickets,
+        vendorPhone: vendorPhone
     };
     $.ajax({
         type: 'PUT',

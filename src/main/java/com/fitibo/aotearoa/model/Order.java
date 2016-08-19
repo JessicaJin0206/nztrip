@@ -159,6 +159,14 @@ public class Order extends ModelObject {
         this.referenceNumber = referenceNumber;
     }
 
+    public String getVendorPhone() {
+        return vendorPhone;
+    }
+
+    public void setVendorPhone(String vendorPhone) {
+        this.vendorPhone = vendorPhone;
+    }
+
     private int skuId;
     private String uuid;
     private String sku;
@@ -178,4 +186,5 @@ public class Order extends ModelObject {
     private String secondaryContactWechat;
     private String gatheringInfo;
     private String referenceNumber;
+    private String vendorPhone;
 }

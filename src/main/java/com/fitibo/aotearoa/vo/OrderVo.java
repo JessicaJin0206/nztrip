@@ -168,6 +168,14 @@ public class OrderVo {
         this.orderTickets = orderTickets;
     }
 
+    public String getVendorPhone() {
+        return vendorPhone;
+    }
+
+    public void setVendorPhone(String vendorPhone) {
+        this.vendorPhone = vendorPhone;
+    }
+
     private int id;
     private int skuId;
     private String sku;
@@ -188,5 +196,6 @@ public class OrderVo {
     private String gatheringInfo;
     private String referenceNumber;
     private List<OrderTicketVo> orderTickets;
+    private String vendorPhone;
 
 }

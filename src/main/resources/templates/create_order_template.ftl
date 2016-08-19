@@ -1,5 +1,6 @@
 <div class="form-group"><label>订单详情</label></div>
 <div class="form-group"><label>名称:</label><span>   ${sku.name}</span></div>
+<div class="form-group"><label>行程商电话:</label><span>   ${vendor.phone!''}</span></div>
 
 <div class="form-group"><label>主要联系人</label></div>
 <div class="form-group">
