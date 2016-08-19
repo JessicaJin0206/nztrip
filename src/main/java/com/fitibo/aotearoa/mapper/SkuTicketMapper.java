@@ -30,15 +30,6 @@ public interface SkuTicketMapper {
     int batchCreate(List<SkuTicket> skuTickets);
 
     @Update({
-            "<script>",
-            "<foreach collection='list' item='item' open='' close='' separator=';'>",
-            "update sku_ticket set name=#{item.name}, count_constraint=#{item.countConstraint}, age_constraint=#{item.ageConstraint}, weight_constraint=#{item.weightConstraint},description=#{item.description}, status=#{item.status} where id=#{item.id}",
-            "</foreach>",
-            "</script>"
-    })
-    int batchUpdate(List<SkuTicket> skuTickets);
-
-    @Update({
             "update sku_ticket set name=#{item.name}, count_constraint=#{item.countConstraint}, age_constraint=#{item.ageConstraint}, weight_constraint=#{item.weightConstraint},description=#{item.description}, status=#{item.status} where id=#{item.id}",
     })
     int update(@Param("item") SkuTicket skuTicket);

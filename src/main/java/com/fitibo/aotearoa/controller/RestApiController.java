@@ -170,11 +170,11 @@ public class RestApiController extends AuthenticationRequiredController {
         if (!createList.isEmpty()) {
             skuTicketMapper.batchCreate(createList);
         }
-        if (!updateList.isEmpty()) {
-            skuTicketMapper.batchUpdate(updateList);
+        for (SkuTicket skuTicket : updateList) {
+            skuTicketMapper.update(skuTicket);
         }
-        if (!deleteList.isEmpty()) {
-            skuTicketMapper.batchUpdate(deleteList);
+        for (SkuTicket skuTicket : deleteList) {
+            skuTicketMapper.update(skuTicket);
         }
         return skuVo;
     }

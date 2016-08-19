@@ -186,9 +186,9 @@
             </div>
 
         <#if editing = false>
-            <button id="j_edit" class="btn btn-default form-group">修改</button>
+            <button id="j_edit" class="btn btn-primary form-group">修改</button>
         <#else>
-            <button id="j_update" class="btn btn-default form-group">提交</button>
+            <button id="j_update" class="btn btn-primary form-group">提交</button>
         </#if>
         </div>
     </div>

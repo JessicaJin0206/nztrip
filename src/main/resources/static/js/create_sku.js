@@ -197,8 +197,8 @@ $('#j_submit').on('click', function () {
             contentType:"application/json; charset=utf-8",
             url: '/v1/api/skus',
             data: JSON.stringify(data)
-        }).success(function () {
-            success("添加成功");
+        }).success(function (sku) {
+            window.location.href = "/skus/" + sku.id;
         }).error(function (){
             error("添加失败");
         });
@@ -216,7 +216,7 @@ $('#j_update').on('click', function() {
             url: '/v1/api/skus/' + id,
             data: JSON.stringify(data)
         }).success(function () {
-            success("修改成功");
+            window.location.href = "/skus/" + id;
         }).error(function (){
             error("修改失败");
         });
