@@ -46,7 +46,7 @@
             </div>
             <div class="form-group"><input type="text" id="j_phone" class="form-control"
                                            <#if editing = false>disabled</#if> placeholder="请输入行程商邮箱"
-                                           value="<#if vendor.phone??>${vendor.phone}</#if>">
+                                           value="${vendor.phone!''}">
             </div>
 
         <#--<#if editing = false>-->

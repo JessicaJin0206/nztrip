@@ -97,10 +97,10 @@
                             </#if>
                         </#list>
                         </td>
-                        <td>${order.primaryContact}</td>
-                        <td>${order.primaryContactEmail}</td>
-                        <td><#if order.referenceNumber??>${order.referenceNumber}</#if></td>
-                        <td>${order.remark}</td>
+                        <td>${order.primaryContact!''}</td>
+                        <td>${order.primaryContactEmail!''}</td>
+                        <td>${order.referenceNumber!''}</td>
+                        <td>${order.remark!''}</td>
                         <td>
                             <div>
                                 <a href="/orders/${order.id}">

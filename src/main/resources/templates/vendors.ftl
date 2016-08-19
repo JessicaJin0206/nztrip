@@ -48,9 +48,9 @@
                     <#if vendors?exists>
                     <#list vendors as vendor>
                         <tr>
-                            <td>${vendor.name}</td>
-                            <td>${vendor.email}</td>
-                            <td><#if vendor.phone??>${vendor.phone}</#if></td>
+                            <td>${vendor.name!''}</td>
+                            <td>${vendor.email!''}</td>
+                            <td>${vendor.phone!''}</td>
                             <td>
                                 <div>
                                     <a href="/vendors/${vendor.id}">

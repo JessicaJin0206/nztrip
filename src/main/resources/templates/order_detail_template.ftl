@@ -116,9 +116,9 @@
 <#list tickets as ticket>
 <div class="form-group j_ticket_container" value="${ticket.id}" ticketId="${ticket.skuTicketId}" priceId="${ticket.ticketPriceId}">
     <#if editing == true><a id="j_ticket_delete"><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span></a></#if>
-    <div class="form-group"><label>票种:</label><span id="j_ticket_name_span"><#if ticket.skuTicket??>${ticket.skuTicket}</#if></span></div>
-    <div class="form-group"><label>日期:</label><span id="j_ticket_date_span">${ticket.ticketDate}</span></div>
-    <div class="form-group"><label>时间:</label><span id="j_ticket_time_span">${ticket.ticketTime}</span></div>
+    <div class="form-group"><label>票种:</label><span id="j_ticket_name_span">${ticket.skuTicket!''}</span></div>
+    <div class="form-group"><label>日期:</label><span id="j_ticket_date_span">${ticket.ticketDate!''}</span></div>
+    <div class="form-group"><label>时间:</label><span id="j_ticket_time_span">${ticket.ticketTime!''}</span></div>
     <table class="table">
         <thead>
         <tr>
