@@ -81,6 +81,7 @@
                         <th>主联系人</th>
                         <th>Email</th>
                         <th>Reference Number</th>
+                        <th>总价</th>
                         <th>备注</th>
                         <th>操作</th>
                     </tr>
@@ -100,6 +101,7 @@
                         <td>${order.primaryContact!''}</td>
                         <td>${order.primaryContactEmail!''}</td>
                         <td>${order.referenceNumber!''}</td>
+                        <td>${order.price}</td>
                         <td>${order.remark!''}</td>
                         <td>
                             <div>

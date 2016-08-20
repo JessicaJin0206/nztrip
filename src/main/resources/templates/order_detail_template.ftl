@@ -5,7 +5,7 @@
 </div>
 <div class="form-group">
     <div class="row">
-        <label class="col-md-2">价格:</label>
+        <label class="col-md-2">总价:</label>
         <div class="col-md-offset-2">
             <input type="number" id="j_order_price" class="form-control" <#if editing=false>disabled</#if> value="${order.price}">
         </div>
