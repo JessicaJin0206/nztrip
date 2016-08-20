@@ -2,6 +2,7 @@ package com.fitibo.aotearoa.mapper;
 
 import com.fitibo.aotearoa.model.SkuTicketPrice;
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
@@ -109,5 +110,13 @@ public interface SkuTicketPriceMapper {
             @Result(column = "description", property = "description"),
     })
     List<SkuTicketPrice> findBySkuTicketId(int skuTicketId, RowBounds rowBounds);
+
+    @Delete({
+            "<script>",
+            "delete from sku_ticket_price where sku_id = #{skuId} and sku_ticket_id = #{skuTicketId} and date = #{date}",
+            "<if test =\"time != null and time != ''\">and time = #{time} </if>",
+            "</script>"
+    })
+    int deleteTicketPrice(SkuTicketPrice price);
 
 }

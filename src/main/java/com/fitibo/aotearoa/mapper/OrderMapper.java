@@ -232,7 +232,6 @@ public interface OrderMapper {
     @Update("update `order` set " +
             "remark = #{remark} ," +
             "price = #{price}, " +
-            "status = #{status}, " +
             "gathering_info = #{gatheringInfo}, " +
             "reference_number = #{referenceNumber}, " +
             "primary_contact = #{primaryContact}, " +
