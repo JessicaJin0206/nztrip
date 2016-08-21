@@ -40,6 +40,9 @@
 <div class="form-group"><input type="text" id="j_remark" class="form-control"
                                placeholder="备注">
 </div>
+
+<div class="form-group"><label>票种信息</label></div>
+
 <div class="form-group dropdown">
     <button class="btn btn-default dropdown-toggle" type="button"
             data-toggle="dropdown"
@@ -57,7 +60,6 @@
 
 </div>
 
-<div class="form-group"><label>票种信息</label></div>
 <div class="form-group">
     <div class="input-group date col-md-3 col-sm-3 col-xs-3 form-group" id="j_ticket_date">
         <input type="text" class="form-control"/>
