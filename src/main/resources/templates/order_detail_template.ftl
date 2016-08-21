@@ -5,6 +5,33 @@
 </div>
 <div class="form-group">
     <div class="row">
+        <label class="col-md-2">修改订单:</label>
+    <#if editing = false>
+        <button id="j_edit" class="btn btn-default form-group">修改订单信息</button>
+        <#if operations?size != 0 >
+            <#list operations as operation>
+                <button class="btn btn-default form-group j_operation" operation="${operation.action}">${operation.desc}</button>
+            </#list>
+        </#if>
+    <#else>
+        <button id="j_update" class="btn btn-default form-group">提交</button>
+    </#if>
+    </div>
+</div>
+<div class="form-group">
+    <div class="row">
+        <label class="col-md-2">订单状态:</label>
+        <div class="col-md-offset-2">
+        <#list statusList as s>
+            <#if (s.getValue() == order.status)>
+                <input type="text" id="j_status" disabled class="form-control"  value="${s.desc}">
+            </#if>
+        </#list>
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <div class="row">
         <label class="col-md-2">总价:</label>
         <div class="col-md-offset-2">
             <input type="number" id="j_order_price" class="form-control" <#if editing=false>disabled</#if> value="${order.price}">
@@ -138,69 +165,3 @@
                                <#if editing=false>disabled</#if> placeholder="微信"
                                value="${order.secondaryContactWechat}">
 </div>
-
-<div class="form-group">
-    <div class="row">
-        <label class="col-md-2">订单状态:</label>
-    <#--<#if editing=false>-->
-        <div class="col-md-offset-2">
-            <#list statusList as s>
-                <#if (s.getValue() == order.status)>
-                    <input type="text" id="j_status" disabled class="form-control"  value="${s.desc}">
-                </#if>
-            </#list>
-        </div>
-    <#--<#else>-->
-        <#--<div class="dropdown col-md-3">-->
-            <#--<button class="btn btn-default dropdown-toggle" type="button" id="selected_status_button"-->
-                    <#--data-toggle="dropdown"-->
-                    <#--aria-haspopup="true" aria-expanded="true">-->
-                <#--<#list statusList as s>-->
-                    <#--<#if (s.getValue() == order.status)>-->
-                        <#--<span id="j_selected_status" value="${s.getValue()}">${s.getDesc()}</span>-->
-                    <#--</#if>-->
-                <#--</#list>-->
-
-                <#--<span class="caret"></span>-->
-            <#--</button>-->
-            <#--<ul class="dropdown-menu" id="j_status_drop_down" aria-labelledby="selected_status_button">-->
-                <#--<li><a value="0">修改订单状态</a></li>-->
-                <#--<#list statusList as s>-->
-                    <#--<li><a value="${s.getValue()}">${s.getDesc()}</a></li>-->
-                <#--</#list>-->
-            <#--</ul>-->
-        <#--</div>-->
-    <#--</#if>-->
-    </div>
-</div>
-
-<div class="form-group">
-    <div class="row">
-        <label class="col-md-2">修改订单信息:</label>
-        <#if editing = false>
-            <button id="j_edit" class="btn btn-default form-group">修改</button>
-        <#else>
-            <button id="j_update" class="btn btn-default form-group">提交</button>
-        </#if>
-    </div>
-</div>
-
-<#if operations?size != 0 >
-<div class="form-group">
-    <div class="row">
-        <label class="col-md-2">订单操作:</label>
-        <#list operations as operation>
-            <button class="btn btn-default form-group j_operation" operation="${operation.action}">${operation.desc}</button>
-        </#list>
-    </div>
-</div>
-</#if>
-
-<#--<div class="form-group">-->
-    <#--<div class="row">-->
-        <#--<label class="col-md-2">Reference Number:</label>-->
-        <#--<div class="col-md-offset-2">-->
-            <#--<input type="text" id="j_referencenumber" class="form-control" <#if editing=false>disabled</#if> value="${order.referenceNumber!''}">-->
-        <#--</div>-->
-    <#--</div>-->
-<#--</div>-->

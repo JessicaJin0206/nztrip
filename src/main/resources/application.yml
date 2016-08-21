@@ -40,31 +40,28 @@ spring:
 email:
     host: smtp.126.com
     port: 25
-    username: zi___yue@126.com
-    password: Ilove126
+    username: zi___yue@126.com(your email)
+    password: ****
     javaMailProperties:
       mail.smtp.auth: true
 
 ---
 template:
-    email: |
-      <html><body><div>
-      <p>#VENDORNAME#,</p>
-      <br/>
-      <p>Please kindly help us to make the reservation as blew:</p>
-      <br/>
-      <p>TOUR: #TOUR#</p>
-      <p>NAME: #NAME#</p>
-      #TOURINFO#
-      <br/>
-      <p>A prompt replay would greatly oblige us.</p>
-      <br/>
-      <p>Many thanks for your support.</p>
-      <br/>
-      <p>Best Regards</p>
-      <br/>
-      <p>Reservation Team</p>
-      <p style="color: dodgerblue">the <span style="font-weight: bold">Easy Efficient Excellent</span> travel with <span style="font-weight: bold">EYOUNZ Limited</span></p>
-      <p>Tel & Fax: +64 (0)3 357 4405</p>
-      <p>Address: 30 Durey Rd, Christchurch Airport Internatinal Terminal Building, Christchurch 8053</p>
-      </div></body></html>
+    reservationemail:
+      from: zi___yue@126.com(your email)
+      subject: Make Reservation
+      content: |
+        <html><body><div>
+        #VENDORNAME#,<br><br>
+        Please kindly help us to make the reservation as blew:<br><br>
+        TOUR: #TOUR#<br>
+        NAME: #NAME#<br>
+        #TOURINFO#<br>
+        A prompt replay would greatly oblige us.<br><br>
+        Many thanks for your support.<br><br>
+        Best Regards<br><br>
+        Reservation Team<br>
+        <span style="color: dodgerblue">the <span style="font-weight: bold">Easy Efficient Excellent</span> travel with <span style="font-weight: bold">EYOUNZ Limited</span></span><br>
+        Tel & Fax: +64 (0)3 357 4405<br>
+        Address: 30 Durey Rd, Christchurch Airport Internatinal Terminal Building, Christchurch 8053
+        </div></body></html>

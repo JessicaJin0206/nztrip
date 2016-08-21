@@ -33,6 +33,7 @@ import com.fitibo.aotearoa.model.SkuTicket;
 import com.fitibo.aotearoa.model.SkuTicketPrice;
 import com.fitibo.aotearoa.model.Vendor;
 import com.fitibo.aotearoa.service.EmailService;
+import com.fitibo.aotearoa.service.OperationService;
 import com.fitibo.aotearoa.service.TokenService;
 import com.fitibo.aotearoa.service.VendorService;
 import com.fitibo.aotearoa.util.DateUtils;
@@ -108,7 +109,7 @@ public class RestApiController extends AuthenticationRequiredController {
     private TokenService tokenService;
 
     @Autowired
-    private EmailService emailService;
+    private OperationService operationService;
 
     @ExceptionHandler
     public ResponseEntity handleException(AuthenticationFailureException ex) {
@@ -343,7 +344,7 @@ public class RestApiController extends AuthenticationRequiredController {
             return false;
         }
 
-        doRelatedOperation(order);
+        operationService.doRelatedOperation(order);
         return true;
     }
 
@@ -591,31 +592,6 @@ public class RestApiController extends AuthenticationRequiredController {
         result.setDiscount(agentVo.getDiscount());
         result.setEmail(agentVo.getEmail());
         return result;
-    }
-
-    private void doRelatedOperation(Order order) {
-        if (order.getStatus() == OrderStatus.NEW.getValue()) {
-            sendEmail(order);
-        } else {
-            // do nothing now
-        }
-    }
-
-    private void sendEmail(Order order) {
-        List<OrderTicket> ticketList = orderTicketMapper.findByOrderId(order.getId());
-        if (ticketList.isEmpty()) {
-            throw new ResourceNotFoundException();
-        }
-        Sku sku = skuMapper.findById(ticketList.get(0).getSkuId());
-        if (ticketList.isEmpty()) {
-            throw new ResourceNotFoundException();
-        }
-        Vendor vendor = vendorService.findById(sku.getVendorId());
-        try {
-            emailService.sendEmail(vendor, order, ticketList);
-        } catch (Exception e) {
-            //log
-        }
     }
 
 }

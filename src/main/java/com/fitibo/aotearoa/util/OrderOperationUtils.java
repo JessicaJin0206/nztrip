@@ -18,15 +18,15 @@ public class OrderOperationUtils {
             followOperations.add(new Operation(OrderStatus.CLOSED.getValue(), "关闭订单"));
         } else if (status == OrderStatus.PENDING.getValue()) {
             followOperations.add(new Operation(OrderStatus.FULL.getValue(), "库存已满需确认"));
-            followOperations.add(new Operation(OrderStatus.CONFIRMED.getValue(), "已确认订单成功"));
+            followOperations.add(new Operation(OrderStatus.CONFIRMED.getValue(), "确认订单成功"));
         } else if (status == OrderStatus.FULL.getValue()) {
             followOperations.add(new Operation(OrderStatus.CLOSED.getValue(), "确认失败关闭订单"));
-            followOperations.add(new Operation(OrderStatus.CONFIRMED.getValue(), "已确认订单成功"));
+            followOperations.add(new Operation(OrderStatus.CONFIRMED.getValue(), "确认订单成功"));
         } else if (status == OrderStatus.CONFIRMED.getValue()) {
             followOperations.add(new Operation(OrderStatus.MODIFYING.getValue(), "确认后修改订单"));
             followOperations.add(new Operation(OrderStatus.CANCELLED.getValue(), "取消订单"));
         } else if (status == OrderStatus.MODIFYING.getValue()) {
-            //
+            followOperations.add(new Operation(OrderStatus.CONFIRMED.getValue(), "确认订单成功"));
         } else if (status == OrderStatus.CANCELLED.getValue()) {
             //
         } else if (status == OrderStatus.CLOSED.getValue()) {
