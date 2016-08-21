@@ -1,0 +1,1 @@
+ALTER TABLE `order_ticket` ADD COLUMN gathering_place VARCHAR(200) default '';
