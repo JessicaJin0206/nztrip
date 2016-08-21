@@ -101,6 +101,7 @@
 
             <div class="form-group">
                 <button id="j_submit" class="btn btn-primary">添加</button>
+                <button id="j_delete" class="btn btn-primary">删除</button>
             </div>
 
             <div class="form-group">

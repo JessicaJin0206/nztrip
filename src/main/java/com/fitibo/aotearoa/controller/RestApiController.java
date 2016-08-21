@@ -33,12 +33,14 @@ import com.fitibo.aotearoa.model.SkuTicket;
 import com.fitibo.aotearoa.model.SkuTicketPrice;
 import com.fitibo.aotearoa.model.Vendor;
 import com.fitibo.aotearoa.service.EmailService;
+import com.fitibo.aotearoa.service.OperationService;
 import com.fitibo.aotearoa.service.TokenService;
 import com.fitibo.aotearoa.service.VendorService;
 import com.fitibo.aotearoa.util.DateUtils;
 import com.fitibo.aotearoa.util.GuidGenerator;
 import com.fitibo.aotearoa.util.Md5Utils;
 import com.fitibo.aotearoa.util.ObjectParser;
+import com.fitibo.aotearoa.util.OrderOperationUtils;
 import com.fitibo.aotearoa.vo.AddPriceRequest;
 import com.fitibo.aotearoa.vo.AgentVo;
 import com.fitibo.aotearoa.vo.AuthenticationReq;
@@ -107,7 +109,7 @@ public class RestApiController extends AuthenticationRequiredController {
     private TokenService tokenService;
 
     @Autowired
-    private EmailService emailService;
+    private OperationService operationService;
 
     @ExceptionHandler
     public ResponseEntity handleException(AuthenticationFailureException ex) {
@@ -270,7 +272,7 @@ public class RestApiController extends AuthenticationRequiredController {
 
     @RequestMapping(value = "/v1/api/orders/{id}", method = RequestMethod.PUT)
     @Transactional(rollbackFor = Exception.class)
-    @Authentication
+    @Authentication(Role.Admin)
     public OrderVo updateOrder(@RequestBody OrderVo order) {
         Preconditions.checkNotNull(getToken());
         Order o = parse4Update(order);
@@ -314,6 +316,38 @@ public class RestApiController extends AuthenticationRequiredController {
         return order;
     }
 
+    @RequestMapping(value = "/v1/api/orders/{id}/status/{action}", method = RequestMethod.PUT)
+    @Authentication(Role.Admin)
+    public boolean updateOrderStatus(@PathVariable("id") int id, @PathVariable("action") int action) {
+        Order order = orderMapper.findById(id);
+        if (order == null) {
+            throw new ResourceNotFoundException();
+        }
+        int oldStatus = order.getStatus();
+        List<OrderOperationUtils.Operation> operations = OrderOperationUtils.getFollowOperations(oldStatus);
+        if (operations.isEmpty()) {
+            throw new InvalidParamException();
+        }
+        boolean statusValid = false;
+        for (OrderOperationUtils.Operation operation : operations) {
+            if (operation.getAction() == action) {
+                statusValid = true;
+                break;
+            }
+        }
+        if (!statusValid) {
+            throw new InvalidParamException();
+        }
+
+        int row = orderMapper.updateOrderStatus(id, oldStatus, action);
+        if (row != 1) {
+            return false;
+        }
+
+        operationService.doRelatedOperation(order);
+        return true;
+    }
+
     @RequestMapping(value = "/v1/api/orders/tickets/{id}", method = RequestMethod.DELETE)
     @Transactional(rollbackFor = Exception.class)
     @Authentication(Role.Admin)
@@ -328,36 +362,6 @@ public class RestApiController extends AuthenticationRequiredController {
             return false;
         }
         return true;
-    }
-
-    @RequestMapping(value = "/v1/api/orders/{id}/email", method = RequestMethod.PUT)
-    @Authentication(Role.Admin)
-    public boolean sendEmail(@PathVariable("id") int id) {
-        Order order = orderMapper.findById(id);
-        if (order == null) {
-            throw new ResourceNotFoundException();
-        }
-        int oldStatus = order.getStatus();
-        if (oldStatus != OrderStatus.NEW.getValue()) {
-            throw new InvalidParamException();
-        }
-        List<OrderTicket> ticketList = orderTicketMapper.findByOrderId(id);
-        if (ticketList.isEmpty()) {
-            throw new ResourceNotFoundException();
-        }
-        Sku sku = skuMapper.findById(ticketList.get(0).getSkuId());
-        if (ticketList.isEmpty()) {
-            throw new ResourceNotFoundException();
-        }
-        Vendor vendor = vendorService.findById(sku.getVendorId());
-        boolean result = emailService.sendEmail(vendor, order, ticketList);
-        if (result) {
-            int row = orderMapper.updateOrderStatus(id, oldStatus, OrderStatus.PENDING.getValue());
-            if (row != 1) {
-                //log
-            }
-        }
-        return result;
     }
 
     @RequestMapping(value = "v1/api/signin", method = RequestMethod.POST)
@@ -450,6 +454,28 @@ public class RestApiController extends AuthenticationRequiredController {
         } else {
             return skuTicketPriceMapper.batchCreate(prices);
         }
+    }
+
+    @RequestMapping(value = "v1/api/skus/{skuId}/tickets/{ticketId}/prices", method = RequestMethod.DELETE)
+    @Transactional(rollbackFor = Exception.class)
+    @Authentication(Role.Admin)
+    public int deletePrice(@PathVariable("skuId") int skuId,
+                           @PathVariable("ticketId") int ticketId,
+                           @RequestBody AddPriceRequest request) {
+        DateTime start = DateUtils.parseDateTime(request.getStartDate());
+        DateTime end = DateUtils.parseDateTime(request.getEndDate());
+        int count = 0;
+        for (DateTime date = start.toDateTime(); !date.isAfter(end); date = date.plusDays(1)) {
+            if (request.getDayOfWeek().isEmpty() || request.getDayOfWeek().contains(date.getDayOfWeek())) {
+                SkuTicketPrice price = new SkuTicketPrice();
+                price.setSkuId(skuId);
+                price.setSkuTicketId(ticketId);
+                price.setDate(date.toDate());
+                price.setTime(request.getTime());
+                count += skuTicketPriceMapper.deleteTicketPrice(price);
+            }
+        }
+        return count;
     }
 
     private int getDiscount(Token token) {

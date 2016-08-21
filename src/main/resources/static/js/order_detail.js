@@ -285,21 +285,26 @@ $('#j_update').on('click', function () {
     })
 });
 
-$('#j_email').on('click', function () {
+$('.j_operation').on('click', function () {
     var path = window.location.pathname.split('/');
     var id = parseInt(path[path.length - 1]);
+    var action = parseInt($(this).attr("operation"));
+    var result = confirm("确认操作订单吗?");
+    if (!result) {
+        return;
+    }
     $.ajax({
         type: 'PUT',
         contentType: "application/json; charset=utf-8",
-        url: '/v1/api/orders/' + id + "/email"
+        url: '/v1/api/orders/' + id + "/status/" + action,
     }).success(function (data) {
         if(data == true) {
-            alert("发送成功");
+            alert("操作成功");
             window.location.reload();
         } else {
-            error("发送失败");
+            error("操作失败");
         }
     }).error(function () {
-        error("发送失败");
+        error("操作失败");
     })
 })

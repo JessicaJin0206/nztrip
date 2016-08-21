@@ -44,6 +44,7 @@ import com.fitibo.aotearoa.service.CityService;
 import com.fitibo.aotearoa.service.DurationService;
 import com.fitibo.aotearoa.service.VendorService;
 import com.fitibo.aotearoa.util.ObjectParser;
+import com.fitibo.aotearoa.util.OrderOperationUtils;
 import com.fitibo.aotearoa.vo.AgentVo;
 import com.fitibo.aotearoa.vo.SkuVo;
 
@@ -186,12 +187,12 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("module", MODULE_ORDER_DETAIL);
         model.put("statusList", OrderStatus.values());
         model.put("editing", false);
-        model.put("sendEmail", order.getStatus() == OrderStatus.NEW.getValue());
+        model.put("operations", OrderOperationUtils.getFollowOperations(order.getStatus()));
         return "order_detail";
     }
 
     @RequestMapping("orders/{id}/_edit")
-    @Authentication
+    @Authentication(Role.Admin)
     public String editOrder(@PathVariable("id") int id, Map<String, Object> model) {
         Order order = orderMapper.findById(id);
         if (order == null) {
