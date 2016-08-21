@@ -40,7 +40,7 @@ spring:
 email:
     host: smtp.126.com
     port: 25
-    username: zi___yue@126.com(your email)
+    username: zi___yue@126.com
     password: ****
     javaMailProperties:
       mail.smtp.auth: true
@@ -48,7 +48,7 @@ email:
 ---
 template:
     reservationemail:
-      from: zi___yue@126.com(your email)
+      from: zi___yue@126.com
       subject: Make Reservation
       content: |
         <html><body><div>

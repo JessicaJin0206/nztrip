@@ -272,7 +272,7 @@ public class RestApiController extends AuthenticationRequiredController {
 
     @RequestMapping(value = "/v1/api/orders/{id}", method = RequestMethod.PUT)
     @Transactional(rollbackFor = Exception.class)
-    @Authentication
+    @Authentication(Role.Admin)
     public OrderVo updateOrder(@RequestBody OrderVo order) {
         Preconditions.checkNotNull(getToken());
         Order o = parse4Update(order);
@@ -318,7 +318,7 @@ public class RestApiController extends AuthenticationRequiredController {
 
     @RequestMapping(value = "/v1/api/orders/{id}/status/{action}", method = RequestMethod.PUT)
     @Authentication(Role.Admin)
-    public boolean sendEmail(@PathVariable("id") int id, @PathVariable("action") int action) {
+    public boolean updateOrderStatus(@PathVariable("id") int id, @PathVariable("action") int action) {
         Order order = orderMapper.findById(id);
         if (order == null) {
             throw new ResourceNotFoundException();

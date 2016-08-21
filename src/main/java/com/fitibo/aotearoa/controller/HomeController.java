@@ -192,7 +192,7 @@ public class HomeController extends AuthenticationRequiredController {
     }
 
     @RequestMapping("orders/{id}/_edit")
-    @Authentication
+    @Authentication(Role.Admin)
     public String editOrder(@PathVariable("id") int id, Map<String, Object> model) {
         Order order = orderMapper.findById(id);
         if (order == null) {
