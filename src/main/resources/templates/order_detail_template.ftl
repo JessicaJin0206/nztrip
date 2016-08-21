@@ -120,6 +120,7 @@
     <div class="form-group"><label>日期:</label><span id="j_ticket_date_span">${ticket.ticketDate!''}</span></div>
     <div class="form-group"><label>时间:</label><span id="j_ticket_time_span">${ticket.ticketTime!''}</span></div>
     <div class="form-group"><label>价格:</label><span id="j_ticket_price_span">${ticket.price}</span></div>
+    <div class="form-group"><label>集合地点:</label><span id="j_gathering_place_span">${ticket.gatheringPlace!''}</span></div>
     <table class="table">
         <thead>
         <tr>

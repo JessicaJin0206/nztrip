@@ -144,6 +144,14 @@ public class OrderTicket {
         this.price = price;
     }
 
+    public String getGatheringPlace() {
+        return gatheringPlace;
+    }
+
+    public void setGatheringPlace(String gatheringPlace) {
+        this.gatheringPlace = gatheringPlace;
+    }
+
     private int id;
     private int skuId;
     private int orderId;
@@ -161,4 +169,5 @@ public class OrderTicket {
     private int price;
     private String priceDescription;
     private List<OrderTicketUser> users;
+    private String gatheringPlace;
 }

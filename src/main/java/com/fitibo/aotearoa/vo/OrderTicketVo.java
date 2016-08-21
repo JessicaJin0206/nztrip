@@ -119,6 +119,14 @@ public class OrderTicketVo {
         this.price = price;
     }
 
+    public String getGatheringPlace() {
+        return gatheringPlace;
+    }
+
+    public void setGatheringPlace(String gatheringPlace) {
+        this.gatheringPlace = gatheringPlace;
+    }
+
     private int id;
     private int orderId;
     //sku_ticket
@@ -136,5 +144,7 @@ public class OrderTicketVo {
     private String priceDescription;
     //order_ticket_user
     private List<OrderTicketUserVo> orderTicketUsers;
+
+    private String gatheringPlace;
 
 }
