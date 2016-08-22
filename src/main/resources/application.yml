@@ -38,17 +38,17 @@ spring:
 
 ---
 email:
-    host: smtp.126.com
+    host: smtp.qq.com
     port: 25
-    username: zi___yue@126.com
-    password: 112233
+    username: eyounz@foxmail.com
+    password: eemdpbnrqjmxbgia
     javaMailProperties:
       mail.smtp.auth: true
 
 ---
 template:
     reservationemail:
-      from: zi___yue@126.com
+      from: eyounz@foxmail.com
       subject: Make Reservation
       content: |
         <html><body><div>
