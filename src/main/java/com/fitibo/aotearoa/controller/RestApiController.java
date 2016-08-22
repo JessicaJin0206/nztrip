@@ -32,14 +32,12 @@ import com.fitibo.aotearoa.model.Sku;
 import com.fitibo.aotearoa.model.SkuTicket;
 import com.fitibo.aotearoa.model.SkuTicketPrice;
 import com.fitibo.aotearoa.model.Vendor;
-import com.fitibo.aotearoa.service.EmailService;
 import com.fitibo.aotearoa.service.OperationService;
 import com.fitibo.aotearoa.service.TokenService;
 import com.fitibo.aotearoa.service.VendorService;
 import com.fitibo.aotearoa.util.DateUtils;
 import com.fitibo.aotearoa.util.GuidGenerator;
 import com.fitibo.aotearoa.util.Md5Utils;
-import com.fitibo.aotearoa.util.ObjectParser;
 import com.fitibo.aotearoa.util.OrderOperationUtils;
 import com.fitibo.aotearoa.vo.AddPriceRequest;
 import com.fitibo.aotearoa.vo.AgentVo;
@@ -55,6 +53,8 @@ import com.fitibo.aotearoa.vo.VendorVo;
 
 import org.apache.ibatis.session.RowBounds;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -78,6 +78,8 @@ import java.util.Map;
  */
 @RestController
 public class RestApiController extends AuthenticationRequiredController {
+
+    private final static Logger logger = LoggerFactory.getLogger(RestApiController.class);
 
     @Autowired
     private SkuMapper skuMapper;
@@ -239,10 +241,17 @@ public class RestApiController extends AuthenticationRequiredController {
         for (SkuTicketPrice skuTicketPrice : prices) {
             priceMap.put(skuTicketPrice.getId(), skuTicketPrice);
         }
-        SkuTicket skuTicket = skuTicketMapper.findById(orderVo.getSkuId());
-        Preconditions.checkNotNull(skuTicket, "invalid sku id:" + orderVo.getSkuId());
+        List<Integer> skuTicketIds = Lists.transform(orderVo.getOrderTickets(), (input) -> input.getSkuTicketId());
+        logger.info("sku ticket ids from order:" + skuTicketIds);
+        List<SkuTicket> skuTickets = skuTicketMapper.findByIds(skuTicketIds);
+        HashMap<Integer, SkuTicket> skuTicketMap = Maps.newHashMap();
+        for (SkuTicket skuTicket : skuTickets) {
+            skuTicketMap.put(skuTicket.getId(), skuTicket);
+        }
+        Preconditions.checkArgument(!skuTickets.isEmpty());
         for (OrderTicketVo orderTicketVo : orderVo.getOrderTickets()) {
             //need to verify params?
+            SkuTicket skuTicket = skuTicketMap.get(orderTicketVo.getSkuTicketId());
             OrderTicket orderTicket = parse(orderTicketVo, orderVo);
             SkuTicketPrice skuTicketPrice = priceMap.get(orderTicket.getTicketPriceId());
             Preconditions.checkNotNull(skuTicketPrice, "invalid sku ticket price id:" + orderTicket.getTicketPriceId());

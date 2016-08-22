@@ -77,7 +77,11 @@ public interface SkuTicketMapper {
     })
     SkuTicket findById(int ticketId);
 
-    @Select("select * from sku_ticket where id = #{id}")
+    @Select({"<script>",
+            "select * from sku_ticket where id in ",
+            "<foreach collection='ids' item='id' index='index' open='(' separator=',' close=')'>#{id}",
+            "</foreach>",
+            "</script>"})
     @Results({
             @Result(column = "id", property = "id"),
             @Result(column = "name", property = "name"),
@@ -88,5 +92,5 @@ public interface SkuTicketMapper {
             @Result(column = "description", property = "description"),
             @Result(column = "status", property = "status")
     })
-    List<SkuTicket> findByIds(List<Integer> ticketId);
+    List<SkuTicket> findByIds(@Param("ids") List<Integer> ticketId);
 }
