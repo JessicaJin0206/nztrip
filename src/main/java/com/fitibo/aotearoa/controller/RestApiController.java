@@ -53,6 +53,7 @@ import com.fitibo.aotearoa.vo.SkuTicketVo;
 import com.fitibo.aotearoa.vo.SkuVo;
 import com.fitibo.aotearoa.vo.VendorVo;
 
+import org.apache.ibatis.session.RowBounds;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -411,7 +412,7 @@ public class RestApiController extends AuthenticationRequiredController {
     @Authentication
     public List<SkuTicketPriceVo> getPrice(@PathVariable("ticketId") int ticketId,
                                            @RequestParam("date") String date) {
-        List<SkuTicketPrice> ticketPrices = skuTicketPriceMapper.findBySkuTicketIdAndDate(ticketId, DateUtils.parseDate(date));
+        List<SkuTicketPrice> ticketPrices = skuTicketPriceMapper.findBySkuTicketIdAndDate(ticketId, DateUtils.parseDate(date), new RowBounds());
         int discount = getDiscount(getToken());
         return Lists.transform(ticketPrices, (input) -> {
             SkuTicketPriceVo result = new SkuTicketPriceVo();

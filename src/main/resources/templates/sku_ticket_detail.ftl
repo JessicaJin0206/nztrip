@@ -104,6 +104,13 @@
                 <button id="j_delete" class="btn btn-primary">删除</button>
             </div>
 
+            <div class="input-group date col-md-3 col-sm-3 col-xs-3 form-group" id="j_selected_date">
+                <input type="text" placeholder="选择日期" class="form-control" value="${date!''}"/>
+                <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"/>
+                </span>
+            </div>
+
             <div class="form-group">
                 <table class="table">
                     <thead>
@@ -132,10 +139,10 @@
                 <nav aria-label="...">
                     <ul class="pager">
                         <li class="<#if (pageNumber <= 0)>disabled</#if>">
-                            <a href="/skus/${skuId}/tickets/${ticketId}?<#if (pageNumber > 0)>pagenumber=${pageNumber-1}&pagesize=${pageSize}</#if>">上一页</a>
+                            <a href="/skus/${skuId}/tickets/${ticketId}?<#if (date??)>date=${date}&</#if><#if (pageNumber > 0)>pagenumber=${pageNumber-1}&pagesize=${pageSize}</#if>">上一页</a>
                         </li>
                         <li>
-                            <a href="/skus/${skuId}/tickets/${ticketId}?pagenumber=${pageNumber+1}&pagesize=${pageSize}">下一页</a>
+                            <a href="/skus/${skuId}/tickets/${ticketId}?<#if (date??)>date=${date}&</#if>pagenumber=${pageNumber+1}&pagesize=${pageSize}">下一页</a>
                         </li>
                     </ul>
                 </nav>

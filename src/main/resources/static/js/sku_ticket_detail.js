@@ -1,11 +1,20 @@
 var startDateSelector = $('#j_start_date');
 var endDateSelector = $('#j_end_date');
+var dateSelector = $('#j_selected_date');
 startDateSelector.datetimepicker({
     format: "YYYY-MM-DD"
 });
 
 endDateSelector.datetimepicker({
     format: "YYYY-MM-DD"
+});
+
+dateSelector.datetimepicker({
+    format: "YYYY-MM-DD"
+});
+
+dateSelector.on("dp.change", function(e){
+    window.location.href = window.location.pathname + "?date=" + e.date.format("YYYY-MM-DD");
 });
 
 $('#j_submit').on('click', function(){

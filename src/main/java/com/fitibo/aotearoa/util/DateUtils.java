@@ -20,7 +20,7 @@ public final class DateUtils {
 
     private static ThreadLocal<SimpleDateFormat> DATE_FORMAT = new ThreadLocal<>();
 
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormat.forPattern(DateFormatConstants.DATE_FORMAT);
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormat.forPattern(DateFormatConstants.DATE_FORMAT);
 
     private static SimpleDateFormat getDateFormat() {
         if (DATE_FORMAT.get() == null) {
@@ -37,12 +37,12 @@ public final class DateUtils {
         try {
             return getDateFormat().parse(dateString);
         } catch (ParseException e) {
-            throw new InvalidDateFormatException();
+            throw new InvalidDateFormatException("invalid date string:" + dateString);
         }
     }
 
     public static final DateTime parseDateTime(String dateString) {
-        return DateTime.parse(dateString, DATE_TIME_FORMATTER);
+        return DateTime.parse(dateString, DATE_FORMATTER);
     }
 
 }

@@ -96,7 +96,7 @@ public interface SkuTicketPriceMapper {
             @Result(column = "sale_price", property = "salePrice"),
             @Result(column = "description", property = "description"),
     })
-    List<SkuTicketPrice> findBySkuTicketIdAndDate(@Param("skuTicketId") int skuTicketId, @Param("date") Date date);
+    List<SkuTicketPrice> findBySkuTicketIdAndDate(@Param("skuTicketId") int skuTicketId, @Param("date") Date date, RowBounds rowBounds);
 
     @Select("select * from sku_ticket_price where sku_ticket_id = #{skuTicketId} and date > date_add(now(), interval 1 day) order by date desc")
     @Results({

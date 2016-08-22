@@ -21,6 +21,7 @@ import com.google.common.collect.Lists;
 
 import com.fitibo.aotearoa.annotation.Authentication;
 import com.fitibo.aotearoa.constants.CommonConstants;
+import com.fitibo.aotearoa.constants.DateFormatConstants;
 import com.fitibo.aotearoa.constants.OrderStatus;
 import com.fitibo.aotearoa.dto.Role;
 import com.fitibo.aotearoa.exception.ResourceNotFoundException;
@@ -43,11 +44,13 @@ import com.fitibo.aotearoa.service.CategoryService;
 import com.fitibo.aotearoa.service.CityService;
 import com.fitibo.aotearoa.service.DurationService;
 import com.fitibo.aotearoa.service.VendorService;
+import com.fitibo.aotearoa.util.DateUtils;
 import com.fitibo.aotearoa.util.ObjectParser;
 import com.fitibo.aotearoa.util.OrderOperationUtils;
 import com.fitibo.aotearoa.vo.AgentVo;
 import com.fitibo.aotearoa.vo.SkuVo;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -56,6 +59,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -256,6 +260,7 @@ public class HomeController extends AuthenticationRequiredController {
     @Authentication(Role.Admin)
     public String skuTicketDetail(@PathVariable("skuId") int skuId,
                                   @PathVariable("ticketId") int ticketId,
+                                  @RequestParam(value = "date", required = false) String dateString,
                                   @RequestParam(value = "pagesize", defaultValue = "10") int pageSize,
                                   @RequestParam(value = "pagenumber", defaultValue = "0") int pageNumber,
                                   Map<String, Object> model) {
@@ -265,7 +270,14 @@ public class HomeController extends AuthenticationRequiredController {
         }
         Sku sku = skuMapper.findById(skuId);
         Preconditions.checkArgument(sku != null && skuId == ticket.getSkuId(), "invalid skuId:" + skuId);
-        List<SkuTicketPrice> skuTicketPrices = skuTicketPriceMapper.findBySkuTicketId(ticket.getId(), new RowBounds(pageNumber * pageSize, pageSize));
+        List<SkuTicketPrice> skuTicketPrices;
+        if (dateString != null) {
+            model.put("date", dateString);
+            Date date = DateUtils.parseDate(dateString);
+            skuTicketPrices = skuTicketPriceMapper.findBySkuTicketIdAndDate(ticket.getId(), date, new RowBounds(pageNumber * pageSize, pageSize));
+        } else {
+            skuTicketPrices = skuTicketPriceMapper.findBySkuTicketId(ticket.getId(), new RowBounds(pageNumber * pageSize, pageSize));
+        }
         model.put("sku", sku);
         model.put("ticket", ticket);
         model.put("ticketPrices", Lists.transform(skuTicketPrices, ObjectParser::parse));
