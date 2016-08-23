@@ -27,23 +27,28 @@ spring:
 spring:
   profiles: test
   datasource:
-    test-on-borrow: true
-    validation-query: SELECT 1
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://aotearoa.cktnjjqgvdei.ap-northeast-1.rds.amazonaws.com:3306/aotearoa?useUnicode=true&characterEncoding=UTF-8
     username: aotearoa
     password: Fitibo~1
     type: com.zaxxer.hikari.HikariDataSource
     initialize: false
+    hikari:
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+      maximum-pool-size: 10
+      connection-test-query: SELECT 1
 
 ---
 email:
-    host: smtp.qq.com
-    port: 25
-    username: eyounz@foxmail.com
-    password: eemdpbnrqjmxbgia
-    javaMailProperties:
-      mail.smtp.auth: true
+  host: smtp.qq.com
+  port: 25
+  username: eyounz@foxmail.com
+  password: eemdpbnrqjmxbgia
+  javaMailProperties:
+    mail.smtp.auth: true
 
 ---
 template:

@@ -234,7 +234,7 @@ public class RestApiController extends AuthenticationRequiredController {
         orderMapper.create(order);
         orderVo.setId(order.getId());
         if (CollectionUtils.isEmpty(orderVo.getOrderTickets())) {
-            throw new InvalidParamException();
+            throw new InvalidParamException("order tickets cannot be empty");
         }
         Map<Integer, SkuTicketPrice> priceMap = getSkuTicketPriceMap(Lists.transform(orderVo.getOrderTickets(), (orderTicket) -> orderTicket.getTicketPriceId()));
         Map<Integer, SkuTicket> skuTicketMap = getSkuTicketMap(Lists.transform(orderVo.getOrderTickets(), (input) -> input.getSkuTicketId()));
