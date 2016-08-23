@@ -236,22 +236,11 @@ public class RestApiController extends AuthenticationRequiredController {
         if (CollectionUtils.isEmpty(orderVo.getOrderTickets())) {
             throw new InvalidParamException();
         }
-        List<SkuTicketPrice> prices = skuTicketPriceMapper.findByIds(Lists.transform(orderVo.getOrderTickets(), (orderTicket) -> orderTicket.getTicketPriceId()));
-        Map<Integer, SkuTicketPrice> priceMap = Maps.newHashMap();
-        for (SkuTicketPrice skuTicketPrice : prices) {
-            priceMap.put(skuTicketPrice.getId(), skuTicketPrice);
-        }
-        List<Integer> skuTicketIds = Lists.transform(orderVo.getOrderTickets(), (input) -> input.getSkuTicketId());
-        logger.info("sku ticket ids from order:" + skuTicketIds);
-        List<SkuTicket> skuTickets = skuTicketMapper.findByIds(skuTicketIds);
-        HashMap<Integer, SkuTicket> skuTicketMap = Maps.newHashMap();
-        for (SkuTicket skuTicket : skuTickets) {
-            skuTicketMap.put(skuTicket.getId(), skuTicket);
-        }
-        Preconditions.checkArgument(!skuTickets.isEmpty());
+        Map<Integer, SkuTicketPrice> priceMap = getSkuTicketPriceMap(Lists.transform(orderVo.getOrderTickets(), (orderTicket) -> orderTicket.getTicketPriceId()));
+        Map<Integer, SkuTicket> skuTicketMap = getSkuTicketMap(Lists.transform(orderVo.getOrderTickets(), (input) -> input.getSkuTicketId()));
         for (OrderTicketVo orderTicketVo : orderVo.getOrderTickets()) {
-            //need to verify params?
             SkuTicket skuTicket = skuTicketMap.get(orderTicketVo.getSkuTicketId());
+            Preconditions.checkNotNull(skuTicket, "invalid sku ticket id:" + orderTicketVo.getSkuTicketId());
             OrderTicket orderTicket = parse(orderTicketVo, orderVo);
             SkuTicketPrice skuTicketPrice = priceMap.get(orderTicket.getTicketPriceId());
             Preconditions.checkNotNull(skuTicketPrice, "invalid sku ticket price id:" + orderTicket.getTicketPriceId());
@@ -486,6 +475,25 @@ public class RestApiController extends AuthenticationRequiredController {
             }
         }
         return count;
+    }
+
+    private Map<Integer, SkuTicketPrice> getSkuTicketPriceMap(List<Integer> ids) {
+        List<SkuTicketPrice> prices = skuTicketPriceMapper.findByIds(ids);
+        Map<Integer, SkuTicketPrice> priceMap = Maps.newHashMap();
+        for (SkuTicketPrice skuTicketPrice : prices) {
+            priceMap.put(skuTicketPrice.getId(), skuTicketPrice);
+        }
+        return priceMap;
+    }
+
+    private Map<Integer, SkuTicket> getSkuTicketMap(List<Integer> ids) {
+        logger.info("sku ticket ids from order:" + ids);
+        List<SkuTicket> skuTickets = skuTicketMapper.findByIds(ids);
+        HashMap<Integer, SkuTicket> skuTicketMap = Maps.newHashMap();
+        for (SkuTicket skuTicket : skuTickets) {
+            skuTicketMap.put(skuTicket.getId(), skuTicket);
+        }
+        return skuTicketMap;
     }
 
     private int getDiscount(Token token) {
