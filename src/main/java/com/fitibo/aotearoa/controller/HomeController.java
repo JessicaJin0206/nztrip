@@ -21,7 +21,6 @@ import com.google.common.collect.Lists;
 
 import com.fitibo.aotearoa.annotation.Authentication;
 import com.fitibo.aotearoa.constants.CommonConstants;
-import com.fitibo.aotearoa.constants.DateFormatConstants;
 import com.fitibo.aotearoa.constants.OrderStatus;
 import com.fitibo.aotearoa.dto.Role;
 import com.fitibo.aotearoa.exception.ResourceNotFoundException;
@@ -43,14 +42,13 @@ import com.fitibo.aotearoa.model.Vendor;
 import com.fitibo.aotearoa.service.CategoryService;
 import com.fitibo.aotearoa.service.CityService;
 import com.fitibo.aotearoa.service.DurationService;
+import com.fitibo.aotearoa.service.OrderService;
 import com.fitibo.aotearoa.service.VendorService;
 import com.fitibo.aotearoa.util.DateUtils;
 import com.fitibo.aotearoa.util.ObjectParser;
-import com.fitibo.aotearoa.util.OrderOperationUtils;
 import com.fitibo.aotearoa.vo.AgentVo;
 import com.fitibo.aotearoa.vo.SkuVo;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -92,6 +90,9 @@ public class HomeController extends AuthenticationRequiredController {
 
     @Autowired
     private DurationService durationService;
+
+    @Autowired
+    private OrderService orderService;
 
     @Autowired
     private SkuMapper skuMapper;
@@ -191,7 +192,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("module", MODULE_ORDER_DETAIL);
         model.put("statusList", OrderStatus.values());
         model.put("editing", false);
-        model.put("operations", OrderOperationUtils.getFollowOperations(order.getStatus()));
+        model.put("transitions", orderService.getAvailableTransitions(order.getStatus()));
         return "order_detail";
     }
 

@@ -24,6 +24,8 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.mail.MessagingException;
+
 @Service("operationService")
 public class OperationService {
 
@@ -74,7 +76,7 @@ public class OperationService {
         String content = reservationEmailContent(contentTp, vendor, order, ticketList);
         try {
             emailService.sendEmail(from, subject, content, vendor.getEmail());
-        } catch (Exception e) {
+        } catch (MessagingException e) {
             logger.error("Send Email Exception, orderId=" + order.getId() + ", from=" +
                 from + ", content=" + content + ", to=" + vendor.getEmail(), e);
             FailedEmail failedEmail = new FailedEmail();
@@ -84,6 +86,7 @@ public class OperationService {
             failedEmail.setSubject(subject);
             failedEmail.setContent(content);
             failedEmailMapper.create(failedEmail);
+            throw new RuntimeException(e);
         }
     }
 

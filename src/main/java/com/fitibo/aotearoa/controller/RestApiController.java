@@ -12,6 +12,7 @@ import com.fitibo.aotearoa.constants.OrderStatus;
 import com.fitibo.aotearoa.constants.SkuTicketStatus;
 import com.fitibo.aotearoa.dto.Role;
 import com.fitibo.aotearoa.dto.Token;
+import com.fitibo.aotearoa.dto.Transition;
 import com.fitibo.aotearoa.exception.AuthenticationFailureException;
 import com.fitibo.aotearoa.exception.InvalidParamException;
 import com.fitibo.aotearoa.exception.ResourceNotFoundException;
@@ -33,12 +34,12 @@ import com.fitibo.aotearoa.model.SkuTicket;
 import com.fitibo.aotearoa.model.SkuTicketPrice;
 import com.fitibo.aotearoa.model.Vendor;
 import com.fitibo.aotearoa.service.OperationService;
+import com.fitibo.aotearoa.service.OrderService;
 import com.fitibo.aotearoa.service.TokenService;
 import com.fitibo.aotearoa.service.VendorService;
 import com.fitibo.aotearoa.util.DateUtils;
 import com.fitibo.aotearoa.util.GuidGenerator;
 import com.fitibo.aotearoa.util.Md5Utils;
-import com.fitibo.aotearoa.util.OrderOperationUtils;
 import com.fitibo.aotearoa.vo.AddPriceRequest;
 import com.fitibo.aotearoa.vo.AgentVo;
 import com.fitibo.aotearoa.vo.AuthenticationReq;
@@ -113,6 +114,9 @@ public class RestApiController extends AuthenticationRequiredController {
 
     @Autowired
     private OperationService operationService;
+
+    @Autowired
+    private OrderService orderService;
 
     @ExceptionHandler
     public ResponseEntity handleException(AuthenticationFailureException ex) {
@@ -315,30 +319,28 @@ public class RestApiController extends AuthenticationRequiredController {
         return order;
     }
 
-    @RequestMapping(value = "/v1/api/orders/{id}/status/{action}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/v1/api/orders/{id}/status/{toStatus}", method = RequestMethod.PUT)
     @Authentication(Role.Admin)
-    public boolean updateOrderStatus(@PathVariable("id") int id, @PathVariable("action") int action) {
+    @Transactional
+    public boolean updateOrderStatus(@PathVariable("id") int id, @PathVariable("toStatus") int toStatus) {
         Order order = orderMapper.findById(id);
         if (order == null) {
             throw new ResourceNotFoundException();
         }
-        int oldStatus = order.getStatus();
-        List<OrderOperationUtils.Operation> operations = OrderOperationUtils.getFollowOperations(oldStatus);
-        if (operations.isEmpty()) {
-            throw new InvalidParamException();
-        }
+        int fromStatus = order.getStatus();
+        List<Transition> transitions = orderService.getAvailableTransitions(fromStatus);
         boolean statusValid = false;
-        for (OrderOperationUtils.Operation operation : operations) {
-            if (operation.getAction() == action) {
+        for (Transition transition : transitions) {
+            if (transition.getTo() == toStatus) {
                 statusValid = true;
                 break;
             }
         }
         if (!statusValid) {
-            throw new InvalidParamException();
+            throw new InvalidParamException("invalid transition from " + fromStatus + " to " + toStatus);
         }
 
-        int row = orderMapper.updateOrderStatus(id, oldStatus, action);
+        int row = orderMapper.updateOrderStatus(id, fromStatus, toStatus);
         if (row != 1) {
             return false;
         }
