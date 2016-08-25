@@ -19,4 +19,11 @@ public interface CityMapper {
             @Result(column = "name", property = "name")
     })
     List<City> findAll();
+
+    @Select("select * from city where id=#{id}")
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "name", property = "name")
+    })
+    City findById(int cityId);
 }

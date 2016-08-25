@@ -143,7 +143,10 @@ public class HomeController extends AuthenticationRequiredController {
         if (sku == null) {
             throw new ResourceNotFoundException();
         }
-        model.put("sku", parse(sku, cityService.findAll(), categoryService.findAll(), vendorService.findAll(), durationService.findAll()));
+        model.put("sku", parse(sku, cityService.findById(sku.getCityId()),
+                categoryService.findById(sku.getCategoryId()),
+                vendorService.findById(sku.getVendorId()),
+                durationService.findById(sku.getDurationId())));
         model.put("vendor", vendorService.findAll().get(sku.getVendorId()));
         model.put("module", MODULE_CREATE_ORDER);
         return "create_order";
@@ -209,7 +212,7 @@ public class HomeController extends AuthenticationRequiredController {
         if (sku == null) {
             throw new ResourceNotFoundException();
         }
-        model.put("sku", parse(sku, cityService.findAll(), categoryService.findAll(), vendorService.findAll(), durationService.findAll()));
+        model.put("sku", parse(sku));
         model.put("module", MODULE_ORDER_DETAIL);
         model.put("statusList", OrderStatus.values());
         model.put("editing", true);
@@ -220,10 +223,10 @@ public class HomeController extends AuthenticationRequiredController {
     @Authentication(Role.Admin)
     public String createSku(Map<String, Object> model) {
         model.put("module", MODULE_CREATE_SKU);
-        model.put("cities", Lists.newArrayList(cityService.findAll().values()));
-        model.put("categories", Lists.newArrayList(categoryService.findAll().values()));
-        model.put("vendors", Lists.newArrayList(vendorService.findAll().values()));
-        model.put("durations", Lists.newArrayList(durationService.findAll().values()));
+        model.put("cities", cityService.findAll());
+        model.put("categories", categoryService.findAll());
+        model.put("vendors", vendorService.findAll());
+        model.put("durations", durationService.findAll());
         return "create_sku";
     }
 
@@ -235,7 +238,7 @@ public class HomeController extends AuthenticationRequiredController {
         if (sku == null) {
             throw new ResourceNotFoundException();
         }
-        model.put("sku", parse(sku, cityService.findAll(), categoryService.findAll(), vendorService.findAll(), durationService.findAll()));
+        model.put("sku", parse(sku));
         model.put("editing", false);
         return "sku_detail";
     }
@@ -248,11 +251,11 @@ public class HomeController extends AuthenticationRequiredController {
             throw new ResourceNotFoundException();
         }
         model.put("module", MODULE_SKU_DETAIL);
-        model.put("sku", parse(sku, cityService.findAll(), categoryService.findAll(), vendorService.findAll(), durationService.findAll()));
-        model.put("cities", Lists.newArrayList(cityService.findAll().values()));
-        model.put("categories", Lists.newArrayList(categoryService.findAll().values()));
-        model.put("vendors", Lists.newArrayList(vendorService.findAll().values()));
-        model.put("durations", Lists.newArrayList(durationService.findAll().values()));
+        model.put("sku", parse(sku));
+        model.put("cities", cityService.findAll());
+        model.put("categories", categoryService.findAll());
+        model.put("vendors", vendorService.findAll());
+        model.put("durations", durationService.findAll());
         model.put("editing", true);
         return "sku_detail";
     }
@@ -299,19 +302,15 @@ public class HomeController extends AuthenticationRequiredController {
                            @RequestParam(value = "pagesize", defaultValue = "10") int pageSize,
                            @RequestParam(value = "pagenumber", defaultValue = "0") int pageNumber,
                            Map<String, Object> model) {
-        Map<Integer, City> cityMap = cityService.findAll();
-        Map<Integer, Category> categoryMap = categoryService.findAll();
-        Map<Integer, Vendor> vendorMap = vendorService.findAll();
-        Map<Integer, Duration> durationMap = durationService.findAll();
         RowBounds rowBounds = new RowBounds(pageNumber * pageSize, pageSize);
         model.put("module", MODULE_QUERY_SKU);
         model.put("cityId", cityId);
         model.put("categoryId", categoryId);
         model.put("keyword", keyword);
-        model.put("cities", Lists.newArrayList(cityMap.values()));
-        model.put("categories", Lists.newArrayList(categoryMap.values()));
-        model.put("durations", Lists.newArrayList(durationMap.values()));
-        model.put("skus", Lists.transform(searchSku(keyword, cityId, categoryId, rowBounds), (input) -> parse(input, cityMap, categoryMap, vendorMap, durationMap)));
+        model.put("cities", cityService.findAll());
+        model.put("categories", categoryService.findAll());
+        model.put("durations", durationService.findAll());
+        model.put("skus", Lists.transform(searchSku(keyword, cityId, categoryId, rowBounds), this::parse));
         model.put("pageSize", pageSize);
         model.put("pageNumber", pageNumber);
         return "skus";
@@ -327,9 +326,8 @@ public class HomeController extends AuthenticationRequiredController {
     @RequestMapping("vendors")
     @Authentication(Role.Admin)
     public String queryVendor(Map<String, Object> model) {
-        Map<Integer, Vendor> vendorMap = vendorService.findAll();
         model.put("module", MODULE_QUERY_VENDOR);
-        model.put("vendors", vendorMap.values());
+        model.put("vendors", vendorService.findAll());
         return "vendors";
     }
 
@@ -418,25 +416,32 @@ public class HomeController extends AuthenticationRequiredController {
         return skuMapper.findAllByMultiFields(keyword, cityId, categoryId, rowBounds);
     }
 
-    private static SkuVo parse(Sku sku, Map<Integer, City> cityMap,
-                               Map<Integer, Category> categoryMap,
-                               Map<Integer, Vendor> vendorMap,
-                               Map<Integer, Duration> durationMap) {
+    private SkuVo parse(Sku sku) {
+        return parse(sku,
+                cityService.findById(sku.getCityId()),
+                categoryService.findById(sku.getCategoryId()),
+                vendorService.findById(sku.getVendorId()),
+                durationService.findById(sku.getDurationId()));
+    }
+
+    private static SkuVo parse(Sku sku, City city,
+                               Category category,
+                               Vendor vendor,
+                               Duration duration) {
         SkuVo result = new SkuVo();
         result.setId(sku.getId());
         result.setName(sku.getName());
         result.setUuid(sku.getUuid());
         result.setVendorId(sku.getVendorId());
-        result.setVendor(vendorMap.get(sku.getVendorId()).getName());
+        result.setVendor(vendor.getName());
         result.setDescription(sku.getDescription());
         result.setCategoryId(sku.getCategoryId());
-        result.setCategory(categoryMap.get(sku.getCategoryId()).getName());
+        result.setCategory(category.getName());
         result.setCityId(sku.getCityId());
-        result.setCity(cityMap.get(sku.getCityId()).getName());
+        result.setCity(city.getName());
         result.setGatheringPlace(Lists.newArrayList(sku.getGatheringPlace().split(CommonConstants.SEPARATOR)));
         result.setPickupService(sku.hasPickupService());
         result.setDurationId(sku.getDurationId());
-        Duration duration = durationMap.get(sku.getDurationId());
         result.setDuration(duration != null?duration.getName():"");
         result.setTickets(Lists.transform(sku.getTickets(), ObjectParser::parse));
         return result;

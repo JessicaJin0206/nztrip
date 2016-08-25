@@ -19,4 +19,11 @@ public interface DurationMapper {
             @Result(column = "name", property = "name")
     })
     List<Duration> findAll();
+
+    @Select("select * from duration where id = #{id}")
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "name", property = "name")
+    })
+    Duration findById(int durationId);
 }

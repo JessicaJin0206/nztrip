@@ -20,4 +20,12 @@ public interface CategoryMapper {
             @Result(column = "parent_category_id", property = "parentCategoryId")
     })
     List<Category> findAll();
+
+    @Select("select * from category where id = #{id}")
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "name", property = "name"),
+            @Result(column = "parent_category_id", property = "parentCategoryId")
+    })
+    Category findById(int id);
 }
