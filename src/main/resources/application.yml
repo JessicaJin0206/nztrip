@@ -2,6 +2,10 @@ aes:
   iv: unforethoughtful
   key: perineorrhaphies
 
+flyway:
+  sql-migration-prefix: V
+  sql-migration-suffix: sql
+
 ---
 spring:
   profiles: dev
@@ -18,10 +22,6 @@ spring:
     restart:
       exclude: static/**, templates/**
 debug: true
-flyway:
-  sql-migration-prefix: V
-  sql-migration-suffix: sql
-
 
 ---
 spring:
