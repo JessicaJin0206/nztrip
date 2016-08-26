@@ -6,6 +6,7 @@ import org.joda.time.DateTime;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -38,8 +39,8 @@ public class SkuTicketPriceMapperTest extends BaseTest {
         price1.setSkuTicketId(1023);
         price1.setDate(DateTime.now().minusDays(1).toDate());
         price1.setTime("上午");
-        price1.setCostPrice(100);
-        price1.setSalePrice(200);
+        price1.setCostPrice(BigDecimal.valueOf(100));
+        price1.setSalePrice(BigDecimal.valueOf(200));
         price1.setDescription("hello");
 
         SkuTicketPrice price2 = new SkuTicketPrice();
@@ -48,8 +49,8 @@ public class SkuTicketPriceMapperTest extends BaseTest {
         price2.setDate(DateTime.now().toDate());
         price2.setTime("晚上5点");
         price2.setDescription("hello 2");
-        price2.setSalePrice(2000);
-        price2.setCostPrice(500);
+        price2.setSalePrice(BigDecimal.valueOf(2000));
+        price2.setCostPrice(BigDecimal.valueOf(500));
 
         assertEquals(skuTicketPriceMapper.batchCreate(Arrays.asList(price1, price2)), 2);
         assertEquals(skuTicketPriceMapper.findBySkuIdAndStartTime(0, new Date(), new Date()).size(), 0);

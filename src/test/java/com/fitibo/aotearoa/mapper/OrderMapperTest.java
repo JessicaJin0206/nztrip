@@ -10,6 +10,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.math.BigDecimal;
+
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -26,7 +28,7 @@ public class OrderMapperTest extends BaseTest {
         Order order1 = new Order();
         order1.setSkuId(100);
         order1.setAgentId(AGENT_ID);
-        order1.setPrice(1024);
+        order1.setPrice(BigDecimal.valueOf(1024));
         order1.setRemark("{}");
         order1.setStatus(OrderStatus.PENDING.getValue());
         order1.setPrimaryContact("will");
@@ -39,7 +41,7 @@ public class OrderMapperTest extends BaseTest {
         Order order2 = new Order();
         order2.setSkuId(101);
         order2.setAgentId(AGENT_ID);
-        order2.setPrice(1000);
+        order2.setPrice(BigDecimal.valueOf(1000));
         order2.setRemark("{}");
         order2.setStatus(OrderStatus.CONFIRMED.getValue());
         order2.setPrimaryContact("phil");

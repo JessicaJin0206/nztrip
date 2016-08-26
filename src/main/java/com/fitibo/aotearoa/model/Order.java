@@ -1,5 +1,6 @@
 package com.fitibo.aotearoa.model;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -63,11 +64,11 @@ public class Order extends ModelObject {
         this.updateTime = updateTime;
     }
 
-    public int getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(int price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
@@ -175,7 +176,7 @@ public class Order extends ModelObject {
     private int status;
     private Date createTime;
     private Date updateTime;
-    private int price;
+    private BigDecimal price;
     private String primaryContact;
     private String primaryContactEmail;
     private String primaryContactPhone;

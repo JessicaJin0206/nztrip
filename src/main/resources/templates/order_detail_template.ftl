@@ -36,7 +36,7 @@
         <label class="col-md-2">总价:</label>
         <div class="col-md-offset-2">
             <input type="number" id="j_order_price" class="form-control"
-                   <#if editing=false>disabled</#if> value="${order.price}">
+                   <#if editing=false>disabled</#if> value="${order.price?string('0.00')}">
         </div>
     </div>
 </div>
@@ -116,7 +116,7 @@
             id="j_ticket_date_span">${ticket.ticketDate!''}</span></div>
     <div class="form-group"><label>时间:</label><span
             id="j_ticket_time_span">${ticket.ticketTime!''}</span></div>
-    <div class="form-group"><label>价格:</label><span id="j_ticket_price_span">${ticket.price}</span>
+    <div class="form-group"><label>价格:</label><span id="j_ticket_price_span">${ticket.price?string('0.00')}</span>
     </div>
     <div class="form-group"><label>集合地点:</label><span
             id="j_gathering_place_span">${ticket.gatheringPlace!''}</span></div>

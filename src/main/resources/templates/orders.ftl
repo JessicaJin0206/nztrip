@@ -101,7 +101,7 @@
                         <td>${order.primaryContact!''}</td>
                         <td>${order.primaryContactEmail!''}</td>
                         <td>${order.referenceNumber!''}</td>
-                        <td>${order.price}</td>
+                        <td>${order.price?string('0.00')}</td>
                         <td>${order.remark!''}</td>
                         <td>
                             <div>

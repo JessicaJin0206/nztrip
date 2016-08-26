@@ -127,8 +127,8 @@
                     <tr value="">
                         <td><span>${price.date}</span></td>
                         <td><span>${price.time}</span></td>
-                        <td><span>${price.costPrice}</span></td>
-                        <td><span>${price.salePrice}</span></td>
+                        <td><span>${price.costPrice?string('0.00')}</span></td>
+                        <td><span>${price.salePrice?string('0.00')}</span></td>
                         <td><span>${price.descrption!''}</span></td>
                     </tr>
                     </#list>

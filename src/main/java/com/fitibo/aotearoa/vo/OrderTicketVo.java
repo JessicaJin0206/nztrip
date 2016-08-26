@@ -1,5 +1,6 @@
 package com.fitibo.aotearoa.vo;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -111,11 +112,11 @@ public class OrderTicketVo {
         this.orderId = orderId;
     }
 
-    public int getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(int price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
@@ -140,7 +141,7 @@ public class OrderTicketVo {
     private int ticketPriceId;
     private String ticketDate;
     private String ticketTime;
-    private int price;
+    private BigDecimal price;
     private String priceDescription;
     //order_ticket_user
     private List<OrderTicketUserVo> orderTicketUsers;

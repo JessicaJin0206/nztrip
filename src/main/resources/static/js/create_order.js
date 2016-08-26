@@ -115,7 +115,7 @@ $('#add_ticket').on('click', function(e){
     }
     var time = timeSpan.html();
     var priceId = parseInt(timeSpan.attr('value'));
-    var price = parseInt(timeSpan.attr('price'));
+    var price = parseFloat(timeSpan.attr('price'));
     if (priceId <= 0) {
         return;
     }

@@ -1,5 +1,6 @@
 package com.fitibo.aotearoa.model;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -104,22 +105,6 @@ public class OrderTicket {
         this.ticketTime = ticketTime;
     }
 
-    public int getSalePrice() {
-        return salePrice;
-    }
-
-    public void setSalePrice(int salePrice) {
-        this.salePrice = salePrice;
-    }
-
-    public int getCostPrice() {
-        return costPrice;
-    }
-
-    public void setCostPrice(int costPrice) {
-        this.costPrice = costPrice;
-    }
-
     public String getPriceDescription() {
         return priceDescription;
     }
@@ -136,20 +121,36 @@ public class OrderTicket {
         this.ticketPriceId = ticketPriceId;
     }
 
-    public int getPrice() {
-        return price;
-    }
-
-    public void setPrice(int price) {
-        this.price = price;
-    }
-
     public String getGatheringPlace() {
         return gatheringPlace;
     }
 
     public void setGatheringPlace(String gatheringPlace) {
         this.gatheringPlace = gatheringPlace;
+    }
+
+    public BigDecimal getSalePrice() {
+        return salePrice;
+    }
+
+    public void setSalePrice(BigDecimal salePrice) {
+        this.salePrice = salePrice;
+    }
+
+    public BigDecimal getCostPrice() {
+        return costPrice;
+    }
+
+    public void setCostPrice(BigDecimal costPrice) {
+        this.costPrice = costPrice;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 
     private int id;
@@ -164,9 +165,9 @@ public class OrderTicket {
     private int ticketPriceId;
     private Date ticketDate;
     private String ticketTime;
-    private int salePrice;
-    private int costPrice;
-    private int price;
+    private BigDecimal salePrice;
+    private BigDecimal costPrice;
+    private BigDecimal price;
     private String priceDescription;
     private List<OrderTicketUser> users;
     private String gatheringPlace;

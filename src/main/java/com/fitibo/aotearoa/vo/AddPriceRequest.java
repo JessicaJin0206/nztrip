@@ -1,5 +1,6 @@
 package com.fitibo.aotearoa.vo;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -31,19 +32,19 @@ public class AddPriceRequest {
         this.dayOfWeek = dayOfWeek;
     }
 
-    public int getSalePrice() {
+    public BigDecimal getSalePrice() {
         return salePrice;
     }
 
-    public void setSalePrice(int salePrice) {
+    public void setSalePrice(BigDecimal salePrice) {
         this.salePrice = salePrice;
     }
 
-    public int getCostPrice() {
+    public BigDecimal getCostPrice() {
         return costPrice;
     }
 
-    public void setCostPrice(int costPrice) {
+    public void setCostPrice(BigDecimal costPrice) {
         this.costPrice = costPrice;
     }
 
@@ -67,7 +68,7 @@ public class AddPriceRequest {
     private String endDate;
     private List<Integer> dayOfWeek;
     private String time;
-    private int salePrice;
-    private int costPrice;
+    private BigDecimal salePrice;
+    private BigDecimal costPrice;
     private String description;
 }

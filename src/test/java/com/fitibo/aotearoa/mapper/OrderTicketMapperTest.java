@@ -4,6 +4,7 @@ import com.fitibo.aotearoa.model.OrderTicket;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
@@ -31,8 +32,8 @@ public class OrderTicketMapperTest extends BaseTest{
 		orderTicket.setTicketPriceId(15);
 		orderTicket.setTicketDate(new Date());
 		orderTicket.setTicketTime("5点");
-		orderTicket.setSalePrice(20);
-		orderTicket.setCostPrice(100);
+		orderTicket.setSalePrice(BigDecimal.valueOf(20));
+		orderTicket.setCostPrice(BigDecimal.valueOf(100));
 		orderTicket.setPriceDescription("priceDesc");
 		assertTrue(orderTicketMapper.create(orderTicket) == 1);
 		assertTrue(orderTicket.getId() > 0);

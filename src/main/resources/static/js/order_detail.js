@@ -171,7 +171,7 @@ $('#j_edit').on('click', function () {
 
 $('#j_update').on('click', function () {
     var skuId = parseInt($('#j_order_sku').attr("skuid"));
-    var price = parseInt($('#j_order_price').val());
+    var price = parseFloat($('#j_order_price').val());
     var status = parseInt(statusDropDown.attr("value"));
     var referenceNumber = $('#j_referencenumber').val();
     var gatheringInfo = $('#j_gatheringinfo').val();

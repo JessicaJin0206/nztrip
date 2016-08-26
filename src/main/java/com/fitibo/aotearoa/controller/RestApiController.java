@@ -69,6 +69,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -224,14 +225,15 @@ public class RestApiController extends AuthenticationRequiredController {
         Preconditions.checkNotNull(getToken());
         final int agentId = getToken().getRole() == Role.Agent ? getToken().getId() : 0;
         int discount = getDiscount(getToken());
-        int price = 0;
+        BigDecimal total = new BigDecimal(0);
         for (OrderTicketVo orderTicketVo : orderVo.getOrderTickets()) {
             SkuTicketPrice ticketPrice = skuTicketPriceMapper.findById(orderTicketVo.getTicketPriceId());
-            orderTicketVo.setPrice(ticketPrice.getCostPrice() + ((ticketPrice.getSalePrice() - ticketPrice.getCostPrice()) * discount / 100));
-            price += orderTicketVo.getPrice();
+            BigDecimal price = calculateTicketPrice(ticketPrice, discount);
+            orderTicketVo.setPrice(price);
+            total = total.add(price);
         }
         Order order = parse(orderVo, agentId);
-        order.setPrice(price);
+        order.setPrice(total);
         order.setVendorPhone(vendorService.findById(skuMapper.findById(orderVo.getSkuId()).getVendorId()).getPhone());
         order.setUuid(GuidGenerator.generate(14));
         order.setStatus(OrderStatus.NEW.getValue());
@@ -416,9 +418,7 @@ public class RestApiController extends AuthenticationRequiredController {
         int discount = getDiscount(getToken());
         return Lists.transform(ticketPrices, (input) -> {
             SkuTicketPriceVo result = new SkuTicketPriceVo();
-            int cost = input.getCostPrice();
-            int sale = input.getSalePrice();
-            result.setPrice(cost + ((sale - cost) * discount / 100));
+            result.setPrice(calculateTicketPrice(input, discount));
             result.setId(input.getId());
             result.setSkuId(input.getSkuId());
             result.setSkuTicketId(input.getSkuTicketId());
@@ -427,6 +427,12 @@ public class RestApiController extends AuthenticationRequiredController {
             result.setTime(input.getTime());
             return result;
         });
+    }
+
+    private BigDecimal calculateTicketPrice(SkuTicketPrice ticketPrice, int discount) {
+        BigDecimal cost = ticketPrice.getCostPrice();
+        BigDecimal sale = ticketPrice.getSalePrice();
+        return cost.add(sale.subtract(cost).multiply(BigDecimal.valueOf(discount)).divide(BigDecimal.valueOf(100)));
     }
 
     @RequestMapping(value = "v1/api/skus/{skuId}/tickets/{ticketId}/prices", method = RequestMethod.POST)

@@ -1,3 +1,33 @@
+var create_alert = function (message) {
+    var alert = $('.main .alert');
+    if (alert != null) {
+        alert.remove();
+    }
+    return $('<div class="alert ">' +
+             '<button type="button" class="close" data-dismiss="alert"' +
+             'aria-hidden="true">' +
+             '&times;' +
+             '</button>' +
+             '<span id="j_alert">' + message + '</span>' +
+             '</div>');
+};
+
+var warn = function (message) {
+    var alert = create_alert(message);
+    alert.addClass('alert-warning');
+    $('.main').prepend(alert);
+};
+var success = function(message) {
+    var alert = create_alert(message);
+    alert.addClass('alert-success');
+    $('.main').prepend(alert);
+};
+var error = function(message) {
+    var alert = create_alert(message);
+    alert.addClass('alert-danger');
+    $('.main').prepend(alert);
+};
+
 var startDateSelector = $('#j_start_date');
 var endDateSelector = $('#j_end_date');
 var dateSelector = $('#j_selected_date');
@@ -31,8 +61,8 @@ $('#j_submit').on('click', function(){
         }
     });
     var time = $('#j_ticket_time').val();
-    var salePrice = parseInt($('#j_ticket_sale_price').val());
-    var costPrice = parseInt($('#j_ticket_cost_price').val());
+    var salePrice = parseFloat($('#j_ticket_sale_price').val());
+    var costPrice = parseFloat($('#j_ticket_cost_price').val());
     var description = $('#j_ticket_description').val();
     var skuId = $('.main').attr('skuId');
     var ticketId = $('.main').attr('ticketId');
@@ -52,9 +82,9 @@ $('#j_submit').on('click', function(){
         url: '/v1/api/skus/' + skuId + '/tickets/' + ticketId + '/prices',
         data: JSON.stringify(data)
     }).success(function () {
-        window.location.reload();
+        success("添加成功");
     }).error(function () {
-
+        error("添加失败");
     });
 
 });
@@ -91,7 +121,8 @@ $('#j_delete').on('click', function(){
                url: '/v1/api/skus/' + skuId + '/tickets/' + ticketId + '/prices',
                data: JSON.stringify(data)
     }).success(function () {
-        window.location.reload();
+        success("删除成功");
     }).error(function () {
+        error("删除失败");
     });
 });

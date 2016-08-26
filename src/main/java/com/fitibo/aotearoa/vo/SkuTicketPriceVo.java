@@ -1,5 +1,7 @@
 package com.fitibo.aotearoa.vo;
 
+import java.math.BigDecimal;
+
 /**
  * Created by qianhao.zhou on 8/11/16.
  */
@@ -53,28 +55,28 @@ public class SkuTicketPriceVo {
         this.description = description;
     }
 
-    public int getPrice() {
-        return price;
-    }
-
-    public void setPrice(int price) {
-        this.price = price;
-    }
-
-    public int getSalePrice() {
+    public BigDecimal getSalePrice() {
         return salePrice;
     }
 
-    public void setSalePrice(int salePrice) {
+    public void setSalePrice(BigDecimal salePrice) {
         this.salePrice = salePrice;
     }
 
-    public int getCostPrice() {
+    public BigDecimal getCostPrice() {
         return costPrice;
     }
 
-    public void setCostPrice(int costPrice) {
+    public void setCostPrice(BigDecimal costPrice) {
         this.costPrice = costPrice;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 
     private int id;
@@ -83,8 +85,8 @@ public class SkuTicketPriceVo {
     private int skuTicketId;
     private String date;
     private String time;
-    private int salePrice;
-    private int costPrice;
-    private int price;
+    private BigDecimal salePrice;
+    private BigDecimal costPrice;
+    private BigDecimal price;
     private String description;
 }
