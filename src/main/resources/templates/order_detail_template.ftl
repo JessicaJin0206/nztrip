@@ -3,6 +3,7 @@
     <label>名称:</label>
     <span>  ${order.sku}</span>
 </div>
+<#if role?? && role == "Admin">
 <div class="form-group">
     <div class="row">
         <label class="col-md-2">修改订单:</label>
@@ -17,6 +18,7 @@
     </#if>
     </div>
 </div>
+</#if>
 <div class="form-group">
     <div class="row">
         <label class="col-md-2">订单状态:</label>

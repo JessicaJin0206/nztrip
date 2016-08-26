@@ -126,6 +126,7 @@ public class HomeController extends AuthenticationRequiredController {
     @Authentication
     public String home(Map<String, Object> model) {
         model.put("module", MODULE_DASHBOARD);
+        model.put("role", getToken().getRole().toString());
         return "dashboard";
     }
 
@@ -133,6 +134,7 @@ public class HomeController extends AuthenticationRequiredController {
     @Authentication
     public String dashboard(Map<String, Object> model) {
         model.put("module", MODULE_DASHBOARD);
+        model.put("role", getToken().getRole().toString());
         return "dashboard";
     }
 
@@ -149,6 +151,7 @@ public class HomeController extends AuthenticationRequiredController {
                 durationService.findById(sku.getDurationId())));
         model.put("vendor", vendorService.findAll().get(sku.getVendorId()));
         model.put("module", MODULE_CREATE_ORDER);
+        model.put("role", getToken().getRole().toString());
         return "create_order";
     }
 
@@ -170,6 +173,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("keyword", keyword);
         model.put("uuid", uuid);
         model.put("referenceNumber", referenceNumber);
+        model.put("role", getToken().getRole().toString());
         switch (getToken().getRole()) {
             case Admin:
                 model.put("orders", orderMapper.findAllByMultiFields(uuid, keyword, referenceNumber, status, new RowBounds(pageNumber * pageSize, pageSize)));
@@ -196,6 +200,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("statusList", OrderStatus.values());
         model.put("editing", false);
         model.put("transitions", orderService.getAvailableTransitions(order.getStatus()));
+        model.put("role", getToken().getRole().toString());
         return "order_detail";
     }
 
@@ -216,6 +221,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("module", MODULE_ORDER_DETAIL);
         model.put("statusList", OrderStatus.values());
         model.put("editing", true);
+        model.put("role", getToken().getRole().toString());
         return "order_detail";
     }
 
@@ -227,6 +233,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("categories", categoryService.findAll());
         model.put("vendors", vendorService.findAll());
         model.put("durations", durationService.findAll());
+        model.put("role", getToken().getRole().toString());
         return "create_sku";
     }
 
@@ -240,6 +247,7 @@ public class HomeController extends AuthenticationRequiredController {
         }
         model.put("sku", parse(sku));
         model.put("editing", false);
+        model.put("role", getToken().getRole().toString());
         return "sku_detail";
     }
 
@@ -257,6 +265,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("vendors", vendorService.findAll());
         model.put("durations", durationService.findAll());
         model.put("editing", true);
+        model.put("role", getToken().getRole().toString());
         return "sku_detail";
     }
 
@@ -290,6 +299,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("pageNumber", pageNumber);
         model.put("skuId", skuId);
         model.put("ticketId", ticketId);
+        model.put("role", getToken().getRole().toString());
         return "sku_ticket_detail";
     }
 
@@ -313,6 +323,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("skus", Lists.transform(searchSku(keyword, cityId, categoryId, rowBounds), this::parse));
         model.put("pageSize", pageSize);
         model.put("pageNumber", pageNumber);
+        model.put("role", getToken().getRole().toString());
         return "skus";
     }
 
@@ -320,6 +331,7 @@ public class HomeController extends AuthenticationRequiredController {
     @Authentication(Role.Admin)
     public String createVendor(Map<String, Object> model) {
         model.put("module", MODULE_CREATE_VENDOR);
+        model.put("role", getToken().getRole().toString());
         return "create_vendor";
     }
 
@@ -328,6 +340,7 @@ public class HomeController extends AuthenticationRequiredController {
     public String queryVendor(Map<String, Object> model) {
         model.put("module", MODULE_QUERY_VENDOR);
         model.put("vendors", vendorService.findAll());
+        model.put("role", getToken().getRole().toString());
         return "vendors";
     }
 
@@ -341,6 +354,7 @@ public class HomeController extends AuthenticationRequiredController {
         }
         model.put("vendor", vendor);
         model.put("editing", false);
+        model.put("role", getToken().getRole().toString());
         return "vendor_detail";
     }
 
@@ -354,6 +368,7 @@ public class HomeController extends AuthenticationRequiredController {
         }
         model.put("vendor", vendor);
         model.put("editing", true);
+        model.put("role", getToken().getRole().toString());
         return "vendor_detail";
     }
 
@@ -361,6 +376,7 @@ public class HomeController extends AuthenticationRequiredController {
     @Authentication(Role.Admin)
     public String createAgent(Map<String, Object> model) {
         model.put("module", MODULE_CREATE_AGENT);
+        model.put("role", getToken().getRole().toString());
         return "create_agent";
     }
 
@@ -369,7 +385,8 @@ public class HomeController extends AuthenticationRequiredController {
     public String queryAgent(Map<String, Object> model) {
         List<Agent> agents = agentMapper.findAll();
         model.put("module", MODULE_QUERY_AGENT);
-        model.put("agents", Lists.transform(agents, (input) -> parse(input)));
+        model.put("agents", Lists.transform(agents, HomeController::parse));
+        model.put("role", getToken().getRole().toString());
         return "agents";
     }
 
@@ -383,6 +400,7 @@ public class HomeController extends AuthenticationRequiredController {
         }
         model.put("agent", parse(agent));
         model.put("action", "check");
+        model.put("role", getToken().getRole().toString());
         return "agent_detail";
     }
 
@@ -396,6 +414,7 @@ public class HomeController extends AuthenticationRequiredController {
         }
         model.put("agent", parse(agent));
         model.put("action", "edit");
+        model.put("role", getToken().getRole().toString());
         return "agent_detail";
     }
 
@@ -409,6 +428,7 @@ public class HomeController extends AuthenticationRequiredController {
         }
         model.put("agent", parse(agent));
         model.put("action", "reset");
+        model.put("role", getToken().getRole().toString());
         return "agent_detail";
     }
 
