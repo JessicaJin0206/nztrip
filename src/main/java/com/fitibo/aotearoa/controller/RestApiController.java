@@ -347,7 +347,7 @@ public class RestApiController extends AuthenticationRequiredController {
             return false;
         }
 
-        operationService.doRelatedOperation(order);
+        operationService.doRelatedOperation(fromStatus, toStatus, order);
         return true;
     }
 

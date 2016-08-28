@@ -26,19 +26,19 @@ public class OrderService {
     @PostConstruct
     public void init() {
         transitionMap.put(OrderStatus.NEW.getValue(),
-                Lists.newArrayList(new Transition(OrderStatus.PENDING.getValue(), "发送预订邮件"), new Transition(OrderStatus.CLOSED.getValue(), "关闭订单")));
+                Lists.newArrayList(new Transition(OrderStatus.PENDING.getValue(), "审核通过"), new Transition(OrderStatus.CLOSED.getValue(), "关闭订单")));
 
         transitionMap.put(OrderStatus.PENDING.getValue(),
-                Lists.newArrayList(new Transition(OrderStatus.FULL.getValue(), "库存已满需确认"), new Transition(OrderStatus.CONFIRMED.getValue(), "确认订单成功")));
+                Lists.newArrayList(new Transition(OrderStatus.FULL.getValue(), "库存已满"), new Transition(OrderStatus.CONFIRMED.getValue(), "预订成功")));
 
         transitionMap.put(OrderStatus.FULL.getValue(),
-                Lists.newArrayList(new Transition(OrderStatus.CLOSED.getValue(), "确认失败关闭订单"), new Transition(OrderStatus.CONFIRMED.getValue(), "确认订单成功")));
+                Lists.newArrayList(new Transition(OrderStatus.CLOSED.getValue(), "关闭订单"), new Transition(OrderStatus.CONFIRMED.getValue(), "预订成功")));
 
         transitionMap.put(OrderStatus.CONFIRMED.getValue(),
                 Lists.newArrayList(new Transition(OrderStatus.MODIFYING.getValue(), "确认后修改订单"), new Transition(OrderStatus.CANCELLED.getValue(), "取消订单")));
 
         transitionMap.put(OrderStatus.MODIFYING.getValue(),
-                Lists.newArrayList(new Transition(OrderStatus.CONFIRMED.getValue(), "确认订单成功")));
+                Lists.newArrayList(new Transition(OrderStatus.CONFIRMED.getValue(), "预订成功")));
 
         transitionMap.put(OrderStatus.CANCELLED.getValue(),
                 Lists.newArrayList());

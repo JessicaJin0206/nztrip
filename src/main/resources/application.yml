@@ -52,3 +52,35 @@ template:
       Tel & Fax: +64 (0)3 357 4405<br>
       Address: 30 Durey Rd, Christchurch Airport Internatinal Terminal Building, Christchurch 8053
       </div></body></html>
+
+  confirmation_email:
+    from: eyounz@foxmail.com
+    subject: Reservation Confirmed
+    content: |
+      <html><body><div>
+      #AGENT_NAME#,<br><br>
+      Please be noted that your reservation has been confirmed:<br><br>
+      订单编号 Order ID: #ORDER_ID#<br>
+      预定项目 Book Package: #TOUR_NAME#<br>
+      总价 Total Price: #PRICE#<br>
+      联系人姓名 Guest Name: #GUEST_NAME#<br>
+      国内手机号 Mobile: #MOBILE#<br>
+      确认号 Confirmation Number: #REFERENCE_NUMBER#<br>
+
+      出行信息:<br>
+      #GUESTS_INFO#
+      <br>
+      <br>
+      Many thanks for your support.<br><br>
+      Best Regards<br><br>
+      Reservation Team<br>
+      <span style="color: dodgerblue">the <span style="font-weight: bold">Easy Efficient Excellent</span> travel with <span style="font-weight: bold">EYOUNZ Limited</span></span><br>
+      Tel & Fax: +64 (0)3 357 4405<br>
+      Address: 30 Durey Rd, Christchurch Airport Internatinal Terminal Building, Christchurch 8053
+      </div></body></html>
+    guests_info: |
+      出行人 Guests:<br>
+      #GUESTS#<br>
+      出发日期 Tour Date(Y/M/D): #DATE#<br>
+      场次 Time: #TIME#<br>
+      集合地点 Meeting Place: #GATHERING_PLACE#
