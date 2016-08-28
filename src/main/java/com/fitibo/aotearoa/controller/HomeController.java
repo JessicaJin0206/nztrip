@@ -149,7 +149,7 @@ public class HomeController extends AuthenticationRequiredController {
                 categoryService.findById(sku.getCategoryId()),
                 vendorService.findById(sku.getVendorId()),
                 durationService.findById(sku.getDurationId())));
-        model.put("vendor", vendorService.findAll().get(sku.getVendorId()));
+        model.put("vendor", vendorService.findById(sku.getVendorId()));
         model.put("module", MODULE_CREATE_ORDER);
         model.put("role", getToken().getRole().toString());
         return "create_order";
