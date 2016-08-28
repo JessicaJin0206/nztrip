@@ -26,7 +26,7 @@ public class OrderService {
     @PostConstruct
     public void init() {
         transitionMap.put(OrderStatus.NEW.getValue(),
-                Lists.newArrayList(new Transition(OrderStatus.PENDING.getValue(), "发送确认邮件"), new Transition(OrderStatus.CLOSED.getValue(), "关闭订单")));
+                Lists.newArrayList(new Transition(OrderStatus.PENDING.getValue(), "发送预订邮件"), new Transition(OrderStatus.CLOSED.getValue(), "关闭订单")));
 
         transitionMap.put(OrderStatus.PENDING.getValue(),
                 Lists.newArrayList(new Transition(OrderStatus.FULL.getValue(), "库存已满需确认"), new Transition(OrderStatus.CONFIRMED.getValue(), "确认订单成功")));

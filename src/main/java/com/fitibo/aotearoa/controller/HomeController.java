@@ -23,6 +23,7 @@ import com.fitibo.aotearoa.annotation.Authentication;
 import com.fitibo.aotearoa.constants.CommonConstants;
 import com.fitibo.aotearoa.constants.OrderStatus;
 import com.fitibo.aotearoa.dto.Role;
+import com.fitibo.aotearoa.exception.InvalidParamException;
 import com.fitibo.aotearoa.exception.ResourceNotFoundException;
 import com.fitibo.aotearoa.mapper.AgentMapper;
 import com.fitibo.aotearoa.mapper.OrderMapper;
@@ -140,11 +141,24 @@ public class HomeController extends AuthenticationRequiredController {
 
     @RequestMapping("create_order")
     @Authentication
-    public String createOrder(@RequestParam("skuId") int skuId, Map<String, Object> model) {
-        Sku sku = skuMapper.findById(skuId);
-        if (sku == null) {
-            throw new ResourceNotFoundException();
+    public String createOrder(@RequestParam(value = "skuId", defaultValue = "0") int skuId,
+                              @RequestParam(value = "uuid", defaultValue = "") String uuid,
+                              Map<String, Object> model) {
+        Sku sku = null;
+        if (skuId > 0) {
+            skuMapper.findById(skuId);
+            if (sku == null) {
+                throw new ResourceNotFoundException();
+            }
+        } else if (uuid != null && uuid.length() > 0){
+            sku = skuMapper.findByUuid(uuid);
+            if (sku == null) {
+                throw new ResourceNotFoundException();
+            }
+        } else {
+            throw new InvalidParamException();
         }
+
         model.put("sku", parse(sku, cityService.findById(sku.getCityId()),
                 categoryService.findById(sku.getCategoryId()),
                 vendorService.findById(sku.getVendorId()),

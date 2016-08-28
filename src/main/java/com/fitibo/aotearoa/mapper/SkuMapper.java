@@ -37,6 +37,23 @@ public interface SkuMapper {
             "where id = #{id}")
     int update(Sku sku);
 
+    @Select("select * from sku where uuid = #{uuid}")
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "uuid", property = "uuid"),
+            @Result(column = "name", property = "name"),
+            @Result(column = "city_id", property = "cityId"),
+            @Result(column = "category_id", property = "categoryId"),
+            @Result(column = "description", property = "description"),
+            @Result(column = "vendor_id", property = "vendorId"),
+            @Result(column = "gathering_place", property = "gatheringPlace"),
+            @Result(column = "pickup_service", property = "pickupService"),
+            @Result(column = "duration_id", property = "durationId"),
+            @Result(column = "id", property = "tickets", javaType = List.class, many
+                    = @Many(select = "com.fitibo.aotearoa.mapper.SkuTicketMapper.findOnlineBySkuId"))
+    })
+    Sku findByUuid(String uuid);
+
     @Select("select * from sku where id = #{id}")
     @Results({
             @Result(column = "id", property = "id"),

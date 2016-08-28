@@ -1,3 +1,9 @@
+function getQueryString(name) {
+    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) return unescape(r[2]); return null;
+}
+
 $('#j_submit').on('click', function(){
     var user = $('#j_user').val();
     var pass = $('#j_pass').val();
@@ -16,7 +22,13 @@ $('#j_submit').on('click', function(){
         data: JSON.stringify(data)
     }).success(function(data){
         $.cookie('X-TOKEN', data.token);
-        window.location.href = "/";
+        var redirect = getQueryString("redirectUrl");
+        if (redirect) {
+            window.location.href = redirect;
+        } else {
+            window.location.href = "/";
+        }
+
     }).error(function(data){
         if (data.status == 401) {
             alert('密码错误');

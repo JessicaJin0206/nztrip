@@ -40,13 +40,13 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
                     ((AuthenticationRequiredController) handlerMethod.getBean()).setToken(token);
                 }
                 if (token == null || token.isExpired()) {
-                    httpServletResponse.sendRedirect("/signin");
+                    httpServletResponse.sendRedirect("/signin?redirectUrl=" + httpServletRequest.getRequestURI());
                     return false;
                 }
                 if (Lists.newArrayList(authentication.value()).contains(token.getRole())) {
                     return true;
                 } else {
-                    httpServletResponse.sendRedirect("/signin");
+                    httpServletResponse.sendRedirect("/signin?redirectUrl=" + httpServletRequest.getRequestURI());
                     return false;
                 }
             }
