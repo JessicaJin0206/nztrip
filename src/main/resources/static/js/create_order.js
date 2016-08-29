@@ -74,8 +74,7 @@ $('#j_ticket_type_selector li a').on('click', function(e){
         }).success(function(data){
             if (data && data.length > 0) {
                 timeSelector.empty();
-                for (var i= 0; i < data.length; ++i) {
-                    var price = data[i];
+                $.each(data, function(index, price){
                     var item = $('<li><a value="' + price.id + '">' + price.time + '</a></li>');
                     item.on('click', function(){
                         timeSpan.html(price.time);
@@ -83,7 +82,7 @@ $('#j_ticket_type_selector li a').on('click', function(e){
                         timeSpan.attr('price', price.price);
                     });
                     timeSelector.append(item);
-                }
+                });
             }
         }).error(function(){
             timeSelector.empty();
