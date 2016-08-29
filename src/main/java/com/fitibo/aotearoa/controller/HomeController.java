@@ -144,9 +144,9 @@ public class HomeController extends AuthenticationRequiredController {
     public String createOrder(@RequestParam(value = "skuId", defaultValue = "0") int skuId,
                               @RequestParam(value = "uuid", defaultValue = "") String uuid,
                               Map<String, Object> model) {
-        Sku sku = null;
+        Sku sku;
         if (skuId > 0) {
-            skuMapper.findById(skuId);
+            sku = skuMapper.findById(skuId);
             if (sku == null) {
                 throw new ResourceNotFoundException();
             }
