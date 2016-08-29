@@ -28,7 +28,7 @@ public class EmailService {
 
     public void sendEmail(String from, String subject, String content, String to) throws MessagingException {
         if (!enabled) {
-            to = "eyounz@foxmail.com";
+            to = "z.qianhao@gmail.com";
         }
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper messageHelper = new MimeMessageHelper(message, true, "utf-8");

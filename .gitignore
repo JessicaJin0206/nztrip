@@ -2,4 +2,6 @@
 target
 *.iml
 src/main/bootstrap-3.3.6/
+src/main/resources/application-dev.yml
+src/main/resources/application-test.yml
 *.bak
