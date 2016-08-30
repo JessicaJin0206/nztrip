@@ -129,7 +129,7 @@
                         <td><span>${price.time}</span></td>
                         <td><span>${price.costPrice?string('0.00')}</span></td>
                         <td><span>${price.salePrice?string('0.00')}</span></td>
-                        <td><span>${price.descrption!''}</span></td>
+                        <td><span>${price.description!''}</span></td>
                     </tr>
                     </#list>
                     </tbody>
