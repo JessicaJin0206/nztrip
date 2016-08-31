@@ -31,7 +31,7 @@ VALUES
 INSERT INTO `category` (`name`, `parent_category_id`)
 VALUES
 	('极限', 0),
-	('轻探险', 0),
+	('清探险', 0),
 	('老少咸宜', 0),
 	('亲子互动', 0),
 	('新婚蜜月', 0);
