@@ -224,6 +224,10 @@ public class RestApiController extends AuthenticationRequiredController {
     public OrderVo createOrder(@RequestBody OrderVo orderVo) {
         Preconditions.checkNotNull(getToken());
         final int agentId = getToken().getRole() == Role.Agent ? getToken().getId() : 0;
+        final Sku sku = skuMapper.findById(orderVo.getSkuId());
+        Preconditions.checkNotNull(sku, "invalid sku id:" + orderVo.getSkuId());
+        final Vendor vendor = vendorService.findById(sku.getVendorId());
+        Preconditions.checkNotNull(vendor, "invalid vendor id:" + sku.getVendorId());
         int discount = getDiscount(getToken());
         BigDecimal total = new BigDecimal(0);
         for (OrderTicketVo orderTicketVo : orderVo.getOrderTickets()) {
@@ -234,7 +238,7 @@ public class RestApiController extends AuthenticationRequiredController {
         }
         Order order = parse(orderVo, agentId);
         order.setPrice(total);
-        order.setVendorPhone(vendorService.findById(skuMapper.findById(orderVo.getSkuId()).getVendorId()).getPhone());
+        order.setVendorPhone(vendor.getPhone());
         order.setUuid(GuidGenerator.generate(14));
         order.setStatus(OrderStatus.NEW.getValue());
         orderMapper.create(order);

@@ -1,5 +1,6 @@
 package com.fitibo.aotearoa.service;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,15 +28,19 @@ public class EmailService {
     private final static Logger logger = LoggerFactory.getLogger(EmailService.class);
 
     public void sendEmail(String from, String subject, String content, String to) throws MessagingException {
+        if (StringUtils.isEmpty(to)) {
+            return;
+        }
         if (!enabled) {
             to = "z.qianhao@gmail.com";
         }
+        String[] receivers = to.split(";");
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper messageHelper = new MimeMessageHelper(message, true, "utf-8");
         messageHelper.setFrom(from);
         messageHelper.setSubject(subject);
         messageHelper.setText(content, true);
-        messageHelper.setTo(to);
+        messageHelper.setTo(receivers);
         mailSender.send(message);
     }
 
