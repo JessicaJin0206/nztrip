@@ -1,0 +1,1 @@
+ALTER TABLE `agent` MODIFY COLUMN email varchar(100);

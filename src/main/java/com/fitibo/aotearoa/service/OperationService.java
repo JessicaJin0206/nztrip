@@ -6,12 +6,10 @@ import com.google.common.collect.Lists;
 import com.fitibo.aotearoa.constants.OrderStatus;
 import com.fitibo.aotearoa.exception.ResourceNotFoundException;
 import com.fitibo.aotearoa.mapper.AgentMapper;
-import com.fitibo.aotearoa.mapper.FailedEmailMapper;
 import com.fitibo.aotearoa.mapper.OrderTicketMapper;
 import com.fitibo.aotearoa.mapper.OrderTicketUserMapper;
 import com.fitibo.aotearoa.mapper.SkuMapper;
 import com.fitibo.aotearoa.model.Agent;
-import com.fitibo.aotearoa.model.FailedEmail;
 import com.fitibo.aotearoa.model.Order;
 import com.fitibo.aotearoa.model.OrderTicket;
 import com.fitibo.aotearoa.model.OrderTicketUser;
@@ -28,8 +26,6 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.mail.MessagingException;
-
 @Service("operationService")
 public class OperationService {
 
@@ -44,9 +40,6 @@ public class OperationService {
 
     @Autowired
     private AgentMapper agentMapper;
-
-    @Autowired
-    private FailedEmailMapper failedEmailMapper;
 
     @Autowired
     private VendorService vendorService;
@@ -95,15 +88,8 @@ public class OperationService {
         }
         Agent agent = agentMapper.findById(agentId);
         String to = agent.getEmail();
-        to = "z.qianhao@gmail.com";
-
         String content = formatConfirmationEmailContent(confirmationEmailTemplate, order, skuMapper.findById(order.getSkuId()), agent);
-        try {
-            emailService.sendEmail(confirmationEmailFrom, confirmationEmailSubject, content, to);
-        } catch (MessagingException e) {
-            logger.error("failed to send confirmation email, order id:" + order.getId());
-            throw new RuntimeException(e);
-        }
+        emailService.send(order.getId(), confirmationEmailFrom, to, confirmationEmailSubject, content);
     }
 
     public void sendReservationEmail(Order order) {
@@ -121,20 +107,7 @@ public class OperationService {
             return;
         }
         String content = formatReservationEmailContent(reservationEmailTemplate, vendor, order, ticketList);
-        try {
-            emailService.sendEmail(reservationEmailFrom, reservationEmailSubject, content, vendor.getEmail());
-        } catch (MessagingException e) {
-            logger.error("Send Email Exception, orderId=" + order.getId() + ", from=" +
-                reservationEmailFrom + ", content=" + content + ", to=" + vendor.getEmail(), e);
-            FailedEmail failedEmail = new FailedEmail();
-            failedEmail.setOrderId(order.getId());
-            failedEmail.setFrom(reservationEmailFrom);
-            failedEmail.setTo(vendor.getEmail());
-            failedEmail.setSubject(reservationEmailSubject);
-            failedEmail.setContent(content);
-            failedEmailMapper.create(failedEmail);
-            throw new RuntimeException(e);
-        }
+        emailService.send(order.getId(), reservationEmailFrom, vendor.getEmail(), reservationEmailSubject, content);
     }
 
     private String formatConfirmationEmailContent(String template, Order order, Sku sku, Agent agent) {
