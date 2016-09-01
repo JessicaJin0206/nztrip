@@ -32,8 +32,8 @@ public class OrderTicketMapperTest extends BaseTest{
 		orderTicket.setTicketPriceId(15);
 		orderTicket.setTicketDate(new Date());
 		orderTicket.setTicketTime("5点");
-		orderTicket.setSalePrice(BigDecimal.valueOf(20));
-		orderTicket.setCostPrice(BigDecimal.valueOf(100));
+		orderTicket.setSalePrice(BigDecimal.valueOf(20).setScale(2));
+		orderTicket.setCostPrice(BigDecimal.valueOf(100).setScale(2));
 		orderTicket.setPriceDescription("priceDesc");
 		assertTrue(orderTicketMapper.create(orderTicket) == 1);
 		assertTrue(orderTicket.getId() > 0);

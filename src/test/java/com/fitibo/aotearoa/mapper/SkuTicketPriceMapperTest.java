@@ -39,8 +39,8 @@ public class SkuTicketPriceMapperTest extends BaseTest {
         price1.setSkuTicketId(1023);
         price1.setDate(DateTime.now().minusDays(1).toDate());
         price1.setTime("上午");
-        price1.setCostPrice(BigDecimal.valueOf(100));
-        price1.setSalePrice(BigDecimal.valueOf(200));
+        price1.setCostPrice(BigDecimal.valueOf(100).setScale(2));
+        price1.setSalePrice(BigDecimal.valueOf(200).setScale(2));
         price1.setDescription("hello");
 
         SkuTicketPrice price2 = new SkuTicketPrice();
@@ -49,8 +49,8 @@ public class SkuTicketPriceMapperTest extends BaseTest {
         price2.setDate(DateTime.now().toDate());
         price2.setTime("晚上5点");
         price2.setDescription("hello 2");
-        price2.setSalePrice(BigDecimal.valueOf(2000));
-        price2.setCostPrice(BigDecimal.valueOf(500));
+        price2.setSalePrice(BigDecimal.valueOf(2000).setScale(2));
+        price2.setCostPrice(BigDecimal.valueOf(500).setScale(2));
 
         assertEquals(skuTicketPriceMapper.batchCreate(Arrays.asList(price1, price2)), 2);
         assertEquals(skuTicketPriceMapper.findBySkuIdAndStartTime(0, new Date(), new Date()).size(), 0);
