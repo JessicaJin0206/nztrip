@@ -45,14 +45,7 @@ $('#j_ticket_type_selector li a').on('click', function(e){
     var availableDate = selected.attr('available_date').split("|").filter(function(value) {
         return value.length > 0;
     }).sort();
-    var minDate = moment(availableDate[0]);
-    var maxDate = moment(availableDate[availableDate.length - 1]);
-    var disabledDates = [];
-    for (var d = minDate.clone(); d.isBefore(maxDate) || d.isSame(maxDate); d.add(1, 'days')) {
-        if (availableDate.indexOf(d.format('YYYY-MM-DD')) < 0) {
-            disabledDates.push(d.clone());
-        }
-    }
+    availableDate.push(moment().format('YYYY-MM-DD'));
     var selector = $('#j_ticket_date');
     if (selector.data('DateTimePicker')) {
         selector.data('DateTimePicker').destroy();
@@ -61,9 +54,7 @@ $('#j_ticket_type_selector li a').on('click', function(e){
     timeSpan.html('选择时间');
     timeSpan.attr('value', "0");
     selector.datetimepicker({
-        disabledDates: disabledDates,
-        minDate: minDate,
-        maxDate: maxDate,
+        enabledDates: availableDate,
         format: "YYYY-MM-DD"
     }).on('dp.change', function(e){
         var url = '/v1/api/skus/' + $('.main').attr('skuId') + '/tickets/' + ticket.attr('value') + '/prices?date=' + e.date.format('YYYY-MM-DD');
@@ -72,8 +63,8 @@ $('#j_ticket_type_selector li a').on('click', function(e){
             contentType:"application/json; charset=utf-8",
             url: url
         }).success(function(data){
+            timeSelector.empty();
             if (data && data.length > 0) {
-                timeSelector.empty();
                 $.each(data, function(index, price){
                     var item = $('<li><a value="' + price.id + '">' + price.time + '</a></li>');
                     item.on('click', function(){
@@ -83,6 +74,8 @@ $('#j_ticket_type_selector li a').on('click', function(e){
                     });
                     timeSelector.append(item);
                 });
+            } else {
+
             }
         }).error(function(){
             timeSelector.empty();
