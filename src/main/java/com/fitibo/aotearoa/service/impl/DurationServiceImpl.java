@@ -1,7 +1,5 @@
 package com.fitibo.aotearoa.service.impl;
 
-import com.google.common.collect.Maps;
-
 import com.fitibo.aotearoa.mapper.DurationMapper;
 import com.fitibo.aotearoa.model.Duration;
 import com.fitibo.aotearoa.service.DurationService;
@@ -9,8 +7,6 @@ import com.fitibo.aotearoa.service.DurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,11 +31,6 @@ public class DurationServiceImpl implements DurationService {
 
     @Override
     public Map<Integer, Duration> findByIds(List<Integer> ids) {
-        List<Duration> durations = durationMapper.findByIds(ids);
-        HashMap<Integer, Duration> result = Maps.newHashMapWithExpectedSize(durations.size());
-        for (Duration duration : durations) {
-            result.put(duration.getId(), duration);
-        }
-        return Collections.unmodifiableMap(result);
+        return ServiceHelper.convert(durationMapper.findByIds(ids));
     }
 }

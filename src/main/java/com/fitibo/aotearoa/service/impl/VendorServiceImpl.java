@@ -26,7 +26,7 @@ public class VendorServiceImpl implements VendorService {
 
     @Override
     public Map<Integer, Vendor> findByIds(List<Integer> ids) {
-        return null;
+        return ServiceHelper.convert(vendorMapper.findByIds(ids));
     }
 
     @Override

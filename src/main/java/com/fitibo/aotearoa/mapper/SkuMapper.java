@@ -104,7 +104,7 @@ public interface SkuMapper {
 
     @Select("<script>" +
             "select * from sku where 1 = 1 " +
-            "<if test =\"name != null and name != ''\">and name like CONCAT('%',#{name},'%') </if> " +
+            "<if test =\"keyword != null and keyword != ''\">and (uuid = #{keyword} or name like CONCAT('%',#{keyword},'%')) </if> " +
             "<if test =\"categoryId > 0\">and category_id = #{categoryId} </if> " +
             "<if test =\"cityId > 0\">and city_id = #{cityId} </if> " +
             "</script>")
@@ -120,5 +120,5 @@ public interface SkuMapper {
             @Result(column = "pickup_service", property = "pickupService"),
             @Result(column = "duration_id", property = "durationId")
     })
-    List<Sku> findAllByMultiFields(@Param("name") String name, @Param("cityId") int cityId, @Param("categoryId") int categoryId, RowBounds rowBounds);
+    List<Sku> findAllByMultiFields(@Param("keyword") String keyword, @Param("cityId") int cityId, @Param("categoryId") int categoryId, RowBounds rowBounds);
 }

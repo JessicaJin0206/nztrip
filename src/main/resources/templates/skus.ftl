@@ -85,7 +85,7 @@
                     </#list>
                     </ul>
                 </div>
-                <div class="col-md-4"><input type="text" id="j_keyword" class="form-control" placeholder="请输入关键词..." value="${keyword}">
+                <div class="col-md-4"><input type="text" id="j_keyword" class="form-control" placeholder="请输入编号或关键词" value="${keyword}">
                 </div>
                 <div class="col-md-2">
                     <button id="j_search" class="btn btn-primary">搜索</button>
