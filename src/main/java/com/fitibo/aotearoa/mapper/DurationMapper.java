@@ -26,4 +26,22 @@ public interface DurationMapper {
             @Result(column = "name", property = "name")
     })
     Duration findById(int durationId);
+
+
+    @Select({
+            "<script>",
+            "select * from duration where false",
+            "<if test='list.size() > 0'>",
+            "or id in ",
+            "<foreach collection='list' open = '(' close = ')' item='item' separator=','>",
+            "#{item}",
+            "</foreach>",
+            "</if>",
+            "</script>"
+    })
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "name", property = "name")
+    })
+    List<Duration> findByIds(List<Integer> ids);
 }

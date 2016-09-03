@@ -26,4 +26,22 @@ public interface CityMapper {
             @Result(column = "name", property = "name")
     })
     City findById(int cityId);
+
+
+    @Select({
+            "<script>",
+            "select * from city where false",
+            "<if test='list.size() > 0'>",
+            "or id in ",
+            "<foreach collection='list' open = '(' close = ')' item='item' separator=','>",
+            "#{item}",
+            "</foreach>",
+            "</if>",
+            "</script>"
+    })
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "name", property = "name")
+    })
+    List<City> findByIds(List<Integer> ids);
 }

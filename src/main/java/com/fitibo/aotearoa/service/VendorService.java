@@ -1,37 +1,21 @@
 package com.fitibo.aotearoa.service;
 
-import com.fitibo.aotearoa.mapper.VendorMapper;
 import com.fitibo.aotearoa.model.Vendor;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
+import java.util.Map;
 
 /**
- * Created by qianhao.zhou on 8/4/16.
+ * Created by qianhao.zhou on 9/3/16.
  */
-@Service
-public class VendorService {
+public interface VendorService {
+    List<Vendor> findAll();
 
-    @Autowired
-    private VendorMapper vendorMapper;
+    Map<Integer, Vendor> findByIds(List<Integer> ids);
 
-    public List<Vendor> findAll() {
-        return vendorMapper.findAll();
-    }
+    int createVendor(Vendor vendor);
 
-    public int createVendor(Vendor vendor) {
-        vendorMapper.create(vendor);
-        return vendor.getId();
-    }
+    int update(Vendor vendor);
 
-    public int update(Vendor vendor) {
-        int update = vendorMapper.update(vendor);
-        return update;
-    }
-
-    public Vendor findById(int id) {
-        return vendorMapper.findById(id);
-    }
+    Vendor findById(int id);
 }

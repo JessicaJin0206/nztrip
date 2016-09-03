@@ -40,11 +40,11 @@ import com.fitibo.aotearoa.model.Sku;
 import com.fitibo.aotearoa.model.SkuTicket;
 import com.fitibo.aotearoa.model.SkuTicketPrice;
 import com.fitibo.aotearoa.model.Vendor;
-import com.fitibo.aotearoa.service.CategoryService;
 import com.fitibo.aotearoa.service.CityService;
 import com.fitibo.aotearoa.service.DurationService;
 import com.fitibo.aotearoa.service.OrderService;
 import com.fitibo.aotearoa.service.VendorService;
+import com.fitibo.aotearoa.service.impl.CategoryServiceImpl;
 import com.fitibo.aotearoa.util.DateUtils;
 import com.fitibo.aotearoa.util.ObjectParser;
 import com.fitibo.aotearoa.vo.AgentVo;
@@ -84,7 +84,7 @@ public class HomeController extends AuthenticationRequiredController {
     private CityService cityService;
 
     @Autowired
-    private CategoryService categoryService;
+    private CategoryServiceImpl categoryService;
 
     @Autowired
     private VendorService vendorService;
@@ -150,7 +150,7 @@ public class HomeController extends AuthenticationRequiredController {
             if (sku == null) {
                 throw new ResourceNotFoundException();
             }
-        } else if (uuid != null && uuid.length() > 0){
+        } else if (uuid != null && uuid.length() > 0) {
             sku = skuMapper.findByUuid(uuid);
             if (sku == null) {
                 throw new ResourceNotFoundException();
@@ -159,11 +159,9 @@ public class HomeController extends AuthenticationRequiredController {
             throw new InvalidParamException();
         }
 
-        model.put("sku", parse(sku, cityService.findById(sku.getCityId()),
-                categoryService.findById(sku.getCategoryId()),
-                vendorService.findById(sku.getVendorId()),
-                durationService.findById(sku.getDurationId())));
-        model.put("vendor", vendorService.findById(sku.getVendorId()));
+        Vendor vendor = vendorService.findById(sku.getVendorId());
+        model.put("sku", parse(sku));
+        model.put("vendor", vendor);
         model.put("module", MODULE_CREATE_ORDER);
         model.put("role", getToken().getRole().toString());
         return "create_order";
@@ -334,7 +332,17 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("cities", cityService.findAll());
         model.put("categories", categoryService.findAll());
         model.put("durations", durationService.findAll());
-        model.put("skus", Lists.transform(searchSku(keyword, cityId, categoryId, rowBounds), this::parse));
+        List<Sku> skus = searchSku(keyword, cityId, categoryId, rowBounds);
+        Map<Integer, City> cityMap = cityService.findByIds(Lists.transform(skus, Sku::getCityId));
+        Map<Integer, Category> categoryMap = categoryService.findByIds(Lists.transform(skus, Sku::getCategoryId));
+        Map<Integer, Vendor> vendorMap = vendorService.findByIds(Lists.transform(skus, Sku::getVendorId));
+        Map<Integer, Duration> durationMap = durationService.findByIds(Lists.transform(skus, Sku::getDurationId));
+        model.put("skus", Lists.transform(skus,
+                input -> parse(input,
+                        cityMap.get(input.getCityId()),
+                        categoryMap.get(input.getCategoryId()),
+                        vendorMap.get(input.getVendorId()),
+                        durationMap.get(input.getDurationId()))));
         model.put("pageSize", pageSize);
         model.put("pageNumber", pageNumber);
         model.put("role", getToken().getRole().toString());
@@ -476,7 +484,7 @@ public class HomeController extends AuthenticationRequiredController {
         result.setGatheringPlace(Lists.newArrayList(sku.getGatheringPlace().split(CommonConstants.SEPARATOR)));
         result.setPickupService(sku.hasPickupService());
         result.setDurationId(sku.getDurationId());
-        result.setDuration(duration != null?duration.getName():"");
+        result.setDuration(duration != null ? duration.getName() : "");
         result.setTickets(Lists.transform(sku.getTickets(), ObjectParser::parse));
         return result;
     }

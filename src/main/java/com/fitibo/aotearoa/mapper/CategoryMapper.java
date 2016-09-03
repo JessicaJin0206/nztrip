@@ -2,6 +2,7 @@ package com.fitibo.aotearoa.mapper;
 
 import com.fitibo.aotearoa.model.Category;
 
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
@@ -28,4 +29,23 @@ public interface CategoryMapper {
             @Result(column = "parent_category_id", property = "parentCategoryId")
     })
     Category findById(int id);
+
+
+    @Select({
+            "<script>",
+            "select * from category where false",
+            "<if test='list.size() > 0'>",
+            "or id in ",
+            "<foreach collection='list' open = '(' close = ')' item='item' separator=','>",
+            "#{item}",
+            "</foreach>",
+            "</if>",
+            "</script>"
+    })
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "name", property = "name"),
+            @Result(column = "parent_category_id", property = "parentCategoryId")
+    })
+    List<Category> findByIds(@Param("list") List<Integer> ids);
 }

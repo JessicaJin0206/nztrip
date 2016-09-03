@@ -1,27 +1,17 @@
 package com.fitibo.aotearoa.service;
 
-import com.fitibo.aotearoa.mapper.CityMapper;
 import com.fitibo.aotearoa.model.City;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
+import java.util.Map;
 
 /**
- * Created by qianhao.zhou on 8/1/16.
+ * Created by qianhao.zhou on 9/3/16.
  */
-@Service
-public class CityService {
+public interface CityService {
+    List<City> findAll();
 
-    @Autowired
-    private CityMapper cityMapper;
+    City findById(int cityId);
 
-    public List<City> findAll() {
-        return cityMapper.findAll();
-    }
-
-    public City findById(int cityId) {
-        return cityMapper.findById(cityId);
-    }
+    Map<Integer, City> findByIds(List<Integer> ids);
 }

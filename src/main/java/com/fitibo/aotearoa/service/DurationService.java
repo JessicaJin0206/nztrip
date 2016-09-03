@@ -1,27 +1,17 @@
 package com.fitibo.aotearoa.service;
 
-import com.fitibo.aotearoa.mapper.DurationMapper;
 import com.fitibo.aotearoa.model.Duration;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
+import java.util.Map;
 
 /**
- * Created by qianhao.zhou on 8/19/16.
+ * Created by qianhao.zhou on 9/3/16.
  */
-@Service
-public class DurationService {
+public interface DurationService {
+    List<Duration> findAll();
 
-    @Autowired
-    private DurationMapper durationMapper;
+    Duration findById(int durationId);
 
-    public List<Duration> findAll() {
-        return durationMapper.findAll();
-    }
-
-    public Duration findById(int durationId) {
-        return durationMapper.findById(durationId);
-    }
+    Map<Integer, Duration> findByIds(List<Integer> ids);
 }

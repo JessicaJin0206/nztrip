@@ -35,6 +35,26 @@ public interface VendorMapper {
     })
     List<Vendor> findAll();
 
+
+    @Select({
+            "<script>",
+            "select * from vendor where false",
+            "<if test='list.size() > 0'>",
+            "or id in ",
+            "<foreach collection='list' open = '(' close = ')' item='item' separator=','>",
+            "#{item}",
+            "</foreach>",
+            "</if>",
+            "</script>"
+    })
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "name", property = "name"),
+            @Result(column = "email", property = "email"),
+            @Result(column = "phone", property = "phone")
+    })
+    List<Vendor> findByIds(List<Integer> ids);
+
     @Insert("insert into vendor(name, email, phone) values(#{name}, #{email}, #{phone})")
     @SelectKey(statement = "select last_insert_id() as id", keyProperty = "id", keyColumn = "id", before = false, resultType = Integer.class)
     @Options(useGeneratedKeys = true, keyColumn = "id", keyProperty = "id", flushCache = Options.FlushCachePolicy.DEFAULT)
