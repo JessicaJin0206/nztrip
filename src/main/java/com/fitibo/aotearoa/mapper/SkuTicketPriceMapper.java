@@ -72,7 +72,7 @@ public interface SkuTicketPriceMapper {
     })
     List<SkuTicketPrice> findByIds(@Param("ids") List<Integer> ids);
 
-    @Select("select * from sku_ticket_price where sku_id = #{skuId} and date > date_add(now(), interval 1 day)")
+    @Select("select * from sku_ticket_price where sku_id = #{skuId} and date > date_add(now(), interval -1 day)")
     @Results({
             @Result(column = "id", property = "id"),
             @Result(column = "sku_id", property = "skuId"),
@@ -98,7 +98,7 @@ public interface SkuTicketPriceMapper {
     })
     List<SkuTicketPrice> findBySkuTicketIdAndDate(@Param("skuTicketId") int skuTicketId, @Param("date") Date date, RowBounds rowBounds);
 
-    @Select("select * from sku_ticket_price where sku_ticket_id = #{skuTicketId} and date > date_add(now(), interval 1 day) order by date desc")
+    @Select("select * from sku_ticket_price where sku_ticket_id = #{skuTicketId} and date > date_add(now(), interval -1 day) order by date desc")
     @Results({
             @Result(column = "id", property = "id"),
             @Result(column = "sku_id", property = "skuId"),

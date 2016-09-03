@@ -75,7 +75,6 @@ $('#j_submit').on('click', function(){
         costPrice: costPrice,
         description: description
     };
-    console.log(JSON.stringify(data));
     $.ajax({
         type: 'POST',
         contentType: "application/json; charset=utf-8",

@@ -1,0 +1,1 @@
+ALTER TABLE `sku_ticket_price` MODIFY COLUMN time varchar(50);
