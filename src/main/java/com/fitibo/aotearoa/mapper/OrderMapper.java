@@ -248,4 +248,7 @@ public interface OrderMapper {
 
     @Update("update `order` set status = #{newStatus} where id = #{id} and status = #{oldStatus}")
     int updateOrderStatus(@Param("id") int id, @Param("oldStatus") int oldStatus, @Param("newStatus") int newStatus);
+
+    @Update("update `order` set reference_number = #{referenceNumber} where id = #{id}")
+    int updateReferenceNumber(@Param("id") int id, @Param("referenceNumber") String referenceNumber);
 }

@@ -110,18 +110,19 @@ $('#j_delete').on('click', function(){
         dayOfWeek: dayOfWeek,
         time: time,
     };
-    var result = confirm("确定删除上述票种吗?");
-    if (!result) {
-        return;
-    }
-    $.ajax({
-               type: 'DELETE',
-               contentType: "application/json; charset=utf-8",
-               url: '/v1/api/skus/' + skuId + '/tickets/' + ticketId + '/prices',
-               data: JSON.stringify(data)
-    }).success(function () {
-        success("删除成功");
-    }).error(function () {
-        error("删除失败");
+    bootbox.confirm("确定删除上述票种吗?", function(yes){
+        if (yes) {
+            $.ajax({
+                type: 'DELETE',
+                contentType: "application/json; charset=utf-8",
+                url: '/v1/api/skus/' + skuId + '/tickets/' + ticketId + '/prices',
+                data: JSON.stringify(data)
+            }).success(function () {
+                success("删除成功");
+            }).error(function () {
+                error("删除失败");
+            });
+        }
+
     });
 });

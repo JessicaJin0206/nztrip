@@ -10,7 +10,7 @@
     <#if editing = false>
         <button id="j_edit" class="btn btn-default form-group">修改订单信息</button>
         <#list transitions as transition>
-            <button class="btn btn-default form-group j_operation"
+            <button class="btn btn-primary form-group j_operation"
                     operation="${transition.to}">${transition.action}</button>
         </#list>
     <#else>

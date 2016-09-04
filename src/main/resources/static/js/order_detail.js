@@ -4,12 +4,12 @@ var create_alert = function (message) {
         alert.remove();
     }
     return $('<div class="alert ">' +
-        '<button type="button" class="close" data-dismiss="alert"' +
-        'aria-hidden="true">' +
-        '&times;' +
-        '</button>' +
-        '<span id="j_alert">' + message + '</span>' +
-        '</div>');
+             '<button type="button" class="close" data-dismiss="alert"' +
+             'aria-hidden="true">' +
+             '&times;' +
+             '</button>' +
+             '<span id="j_alert">' + message + '</span>' +
+             '</div>');
 };
 
 var warn = function (message) {
@@ -17,12 +17,12 @@ var warn = function (message) {
     alert.addClass('alert-warning');
     $('.main').prepend(alert);
 };
-var success = function(message) {
+var success = function (message) {
     var alert = create_alert(message);
     alert.addClass('alert-success');
     $('.main').prepend(alert);
 };
-var error = function(message) {
+var error = function (message) {
     var alert = create_alert(message);
     alert.addClass('alert-danger');
     $('.main').prepend(alert);
@@ -31,7 +31,7 @@ var error = function(message) {
 var statusDropDown = $('#j_selected_status');
 $.each($('#j_status_drop_down li a'), function (idx, item) {
     var status = $(item);
-    status.on('click', function(){
+    status.on('click', function () {
         statusDropDown.html(status.html());
         statusDropDown.attr('value', status.attr('value'));
     })
@@ -40,18 +40,21 @@ $.each($('#j_status_drop_down li a'), function (idx, item) {
 function getQueryString(name) {
     var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
     var r = window.location.search.substr(1).match(reg);
-    if (r != null) return unescape(r[2]); return null;
+    if (r != null) {
+        return unescape(r[2]);
+    }
+    return null;
 }
 
 var timeSelector = $('#j_ticket_time_selector');
 var timeSpan = $('#j_ticket_time_span');
-$('#j_ticket_type_selector li a').on('click', function(e){
+$('#j_ticket_type_selector li a').on('click', function (e) {
     var selected = $(e.target);
     var ticket = $('#j_ticket');
     ticket.attr('value', selected.attr("value"));
     ticket.attr('count', selected.attr("count"));
     ticket.html(selected.html());
-    var availableDate = selected.attr('available_date').split("|").filter(function(value) {
+    var availableDate = selected.attr('available_date').split("|").filter(function (value) {
         return value.length > 0;
     }).sort();
     availableDate.push(moment().format('YYYY-MM-DD'));
@@ -63,36 +66,37 @@ $('#j_ticket_type_selector li a').on('click', function(e){
     timeSpan.html('选择时间');
     timeSpan.attr('value', "0");
     selector.datetimepicker({
-        enabledDates: availableDate,
-        // minDate: minDate,
-        // maxDate: maxDate,
-        format: "YYYY-MM-DD"
-    }).on('dp.change', function(e){
-        var url = '/v1/api/skus/' + $('.main').attr('skuId') + '/tickets/' + ticket.attr('value') + '/prices?date=' + e.date.format('YYYY-MM-DD');
+                                enabledDates: availableDate,
+                                // minDate: minDate,
+                                // maxDate: maxDate,
+                                format: "YYYY-MM-DD"
+                            }).on('dp.change', function (e) {
+        var url = '/v1/api/skus/' + $('.main').attr('skuId') + '/tickets/' + ticket.attr('value')
+                  + '/prices?date=' + e.date.format('YYYY-MM-DD');
         $.ajax({
-            type: 'GET',
-            contentType:"application/json; charset=utf-8",
-            url: url
-        }).success(function(data){
+                   type: 'GET',
+                   contentType: "application/json; charset=utf-8",
+                   url: url
+               }).success(function (data) {
             timeSelector.empty();
             if (data && data.length > 0) {
-                for (var i= 0; i < data.length; ++i) {
+                for (var i = 0; i < data.length; ++i) {
                     var price = data[i];
                     var item = $('<li><a value="' + price.id + '">' + price.time + '</a></li>');
-                    item.on('click', function(){
+                    item.on('click', function () {
                         timeSpan.html(price.time);
                         timeSpan.attr('value', price.id);
                     });
                     timeSelector.append(item);
                 }
             }
-        }).error(function(){
+        }).error(function () {
             timeSelector.empty();
         });
     });
 });
 
-$('#add_ticket').on('click', function(e){
+$('#add_ticket').on('click', function (e) {
     var ticket = $('#j_ticket');
     var ticketId = parseInt(ticket.attr('value'));
     if (ticketId <= 0) {
@@ -107,7 +111,8 @@ $('#add_ticket').on('click', function(e){
     if (priceId <= 0) {
         return;
     }
-    var ticketContainer = $('<div class="form-group j_ticket_container" id="j_ticket_container"><a id="j_ticket_delete"><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span></a><div class="form-group"><label>票种:</label><span id="j_ticket_name_span"></span></div><div class="form-group"><label>日期:</label><span id="j_ticket_date_span"></span></div><div class="form-group"><label>时间:</label><span id="j_ticket_time_span"></span></div><table class="table"><thead><tr><th>姓名</th><th>年龄</th><th>体重</th></tr></thead><tbody></tbody></table></div>');
+    var ticketContainer = $(
+        '<div class="form-group j_ticket_container" id="j_ticket_container"><a id="j_ticket_delete"><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span></a><div class="form-group"><label>票种:</label><span id="j_ticket_name_span"></span></div><div class="form-group"><label>日期:</label><span id="j_ticket_date_span"></span></div><div class="form-group"><label>时间:</label><span id="j_ticket_time_span"></span></div><table class="table"><thead><tr><th>姓名</th><th>年龄</th><th>体重</th></tr></thead><tbody></tbody></table></div>');
     var ticketName = ticket.html();
     var ticketCount = parseInt(ticket.attr('count'));
     ticketContainer.attr('ticketId', ticketId);
@@ -116,8 +121,9 @@ $('#add_ticket').on('click', function(e){
     ticketContainer.find('#j_ticket_name_span').html(ticketName);
     ticketContainer.find('#j_ticket_date_span').html(date);
     ticketContainer.find('#j_ticket_time_span').html(time);
-    for(var i = 0; i < ticketCount; i++) {
-        var ticketDetail = $('<tr><th><input type="text" id="j_user_name" class="form-control"/></th><th><input type="number" id="j_user_age" class="form-control"/></th><th><input type="number" id="j_user_weight" class="form-control"/></th></tr>')
+    for (var i = 0; i < ticketCount; i++) {
+        var ticketDetail = $(
+            '<tr><th><input type="text" id="j_user_name" class="form-control"/></th><th><input type="number" id="j_user_age" class="form-control"/></th><th><input type="number" id="j_user_weight" class="form-control"/></th></tr>')
         ticketContainer.find('tbody').append(ticketDetail);
     }
     ticketContainer.find("a#j_ticket_delete").on('click', function () {
@@ -128,33 +134,34 @@ $('#add_ticket').on('click', function(e){
 $('.j_ticket_container').each(function (index, e) {
     var row = $(e);
     row.find("a#j_ticket_delete").on('click', function () {
-        var result = confirm("确认删除订单的该张票的信息?");
-        if (result == true) {
-            var id = row.attr("value");
-            var skuTicketId = row.attr("ticketId");
-            var path = window.location.pathname.split('/');
-            var orderId = parseInt(path[path.length - 2]);
-            var data = {
-                id: id,
-                skuTicketId: skuTicketId,
-                orderId: orderId
-            }
-            $.ajax({
-                type: 'DELETE',
-                contentType: "application/json; charset=utf-8",
-                url: '/v1/api/orders/tickets/' + id,
-                data: JSON.stringify(data)
-            }).success(function (data) {
-                if (data == true) {
-                    row.remove();
-                    success("删除成功");
-                } else {
+        bootbox.confirm("确认删除订单的该张票的信息?", function (result) {
+            if (result) {
+                var id = row.attr("value");
+                var skuTicketId = row.attr("ticketId");
+                var path = window.location.pathname.split('/');
+                var orderId = parseInt(path[path.length - 2]);
+                var data = {
+                    id: id,
+                    skuTicketId: skuTicketId,
+                    orderId: orderId
+                };
+                $.ajax({
+                           type: 'DELETE',
+                           contentType: "application/json; charset=utf-8",
+                           url: '/v1/api/orders/tickets/' + id,
+                           data: JSON.stringify(data)
+                       }).success(function (data) {
+                    if (data == true) {
+                        row.remove();
+                        success("删除成功");
+                    } else {
+                        error("修改失败");
+                    }
+                }).error(function () {
                     error("修改失败");
-                }
-            }).error(function () {
-                error("修改失败");
-            })
-        }
+                })
+            }
+        });
     })
 })
 
@@ -181,7 +188,7 @@ $('#j_update').on('click', function () {
     var vendorPhone = $('#j_vendor_phone').val();
     var orderTickets = [];
 
-    if(price <= 0) {
+    if (price <= 0) {
         warn("订单价格有误");
         isDataValid = false;
         return;
@@ -196,7 +203,7 @@ $('#j_update').on('click', function () {
         isDataValid = false;
         return;
     }
-    
+
     //ticket
     var ticketContainer = $('.j_ticket_container');
     if (ticketContainer.length == 0) {
@@ -204,7 +211,7 @@ $('#j_update').on('click', function () {
         isDataValid = false;
         return;
     }
-    ticketContainer.each(function(index, e){
+    ticketContainer.each(function (index, e) {
         var orderTicket = {};
         var node = $(e);
         orderTicket.id = parseInt(node.attr("value"))
@@ -222,33 +229,33 @@ $('#j_update').on('click', function () {
         orderTicket.priceDescription = "";
         orderTicket.orderTicketUsers = [];
         orderTickets.push(orderTicket);
-        node.find('tbody tr').each(function(index, e){
+        node.find('tbody tr').each(function (index, e) {
             var ticketUserContainer = $(e);
             var id = ticketUserContainer.attr("value");
             var name = ticketUserContainer.find('#j_user_name').val();
-            if(name.length == 0) {
+            if (name.length == 0) {
                 warn("请添加姓名");
                 isDataValid = false;
                 return;
             }
             var age = parseInt(ticketUserContainer.find('#j_user_age').val());
-            if(age <= 0) {
+            if (age <= 0) {
                 warn("请填写正确的年龄");
                 isDataValid = false;
                 return;
             }
             var weight = parseInt(ticketUserContainer.find('#j_user_weight').val());
-            if(weight <= 0) {
+            if (weight <= 0) {
                 warn("请填写正确的体重");
                 isDataValid = false;
                 return;
-            } 
+            }
             orderTicket.orderTicketUsers.push({
-                id: id,
-                name: name,
-                age: age,
-                weight: weight
-            })
+                                                  id: id,
+                                                  name: name,
+                                                  age: age,
+                                                  weight: weight
+                                              })
         });
     });
 
@@ -277,11 +284,11 @@ $('#j_update').on('click', function () {
         vendorPhone: vendorPhone
     };
     $.ajax({
-        type: 'PUT',
-        contentType: "application/json; charset=utf-8",
-        url: '/v1/api/orders/' + id,
-        data: JSON.stringify(data)
-    }).success(function () {
+               type: 'PUT',
+               contentType: "application/json; charset=utf-8",
+               url: '/v1/api/orders/' + id,
+               data: JSON.stringify(data)
+           }).success(function () {
         success("修改成功");
         $('#j_update').attr("disabled", true);
         window.location.href = '/orders/' + id;
@@ -294,22 +301,75 @@ $('.j_operation').on('click', function () {
     var path = window.location.pathname.split('/');
     var id = parseInt(path[path.length - 1]);
     var action = parseInt($(this).attr("operation"));
-    var result = confirm("确认操作订单吗?");
-    if (!result) {
-        return;
-    }
-    $.ajax({
-        type: 'PUT',
-        contentType: "application/json; charset=utf-8",
-        url: '/v1/api/orders/' + id + "/status/" + action,
-    }).success(function (data) {
-        if(data == true) {
-            alert("操作成功");
-            window.location.reload();
-        } else {
-            error("操作失败");
+    var data = {};
+    bootbox.confirm("确认操作订单吗?", function (yes) {
+        if (!yes) {
+            return;
         }
-    }).error(function () {
-        error("操作失败");
-    })
-})
+        if (action == 40) {//reservation confirmed
+            if ($('#j_referencenumber').val().length == 0) {
+                bootbox.prompt("请先填写Reference Number", function(referenceNumber){
+                    if (referenceNumber === null) {
+                        return;
+                    } else if (referenceNumber.length == 0){
+                        warn("缺少Reference Number");
+                        return;
+                    } else {
+                        data.referenceNumber = referenceNumber;
+                    }
+                    $.ajax({
+                        type: 'PUT',
+                        contentType: "application/json; charset=utf-8",
+                        url: '/v1/api/orders/' + id + "/status/" + action,
+                        data: JSON.stringify(data)
+                    }).success(function (data) {
+                        if (data == true) {
+                            bootbox.alert("操作成功", function() {
+                                window.location.reload();
+                            });
+                        } else {
+                            error("操作失败");
+                        }
+                    }).error(function () {
+                        error("操作失败");
+                    });
+                });
+            } else {
+                $.ajax({
+                    type: 'PUT',
+                    contentType: "application/json; charset=utf-8",
+                    url: '/v1/api/orders/' + id + "/status/" + action,
+                    data: JSON.stringify(data)
+                }).success(function (data) {
+                    if (data == true) {
+                        bootbox.alert("操作成功", function() {
+                            window.location.reload();
+                        });
+                    } else {
+                        error("操作失败");
+                    }
+                }).error(function () {
+                    error("操作失败");
+                });
+            }
+        } else {
+            console.log('modify status to ' + action);
+            $.ajax({
+                type: 'PUT',
+                contentType: "application/json; charset=utf-8",
+                url: '/v1/api/orders/' + id + "/status/" + action,
+                data: JSON.stringify(data)
+            }).success(function (data) {
+                if (data == true) {
+                    alert("操作成功");
+                    window.location.reload();
+                } else {
+                    error("操作失败");
+                }
+            }).error(function () {
+                error("操作失败");
+            })
+        }
+    });
+
+});

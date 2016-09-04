@@ -52,6 +52,7 @@ import com.fitibo.aotearoa.vo.SkuTicketVo;
 import com.fitibo.aotearoa.vo.SkuVo;
 import com.fitibo.aotearoa.vo.VendorVo;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -328,7 +329,9 @@ public class RestApiController extends AuthenticationRequiredController {
     @RequestMapping(value = "/v1/api/orders/{id}/status/{toStatus}", method = RequestMethod.PUT)
     @Authentication(Role.Admin)
     @Transactional
-    public boolean updateOrderStatus(@PathVariable("id") int id, @PathVariable("toStatus") int toStatus) {
+    public boolean updateOrderStatus(@PathVariable("id") int id,
+                                     @PathVariable("toStatus") int toStatus,
+                                     @RequestBody OrderVo extra) {
         Order order = orderMapper.findById(id);
         if (order == null) {
             throw new ResourceNotFoundException();
@@ -340,6 +343,15 @@ public class RestApiController extends AuthenticationRequiredController {
             if (transition.getTo() == toStatus) {
                 statusValid = true;
                 break;
+            }
+        }
+        if (toStatus == OrderStatus.CONFIRMED.getValue()) {
+            if (StringUtils.isEmpty(order.getReferenceNumber())) {
+                Preconditions.checkNotNull(extra, "missing reference number");
+                String referenceNumber = extra.getReferenceNumber();
+                Preconditions.checkNotNull(referenceNumber, "missing reference number");
+                orderMapper.updateReferenceNumber(id, referenceNumber);
+                order.setReferenceNumber(referenceNumber);
             }
         }
         if (!statusValid) {
