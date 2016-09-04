@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -26,6 +27,14 @@ public interface OrderTicketMapper {
             "#{ticketPriceId}, #{ticketDate}, #{ticketTime}, #{salePrice}, #{costPrice}, #{priceDescription}, #{price}, #{gatheringPlace})")
     @Options(useGeneratedKeys = true, keyColumn = "id", keyProperty = "id", flushCache = Options.FlushCachePolicy.DEFAULT)
     int create(OrderTicket orderTicket);
+
+    @Update("update order ticket set " +
+            "ticket_date = #{ticketDate}," +
+            "ticket_time = #{ticketTime}," +
+            "sale_price = #{salePrice}," +
+            "cost_price = #{costPrice}" +
+            " where id = #{id}")
+    int update(OrderTicket orderTicket);
 
     @Select("select id, sku_id, sku_ticket_id, order_id, sku_ticket_name, " +
             "count_constraint, age_constraint, weight_constraint, ticket_description, " +

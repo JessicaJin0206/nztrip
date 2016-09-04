@@ -293,12 +293,12 @@ public class RestApiController extends AuthenticationRequiredController {
         for (OrderTicketVo orderTicketVo : order.getOrderTickets()) {
 
             if (orderTicketVo.getId() > 0) {
-                OrderTicket orderTicket = new OrderTicket();
-                orderTicket.setSkuTicket(orderTicketVo.getSkuTicket());
-                orderTicket.setTicketDate(DateUtils.parseDate(orderTicketVo.getTicketDate()));
-                orderTicket.setTicketTime(orderTicketVo.getTicketTime());
-                orderTicket.setId(orderTicketVo.getId());
-//            orderTicketMapper.updateOrderTicketInfo(orderTicket);
+//                OrderTicket orderTicket = new OrderTicket();
+//                orderTicket.setSkuTicket(orderTicketVo.getSkuTicket());
+//                orderTicket.setTicketDate(DateUtils.parseDate(orderTicketVo.getTicketDate()));
+//                orderTicket.setTicketTime(orderTicketVo.getTicketTime());
+//                orderTicket.setId(orderTicketVo.getId());
+//                orderTicketMapper.update(orderTicket);
             } else {
                 OrderTicket orderTicket = parse(orderTicketVo, order);
                 orderTicketMapper.create(orderTicket);

@@ -140,18 +140,22 @@ $('#j_submit').on('click', function(){
     var secondaryContactWechat = $('#j_secondary_contact_wechat').val();
     var remark = $('#j_remark').val();
     var orderTickets = [];
+    var isDataValid = true;
 
     if (primaryContact.length == 0) {
         warn("缺少主要联系人信息");
+        isDataValid = false;
         return;
     }
     if (primaryContactEmail.length == 0) {
         warn("缺少主要联系人信息");
+        isDataValid = false;
         return;
     }
     var ticketContainer = $('.j_ticket_container');
     if (ticketContainer.length == 0) {
         warn("至少需要添加一张票");
+        isDataValid = false;
         return;
     }
     ticketContainer.each(function(index, e){
@@ -177,6 +181,21 @@ $('#j_submit').on('click', function(){
             var name = ticketUserContainer.find('#j_user_name').val();
             var age = parseInt(ticketUserContainer.find('#j_user_age').val());
             var weight = parseInt(ticketUserContainer.find('#j_user_weight').val());
+            if(name.length == 0) {
+                warn("请添加姓名");
+                isDataValid = false;
+                return;
+            }
+            if(isNaN(age) || age <= 0) {
+                warn("请填写正确的年龄");
+                isDataValid = false;
+                return;
+            }
+            if(isNaN(weight) || weight <= 0) {
+                warn("请填写正确的体重");
+                isDataValid = false;
+                return;
+            }
             orderTicket.orderTicketUsers.push({
                 name: name,
                 age: age,
@@ -184,6 +203,9 @@ $('#j_submit').on('click', function(){
             })
         });
     });
+    if (!isDataValid) {
+        return;
+    }
     var data = {
         skuId: skuId,
         primaryContact: primaryContact,

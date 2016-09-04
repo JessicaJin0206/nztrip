@@ -163,6 +163,7 @@ $('#j_edit').on('click', function () {
 })
 
 $('#j_update').on('click', function () {
+    var isDataValid = true;
     var skuId = parseInt($('#j_order_sku').attr("skuid"));
     var price = parseFloat($('#j_order_price').val());
     var status = parseInt(statusDropDown.attr("value"));
@@ -182,14 +183,17 @@ $('#j_update').on('click', function () {
 
     if(price <= 0) {
         warn("订单价格有误");
+        isDataValid = false;
         return;
     }
     if (primaryContact.length == 0) {
         warn("缺少主要联系人信息");
+        isDataValid = false;
         return;
     }
     if (primaryContactEmail.length == 0) {
         warn("缺少主要联系人信息");
+        isDataValid = false;
         return;
     }
     
@@ -197,6 +201,7 @@ $('#j_update').on('click', function () {
     var ticketContainer = $('.j_ticket_container');
     if (ticketContainer.length == 0) {
         warn("至少需要添加一张票");
+        isDataValid = false;
         return;
     }
     ticketContainer.each(function(index, e){
@@ -223,16 +228,19 @@ $('#j_update').on('click', function () {
             var name = ticketUserContainer.find('#j_user_name').val();
             if(name.length == 0) {
                 warn("请添加姓名");
+                isDataValid = false;
                 return;
             }
             var age = parseInt(ticketUserContainer.find('#j_user_age').val());
             if(age <= 0) {
                 warn("请填写正确的年龄");
+                isDataValid = false;
                 return;
             }
             var weight = parseInt(ticketUserContainer.find('#j_user_weight').val());
             if(weight <= 0) {
                 warn("请填写正确的体重");
+                isDataValid = false;
                 return;
             } 
             orderTicket.orderTicketUsers.push({
@@ -243,7 +251,10 @@ $('#j_update').on('click', function () {
             })
         });
     });
-    
+
+    if (!isDataValid) {
+        return;
+    }
     var path = window.location.pathname.split('/');
     var id = parseInt(path[path.length - 2]);
     var data = {
