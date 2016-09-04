@@ -17,7 +17,8 @@ email:
 template:
   reservationemail:
     from: eyounz@foxmail.com
-    subject: Make Reservation
+    subject: |
+      New Booking from EYOUNZ LTD #TOUR# #PRIMARY_CONTACT#
     content: |
       <html><body><div>
       #VENDORNAME#,<br><br>

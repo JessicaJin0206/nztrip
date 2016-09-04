@@ -107,7 +107,15 @@ public class OperationService {
             return;
         }
         String content = formatReservationEmailContent(reservationEmailTemplate, vendor, order, ticketList);
-        emailService.send(order.getId(), reservationEmailFrom, vendor.getEmail(), reservationEmailSubject, content);
+        String subject = formatReservationEmailSubject(reservationEmailSubject, order);
+        emailService.send(order.getId(), reservationEmailFrom, vendor.getEmail(), subject, content);
+    }
+
+    private String formatReservationEmailSubject(String template, Order order) {
+        String result = template;
+        result = result.replace("#TOUR#", order.getSku());
+        result = result.replace("#PRIMARY_CONTACT#", order.getPrimaryContact());
+        return result;
     }
 
     private String formatConfirmationEmailContent(String template, Order order, Sku sku, Agent agent) {
