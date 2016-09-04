@@ -23,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
 
 @Service("operationService")
@@ -147,6 +146,8 @@ public class OperationService {
         return Joiner.on("<br><br>").join(list);
     }
 
+    private static final String SPACE = "&nbsp;&nbsp;&nbsp;";
+
     private String formatReservationEmailContent(String contentTemplate, Vendor vendor, Order order, List<OrderTicket> tickets) {
 
         String content = contentTemplate;
@@ -154,34 +155,23 @@ public class OperationService {
         content = content.replace("#TOUR#", order.getSku());
         content = content.replace("#NAME#", order.getPrimaryContact());
 
-        StringBuffer tourInfo = new StringBuffer();
-        HashMap<String, List<OrderTicket>> ticketsMap = new HashMap<>();
+        StringBuilder tourInfo = new StringBuilder();
+        tourInfo.append("DETAILS:<br>");
         for (OrderTicket ticket : tickets) {
-            String key = ticket.getSkuId() + "_" + ticket.getSkuTicketId() + "_" + ticket.getTicketDate() + "_" + ticket.getTicketTime();
-            if (ticketsMap.containsKey(key)) {
-                ticketsMap.get(key).add(ticket);
-            } else {
-                ticketsMap.put(key, Lists.newArrayList(ticket));
-            }
-        }
-        for (List<OrderTicket> sameTicketList : ticketsMap.values()) {
-            String date = DateUtils.formatDate(sameTicketList.get(0).getTicketDate());
-            String time = sameTicketList.get(0).getTicketTime();
-            tourInfo.append("DATE: ").append(date).append("<br>");
-            tourInfo.append("TIME: ").append(time).append("<br>");
+            String date = DateUtils.formatDate(ticket.getTicketDate());
+            String time = ticket.getTicketTime();
+            tourInfo.append(SPACE).append("ITEM: ").append(ticket.getSkuTicket()).append("<br>");
+            tourInfo.append(SPACE).append("DATE: ").append(date).append("<br>");
+            tourInfo.append(SPACE).append("TIME: ").append(time).append("<br>");
 
-            int count = 0;
-            StringBuffer paxSb = new StringBuffer();
-            for (OrderTicket ticket : sameTicketList) {
-                for (OrderTicketUser user : ticket.getUsers()) {
-                    count++;
-                    paxSb.append(" ").append(user.getName()).append("-")
-                            .append(user.getAge()).append(" years old").append("-")
-                            .append(user.getWeight()).append("kg;");
-                }
+            for (OrderTicketUser user : ticket.getUsers()) {
+                tourInfo.append(SPACE).append(SPACE).append(user.getName()).append("-")
+                        .append(user.getAge()).append(" years old").append("-")
+                        .append(user.getWeight()).append("kg").append("<br>");
             }
-            tourInfo.append("TOTAL PAX: ").append(count + " persons: ").append(paxSb).append("<br>");
+            tourInfo.append("<br>");
         }
+
 
         content = content.replace("#TOURINFO#", tourInfo.toString());
         return content;
