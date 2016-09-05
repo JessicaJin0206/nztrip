@@ -20,11 +20,13 @@ public interface SkuTicketPriceMapper {
 
     @Insert({
             "<script>",
+            "<if test = 'skuTicketPrices != null and skuTicketPrices.size() > 0'>",
             "insert into sku_ticket_price (sku_id, sku_ticket_id, date, time, sale_price, cost_price, description)",
             "values ",
             "<foreach  collection='skuTicketPrices' item='item' separator=','>",
             "(#{item.skuId}, #{item.skuTicketId}, #{item.date}, #{item.time}, #{item.salePrice}, #{item.costPrice}, #{item.description})",
             "</foreach>",
+            "</if>",
             "</script>"
     })
     int batchCreate(@Param("skuTicketPrices") List<SkuTicketPrice> skuTicketPrices);
@@ -118,5 +120,20 @@ public interface SkuTicketPriceMapper {
             "</script>"
     })
     int deleteTicketPrice(SkuTicketPrice price);
+
+    @Delete({
+            "<script>",
+            "delete from sku_ticket_price where sku_id = #{skuId} and sku_ticket_id = #{skuTicketId} and date = #{date} ",
+            "<if test ='times != null and times.size() > 0'>",
+            "and time in ",
+            "<foreach  collection='times' open='(' close=')' item='item' separator=','>#{item}",
+            "</foreach>",
+            "</if>",
+            "</script>"
+    })
+    int batchDelete(@Param("skuId") int skuId,
+                          @Param("skuTicketId") int skuTicketId,
+                          @Param("date") Date date,
+                          @Param("times") List<String> times);
 
 }

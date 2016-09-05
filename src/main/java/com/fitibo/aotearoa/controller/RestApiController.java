@@ -2,7 +2,9 @@ package com.fitibo.aotearoa.controller;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -72,6 +74,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -453,29 +456,42 @@ public class RestApiController extends AuthenticationRequiredController {
 
     @RequestMapping(value = "v1/api/skus/{skuId}/tickets/{ticketId}/prices", method = RequestMethod.POST)
     @Authentication(Role.Admin)
+    @Transactional
     public int addPrice(@PathVariable("skuId") int skuId,
                         @PathVariable("ticketId") int ticketId,
                         @RequestBody AddPriceRequest request) {
+        Preconditions.checkNotNull(request.getSalePrice(), "sale price cannot be null");
+        Preconditions.checkNotNull(request.getCostPrice(), "cost price cannot be null");
+        Preconditions.checkNotNull(request.getTime(), "cost price cannot be null");
         DateTime start = DateUtils.parseDateTime(request.getStartDate());
         DateTime end = DateUtils.parseDateTime(request.getEndDate());
+        List<String> times = Lists.newArrayList(Splitter.on(';').trimResults().omitEmptyStrings().split(request.getTime()));
+        Preconditions.checkArgument(!times.isEmpty(), "invalid times parsed from Field(time):" + request.getTime());
         List<SkuTicketPrice> prices = Lists.newArrayList();
         for (DateTime date = start.toDateTime(); !date.isAfter(end); date = date.plusDays(1)) {
             if (request.getDayOfWeek().contains(date.getDayOfWeek())) {
-                SkuTicketPrice price = new SkuTicketPrice();
-                price.setCostPrice(request.getCostPrice());
-                price.setSalePrice(request.getSalePrice());
-                price.setDate(date.toDate());
-                price.setDescription(request.getDescription());
-                price.setSkuId(skuId);
-                price.setSkuTicketId(ticketId);
-                price.setTime(request.getTime());
-                prices.add(price);
+                skuTicketPriceMapper.batchDelete(skuId, ticketId, date.toDate(), times);
+                for (String time : times) {
+                    SkuTicketPrice price = new SkuTicketPrice();
+                    price.setCostPrice(request.getCostPrice());
+                    price.setSalePrice(request.getSalePrice());
+                    price.setDate(date.toDate());
+                    price.setDescription(request.getDescription());
+                    price.setSkuId(skuId);
+                    price.setSkuTicketId(ticketId);
+                    price.setTime(time);
+                    prices.add(price);
+                }
             }
         }
         if (prices.isEmpty()) {
             return 0;
         } else {
-            return skuTicketPriceMapper.batchCreate(prices);
+            int total = 0;
+            for (List<SkuTicketPrice> skuTicketPrices : Lists.partition(prices, 20)) {
+                total += skuTicketPriceMapper.batchCreate(skuTicketPrices);
+            }
+            return total;
         }
     }
 
@@ -488,14 +504,24 @@ public class RestApiController extends AuthenticationRequiredController {
         DateTime start = DateUtils.parseDateTime(request.getStartDate());
         DateTime end = DateUtils.parseDateTime(request.getEndDate());
         int count = 0;
+        List<String> times = Collections.emptyList();
+        if (request.getTime() != null) {
+            times = Lists.newArrayList(Splitter.on(';').trimResults().omitEmptyStrings().split(request.getTime()));
+        }
         for (DateTime date = start.toDateTime(); !date.isAfter(end); date = date.plusDays(1)) {
             if (request.getDayOfWeek().isEmpty() || request.getDayOfWeek().contains(date.getDayOfWeek())) {
                 SkuTicketPrice price = new SkuTicketPrice();
                 price.setSkuId(skuId);
                 price.setSkuTicketId(ticketId);
                 price.setDate(date.toDate());
-                price.setTime(request.getTime());
-                count += skuTicketPriceMapper.deleteTicketPrice(price);
+                if (times.isEmpty()) {
+                    price.setTime(null);
+                } else {
+                    for (String time : times) {
+                        price.setTime(time);
+                        count += skuTicketPriceMapper.deleteTicketPrice(price);
+                    }
+                }
             }
         }
         return count;

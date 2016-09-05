@@ -63,6 +63,10 @@ $('#j_submit').on('click', function(){
     var time = $('#j_ticket_time').val();
     var salePrice = parseFloat($('#j_ticket_sale_price').val());
     var costPrice = parseFloat($('#j_ticket_cost_price').val());
+    if (isNaN(salePrice) || isNaN(costPrice)) {
+        warn('请输入正确的价格');
+        return;
+    }
     var description = $('#j_ticket_description').val();
     var skuId = $('.main').attr('skuId');
     var ticketId = $('.main').attr('ticketId');
