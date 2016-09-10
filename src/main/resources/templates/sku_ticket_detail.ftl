@@ -72,6 +72,8 @@
                 </div>
                 <div class="col-md-2"><input type="number" id="j_ticket_sale_price" class="form-control" placeholder="销售价">
                 </div>
+                <div class="col-md-2"><input type="number" id="j_ticket_total_count" class="form-control" placeholder="库存">
+                </div>
                 <div class="col-md-4"><input type="text" id="j_ticket_description" class="form-control" placeholder="描述">
                 </div>
             </div>
@@ -96,6 +98,8 @@
                         <th>时间</th>
                         <th>成本价</th>
                         <th>零售价</th>
+                        <th>已售</th>
+                        <th>库存</th>
                         <th>说明</th>
                     </tr>
                     </thead>
@@ -106,6 +110,8 @@
                         <td><span>${price.time}</span></td>
                         <td><span>${price.costPrice?string('0.00')}</span></td>
                         <td><span>${price.salePrice?string('0.00')}</span></td>
+                        <td><span>${price.currentCount}</span></td>
+                        <td><span><#if (price.totalCount > 0)>${price.totalCount}<#else>N/A</#if></span></td>
                         <td><span>${price.description!''}</span></td>
                     </tr>
                     </#list>

@@ -64,6 +64,22 @@ public class AddPriceRequest {
         this.time = time;
     }
 
+    public int getTotalCount() {
+        return totalCount;
+    }
+
+    public void setTotalCount(int totalCount) {
+        this.totalCount = totalCount;
+    }
+
+    public int getCurrentCount() {
+        return currentCount;
+    }
+
+    public void setCurrentCount(int currentCount) {
+        this.currentCount = currentCount;
+    }
+
     private String startDate;
     private String endDate;
     private List<Integer> dayOfWeek;
@@ -71,4 +87,6 @@ public class AddPriceRequest {
     private BigDecimal salePrice;
     private BigDecimal costPrice;
     private String description;
+    private int totalCount;
+    private int currentCount;
 }

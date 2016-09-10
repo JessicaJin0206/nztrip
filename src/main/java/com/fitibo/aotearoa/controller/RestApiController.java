@@ -75,6 +75,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -433,7 +434,7 @@ public class RestApiController extends AuthenticationRequiredController {
     @Authentication
     public List<SkuTicketPriceVo> getPrice(@PathVariable("ticketId") int ticketId,
                                            @RequestParam("date") String date) {
-        List<SkuTicketPrice> ticketPrices = skuTicketPriceMapper.findBySkuTicketIdAndDate(ticketId, DateUtils.parseDate(date), new RowBounds());
+        List<SkuTicketPrice> ticketPrices = skuTicketPriceMapper.findAvailableBySkuTicketIdAndDate(ticketId, DateUtils.parseDate(date), new RowBounds());
         int discount = getDiscount(getToken());
         return Lists.transform(ticketPrices, (input) -> {
             SkuTicketPriceVo result = new SkuTicketPriceVo();
@@ -468,18 +469,28 @@ public class RestApiController extends AuthenticationRequiredController {
         List<String> times = Lists.newArrayList(Splitter.on(';').trimResults().omitEmptyStrings().split(request.getTime()));
         Preconditions.checkArgument(!times.isEmpty(), "invalid times parsed from Field(time):" + request.getTime());
         List<SkuTicketPrice> prices = Lists.newArrayList();
-        for (DateTime date = start.toDateTime(); !date.isAfter(end); date = date.plusDays(1)) {
-            if (request.getDayOfWeek().contains(date.getDayOfWeek())) {
-                skuTicketPriceMapper.batchDelete(skuId, ticketId, date.toDate(), times);
+
+        BigDecimal costPrice = request.getCostPrice();
+        BigDecimal salePrice = request.getSalePrice();
+        int currentCount = request.getCurrentCount();
+        int totalCount = request.getTotalCount();
+
+        for (DateTime dateTime = start.toDateTime(); !dateTime.isAfter(end); dateTime = dateTime.plusDays(1)) {
+            if (request.getDayOfWeek().contains(dateTime.getDayOfWeek())) {
+                Date date = dateTime.toDate();
+                skuTicketPriceMapper.batchDelete(skuId, ticketId, date, times);
                 for (String time : times) {
                     SkuTicketPrice price = new SkuTicketPrice();
-                    price.setCostPrice(request.getCostPrice());
-                    price.setSalePrice(request.getSalePrice());
-                    price.setDate(date.toDate());
-                    price.setDescription(request.getDescription());
+                    String description = request.getDescription();
+                    price.setCostPrice(costPrice);
+                    price.setSalePrice(salePrice);
+                    price.setDate(date);
+                    price.setDescription(description);
                     price.setSkuId(skuId);
                     price.setSkuTicketId(ticketId);
                     price.setTime(time);
+                    price.setTotalCount(totalCount);
+                    price.setCurrentCount(currentCount);
                     prices.add(price);
                 }
             }

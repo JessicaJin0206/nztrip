@@ -21,10 +21,10 @@ public interface SkuTicketPriceMapper {
     @Insert({
             "<script>",
             "<if test = 'skuTicketPrices != null and skuTicketPrices.size() > 0'>",
-            "insert into sku_ticket_price (sku_id, sku_ticket_id, date, time, sale_price, cost_price, description)",
+            "insert into sku_ticket_price (sku_id, sku_ticket_id, date, time, sale_price, cost_price, description, total_count, current_count)",
             "values ",
             "<foreach  collection='skuTicketPrices' item='item' separator=','>",
-            "(#{item.skuId}, #{item.skuTicketId}, #{item.date}, #{item.time}, #{item.salePrice}, #{item.costPrice}, #{item.description})",
+            "(#{item.skuId}, #{item.skuTicketId}, #{item.date}, #{item.time}, #{item.salePrice}, #{item.costPrice}, #{item.description}, #{item.totalCount}, #{item.currentCount})",
             "</foreach>",
             "</if>",
             "</script>"
@@ -41,6 +41,8 @@ public interface SkuTicketPriceMapper {
             @Result(column = "cost_price", property = "costPrice"),
             @Result(column = "sale_price", property = "salePrice"),
             @Result(column = "description", property = "description"),
+            @Result(column = "total_count", property = "totalCount"),
+            @Result(column = "current_count", property = "currentCount"),
     })
     List<SkuTicketPrice> findBySkuIdAndStartTime(@Param("skuId") int skuId, @Param("start") Date start, @Param("end") Date end);
 
@@ -54,6 +56,8 @@ public interface SkuTicketPriceMapper {
             @Result(column = "cost_price", property = "costPrice"),
             @Result(column = "sale_price", property = "salePrice"),
             @Result(column = "description", property = "description"),
+            @Result(column = "total_count", property = "totalCount"),
+            @Result(column = "current_count", property = "currentCount"),
     })
     SkuTicketPrice findById(int id);
 
@@ -71,6 +75,8 @@ public interface SkuTicketPriceMapper {
             @Result(column = "cost_price", property = "costPrice"),
             @Result(column = "sale_price", property = "salePrice"),
             @Result(column = "description", property = "description"),
+            @Result(column = "total_count", property = "totalCount"),
+            @Result(column = "current_count", property = "currentCount"),
     })
     List<SkuTicketPrice> findByIds(@Param("ids") List<Integer> ids);
 
@@ -84,6 +90,8 @@ public interface SkuTicketPriceMapper {
             @Result(column = "cost_price", property = "costPrice"),
             @Result(column = "sale_price", property = "salePrice"),
             @Result(column = "description", property = "description"),
+            @Result(column = "total_count", property = "totalCount"),
+            @Result(column = "current_count", property = "currentCount"),
     })
     List<SkuTicketPrice> findBySkuId(@Param("skuId") int skuId);
 
@@ -97,8 +105,25 @@ public interface SkuTicketPriceMapper {
             @Result(column = "cost_price", property = "costPrice"),
             @Result(column = "sale_price", property = "salePrice"),
             @Result(column = "description", property = "description"),
+            @Result(column = "total_count", property = "totalCount"),
+            @Result(column = "current_count", property = "currentCount"),
     })
     List<SkuTicketPrice> findBySkuTicketIdAndDate(@Param("skuTicketId") int skuTicketId, @Param("date") Date date, RowBounds rowBounds);
+
+    @Select("select * from sku_ticket_price where sku_ticket_id = #{skuTicketId} and date =#{date} and (total_count = 0 or current_count < total_count)")
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "sku_id", property = "skuId"),
+            @Result(column = "sku_ticket_id", property = "skuTicketId"),
+            @Result(column = "date", property = "date"),
+            @Result(column = "time", property = "time"),
+            @Result(column = "cost_price", property = "costPrice"),
+            @Result(column = "sale_price", property = "salePrice"),
+            @Result(column = "description", property = "description"),
+            @Result(column = "total_count", property = "totalCount"),
+            @Result(column = "current_count", property = "currentCount"),
+    })
+    List<SkuTicketPrice> findAvailableBySkuTicketIdAndDate(@Param("skuTicketId") int skuTicketId, @Param("date") Date date, RowBounds rowBounds);
 
     @Select("select * from sku_ticket_price where sku_ticket_id = #{skuTicketId} and date > date_add(now(), interval -1 day) order by date desc")
     @Results({
@@ -110,8 +135,25 @@ public interface SkuTicketPriceMapper {
             @Result(column = "cost_price", property = "costPrice"),
             @Result(column = "sale_price", property = "salePrice"),
             @Result(column = "description", property = "description"),
+            @Result(column = "total_count", property = "totalCount"),
+            @Result(column = "current_count", property = "currentCount"),
     })
     List<SkuTicketPrice> findBySkuTicketId(int skuTicketId, RowBounds rowBounds);
+
+    @Select("select * from sku_ticket_price where sku_ticket_id = #{skuTicketId} and date > date_add(now(), interval -1 day) and (total_count = 0 or current_count < total_count) order by date desc")
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "sku_id", property = "skuId"),
+            @Result(column = "sku_ticket_id", property = "skuTicketId"),
+            @Result(column = "date", property = "date"),
+            @Result(column = "time", property = "time"),
+            @Result(column = "cost_price", property = "costPrice"),
+            @Result(column = "sale_price", property = "salePrice"),
+            @Result(column = "description", property = "description"),
+            @Result(column = "total_count", property = "totalCount"),
+            @Result(column = "current_count", property = "currentCount"),
+    })
+    List<SkuTicketPrice> findAvailableBySkuTicketId(int skuTicketId, RowBounds rowBounds);
 
     @Delete({
             "<script>",

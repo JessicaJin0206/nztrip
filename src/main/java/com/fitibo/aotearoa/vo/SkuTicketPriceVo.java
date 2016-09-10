@@ -79,6 +79,22 @@ public class SkuTicketPriceVo {
         this.price = price;
     }
 
+    public int getCurrentCount() {
+        return currentCount;
+    }
+
+    public void setCurrentCount(int currentCount) {
+        this.currentCount = currentCount;
+    }
+
+    public int getTotalCount() {
+        return totalCount;
+    }
+
+    public void setTotalCount(int totalCount) {
+        this.totalCount = totalCount;
+    }
+
     private int id;
 
     private int skuId;
@@ -89,4 +105,6 @@ public class SkuTicketPriceVo {
     private BigDecimal costPrice;
     private BigDecimal price;
     private String description;
+    private int currentCount;
+    private int totalCount;
 }

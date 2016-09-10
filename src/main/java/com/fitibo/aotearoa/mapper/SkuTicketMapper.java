@@ -59,7 +59,7 @@ public interface SkuTicketMapper {
             @Result(column = "description", property = "description"),
             @Result(column = "status", property = "status"),
             @Result(column = "id", property = "ticketPrices", javaType = List.class,
-                    many = @Many(select = "com.fitibo.aotearoa.mapper.SkuTicketPriceMapper.findBySkuTicketId"))
+                    many = @Many(select = "com.fitibo.aotearoa.mapper.SkuTicketPriceMapper.findAvailableBySkuTicketId"))
     })
     List<SkuTicket> findOnlineBySkuId(int skuId);
 

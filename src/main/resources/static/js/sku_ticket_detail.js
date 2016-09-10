@@ -63,9 +63,13 @@ $('#j_submit').on('click', function(){
     var time = $('#j_ticket_time').val();
     var salePrice = parseFloat($('#j_ticket_sale_price').val());
     var costPrice = parseFloat($('#j_ticket_cost_price').val());
+    var totalCount = parseInt($('#j_ticket_total_count').val());
     if (isNaN(salePrice) || isNaN(costPrice)) {
         warn('请输入正确的价格');
         return;
+    }
+    if (isNaN(totalCount)) {
+        totalCount = 0;
     }
     var description = $('#j_ticket_description').val();
     var skuId = $('.main').attr('skuId');
@@ -77,6 +81,7 @@ $('#j_submit').on('click', function(){
         time: time,
         salePrice: salePrice,
         costPrice: costPrice,
+        totalCount: totalCount,
         description: description
     };
     $.ajax({

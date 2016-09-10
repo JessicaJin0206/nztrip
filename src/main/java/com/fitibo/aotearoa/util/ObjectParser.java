@@ -29,6 +29,8 @@ public final class ObjectParser {
         result.setTime(input.getTime());
         result.setSalePrice(input.getSalePrice());
         result.setCostPrice(input.getCostPrice());
+        result.setCurrentCount(input.getCurrentCount());
+        result.setTotalCount(input.getTotalCount());
         return result;
     }
 

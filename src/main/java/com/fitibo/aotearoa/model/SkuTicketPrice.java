@@ -64,6 +64,22 @@ public class SkuTicketPrice extends ModelObject {
         this.description = description;
     }
 
+    public int getTotalCount() {
+        return totalCount;
+    }
+
+    public void setTotalCount(int totalCount) {
+        this.totalCount = totalCount;
+    }
+
+    public int getCurrentCount() {
+        return currentCount;
+    }
+
+    public void setCurrentCount(int currentCount) {
+        this.currentCount = currentCount;
+    }
+
     private int skuId;
     private int skuTicketId;
     private Date date;
@@ -71,4 +87,6 @@ public class SkuTicketPrice extends ModelObject {
     private BigDecimal salePrice;
     private BigDecimal costPrice;
     private String description;
+    private int totalCount;
+    private int currentCount;
 }
