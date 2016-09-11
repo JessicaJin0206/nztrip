@@ -357,6 +357,11 @@ public class RestApiController extends AuthenticationRequiredController {
                 orderMapper.updateReferenceNumber(id, referenceNumber);
                 order.setReferenceNumber(referenceNumber);
             }
+            List<OrderTicket> orderTickets = orderTicketMapper.findByOrderId(order.getId());
+            skuTicketPriceMapper.increaseCurrentCount(Lists.transform(orderTickets, OrderTicket::getTicketPriceId));
+        } else if (fromStatus == OrderStatus.CONFIRMED.getValue() && toStatus == OrderStatus.CANCELLED.getValue()) {
+            List<OrderTicket> orderTickets = orderTicketMapper.findByOrderId(order.getId());
+            skuTicketPriceMapper.decreaseCurrentCount(Lists.transform(orderTickets, OrderTicket::getTicketPriceId));
         }
         if (!statusValid) {
             throw new InvalidParamException("invalid transition from " + fromStatus + " to " + toStatus);

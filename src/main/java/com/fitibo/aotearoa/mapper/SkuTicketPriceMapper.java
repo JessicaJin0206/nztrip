@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.apache.ibatis.session.RowBounds;
 
 import java.util.Date;
@@ -174,8 +175,26 @@ public interface SkuTicketPriceMapper {
             "</script>"
     })
     int batchDelete(@Param("skuId") int skuId,
-                          @Param("skuTicketId") int skuTicketId,
-                          @Param("date") Date date,
-                          @Param("times") List<String> times);
+                    @Param("skuTicketId") int skuTicketId,
+                    @Param("date") Date date,
+                    @Param("times") List<String> times);
+
+    @Update({
+            "<script>",
+            "update sku_ticket_price set current_count = current_count+1 where id in ",
+            "<foreach collection='ids' item='id' index='index' open='(' separator=',' close=')'>#{id}",
+            "</foreach>",
+            "</script>"
+    })
+    int increaseCurrentCount(@Param("ids") List<Integer> ids);
+
+    @Update({
+            "<script>",
+            "update sku_ticket_price set current_count = current_count-1 where id in ",
+            "<foreach collection='ids' item='id' index='index' open='(' separator=',' close=')'>#{id}",
+            "</foreach>",
+            "</script>"
+    })
+    int decreaseCurrentCount(@Param("ids") List<Integer> ids);
 
 }
