@@ -4,7 +4,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -233,15 +232,13 @@ public class RestApiController extends AuthenticationRequiredController {
         Preconditions.checkNotNull(sku, "invalid sku id:" + orderVo.getSkuId());
         final Vendor vendor = vendorService.findById(sku.getVendorId());
         Preconditions.checkNotNull(vendor, "invalid vendor id:" + sku.getVendorId());
-        int discount = getDiscount(getToken());
-        BigDecimal total = new BigDecimal(0);
-        for (OrderTicketVo orderTicketVo : orderVo.getOrderTickets()) {
-            SkuTicketPrice ticketPrice = skuTicketPriceMapper.findById(orderTicketVo.getTicketPriceId());
-            BigDecimal price = calculateTicketPrice(ticketPrice, discount);
-            orderTicketVo.setPrice(price);
-            total = total.add(price);
-        }
+        final int discount = getDiscount(getToken());
+        Map<Integer, SkuTicketPrice> priceMap = getSkuTicketPriceMap(Lists.transform(orderVo.getOrderTickets(), OrderTicketVo::getTicketPriceId));
+        Map<Integer, SkuTicket> skuTicketMap = getSkuTicketMap(Lists.transform(orderVo.getOrderTickets(), OrderTicketVo::getSkuTicketId));
         Order order = parse(orderVo, agentId);
+        BigDecimal total = orderVo.getOrderTickets().stream().
+                map((orderTicket) -> calculateTicketPrice(priceMap.get(orderTicket.getTicketPriceId()), discount)).
+                reduce((a, b) -> a.add(b)).orElseGet(() -> BigDecimal.ZERO);
         order.setPrice(total);
         order.setVendorPhone(vendor.getPhone());
         order.setUuid(GuidGenerator.generate(14));
@@ -251,26 +248,14 @@ public class RestApiController extends AuthenticationRequiredController {
         if (CollectionUtils.isEmpty(orderVo.getOrderTickets())) {
             throw new InvalidParamException("order tickets cannot be empty");
         }
-        Map<Integer, SkuTicketPrice> priceMap = getSkuTicketPriceMap(Lists.transform(orderVo.getOrderTickets(), (orderTicket) -> orderTicket.getTicketPriceId()));
-        Map<Integer, SkuTicket> skuTicketMap = getSkuTicketMap(Lists.transform(orderVo.getOrderTickets(), (input) -> input.getSkuTicketId()));
+
         for (OrderTicketVo orderTicketVo : orderVo.getOrderTickets()) {
-            SkuTicket skuTicket = skuTicketMap.get(orderTicketVo.getSkuTicketId());
-            Preconditions.checkNotNull(skuTicket, "invalid sku ticket id:" + orderTicketVo.getSkuTicketId());
-            OrderTicket orderTicket = parse(orderTicketVo, orderVo);
-            SkuTicketPrice skuTicketPrice = priceMap.get(orderTicket.getTicketPriceId());
-            Preconditions.checkNotNull(skuTicketPrice, "invalid sku ticket price id:" + orderTicket.getTicketPriceId());
-            orderTicket.setWeightConstraint(skuTicket.getWeightConstraint());
-            orderTicket.setAgeConstraint(skuTicket.getAgeConstraint());
-            orderTicket.setCountConstraint(skuTicket.getCountConstraint());
-            orderTicket.setTicketDescription(skuTicket.getDescription());
-            orderTicket.setSalePrice(skuTicketPrice.getSalePrice());
-            orderTicket.setCostPrice(skuTicketPrice.getCostPrice());
-            orderTicket.setTicketDescription(skuTicketPrice.getDescription());
+            if (CollectionUtils.isEmpty(orderTicketVo.getOrderTicketUsers())) {
+                throw new InvalidParamException("order ticket user cannot be empty");
+            }
+            OrderTicket orderTicket = parse(orderTicketVo, orderVo, priceMap, skuTicketMap, discount);
             orderTicketMapper.create(orderTicket);
             orderTicketVo.setId(orderTicket.getId());
-            if (CollectionUtils.isEmpty(orderTicketVo.getOrderTicketUsers())) {
-                throw new InvalidParamException();
-            }
             for (OrderTicketUserVo orderTicketUserVo : orderTicketVo.getOrderTicketUsers()) {
                 OrderTicketUser orderTicketUser = new OrderTicketUser();
                 orderTicketUser.setOrderTicketId(orderTicketVo.getId());
@@ -289,28 +274,31 @@ public class RestApiController extends AuthenticationRequiredController {
     @Authentication(Role.Admin)
     public OrderVo updateOrder(@RequestBody OrderVo order) {
         Preconditions.checkNotNull(getToken());
-        Order o = parse4Update(order);
-        orderMapper.updateOrderInfo(o);
+
         //update ticket
         if (CollectionUtils.isEmpty(order.getOrderTickets())) {
             throw new InvalidParamException();
         }
+        final int discount = getDiscount(getToken());
+        Map<Integer, SkuTicketPrice> priceMap = getSkuTicketPriceMap(Lists.transform(order.getOrderTickets(), OrderTicketVo::getTicketPriceId));
+        Map<Integer, SkuTicket> skuTicketMap = getSkuTicketMap(Lists.transform(order.getOrderTickets(), OrderTicketVo::getSkuTicketId));
+        boolean hasOrderPriceChanged = false;
         for (OrderTicketVo orderTicketVo : order.getOrderTickets()) {
-
-            if (orderTicketVo.getId() > 0) {
+            if (CollectionUtils.isEmpty(orderTicketVo.getOrderTicketUsers())) {
+                throw new InvalidParamException();
+            }
+            if (orderTicketVo.getId() > 0) {//update
 //                OrderTicket orderTicket = new OrderTicket();
 //                orderTicket.setSkuTicket(orderTicketVo.getSkuTicket());
 //                orderTicket.setTicketDate(DateUtils.parseDate(orderTicketVo.getTicketDate()));
 //                orderTicket.setTicketTime(orderTicketVo.getTicketTime());
 //                orderTicket.setId(orderTicketVo.getId());
 //                orderTicketMapper.update(orderTicket);
-            } else {
-                OrderTicket orderTicket = parse(orderTicketVo, order);
+            } else {//create new
+                hasOrderPriceChanged = true;
+                OrderTicket orderTicket = parse(orderTicketVo, order, priceMap, skuTicketMap, discount);
                 orderTicketMapper.create(orderTicket);
                 orderTicketVo.setId(orderTicket.getId());
-            }
-            if (CollectionUtils.isEmpty(orderTicketVo.getOrderTicketUsers())) {
-                throw new InvalidParamException();
             }
             for (OrderTicketUserVo orderTicketUserVo : orderTicketVo.getOrderTicketUsers()) {
                 OrderTicketUser orderTicketUser = new OrderTicketUser();
@@ -326,6 +314,14 @@ public class RestApiController extends AuthenticationRequiredController {
                     orderTicketUserVo.setId(orderTicketUser.getId());
                 }
             }
+        }
+        Order o = parse4Update(order);
+        if (hasOrderPriceChanged) {
+            BigDecimal total = order.getOrderTickets().stream().
+                    map((orderTicket) -> calculateTicketPrice(priceMap.get(orderTicket.getTicketPriceId()), discount)).
+                    reduce((a, b) -> a.add(b)).orElseGet(() -> BigDecimal.ZERO);
+            o.setPrice(total);
+            orderMapper.updateOrderInfo(o);
         }
         return order;
     }
@@ -454,10 +450,10 @@ public class RestApiController extends AuthenticationRequiredController {
         });
     }
 
-    private BigDecimal calculateTicketPrice(SkuTicketPrice ticketPrice, int discount) {
+    private static BigDecimal calculateTicketPrice(SkuTicketPrice ticketPrice, int discount) {
         BigDecimal cost = ticketPrice.getCostPrice();
         BigDecimal sale = ticketPrice.getSalePrice();
-        return cost.add(sale.subtract(cost).multiply(BigDecimal.valueOf(discount)).divide(BigDecimal.valueOf(100)));
+        return cost.add(sale.subtract(cost).multiply(BigDecimal.valueOf(discount)).divide(BigDecimal.valueOf(100), BigDecimal.ROUND_CEILING));
     }
 
     @RequestMapping(value = "v1/api/skus/{skuId}/tickets/{ticketId}/prices", method = RequestMethod.POST)
@@ -646,22 +642,30 @@ public class RestApiController extends AuthenticationRequiredController {
         return result;
     }
 
-    private static OrderTicket parse(OrderTicketVo ticketVo, OrderVo orderVo) {
-        OrderTicket result = new OrderTicket();
+    private static OrderTicket parse(OrderTicketVo ticketVo, OrderVo orderVo, Map<Integer, SkuTicketPrice> priceMap, Map<Integer, SkuTicket> skuTicketMap, int discount) {
+        final OrderTicket result = new OrderTicket();
+        final SkuTicketPrice skuTicketPrice = priceMap.get(ticketVo.getTicketPriceId());
+        final SkuTicket skuTicket = skuTicketMap.get(ticketVo.getSkuTicketId());
+        Preconditions.checkNotNull(skuTicketPrice, "invalid sku ticket price id:" + result.getTicketPriceId());
+        Preconditions.checkNotNull(skuTicketPrice, "invalid sku ticket id:" + result.getSkuTicketId());
         result.setSkuId(orderVo.getSkuId());
         result.setOrderId(orderVo.getId());
         result.setSkuTicketId(ticketVo.getSkuTicketId());
         result.setSkuTicket(ticketVo.getSkuTicket());
-        result.setCountConstraint(ticketVo.getCountConstraint());
-        result.setAgeConstraint(ticketVo.getAgeConstraint());
-        result.setWeightConstraint(ticketVo.getWeightConstraint());
-        result.setTicketDescription(ticketVo.getTicketDescription());
         result.setTicketPriceId(ticketVo.getTicketPriceId());
         result.setTicketDate(DateUtils.parseDate(ticketVo.getTicketDate()));
         result.setTicketTime(ticketVo.getTicketTime());
         result.setPriceDescription(ticketVo.getPriceDescription());
         result.setPrice(ticketVo.getPrice());
         result.setGatheringPlace(ticketVo.getGatheringPlace());
+        result.setWeightConstraint(skuTicket.getWeightConstraint());
+        result.setAgeConstraint(skuTicket.getAgeConstraint());
+        result.setCountConstraint(skuTicket.getCountConstraint());
+        result.setTicketDescription(skuTicket.getDescription());
+        result.setSalePrice(skuTicketPrice.getSalePrice());
+        result.setCostPrice(skuTicketPrice.getCostPrice());
+        result.setTicketDescription(skuTicketPrice.getDescription());
+        result.setPrice(calculateTicketPrice(skuTicketPrice, discount));
         return result;
     }
 
