@@ -526,14 +526,7 @@ public class RestApiController extends AuthenticationRequiredController {
                 price.setSkuId(skuId);
                 price.setSkuTicketId(ticketId);
                 price.setDate(date.toDate());
-                if (times.isEmpty()) {
-                    price.setTime(null);
-                } else {
-                    for (String time : times) {
-                        price.setTime(time);
-                        count += skuTicketPriceMapper.deleteTicketPrice(price);
-                    }
-                }
+                skuTicketPriceMapper.batchDelete(skuId, ticketId, date.toDate(), times);
             }
         }
         return count;
