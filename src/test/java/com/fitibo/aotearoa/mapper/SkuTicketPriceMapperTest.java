@@ -77,8 +77,8 @@ public class SkuTicketPriceMapperTest extends BaseTest {
         price3.setCostPrice(BigDecimal.valueOf(400).setScale(2));
 
         INITIAL_LIST.add(price1);
-        INITIAL_LIST.add(price4);
         INITIAL_LIST.add(price2);
+        INITIAL_LIST.add(price3);
         INITIAL_LIST.add(price4);
     }
 

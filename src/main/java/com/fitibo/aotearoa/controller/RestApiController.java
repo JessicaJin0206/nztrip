@@ -500,7 +500,7 @@ public class RestApiController extends AuthenticationRequiredController {
             return 0;
         } else {
             int total = 0;
-            for (List<SkuTicketPrice> skuTicketPrices : Lists.partition(prices, 20)) {
+            for (List<SkuTicketPrice> skuTicketPrices : Lists.partition(prices, 50)) {
                 total += skuTicketPriceMapper.batchCreate(skuTicketPrices);
             }
             return total;
