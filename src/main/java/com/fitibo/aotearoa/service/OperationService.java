@@ -1,7 +1,6 @@
 package com.fitibo.aotearoa.service;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 
 import com.fitibo.aotearoa.constants.OrderStatus;
 import com.fitibo.aotearoa.exception.ResourceNotFoundException;
@@ -24,6 +23,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import rx.Observable;
 
 @Service("operationService")
 public class OperationService {
@@ -156,6 +157,10 @@ public class OperationService {
         content = content.replace("#NAME#", order.getPrimaryContact());
 
         StringBuilder tourInfo = new StringBuilder();
+        tourInfo.append("TOTAL:<br>");
+        Observable.from(tickets).groupBy(OrderTicket::getSkuTicket).subscribe(
+                input -> input.count().subscribe(
+                        inner -> tourInfo.append(input.getKey()).append(": ").append(inner.intValue()).append("<br>")));
         tourInfo.append("DETAILS:<br>");
         for (OrderTicket ticket : tickets) {
             String date = DateUtils.formatDate(ticket.getTicketDate());
