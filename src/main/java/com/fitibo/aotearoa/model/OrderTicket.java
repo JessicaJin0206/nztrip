@@ -7,15 +7,7 @@ import java.util.List;
 /**
  * Created by qianhao.zhou on 8/5/16.
  */
-public class OrderTicket {
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
+public class OrderTicket extends ModelObject{
 
     public int getSkuId() {
         return skuId;
@@ -153,7 +145,14 @@ public class OrderTicket {
         this.price = price;
     }
 
-    private int id;
+    public String getGatheringTime() {
+        return gatheringTime;
+    }
+
+    public void setGatheringTime(String gatheringTime) {
+        this.gatheringTime = gatheringTime;
+    }
+
     private int skuId;
     private int orderId;
     private int skuTicketId;
@@ -171,4 +170,5 @@ public class OrderTicket {
     private String priceDescription;
     private List<OrderTicketUser> users;
     private String gatheringPlace;
+    private String gatheringTime;
 }

@@ -218,6 +218,7 @@ $('#j_update').on('click', function () {
         orderTicket.skuTicket = node.find("#j_ticket_name_span").html();
         orderTicket.ticketDate = node.find("#j_ticket_date_span").html();
         orderTicket.ticketTime = node.find("#j_ticket_time_span").html();
+        orderTicket.gatheringTime = node.find("#j_gathering_time_span").val();
         orderTicket.skuTicketId = parseInt(node.attr('ticketId'));
         orderTicket.countConstraint = "";
         orderTicket.ageConstraint = "";

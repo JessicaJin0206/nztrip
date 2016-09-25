@@ -288,6 +288,10 @@ public class RestApiController extends AuthenticationRequiredController {
                 throw new InvalidParamException();
             }
             if (orderTicketVo.getId() > 0) {//update
+                OrderTicket orderTicket = new OrderTicket();
+                orderTicket.setId(orderTicketVo.getId());
+                orderTicket.setGatheringTime(orderTicketVo.getGatheringTime());
+                orderTicketMapper.update(orderTicket);
 //                OrderTicket orderTicket = new OrderTicket();
 //                orderTicket.setSkuTicket(orderTicketVo.getSkuTicket());
 //                orderTicket.setTicketDate(DateUtils.parseDate(orderTicketVo.getTicketDate()));

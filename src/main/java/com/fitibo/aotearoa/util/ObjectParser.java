@@ -65,6 +65,7 @@ public final class ObjectParser {
         result.setOrderTicketUsers(Lists.transform(orderTicket.getUsers(), ObjectParser::parse));
         result.setPrice(orderTicket.getPrice());
         result.setGatheringPlace(orderTicket.getGatheringPlace());
+        result.setGatheringTime(orderTicket.getGatheringTime());
         return result;
     }
 

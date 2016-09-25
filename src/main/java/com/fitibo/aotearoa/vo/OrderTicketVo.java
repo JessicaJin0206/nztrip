@@ -128,6 +128,14 @@ public class OrderTicketVo {
         this.gatheringPlace = gatheringPlace;
     }
 
+    public String getGatheringTime() {
+        return gatheringTime;
+    }
+
+    public void setGatheringTime(String gatheringTime) {
+        this.gatheringTime = gatheringTime;
+    }
+
     private int id;
     private int orderId;
     //sku_ticket
@@ -147,5 +155,6 @@ public class OrderTicketVo {
     private List<OrderTicketUserVo> orderTicketUsers;
 
     private String gatheringPlace;
+    private String gatheringTime;
 
 }

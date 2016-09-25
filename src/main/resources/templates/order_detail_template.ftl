@@ -118,6 +118,15 @@
             id="j_ticket_time_span">${ticket.ticketTime!''}</span></div>
     <div class="form-group"><label>价格:</label><span id="j_ticket_price_span">${ticket.price?string('0.00')}</span>
     </div>
+    <div class="form-group">
+        <div class="row">
+            <label class="col-md-2">集合时间:</label>
+            <div class="col-md-offset-2">
+                <input type="text" id="j_gathering_time_span" class="form-control"
+                       <#if editing=false>disabled</#if> value="${ticket.gatheringTime!''}">
+            </div>
+        </div>
+    </div>
     <div class="form-group"><label>集合地点:</label><span
             id="j_gathering_place_span">${ticket.gatheringPlace!''}</span></div>
     <table class="table">

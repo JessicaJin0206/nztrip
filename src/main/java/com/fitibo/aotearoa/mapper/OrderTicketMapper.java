@@ -28,17 +28,15 @@ public interface OrderTicketMapper {
     @Options(useGeneratedKeys = true, keyColumn = "id", keyProperty = "id", flushCache = Options.FlushCachePolicy.DEFAULT)
     int create(OrderTicket orderTicket);
 
-    @Update("update order ticket set " +
-            "ticket_date = #{ticketDate}," +
-            "ticket_time = #{ticketTime}," +
-            "sale_price = #{salePrice}," +
-            "cost_price = #{costPrice}" +
-            " where id = #{id}")
+    @Update("update order_ticket " +
+            "set gathering_time = #{gatheringTime} " +
+            "where id = #{id}")
     int update(OrderTicket orderTicket);
 
     @Select("select id, sku_id, sku_ticket_id, order_id, sku_ticket_name, " +
             "count_constraint, age_constraint, weight_constraint, ticket_description, " +
-            "ticket_price_id, ticket_date, ticket_time, sale_price, cost_price, price_description, price, gathering_place " +
+            "ticket_price_id, ticket_date, ticket_time, sale_price, cost_price, " +
+            "price_description, price, gathering_place, gathering_time " +
             "from order_ticket where order_id = #{orderId}")
     @Results({
             @Result(column = "id", property = "id"),
@@ -58,6 +56,7 @@ public interface OrderTicketMapper {
             @Result(column = "price_description", property = "priceDescription"),
             @Result(column = "price", property = "price"),
             @Result(column = "gathering_place", property = "gatheringPlace"),
+            @Result(column = "gathering_time", property = "gatheringTime"),
             @Result(column = "id", property = "users", javaType = List.class, many
                     = @Many(select = "com.fitibo.aotearoa.mapper.OrderTicketUserMapper.findByOrderTicketId"))
     })
