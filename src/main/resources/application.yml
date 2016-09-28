@@ -10,7 +10,7 @@ email:
   host: smtp.qq.com
   port: 25
   username: eyounz@foxmail.com
-  password: eemdpbnrqjmxbgia
+  password: bwczsvngzcxjcbab
   javaMailProperties:
     mail.smtp.auth: true
 
