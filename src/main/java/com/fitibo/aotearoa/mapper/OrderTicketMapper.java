@@ -62,6 +62,10 @@ public interface OrderTicketMapper {
     })
     List<OrderTicket> findByOrderId(int orderId);
 
+    @Select("select order_id " +
+            "from order_ticket where id = #{id}")
+    int findOrderId(int id);
+
     @Delete("delete from order_ticket where id = #{id} and order_id = #{orderId}")
     int deleteTicket(@Param("id") int id, @Param("orderId") int orderId);
 }

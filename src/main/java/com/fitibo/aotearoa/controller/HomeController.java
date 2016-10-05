@@ -23,6 +23,8 @@ import com.fitibo.aotearoa.annotation.Authentication;
 import com.fitibo.aotearoa.constants.CommonConstants;
 import com.fitibo.aotearoa.constants.OrderStatus;
 import com.fitibo.aotearoa.dto.Role;
+import com.fitibo.aotearoa.dto.Token;
+import com.fitibo.aotearoa.exception.AuthenticationFailureException;
 import com.fitibo.aotearoa.exception.InvalidParamException;
 import com.fitibo.aotearoa.exception.ResourceNotFoundException;
 import com.fitibo.aotearoa.mapper.AgentMapper;
@@ -217,12 +219,15 @@ public class HomeController extends AuthenticationRequiredController {
     }
 
     @RequestMapping("orders/{id}/_edit")
-    @Authentication(Role.Admin)
+    @Authentication
     public String editOrder(@PathVariable("id") int id, Map<String, Object> model) {
+        Token token = getToken();
+        Role role = token.getRole();
         Order order = orderMapper.findById(id);
         if (order == null) {
             throw new ResourceNotFoundException();
         }
+        AuthenticationHelper.checkAgentAuthentication(order, token);
         model.put("order", order);
         model.put("tickets", Lists.transform(orderTicketMapper.findByOrderId(order.getId()), ObjectParser::parse));
         Sku sku = skuMapper.findById(order.getSkuId());
@@ -233,7 +238,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("module", MODULE_ORDER_DETAIL);
         model.put("statusList", OrderStatus.values());
         model.put("editing", true);
-        model.put("role", getToken().getRole().toString());
+        model.put("role", role.toString());
         return "order_detail";
     }
 

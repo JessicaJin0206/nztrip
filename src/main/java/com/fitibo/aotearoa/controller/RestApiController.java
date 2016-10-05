@@ -271,19 +271,23 @@ public class RestApiController extends AuthenticationRequiredController {
 
     @RequestMapping(value = "/v1/api/orders/{id}", method = RequestMethod.PUT)
     @Transactional(rollbackFor = Exception.class)
-    @Authentication(Role.Admin)
-    public OrderVo updateOrder(@RequestBody OrderVo order) {
-        Preconditions.checkNotNull(getToken());
-
+    @Authentication
+    public OrderVo updateOrder(@RequestBody OrderVo orderVo) {
+        Token token = getToken();
+        Order order = orderMapper.findById(orderVo.getId());
+        if (order == null) {
+            throw new ResourceNotFoundException("invalid order id:" + orderVo.getId());
+        }
+        AuthenticationHelper.checkAgentAuthentication(order, token);
         //update ticket
-        if (CollectionUtils.isEmpty(order.getOrderTickets())) {
+        if (CollectionUtils.isEmpty(orderVo.getOrderTickets())) {
             throw new InvalidParamException();
         }
-        final int discount = getDiscount(getToken());
-        Map<Integer, SkuTicketPrice> priceMap = getSkuTicketPriceMap(Lists.transform(order.getOrderTickets(), OrderTicketVo::getTicketPriceId));
-        Map<Integer, SkuTicket> skuTicketMap = getSkuTicketMap(Lists.transform(order.getOrderTickets(), OrderTicketVo::getSkuTicketId));
+        final int discount = getDiscount(token);
+        Map<Integer, SkuTicketPrice> priceMap = getSkuTicketPriceMap(Lists.transform(orderVo.getOrderTickets(), OrderTicketVo::getTicketPriceId));
+        Map<Integer, SkuTicket> skuTicketMap = getSkuTicketMap(Lists.transform(orderVo.getOrderTickets(), OrderTicketVo::getSkuTicketId));
         boolean hasOrderPriceChanged = false;
-        for (OrderTicketVo orderTicketVo : order.getOrderTickets()) {
+        for (OrderTicketVo orderTicketVo : orderVo.getOrderTickets()) {
             if (CollectionUtils.isEmpty(orderTicketVo.getOrderTicketUsers())) {
                 throw new InvalidParamException();
             }
@@ -300,7 +304,7 @@ public class RestApiController extends AuthenticationRequiredController {
 //                orderTicketMapper.update(orderTicket);
             } else {//create new
                 hasOrderPriceChanged = true;
-                OrderTicket orderTicket = parse(orderTicketVo, order, priceMap, skuTicketMap, discount);
+                OrderTicket orderTicket = parse(orderTicketVo, orderVo, priceMap, skuTicketMap, discount);
                 orderTicketMapper.create(orderTicket);
                 orderTicketVo.setId(orderTicket.getId());
             }
@@ -319,15 +323,15 @@ public class RestApiController extends AuthenticationRequiredController {
                 }
             }
         }
-        Order o = parse4Update(order);
+        Order o = parse4Update(orderVo);
         if (hasOrderPriceChanged) {
-            BigDecimal total = order.getOrderTickets().stream().
+            BigDecimal total = orderVo.getOrderTickets().stream().
                     map((orderTicket) -> calculateTicketPrice(priceMap.get(orderTicket.getTicketPriceId()), discount)).
                     reduce((a, b) -> a.add(b)).orElseGet(() -> BigDecimal.ZERO);
             o.setPrice(total);
             orderMapper.updateOrderInfo(o);
         }
-        return order;
+        return orderVo;
     }
 
     @RequestMapping(value = "/v1/api/orders/{id}/status/{toStatus}", method = RequestMethod.PUT)
@@ -378,10 +382,17 @@ public class RestApiController extends AuthenticationRequiredController {
 
     @RequestMapping(value = "/v1/api/orders/tickets/{id}", method = RequestMethod.DELETE)
     @Transactional(rollbackFor = Exception.class)
-    @Authentication(Role.Admin)
+    @Authentication
     public boolean deleteTicket(@PathVariable("id") int id, @RequestBody OrderTicketVo ticketVo) {
+        Token token = getToken();
+        int orderId = orderTicketMapper.findOrderId(id);
+        Order order = orderMapper.findById(orderId);
+        if (order == null) {
+            throw new ResourceNotFoundException("invalid order id:" + orderId);
+        }
+        AuthenticationHelper.checkAgentAuthentication(order, token);
         //后续是否添加验证
-        int rowTicket = orderTicketMapper.deleteTicket(id, ticketVo.getOrderId());
+        int rowTicket = orderTicketMapper.deleteTicket(id, orderId);
         if (rowTicket == 0) {
             return false;
         }
@@ -389,6 +400,14 @@ public class RestApiController extends AuthenticationRequiredController {
         if (rowUser == 0) {
             return false;
         }
+        List<OrderTicket> orderTickets = orderTicketMapper.findByOrderId(orderId);
+        Map<Integer, SkuTicketPrice> priceMap = getSkuTicketPriceMap(Lists.transform(orderTickets, OrderTicket::getTicketPriceId));
+        int discount = getDiscount(token);
+        BigDecimal total = orderTickets.stream().
+                map((orderTicket) -> calculateTicketPrice(priceMap.get(orderTicket.getTicketPriceId()), discount)).
+                reduce((a, b) -> a.add(b)).orElseGet(() -> BigDecimal.ZERO);
+        order.setPrice(total);
+        orderMapper.updateOrderInfo(order);
         return true;
     }
 

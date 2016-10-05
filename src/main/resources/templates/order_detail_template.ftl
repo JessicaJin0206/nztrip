@@ -18,6 +18,17 @@
     </#if>
     </div>
 </div>
+<#elseif role?? && role == "Agent" && order.status == 10>
+<div class="form-group">
+    <div class="row">
+        <label class="col-md-2">修改订单:</label>
+        <#if editing = false>
+            <button id="j_edit" class="btn btn-default form-group">修改订单信息</button>
+        <#else>
+            <button id="j_update" class="btn btn-default form-group">提交</button>
+        </#if>
+    </div>
+</div>
 </#if>
 <div class="form-group">
     <div class="row">
