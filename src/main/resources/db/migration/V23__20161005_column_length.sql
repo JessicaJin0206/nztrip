@@ -1,0 +1,1 @@
+ALTER TABLE `email_queue` MODIFY COLUMN subject varchar(300);
