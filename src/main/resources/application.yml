@@ -22,7 +22,7 @@ template:
     content: |
       <html><body><div>
       #VENDORNAME#,<br><br>
-      Please kindly help us to make the reservation as blew:<br><br>
+      Please kindly help us to make the reservation as below:<br><br>
       TOUR: #TOUR#<br>
       NAME: #NAME#<br>
       #TOURINFO#<br>

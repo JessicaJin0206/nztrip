@@ -104,11 +104,13 @@ public class EmailServiceImpl implements EmailService {
             }
             String[] receivers = to.split(";");
             MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper messageHelper = new MimeMessageHelper(message, true, "utf-8");
+            MimeMessageHelper messageHelper = new MimeMessageHelper(message, false, "utf-8");
             messageHelper.setFrom(email.getFrom());
             messageHelper.setSubject(email.getSubject());
             messageHelper.setText(email.getContent(), true);
             messageHelper.setTo(receivers);
+            message.saveChanges();
+            message.setHeader("Content-Transfer-Encoding", "base64");
             mailSender.send(message);
             return true;
         } catch (Exception e) {
@@ -116,4 +118,5 @@ public class EmailServiceImpl implements EmailService {
             return false;
         }
     }
+
 }
