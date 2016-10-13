@@ -1,0 +1,1 @@
+ALTER TABLE `order_ticket` MODIFY COLUMN ticket_time varchar(50);
