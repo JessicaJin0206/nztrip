@@ -169,6 +169,7 @@ public class OperationService {
             tourInfo.append(SPACE).append("ITEM: ").append(ticket.getSkuTicket()).append("<br>");
             tourInfo.append(SPACE).append("DATE: ").append(date).append("<br>");
             tourInfo.append(SPACE).append("TIME: ").append(time).append("<br>");
+            tourInfo.append(SPACE).append("GATHERING AT: ").append(ticket.getGatheringPlace()).append("<br>");
 
             for (OrderTicketUser user : ticket.getUsers()) {
                 tourInfo.append(SPACE).append(SPACE).append(user.getName()).append("-")
