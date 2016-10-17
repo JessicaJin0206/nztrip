@@ -21,7 +21,7 @@
                         <#list cities as city>
                             <#if (city.id = cityId)>
                                 <#assign hasCity = 1>
-                                <span id="j_selected_city" value="${city.id}">${city.name}</span>
+                                <span id="j_selected_city" value="${city.id?c}">${city.name}</span>
                             </#if>
                         </#list>
                     </#if>
@@ -33,7 +33,7 @@
                     <ul class="dropdown-menu" id="j_city_drop_down" aria-labelledby="selected_city_button">
                         <li><a value="0">选择城市</a></li>
                     <#list cities as city>
-                        <li><a value="${city.id}">${city.name}</a></li>
+                        <li><a value="${city.id?c}">${city.name}</a></li>
                     </#list>
                     </ul>
                 </div>
@@ -46,7 +46,7 @@
                         <#list cities as category>
                             <#if (categoryId = category.id)>
                                 <#assign hasCategory = 1>
-                                <span id="j_selected_category" value="${category.id}">${category.name}</span>
+                                <span id="j_selected_category" value="${category.id?c}">${category.name}</span>
                             </#if>
                         </#list>
                     </#if>
@@ -58,7 +58,7 @@
                     <ul class="dropdown-menu" id="j_category_drop_down" aria-labelledby="selected_category_button">
                         <li><a value="0">选择类别</a></li>
                     <#list categories as category>
-                        <li><a value="${category.id}">${category.name}</a></li>
+                        <li><a value="${category.id?c}">${category.name}</a></li>
                     </#list>
                     </ul>
                 </div>
@@ -93,10 +93,10 @@
                         <td>${sku.duration}</td>
                         <td>
                             <div>
-                                <a href="/skus/${sku.id}">
+                                <a href="/skus/${sku.id?c}">
                                     <span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span>
                                 </a>
-                                <a href="/create_order?skuId=${sku.id}">
+                                <a href="/create_order?skuId=${sku.id?c}">
                                     <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
                                 </a>
                             </div>
@@ -110,10 +110,10 @@
                 <nav aria-label="...">
                     <ul class="pager">
                         <li class="<#if (pageNumber <= 0)>disabled</#if>">
-                            <a href="skus?<#if (cityId > 0)>cityid=${cityId}&</#if><#if (categoryId > 0)>categoryid=${categoryId}&</#if><#if (keyword != "")>keyword=${keyword}&</#if><#if (pageNumber > 0)>pagenumber=${pageNumber-1}&pagesize=${pageSize}</#if>">上一页</a>
+                            <a href="skus?<#if (cityId > 0)>cityid=${cityId?c}&</#if><#if (categoryId > 0)>categoryid=${categoryId?c}&</#if><#if (keyword != "")>keyword=${keyword}&</#if><#if (pageNumber > 0)>pagenumber=${pageNumber-1}&pagesize=${pageSize}</#if>">上一页</a>
                         </li>
                         <li>
-                            <a href="skus?<#if (cityId > 0)>cityid=${cityId}&</#if><#if (categoryId > 0)>categoryid=${categoryId}&</#if><#if (keyword != "")>keyword=${keyword}&</#if>pagenumber=${pageNumber+1}&pagesize=${pageSize}">下一页</a>
+                            <a href="skus?<#if (cityId > 0)>cityid=${cityId?c}&</#if><#if (categoryId > 0)>categoryid=${categoryId?c}&</#if><#if (keyword != "")>keyword=${keyword}&</#if>pagenumber=${pageNumber+1}&pagesize=${pageSize}">下一页</a>
                         </li>
                     </ul>
                 </nav>

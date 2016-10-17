@@ -29,14 +29,14 @@
                         data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="true"
                         <#if editing = false>disabled</#if>>
-                    <span id="j_selected_city" value="${sku.cityId}">${sku.city}</span>
+                    <span id="j_selected_city" value="${sku.cityId?c}">${sku.city}</span>
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" id="j_city_drop_down"
                     aria-labelledby="selected_city_button">
                 <#if editing = true>
                     <#list cities as city>
-                        <li><a value="${city.id}">${city.name}</a></li>
+                        <li><a value="${city.id?c}">${city.name}</a></li>
                     </#list>
                 </#if>
                 </ul>
@@ -47,14 +47,14 @@
                         data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="true"
                         <#if editing = false>disabled</#if>>
-                    <span id="j_selected_category" value="${sku.categoryId}">${sku.category}</span>
+                    <span id="j_selected_category" value="${sku.categoryId?c}">${sku.category}</span>
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" id="j_category_drop_down"
                     aria-labelledby="selected_category_button">
                 <#if editing = true>
                     <#list categories as category>
-                        <li><a value="${category.id}">${category.name}</a></li>
+                        <li><a value="${category.id?c}">${category.name}</a></li>
                     </#list>
                 </#if>
                 </ul>
@@ -65,14 +65,14 @@
                         data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="true"
                         <#if editing = false>disabled</#if>>
-                    <span id="j_selected_vendor" value="${sku.vendorId}">${sku.vendor}</span>
+                    <span id="j_selected_vendor" value="${sku.vendorId?c}">${sku.vendor}</span>
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" id="j_vendor_drop_down"
                     aria-labelledby="selected_vendor_button">
                 <#if editing = true>
                     <#list vendors as vendor>
-                        <li><a value="${vendor.id}">${vendor.name}</a></li>
+                        <li><a value="${vendor.id?c}">${vendor.name}</a></li>
                     </#list>
                 </#if>
                 </ul>
@@ -83,14 +83,14 @@
                         data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="true"
                         <#if editing = false>disabled</#if>>
-                    <span id="j_selected_duration" value="${sku.durationId}">${sku.duration}</span>
+                    <span id="j_selected_duration" value="${sku.durationId?c}">${sku.duration}</span>
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" id="j_duration_drop_down"
                     aria-labelledby="selected_duration_button">
                 <#if editing = true>
                     <#list durations as duration>
-                        <li><a value="${duration.id}">${duration.name}</a></li>
+                        <li><a value="${duration.id?c}">${duration.name}</a></li>
                     </#list>
                 </#if>
                 </ul>
@@ -155,7 +155,7 @@
                     </thead>
                     <tbody id="j_ticket_container">
                     <#list sku.tickets as ticket>
-                    <tr id="j_ticket" value="${ticket.id}">
+                    <tr id="j_ticket" value="${ticket.id?c}">
                         <td><input id="j_ticket_name" type="text" class="form-control form-group"
                                    value="${ticket.name}"
                                    <#if editing = false>disabled</#if>/></td>
@@ -188,7 +188,7 @@
                                 <a id="j_ticket_delete"><span class="glyphicon glyphicon-remove"
                                                               aria-hidden="true"></span></a>
                             </#if>
-                            <a id="j_ticket_price" href="/skus/${sku.id}/tickets/${ticket.id}"><span
+                            <a id="j_ticket_price" href="/skus/${sku.id?c}/tickets/${ticket.id?c}"><span
                                     class="glyphicon glyphicon-calendar"></span></a>
                         </#if>
                         </td>

@@ -10,7 +10,7 @@
 <div class="container-fluid">
     <div class="row">
     <#include "menu.ftl"/>
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" skuId="${skuId}" ticketId="${ticketId}">
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" skuId="${skuId?c}" ticketId="${ticketId?c}">
             <div class="form-group">
                 <div class="row">
                     <label>项目名称:</label>
@@ -122,10 +122,10 @@
                 <nav aria-label="...">
                     <ul class="pager">
                         <li class="<#if (pageNumber <= 0)>disabled</#if>">
-                            <a href="/skus/${skuId}/tickets/${ticketId}?<#if (date??)>date=${date}&</#if><#if (pageNumber > 0)>pagenumber=${pageNumber-1}&pagesize=${pageSize}</#if>">上一页</a>
+                            <a href="/skus/${skuId?c}/tickets/${ticketId?c}?<#if (date??)>date=${date}&</#if><#if (pageNumber > 0)>pagenumber=${pageNumber-1}&pagesize=${pageSize}</#if>">上一页</a>
                         </li>
                         <li>
-                            <a href="/skus/${skuId}/tickets/${ticketId}?<#if (date??)>date=${date}&</#if>pagenumber=${pageNumber+1}&pagesize=${pageSize}">下一页</a>
+                            <a href="/skus/${skuId?c}/tickets/${ticketId?c}?<#if (date??)>date=${date}&</#if>pagenumber=${pageNumber+1}&pagesize=${pageSize}">下一页</a>
                         </li>
                     </ul>
                 </nav>

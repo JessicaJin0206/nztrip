@@ -324,13 +324,11 @@ public class RestApiController extends AuthenticationRequiredController {
             }
         }
         Order o = parse4Update(orderVo);
-        if (hasOrderPriceChanged) {
-            BigDecimal total = orderVo.getOrderTickets().stream().
-                    map((orderTicket) -> calculateTicketPrice(priceMap.get(orderTicket.getTicketPriceId()), discount)).
-                    reduce((a, b) -> a.add(b)).orElseGet(() -> BigDecimal.ZERO);
-            o.setPrice(total);
-            orderMapper.updateOrderInfo(o);
-        }
+        BigDecimal total = orderVo.getOrderTickets().stream().
+                map((orderTicket) -> calculateTicketPrice(priceMap.get(orderTicket.getTicketPriceId()), discount)).
+                reduce((a, b) -> a.add(b)).orElseGet(() -> BigDecimal.ZERO);
+        o.setPrice(total);
+        orderMapper.updateOrderInfo(o);
         return orderVo;
     }
 

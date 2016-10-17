@@ -242,7 +242,8 @@ public interface OrderMapper {
             "secondary_contact_email = #{secondaryContactEmail}, " +
             "secondary_contact_phone = #{secondaryContactPhone}, " +
             "secondary_contact_wechat = #{secondaryContactWechat}, " +
-            "vendor_phone = #{vendorPhone} " +
+            "vendor_phone = #{vendorPhone}, " +
+            "remark = #{remark} " +
             "where id = #{id}")
     int updateOrderInfo(Order order);
 

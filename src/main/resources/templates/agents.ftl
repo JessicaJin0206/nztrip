@@ -34,7 +34,7 @@
                             <td>${agent.email}</td>
                             <td>
                                 <div>
-                                    <a href="/agents/${agent.id}">
+                                    <a href="/agents/${agent.id?c}">
                                         <span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span>
                                     </a>
                                 </div>

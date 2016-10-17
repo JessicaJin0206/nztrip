@@ -52,7 +52,7 @@
     </button>
     <ul class="dropdown-menu" id="j_ticket_type_selector">
     <#list sku.tickets as ticket>
-        <li><a value="${ticket.id}" count="${ticket.count}"
+        <li><a value="${ticket.id?c}" count="${ticket.count}"
                available_date="<#list ticket.ticketPrices as ticketPrice>${ticketPrice.date}|</#list>">${ticket.name}</a>
         </li>
     </#list>

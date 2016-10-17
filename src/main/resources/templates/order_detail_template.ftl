@@ -1,5 +1,5 @@
 <div class="form-group"><label>订单详情</label></div>
-<div class="form-group" id="j_order_sku" skuid="${order.skuId}">
+<div class="form-group" id="j_order_sku" skuid="${order.skuId?c}">
     <label>名称:</label>
     <span>  ${order.sku}</span>
 </div>
@@ -89,7 +89,7 @@
     </button>
     <ul class="dropdown-menu" id="j_ticket_type_selector">
         <#list sku.tickets as ticket>
-            <li><a value="${ticket.id}" count="${ticket.count}"
+            <li><a value="${ticket.id?c}" count="${ticket.count}"
                    available_date="<#list ticket.ticketPrices as ticketPrice>${ticketPrice.date}|</#list>">${ticket.name}</a>
             </li>
         </#list>
@@ -117,8 +117,8 @@
 
 </#if>
 <#list tickets as ticket>
-<div class="form-group j_ticket_container" value="${ticket.id}" ticketId="${ticket.skuTicketId}"
-     priceId="${ticket.ticketPriceId}">
+<div class="form-group j_ticket_container" value="${ticket.id?c}" ticketId="${ticket.skuTicketId?c}"
+     priceId="${ticket.ticketPriceId?c}">
     <#if editing == true><a id="j_ticket_delete"><span class="glyphicon glyphicon-remove pull-right"
                                                        aria-hidden="true"></span></a></#if>
     <div class="form-group"><label>票种:</label><span
@@ -150,7 +150,7 @@
         </thead>
         <tbody id="j_ticket_container">
             <#list ticket.orderTicketUsers as user>
-            <tr value="${user.id}">
+            <tr value="${user.id?c}">
                 <td><input class="form-control" id="j_user_name" <#if editing=false>disabled</#if>
                            value="${user.name}"/></td>
                 <td><input class="form-control" id="j_user_age" <#if editing=false>disabled</#if>

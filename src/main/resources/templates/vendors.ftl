@@ -30,7 +30,7 @@
                             <td>${vendor.phone!''}</td>
                             <td>
                                 <div>
-                                    <a href="/vendors/${vendor.id}">
+                                    <a href="/vendors/${vendor.id?c}">
                                         <span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span>
                                     </a>
                                 </div>

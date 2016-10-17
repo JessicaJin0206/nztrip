@@ -82,7 +82,7 @@
                         <td>${order.remark!''}</td>
                         <td>
                             <div>
-                                <a href="/orders/${order.id}">
+                                <a href="/orders/${order.id?c}">
                                     <span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span>
                                 </a>
                             </div>

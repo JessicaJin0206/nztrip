@@ -25,7 +25,7 @@
                 </button>
                 <ul class="dropdown-menu" id="j_city_drop_down" aria-labelledby="selected_city_button">
                 <#list cities as city>
-                    <li><a value="${city.id}">${city.name}</a></li>
+                    <li><a value="${city.id?c}">${city.name}</a></li>
                 </#list>
                 </ul>
             </div>
@@ -38,7 +38,7 @@
                 </button>
                 <ul class="dropdown-menu" id="j_category_drop_down" aria-labelledby="selected_category_button">
                 <#list categories as category>
-                    <li><a value="${category.id}">${category.name}</a></li>
+                    <li><a value="${category.id?c}">${category.name}</a></li>
                 </#list>
                 </ul>
             </div>
@@ -51,7 +51,7 @@
                 </button>
                 <ul class="dropdown-menu" id="j_vendor_drop_down" aria-labelledby="selected_vendor_button">
                 <#list vendors as vendor>
-                    <li><a value="${vendor.id}">${vendor.name}</a></li>
+                    <li><a value="${vendor.id?c}">${vendor.name}</a></li>
                 </#list>
                 </ul>
             </div>
@@ -64,7 +64,7 @@
                 </button>
                 <ul class="dropdown-menu" id="j_duration_drop_down" aria-labelledby="selected_duration_button">
                 <#list durations as duration>
-                    <li><a value="${duration.id}">${duration.name}</a></li>
+                    <li><a value="${duration.id?c}">${duration.name}</a></li>
                 </#list>
                 </ul>
             </div>
