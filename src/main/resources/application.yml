@@ -48,7 +48,7 @@ template:
       联系人姓名 Guest Name: #GUEST_NAME#<br>
       国内手机号 Mobile: #MOBILE#<br>
       确认号 Confirmation Number: #REFERENCE_NUMBER#<br>
-
+      备注 Remark: #REMARK#<br>
       出行信息:<br>
       #GUESTS_INFO#
       <br>

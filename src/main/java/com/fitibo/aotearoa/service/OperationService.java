@@ -128,6 +128,7 @@ public class OperationService {
         content = content.replace("#MOBILE#", order.getPrimaryContactPhone());
         content = content.replace("#REFERENCE_NUMBER#", order.getReferenceNumber());
         content = content.replace("#PRICE#", order.getPrice().toString());
+        content = content.replace("#REMARK#", order.getRemark());
         content = content.replace("#GUESTS_INFO#",
                 formatGuestsInfo(confirmationEmailGuestsInfoTemplate,
                         orderTicketMapper.findByOrderId(order.getId())));

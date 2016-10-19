@@ -53,7 +53,7 @@ public interface OrderMapper {
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
             "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone " +
             "from `order` o left join `sku` s on o.sku_id = s.id " +
-            "where agent_id = #{agentId}")
+            "where agent_id = #{agentId} order by o.id desc")
     @Results({
             @Result(column = "id", property = "id"),
             @Result(column = "sku_id", property = "skuId"),
@@ -90,6 +90,7 @@ public interface OrderMapper {
             "<if test =\"uuid != null and uuid != ''\">and o.uuid = #{uuid} </if> " +
             "<if test =\"referenceNumber != null and referenceNumber != ''\">and o.reference_number = #{referenceNumber} </if> " +
             "<if test =\"status != null and status > 0\">and o.status = #{status} </if> " +
+            " order by o.id desc" +
             "</script>")
     @Results({
             @Result(column = "id", property = "id"),
@@ -126,7 +127,7 @@ public interface OrderMapper {
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
             "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone " +
-            "from `order` o left join `sku` s on o.sku_id = s.id ")
+            "from `order` o left join `sku` s on o.sku_id = s.id order by o.id desc")
     @Results({
             @Result(column = "id", property = "id"),
             @Result(column = "sku_id", property = "skuId"),
@@ -163,6 +164,7 @@ public interface OrderMapper {
             "<if test =\"uuid != null and uuid != ''\">and o.uuid = #{uuid} </if> " +
             "<if test =\"referenceNumber != null and referenceNumber != ''\">and o.reference_number = #{referenceNumber} </if> " +
             "<if test =\"status != null and status > 0\">and o.status = #{status} </if> " +
+            " order by o.id desc" +
             "</script>")
     @Results({
             @Result(column = "id", property = "id"),
@@ -193,7 +195,7 @@ public interface OrderMapper {
                                      @Param("status") int status,
                                      RowBounds rowBounds);
 
-    @Select("select * from `order` where agent_id = #{agentId} and status = #{status}")
+    @Select("select * from `order` where agent_id = #{agentId} and status = #{status} order by o.id desc")
     @Results({
             @Result(column = "id", property = "id"),
             @Result(column = "sku_id", property = "skuId"),
