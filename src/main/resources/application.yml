@@ -64,6 +64,7 @@ template:
     guests_info: |
       出行人 Guests:<br>
       #GUESTS#<br>
+      票种 Ticket: #TICKET#<br>
       出发日期 Tour Date(Y/M/D): #DATE#<br>
       场次 Time: #TIME#<br>
       集合地点 Meeting Place: #GATHERING_PLACE#

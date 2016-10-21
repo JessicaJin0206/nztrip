@@ -53,6 +53,14 @@
 </div>
 <div class="form-group">
     <div class="row">
+        <label class="col-md-2">编号:</label>
+        <div class="col-md-offset-2">
+            <input type="text" id="j_remark" class="form-control" disabled value="${order.uuid!''}">
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <div class="row">
         <label class="col-md-2">Reference Number:</label>
         <div class="col-md-offset-2">
             <input type="text" id="j_referencenumber" class="form-control"
