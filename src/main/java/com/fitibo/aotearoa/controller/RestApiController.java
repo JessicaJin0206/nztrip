@@ -283,10 +283,10 @@ public class RestApiController extends AuthenticationRequiredController {
         if (CollectionUtils.isEmpty(orderVo.getOrderTickets())) {
             throw new InvalidParamException();
         }
-        final int discount = getDiscount(token);
+        int orderAgentId = order.getAgentId();
+        final int discount = orderAgentId > 0 ? getDiscountByAgentId(orderAgentId) : getDiscount(token);
         Map<Integer, SkuTicketPrice> priceMap = getSkuTicketPriceMap(Lists.transform(orderVo.getOrderTickets(), OrderTicketVo::getTicketPriceId));
         Map<Integer, SkuTicket> skuTicketMap = getSkuTicketMap(Lists.transform(orderVo.getOrderTickets(), OrderTicketVo::getSkuTicketId));
-        boolean hasOrderPriceChanged = false;
         for (OrderTicketVo orderTicketVo : orderVo.getOrderTickets()) {
             if (CollectionUtils.isEmpty(orderTicketVo.getOrderTicketUsers())) {
                 throw new InvalidParamException();
@@ -303,7 +303,6 @@ public class RestApiController extends AuthenticationRequiredController {
 //                orderTicket.setId(orderTicketVo.getId());
 //                orderTicketMapper.update(orderTicket);
             } else {//create new
-                hasOrderPriceChanged = true;
                 OrderTicket orderTicket = parse(orderTicketVo, orderVo, priceMap, skuTicketMap, discount);
                 orderTicketMapper.create(orderTicket);
                 orderTicketVo.setId(orderTicket.getId());
@@ -585,6 +584,12 @@ public class RestApiController extends AuthenticationRequiredController {
             default:
                 throw new AuthenticationFailureException("invalid role:" + token.getRole());
         }
+    }
+
+    private int getDiscountByAgentId(int agentId) {
+        Agent agent = agentMapper.findById(agentId);
+        Preconditions.checkArgument(agent != null, "invalid agent id:" + agentId);
+        return agent.getDiscount();
     }
 
     private static Order parse(OrderVo order, int agentId) {
