@@ -140,7 +140,17 @@ public class OperationService {
             List<OrderTicketUser> users = orderTicketUserMapper.findByOrderTicketId(input.getId());
 
             String content = template;
-            content = content.replace("#GUESTS#", Joiner.on(" | ").join(Lists.transform(users, (user) -> "姓名 Name:" + user.getName() + " 年龄 Age:" + user.getAge() + " 体重 Weight:" + user.getWeight())));
+            content = content.replace("#GUESTS#", Joiner.on(" | ").join(Lists.transform(users, user -> {
+                StringBuilder result = new StringBuilder();
+                result.append("姓名 Name:").append(user.getName());
+                if (user.getAge() >= 0) {
+                    result.append(" 年龄 Age:").append(user.getAge());
+                }
+                if (user.getWeight() >= 0) {
+                    result.append(" 体重 Weight:").append(user.getWeight());
+                }
+                return result.toString();
+            })));
             content = content.replace("#DATE#", DateUtils.formatDate(input.getTicketDate()));
             content = content.replace("#TIME#", input.getTicketTime());
             content = content.replace("#GATHERING_PLACE#", input.getGatheringPlace());
@@ -174,9 +184,14 @@ public class OperationService {
             tourInfo.append(SPACE).append("GATHERING AT: ").append(ticket.getGatheringPlace()).append("<br>");
 
             for (OrderTicketUser user : ticket.getUsers()) {
-                tourInfo.append(SPACE).append(SPACE).append(user.getName()).append("-")
-                        .append(user.getAge()).append(" years old").append("-")
-                        .append(user.getWeight()).append("kg").append("<br>");
+                tourInfo.append(SPACE).append(SPACE).append(user.getName());
+                if (user.getAge() >= 0) {
+                    tourInfo.append("-").append(user.getAge()).append(" years old");
+                }
+                if (user.getWeight() >= 0) {
+                    tourInfo.append("-").append(user.getWeight()).append("kg");
+                }
+                tourInfo.append("<br>");
             }
             tourInfo.append("<br>");
         }

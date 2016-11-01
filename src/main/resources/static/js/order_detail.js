@@ -53,6 +53,10 @@ $('#j_ticket_type_selector li a').on('click', function (e) {
     var ticket = $('#j_ticket');
     ticket.attr('value', selected.attr("value"));
     ticket.attr('count', selected.attr("count"));
+    ticket.attr('minAge', selected.attr('minAge'));
+    ticket.attr('maxAge', selected.attr('maxAge'));
+    ticket.attr('minWeight', selected.attr('minWeight'));
+    ticket.attr('maxWeight', selected.attr('maxWeight'));
     ticket.html(selected.html());
     var availableDate = selected.attr('available_date').split("|").filter(function (value) {
         return value.length > 0;
@@ -80,9 +84,9 @@ $('#j_ticket_type_selector li a').on('click', function (e) {
                }).success(function (data) {
             timeSelector.empty();
             if (data && data.length > 0) {
-                $.each(data, function(index, price){
+                $.each(data, function (index, price) {
                     var item = $('<li><a value="' + price.id + '">' + price.time + '</a></li>');
-                    item.on('click', function(){
+                    item.on('click', function () {
                         timeSpan.html(price.time);
                         timeSpan.attr('value', price.id);
                         timeSpan.attr('price', price.price);
@@ -111,6 +115,10 @@ $('#add_ticket').on('click', function (e) {
     if (priceId <= 0) {
         return;
     }
+    var minWeight = parseInt(ticket.attr('minWeight'));
+    var maxWeight = parseInt(ticket.attr('maxWeight'));
+    var minAge = parseInt(ticket.attr('minAge'));
+    var maxAge = parseInt(ticket.attr('maxAge'));
     var ticketContainer = $(
         '<div class="form-group j_ticket_container" id="j_ticket_container"><a id="j_ticket_delete"><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span></a><div class="form-group"><label>票种:</label><span id="j_ticket_name_span"></span></div><div class="form-group"><label>日期:</label><span id="j_ticket_date_span"></span></div><div class="form-group"><label>时间:</label><span id="j_ticket_time_span"></span></div><table class="table"><thead><tr><th>姓名</th><th>年龄</th><th>体重</th></tr></thead><tbody></tbody></table></div>');
     var ticketName = ticket.html();
@@ -122,9 +130,14 @@ $('#add_ticket').on('click', function (e) {
     ticketContainer.find('#j_ticket_date_span').html(date);
     ticketContainer.find('#j_ticket_time_span').html(time);
     for (var i = 0; i < ticketCount; i++) {
-        var ticketDetail = $(
-            '<tr><th><input type="text" id="j_user_name" class="form-control"/></th><th><input type="number" id="j_user_age" class="form-control"/></th><th><input type="number" id="j_user_weight" class="form-control"/></th></tr>')
+        var ticketDetail = $('<tr><th><input type="text" id="j_user_name" class="form-control"/></th><th><input type="number" id="j_user_age" class="form-control"/></th><th><input type="number" id="j_user_weight" class="form-control"/></th></tr>')
         ticketContainer.find('tbody').append(ticketDetail);
+        if (minWeight == maxWeight && minWeight == 0) {
+            ticketDetail.find('#j_user_weight').remove();
+        }
+        if (minAge == maxAge && minAge == 0) {
+            ticketDetail.find('#j_user_age').remove();
+        }
     }
     ticketContainer.find("a#j_ticket_delete").on('click', function () {
         ticketContainer.remove();
@@ -241,16 +254,12 @@ $('#j_update').on('click', function () {
                 return;
             }
             var age = parseInt(ticketUserContainer.find('#j_user_age').val());
-            if (age <= 0) {
-                warn("请填写正确的年龄");
-                isDataValid = false;
-                return;
+            if (isNaN(age)) {
+                age = -1;
             }
             var weight = parseInt(ticketUserContainer.find('#j_user_weight').val());
-            if (weight <= 0) {
-                warn("请填写正确的体重");
-                isDataValid = false;
-                return;
+            if (isNaN(weight)) {
+                weight = -1;
             }
             orderTicket.orderTicketUsers.push({
                                                   id: id,
@@ -310,23 +319,23 @@ $('.j_operation').on('click', function () {
         }
         if (action == 40) {//reservation confirmed
             if ($('#j_referencenumber').val().length == 0) {
-                bootbox.prompt("请先填写Reference Number", function(referenceNumber){
+                bootbox.prompt("请先填写Reference Number", function (referenceNumber) {
                     if (referenceNumber === null) {
                         return;
-                    } else if (referenceNumber.length == 0){
+                    } else if (referenceNumber.length == 0) {
                         warn("缺少Reference Number");
                         return;
                     } else {
                         data.referenceNumber = referenceNumber;
                     }
                     $.ajax({
-                        type: 'PUT',
-                        contentType: "application/json; charset=utf-8",
-                        url: '/v1/api/orders/' + id + "/status/" + action,
-                        data: JSON.stringify(data)
-                    }).success(function (data) {
+                               type: 'PUT',
+                               contentType: "application/json; charset=utf-8",
+                               url: '/v1/api/orders/' + id + "/status/" + action,
+                               data: JSON.stringify(data)
+                           }).success(function (data) {
                         if (data == true) {
-                            bootbox.alert("操作成功", function() {
+                            bootbox.alert("操作成功", function () {
                                 window.location.reload();
                             });
                         } else {
@@ -338,13 +347,13 @@ $('.j_operation').on('click', function () {
                 });
             } else {
                 $.ajax({
-                    type: 'PUT',
-                    contentType: "application/json; charset=utf-8",
-                    url: '/v1/api/orders/' + id + "/status/" + action,
-                    data: JSON.stringify(data)
-                }).success(function (data) {
+                           type: 'PUT',
+                           contentType: "application/json; charset=utf-8",
+                           url: '/v1/api/orders/' + id + "/status/" + action,
+                           data: JSON.stringify(data)
+                       }).success(function (data) {
                     if (data == true) {
-                        bootbox.alert("操作成功", function() {
+                        bootbox.alert("操作成功", function () {
                             window.location.reload();
                         });
                     } else {
@@ -357,11 +366,11 @@ $('.j_operation').on('click', function () {
         } else {
             console.log('modify status to ' + action);
             $.ajax({
-                type: 'PUT',
-                contentType: "application/json; charset=utf-8",
-                url: '/v1/api/orders/' + id + "/status/" + action,
-                data: JSON.stringify(data)
-            }).success(function (data) {
+                       type: 'PUT',
+                       contentType: "application/json; charset=utf-8",
+                       url: '/v1/api/orders/' + id + "/status/" + action,
+                       data: JSON.stringify(data)
+                   }).success(function (data) {
                 if (data == true) {
                     alert("操作成功");
                     window.location.reload();

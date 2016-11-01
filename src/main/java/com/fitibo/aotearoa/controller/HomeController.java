@@ -18,6 +18,8 @@ package com.fitibo.aotearoa.controller;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import com.fitibo.aotearoa.annotation.Authentication;
 import com.fitibo.aotearoa.constants.CommonConstants;
@@ -50,6 +52,8 @@ import com.fitibo.aotearoa.service.impl.CategoryServiceImpl;
 import com.fitibo.aotearoa.util.DateUtils;
 import com.fitibo.aotearoa.util.ObjectParser;
 import com.fitibo.aotearoa.vo.AgentVo;
+import com.fitibo.aotearoa.vo.SkuTicketPriceVo;
+import com.fitibo.aotearoa.vo.SkuTicketVo;
 import com.fitibo.aotearoa.vo.SkuVo;
 
 import org.apache.ibatis.session.RowBounds;
@@ -60,9 +64,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Controller
 public class HomeController extends AuthenticationRequiredController {
@@ -162,7 +168,14 @@ public class HomeController extends AuthenticationRequiredController {
         }
 
         Vendor vendor = vendorService.findById(sku.getVendorId());
-        model.put("sku", parse(sku));
+        SkuVo skuVo = parse(sku);
+        Map<String, Collection<String>> availableDateMap = Maps.newHashMap();
+        for (SkuTicketVo skuTicketVo : skuVo.getTickets()) {
+            Set<String> availableDates = Sets.newLinkedHashSet(Lists.transform(skuTicketVo.getTicketPrices(), SkuTicketPriceVo::getDate));
+            availableDateMap.put(skuTicketVo.getId() + "", availableDates);
+        }
+        model.put("sku", skuVo);
+        model.put("availableDateMap", availableDateMap);
         model.put("vendor", vendor);
         model.put("module", MODULE_CREATE_ORDER);
         model.put("role", getToken().getRole().toString());
@@ -234,7 +247,14 @@ public class HomeController extends AuthenticationRequiredController {
         if (sku == null) {
             throw new ResourceNotFoundException();
         }
-        model.put("sku", parse(sku));
+        Map<String, Collection<String>> availableDateMap = Maps.newHashMap();
+        SkuVo skuVo = parse(sku);
+        for (SkuTicketVo skuTicketVo : skuVo.getTickets()) {
+            Set<String> availableDates = Sets.newLinkedHashSet(Lists.transform(skuTicketVo.getTicketPrices(), SkuTicketPriceVo::getDate));
+            availableDateMap.put(skuTicketVo.getId() + "", availableDates);
+        }
+        model.put("sku", skuVo);
+        model.put("availableDateMap", availableDateMap);
         model.put("module", MODULE_ORDER_DETAIL);
         model.put("statusList", OrderStatus.values());
         model.put("editing", true);

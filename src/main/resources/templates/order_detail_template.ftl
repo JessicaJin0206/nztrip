@@ -97,8 +97,10 @@
     </button>
     <ul class="dropdown-menu" id="j_ticket_type_selector">
         <#list sku.tickets as ticket>
-            <li><a value="${ticket.id?c}" count="${ticket.count}"
-                   available_date="<#list ticket.ticketPrices as ticketPrice>${ticketPrice.date}|</#list>">${ticket.name}</a>
+            <li><a value="${ticket.id?c}" count="${ticket.count?c}" minAge="${ticket.minAge?c}"
+                   maxAge="${ticket.maxAge?c}" minWeight="${ticket.minWeight?c}"
+                   maxWeight="${ticket.maxWeight?c}"
+                   available_date="<#list availableDateMap[ticket.id?string .number] as date>${date}|</#list>">${ticket.name}</a>
             </li>
         </#list>
     </ul>
@@ -161,10 +163,18 @@
             <tr value="${user.id?c}">
                 <td><input class="form-control" id="j_user_name" <#if editing=false>disabled</#if>
                            value="${user.name}"/></td>
-                <td><input class="form-control" id="j_user_age" <#if editing=false>disabled</#if>
-                           value="${user.age}"/></td>
-                <td><input class="form-control" id="j_user_weight" <#if editing=false>disabled</#if>
-                           value="${user.weight}"/></td>
+                <td>
+                    <#if (user.age >= 0) >
+                    <input class="form-control" id="j_user_age" <#if editing=false>disabled</#if>
+                           value="${user.age}"/>
+                    </#if>
+                </td>
+                <td>
+                    <#if (user.weight >= 0) >
+                    <input class="form-control" id="j_user_weight" <#if editing=false>disabled</#if>
+                           value="${user.weight}"/>
+                    </#if>
+                </td>
             </tr>
             </#list>
         </tbody>

@@ -52,8 +52,10 @@
     </button>
     <ul class="dropdown-menu" id="j_ticket_type_selector">
     <#list sku.tickets as ticket>
-        <li><a value="${ticket.id?c}" count="${ticket.count}"
-               available_date="<#list ticket.ticketPrices as ticketPrice>${ticketPrice.date}|</#list>">${ticket.name}</a>
+        <li><a value="${ticket.id?c}" count="${ticket.count?c}" minAge="${ticket.minAge?c}"
+               maxAge="${ticket.maxAge?c}" minWeight="${ticket.minWeight?c}"
+               maxWeight="${ticket.maxWeight?c}"
+               available_date="<#list availableDateMap[ticket.id?string .number] as date>${date}|</#list>">${ticket.name}</a>
         </li>
     </#list>
     </ul>

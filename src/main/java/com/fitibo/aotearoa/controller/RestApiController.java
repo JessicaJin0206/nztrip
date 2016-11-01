@@ -254,6 +254,7 @@ public class RestApiController extends AuthenticationRequiredController {
                 throw new InvalidParamException("order ticket user cannot be empty");
             }
             OrderTicket orderTicket = parse(orderTicketVo, orderVo, priceMap, skuTicketMap, discount);
+            validateTicketUser(orderTicket, orderTicketVo.getOrderTicketUsers());
             orderTicketMapper.create(orderTicket);
             orderTicketVo.setId(orderTicket.getId());
             for (OrderTicketUserVo orderTicketUserVo : orderTicketVo.getOrderTicketUsers()) {
@@ -267,6 +268,27 @@ public class RestApiController extends AuthenticationRequiredController {
             }
         }
         return orderVo;
+    }
+
+    private void validateTicketUser(OrderTicket orderTicket, List<OrderTicketUserVo> users) {
+        String[] ages = orderTicket.getAgeConstraint().split("-");
+        int minAge = (Integer.parseInt(ages[0]));
+        int maxAge = (Integer.parseInt(ages[1]));
+        String[] weights = orderTicket.getWeightConstraint().split("-");
+        int minWeight = (Integer.parseInt(weights[0]));
+        int maxWeight = (Integer.parseInt(weights[1]));
+        boolean needCheckAge = !(minAge == maxAge && maxAge == 0);
+        boolean needCheckWeight = !(minWeight == maxWeight && maxWeight == 0);
+        for (OrderTicketUserVo orderTicketUserVo : users) {
+            int age = orderTicketUserVo.getAge();
+            if (needCheckAge) {
+                Preconditions.checkArgument(age >= minAge && age <= maxAge, "invalid age:" + age + " rule:" + orderTicket.getAgeConstraint());
+            }
+            int weight = orderTicketUserVo.getWeight();
+            if (needCheckWeight) {
+                Preconditions.checkArgument(weight >= minWeight && weight <= maxWeight, "invalid weight:" + weight + " rule:" + orderTicket.getWeightConstraint());
+            }
+        }
     }
 
     @RequestMapping(value = "/v1/api/orders/{id}", method = RequestMethod.PUT)
@@ -298,6 +320,7 @@ public class RestApiController extends AuthenticationRequiredController {
                 orderTicketMapper.update(orderTicket);
             } else {//create new
                 OrderTicket orderTicket = parse(orderTicketVo, orderVo, priceMap, skuTicketMap, discount);
+                validateTicketUser(orderTicket, orderTicketVo.getOrderTicketUsers());
                 orderTicketMapper.create(orderTicket);
                 orderTicketVo.setId(orderTicket.getId());
             }

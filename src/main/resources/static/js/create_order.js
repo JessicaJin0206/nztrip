@@ -41,6 +41,10 @@ $('#j_ticket_type_selector li a').on('click', function(e){
     var ticket = $('#j_ticket');
     ticket.attr('value', selected.attr("value"));
     ticket.attr('count', selected.attr("count"));
+    ticket.attr('minAge', selected.attr('minAge'));
+    ticket.attr('maxAge', selected.attr('maxAge'));
+    ticket.attr('minWeight', selected.attr('minWeight'));
+    ticket.attr('maxWeight', selected.attr('maxWeight'));
     ticket.html(selected.html());
     var availableDate = selected.attr('available_date').split("|").filter(function(value) {
         return value.length > 0;
@@ -111,6 +115,10 @@ $('#add_ticket').on('click', function(e){
     if (priceId <= 0) {
         return;
     }
+    var minWeight = parseInt(ticket.attr('minWeight'));
+    var maxWeight = parseInt(ticket.attr('maxWeight'));
+    var minAge = parseInt(ticket.attr('minAge'));
+    var maxAge = parseInt(ticket.attr('maxAge'));
     var ticketContainer = $('<div class="form-group j_ticket_container" id="j_ticket_container"><a id="j_ticket_delete"><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span></a><div class="form-group"><label>票种:</label><span id="j_ticket_name_span"></span></div><div class="form-group"><label>日期:</label><span id="j_ticket_date_span"></span></div><div class="form-group"><label>时间:</label><span id="j_ticket_time_span"></span></div><div class="form-group"><label>价格:</label><span id="j_ticket_price_span"></span></div><div class="form-group"><label>集合地点:</label><span id="j_gathering_place_span"></span></div><table class="table"><thead><tr><th>姓名</th><th>年龄</th><th>体重</th></tr></thead><tbody></tbody></table></div>');
     var ticketName = ticket.html();
     var ticketCount = parseInt(ticket.attr('count'));
@@ -127,6 +135,12 @@ $('#add_ticket').on('click', function(e){
     ticketContainer.find('#j_gathering_place_span').html(place);
     for(var i = 0; i < ticketCount; i++) {
         var ticketDetail = $('<tr><th><input type="text" id="j_user_name" class="form-control"/></th><th><input type="number" id="j_user_age" class="form-control"/></th><th><input type="number" id="j_user_weight" class="form-control"/></th></tr>')
+        if (minWeight == maxWeight && minWeight == 0) {
+            ticketDetail.find('#j_user_weight').remove();
+        }
+        if (minAge == maxAge && minAge == 0) {
+            ticketDetail.find('#j_user_age').remove();
+        }
         ticketContainer.find('tbody').append(ticketDetail);
     }
 });
@@ -189,15 +203,11 @@ $('#j_submit').on('click', function(){
                 isDataValid = false;
                 return;
             }
-            if(isNaN(age) || age <= 0) {
-                warn("请填写正确的年龄");
-                isDataValid = false;
-                return;
+            if(isNaN(age)) {
+                age = -1;
             }
-            if(isNaN(weight) || weight <= 0) {
-                warn("请填写正确的体重");
-                isDataValid = false;
-                return;
+            if(isNaN(weight)) {
+                weight = -1;
             }
             orderTicket.orderTicketUsers.push({
                 name: name,
