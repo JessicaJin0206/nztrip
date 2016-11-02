@@ -72,7 +72,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -158,15 +157,15 @@ public class RestApiController extends AuthenticationRequiredController {
         sku.setId(id);
         skuMapper.update(sku);
         List<SkuTicket> ticketList = skuTicketMapper.findOnlineBySkuId(id);
-        Map<Integer, SkuTicket> ticketMap = new HashMap<>();
+        Map<Integer, SkuTicket> ticketMap = Maps.newHashMap();
         if (!ticketList.isEmpty()) {
             for (SkuTicket ticket : ticketList) {
                 ticketMap.put(ticket.getId(), ticket);
             }
         }
-        List<SkuTicket> updateList = new ArrayList<>();
-        List<SkuTicket> createList = new ArrayList<>();
-        List<SkuTicket> deleteList = new ArrayList<>();
+        List<SkuTicket> updateList = Lists.newArrayList();
+        List<SkuTicket> createList = Lists.newArrayList();
+        List<SkuTicket> deleteList = Lists.newArrayList();
         for (SkuTicket skuTicket : Lists.transform(skuVo.getTickets(), (input) -> parse(id, input))) {
             if (skuTicket.getId() > 0) {
                 updateList.add(skuTicket);
