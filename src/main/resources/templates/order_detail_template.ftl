@@ -88,6 +88,8 @@
 </div>
 <div class="form-group"><label>游客信息</label></div>
 <#if editing=true>
+<div class="form-group"><label>票种信息</label></div>
+
 <div class="form-group dropdown">
     <button class="btn btn-default dropdown-toggle" type="button"
             data-toggle="dropdown"
@@ -104,6 +106,7 @@
             </li>
         </#list>
     </ul>
+
 </div>
 
 <div class="form-group">
@@ -113,19 +116,41 @@
             <span class="glyphicon glyphicon-calendar"/>
         </span>
     </div>
-    <div class="form-group dropdown">
-        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="true"><span value="0" id="j_ticket_time_span"
-                                           count="0">选择时间</span><span
-                class="caret"></span></button>
-        <ul class="dropdown-menu" id="j_ticket_time_selector">
-        </ul>
-        <a id="add_ticket"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"/></a>
-    </div>
 </div>
 
+<div class="form-group dropdown">
+    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="true"><span value="0" id="j_ticket_time_span" count="0">选择时间</span><span
+            class="caret"></span></button>
+    <ul class="dropdown-menu" id="j_ticket_time_selector">
+    </ul>
+</div>
+
+
+<div class="form-group" id="j_gathering_place_container">
+    <label>选择集合地点</label>
+    <#list sku.gatheringPlace as place>
+        <div class="input-group form-group">
+        <span class="input-group-addon">
+            <input type="radio" name="gathering_place_radio">
+        </span>
+            <input type="text" class="form-control j_place" disabled value="${place}">
+        </div>
+    </#list>
+    <#if sku.pickupService>
+        <div class="input-group form-group">
+        <span class="input-group-addon">
+            <input type="radio" name="gathering_place_radio">
+        </span>
+            <input type="text" class="form-control j_place" value="">
+        </div>
+    </#if>
+    <div class="form-group"><label>游客信息</label><a id="add_ticket"><span
+            class="glyphicon glyphicon-plus-sign" aria-hidden="true"/></a></div>
+</div>
 </#if>
+
 <#list tickets as ticket>
 <div class="form-group j_ticket_container" value="${ticket.id?c}" ticketId="${ticket.skuTicketId?c}"
      priceId="${ticket.ticketPriceId?c}">

@@ -52,7 +52,7 @@ public class EmailServiceImpl implements EmailService {
                 logger.error("fail to run auto-resend task", e);
             }
             logger.info("finish auto-resend email task");
-        }, 5, 5, TimeUnit.MINUTES);
+        }, 0, 5, TimeUnit.MINUTES);
     }
 
     @Override

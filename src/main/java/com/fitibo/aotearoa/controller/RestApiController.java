@@ -470,9 +470,11 @@ public class RestApiController extends AuthenticationRequiredController {
     @RequestMapping(value = "v1/api/skus/{skuId}/tickets/{ticketId}/prices")
     @Authentication
     public List<SkuTicketPriceVo> getPrice(@PathVariable("ticketId") int ticketId,
-                                           @RequestParam("date") String date) {
+                                           @RequestParam("date") String date,
+                                           @RequestParam(value = "orderId", required = false, defaultValue = "0") int orderId) {
+
         List<SkuTicketPrice> ticketPrices = skuTicketPriceMapper.findAvailableBySkuTicketIdAndDate(ticketId, DateUtils.parseDate(date), new RowBounds());
-        int discount = getDiscount(getToken());
+        int discount = orderId > 0 ? getDiscountByOrderId(orderId) : getDiscount(getToken());
         return Lists.transform(ticketPrices, (input) -> {
             SkuTicketPriceVo result = new SkuTicketPriceVo();
             result.setPrice(calculateTicketPrice(input, discount));
@@ -569,6 +571,9 @@ public class RestApiController extends AuthenticationRequiredController {
     }
 
     private Map<Integer, SkuTicketPrice> getSkuTicketPriceMap(List<Integer> ids) {
+        if (ids.isEmpty()) {
+            return Collections.emptyMap();
+        }
         List<SkuTicketPrice> prices = skuTicketPriceMapper.findByIds(ids);
         Map<Integer, SkuTicketPrice> priceMap = Maps.newHashMap();
         for (SkuTicketPrice skuTicketPrice : prices) {
@@ -578,6 +583,9 @@ public class RestApiController extends AuthenticationRequiredController {
     }
 
     private Map<Integer, SkuTicket> getSkuTicketMap(List<Integer> ids) {
+        if (ids.isEmpty()) {
+            return Collections.emptyMap();
+        }
         logger.info("sku ticket ids from order:" + ids);
         List<SkuTicket> skuTickets = skuTicketMapper.findByIds(ids);
         HashMap<Integer, SkuTicket> skuTicketMap = Maps.newHashMap();
@@ -585,6 +593,14 @@ public class RestApiController extends AuthenticationRequiredController {
             skuTicketMap.put(skuTicket.getId(), skuTicket);
         }
         return skuTicketMap;
+    }
+
+    private int getDiscountByOrderId(int orderId) {
+        Order order = orderMapper.findById(orderId);
+        Preconditions.checkNotNull(order, "invalid order id:" + orderId);
+        Agent agent = agentMapper.findById(order.getAgentId());
+        Preconditions.checkNotNull(agent, "invalid agent id:" + order.getAgentId() + " with order id:" + orderId);
+        return agent.getDiscount();
     }
 
     private int getDiscount(Token token) {
