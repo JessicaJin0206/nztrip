@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import rx.Observable;
 
@@ -168,6 +169,7 @@ public class OperationService {
         content = content.replace("#VENDORNAME#", vendor.getName());
         content = content.replace("#TOUR#", order.getSku());
         content = content.replace("#NAME#", order.getPrimaryContact());
+        content = content.replace("#REMARK#", Optional.of(order.getRemark()).orElse(""));
 
         StringBuilder tourInfo = new StringBuilder();
         tourInfo.append("TOTAL:<br>");
