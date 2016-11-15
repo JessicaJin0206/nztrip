@@ -16,14 +16,16 @@ public interface CityMapper {
     @Select("select * from city")
     @Results({
             @Result(column = "id", property = "id"),
-            @Result(column = "name", property = "name")
+            @Result(column = "name", property = "name"),
+            @Result(column = "name_en", property = "nameEn"),
     })
     List<City> findAll();
 
     @Select("select * from city where id=#{id}")
     @Results({
             @Result(column = "id", property = "id"),
-            @Result(column = "name", property = "name")
+            @Result(column = "name", property = "name"),
+            @Result(column = "name_en", property = "nameEn"),
     })
     City findById(int cityId);
 
@@ -41,7 +43,8 @@ public interface CityMapper {
     })
     @Results({
             @Result(column = "id", property = "id"),
-            @Result(column = "name", property = "name")
+            @Result(column = "name", property = "name"),
+            @Result(column = "name_en", property = "nameEn"),
     })
     List<City> findByIds(List<Integer> ids);
 }

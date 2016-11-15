@@ -13,5 +13,15 @@ public class City extends ModelObject {
         this.name = name;
     }
 
+    public String getNameEn() {
+        return nameEn;
+    }
+
+    public void setNameEn(String nameEn) {
+        this.nameEn = nameEn;
+    }
+
     private String name;
+
+    private String nameEn;
 }

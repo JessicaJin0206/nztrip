@@ -13,7 +13,7 @@
             <ul class="nav navbar-nav navbar-right">
                 <li><a id="j_en" onclick="document.cookie='language=en;path=/';window.location.reload()">English</a></li>
                 <li><a id="j_cn" onclick="document.cookie='language=cn;path=/';window.location.reload()">中文</a></li>
-                <li><a id="j_logout">退出</a></li>
+                <li><a id="j_logout">Logout</a></li>
             </ul>
             <form class="navbar-form navbar-right">
                 <input type="text" class="form-control" placeholder="Search...">

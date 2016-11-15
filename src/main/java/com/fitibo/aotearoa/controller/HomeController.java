@@ -59,6 +59,7 @@ import com.fitibo.aotearoa.vo.SkuVo;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -68,25 +69,26 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 @Controller
 public class HomeController extends AuthenticationRequiredController {
 
-    public static final String MODULE_DASHBOARD = "dashboard";
-    public static final String MODULE_CREATE_ORDER = "create_order";
-    public static final String MODULE_QUERY_ORDER = "query_order";
-    public static final String MODULE_ORDER_DETAIL = "order_detail";
-    public static final String MODULE_CREATE_SKU = "create_sku";
-    public static final String MODULE_QUERY_SKU = "query_sku";
-    public static final String MODULE_QUERY_VENDOR = "query_vendor";
-    public static final String MODULE_CREATE_VENDOR = "create_vendor";
-    public static final String MODULE_SKU_DETAIL = "sku_detail";
-    public static final String MODULE_VENDOR_DETAIL = "vendor_detail";
-    public static final String MODULE_SKU_TICKET_DETAIL = "sku_ticket_detail";
-    public static final String MODULE_QUERY_AGENT = "query_agent";
-    public static final String MODULE_AGENT_DETAIL = "agent_detail";
-    public static final String MODULE_CREATE_AGENT = "create_agent";
+    private static final String MODULE_DASHBOARD = "dashboard";
+    private static final String MODULE_CREATE_ORDER = "create_order";
+    private static final String MODULE_QUERY_ORDER = "query_order";
+    private static final String MODULE_ORDER_DETAIL = "order_detail";
+    private static final String MODULE_CREATE_SKU = "create_sku";
+    private static final String MODULE_QUERY_SKU = "query_sku";
+    private static final String MODULE_QUERY_VENDOR = "query_vendor";
+    private static final String MODULE_CREATE_VENDOR = "create_vendor";
+    private static final String MODULE_SKU_DETAIL = "sku_detail";
+    private static final String MODULE_VENDOR_DETAIL = "vendor_detail";
+    private static final String MODULE_SKU_TICKET_DETAIL = "sku_ticket_detail";
+    private static final String MODULE_QUERY_AGENT = "query_agent";
+    private static final String MODULE_AGENT_DETAIL = "agent_detail";
+    private static final String MODULE_CREATE_AGENT = "create_agent";
 
     @Autowired
     private CityService cityService;
@@ -190,6 +192,7 @@ public class HomeController extends AuthenticationRequiredController {
                              @RequestParam(value = "status", defaultValue = "0") int status,
                              @RequestParam(value = "pagesize", defaultValue = "10") int pageSize,
                              @RequestParam(value = "pagenumber", defaultValue = "0") int pageNumber,
+                             @CookieValue(value = "language", defaultValue = "en") String lang,
                              Map<String, Object> model) {
         Preconditions.checkNotNull(getToken());
         model.put("module", MODULE_QUERY_ORDER);
@@ -201,6 +204,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("uuid", uuid);
         model.put("referenceNumber", referenceNumber);
         model.put("role", getToken().getRole().toString());
+        model.put("lang", lang);
         switch (getToken().getRole()) {
             case Admin:
                 model.put("orders", orderMapper.findAllByMultiFields(uuid, keyword, referenceNumber, status, new RowBounds(pageNumber * pageSize, pageSize)));
@@ -216,7 +220,7 @@ public class HomeController extends AuthenticationRequiredController {
 
     @RequestMapping("orders/{id}")
     @Authentication
-    public String orderDetail(@PathVariable("id") int id, Map<String, Object> model) {
+    public String orderDetail(@PathVariable("id") int id, Map<String, Object> model, @CookieValue(value = "language", defaultValue = "en") String lang) {
         Order order = orderMapper.findById(id);
         if (order == null) {
             throw new ResourceNotFoundException();
@@ -228,6 +232,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("editing", false);
         model.put("transitions", orderService.getAvailableTransitions(order.getStatus()));
         model.put("role", getToken().getRole().toString());
+        model.put("lang", lang);
         return "order_detail";
     }
 
@@ -348,6 +353,7 @@ public class HomeController extends AuthenticationRequiredController {
                            @RequestParam(value = "categoryid", defaultValue = "0") int categoryId,
                            @RequestParam(value = "pagesize", defaultValue = "10") int pageSize,
                            @RequestParam(value = "pagenumber", defaultValue = "0") int pageNumber,
+                           @CookieValue(value = "language", defaultValue = "en") String lang,
                            Map<String, Object> model) {
         RowBounds rowBounds = new RowBounds(pageNumber * pageSize, pageSize);
         model.put("module", MODULE_QUERY_SKU);
@@ -357,6 +363,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("cities", cityService.findAll());
         model.put("categories", categoryService.findAll());
         model.put("durations", durationService.findAll());
+        model.put("lang", lang);
         List<Sku> skus = searchSku(keyword, cityId, categoryId, rowBounds);
         Map<Integer, City> cityMap = cityService.findByIds(Lists.transform(skus, Sku::getCityId));
         Map<Integer, Category> categoryMap = categoryService.findByIds(Lists.transform(skus, Sku::getCategoryId));
@@ -506,6 +513,7 @@ public class HomeController extends AuthenticationRequiredController {
         result.setCategory(category.getName());
         result.setCityId(sku.getCityId());
         result.setCity(city.getName());
+        result.setCityEn(city.getNameEn());
         result.setGatheringPlace(Lists.newArrayList(sku.getGatheringPlace().split(CommonConstants.SEPARATOR)));
         result.setPickupService(sku.hasPickupService());
         result.setDurationId(sku.getDurationId());

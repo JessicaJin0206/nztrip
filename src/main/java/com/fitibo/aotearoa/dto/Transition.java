@@ -5,9 +5,10 @@ package com.fitibo.aotearoa.dto;
  */
 public final class Transition {
 
-    public Transition(int to, String action) {
+    public Transition(int to, String action, String actionEn) {
         this.to = to;
         this.action = action;
+        this.actionEn = actionEn;
     }
 
     public int getTo() {
@@ -18,6 +19,11 @@ public final class Transition {
         return action;
     }
 
+    public String getActionEn() {
+        return actionEn;
+    }
+
     private final int to;
     private final String action;
+    private final String actionEn;
 }

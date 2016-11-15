@@ -29,14 +29,14 @@
                         data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="true"
                         <#if editing = false>disabled</#if>>
-                    <span id="j_selected_city" value="${sku.cityId?c}">${sku.city}</span>
+                    <span id="j_selected_city" value="${sku.cityId?c}">${sku.cityEn}</span>
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" id="j_city_drop_down"
                     aria-labelledby="selected_city_button">
                 <#if editing = true>
                     <#list cities as city>
-                        <li><a value="${city.id?c}">${city.name}</a></li>
+                            <li><a value="${city.id?c}">${city.nameEn}</a></li>
                     </#list>
                 </#if>
                 </ul>
@@ -96,7 +96,7 @@
                 </ul>
             </div>
             <div class="form-group" id="j_gathering_place">
-                <span>集合地点</span>
+                <span>Gathering Place</span>
             <#if editing = true>
                 <a>
                     <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
@@ -106,33 +106,33 @@
             <div class="form-group">
             <#list sku.gatheringPlace as place>
                 <input type="text" class="form-control j_gathering_place_input"
-                       placeholder="请输入集合地点..."
+                       placeholder="Please Input Gathering Place"
                        value="${place}" <#if editing = false>disabled</#if>>
             </#list>
             </div>
             <div class="form-group"><input type="text" id="j_description" class="form-control"
                                            <#if editing = false>disabled</#if>
-                                           placeholder="请输入项目详情..." value="${sku.description}">
+                                           placeholder="Description" value="${sku.description}">
             </div>
             <div id="j_pickup_service" class="form-group">
-                <span>是否有接送服务?</span>
+                <span>Has Pickup Service?</span>
                 <div class="btn-group" data-toggle="buttons">
                     <#if editing = true>
                         <label class="btn btn-default <#if sku.pickupService = true>active</#if>">
-                            <input type="radio" class="toggle" value="1">是
+                            <input type="radio" class="toggle" value="1">Yes
                         </label>
                         <label class="btn btn-default <#if sku.pickupService = false>active</#if>">
-                            <input type="radio" class="toggle" value="0">否
+                            <input type="radio" class="toggle" value="0">No
                         </label>
                     <#else>
-                        <#if sku.pickupService = true><span>是</span></#if>
-                        <#if sku.pickupService = false><span>否</span></#if>
+                        <#if sku.pickupService = true><span>Yes</span></#if>
+                        <#if sku.pickupService = false><span>No</span></#if>
                     </#if>
                 </div>
             </div>
 
             <div class="form-group">
-                <span>票种</span>
+                <span>Ticket</span>
             <#if editing = true>
                 <a id="j_add_ticket">
                     <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
@@ -143,13 +143,13 @@
                 <table class="table">
                     <thead>
                     <tr>
-                        <th>名称</th>
-                        <th>人数</th>
-                        <th>最小年龄</th>
-                        <th>最大年龄</th>
-                        <th>最小体重(KG)</th>
-                        <th>最大体重(KG)</th>
-                        <th>描述信息</th>
+                        <th>Name</th>
+                        <th>Count</th>
+                        <th>Min Age</th>
+                        <th>Max Age</th>
+                        <th>Min Weight(KG)</th>
+                        <th>Max Weight(KG)</th>
+                        <th>Description</th>
                         <th></th>
                     </tr>
                     </thead>
@@ -200,9 +200,9 @@
         <#if role?? && role == "Admin">
 
             <#if editing = false>
-                <button id="j_edit" class="btn btn-primary form-group">修改</button>
+                <button id="j_edit" class="btn btn-primary form-group">Modify</button>
             <#else>
-                <button id="j_update" class="btn btn-primary form-group">提交</button>
+                <button id="j_update" class="btn btn-primary form-group">Submit</button>
             </#if>
         </#if>
         </div>

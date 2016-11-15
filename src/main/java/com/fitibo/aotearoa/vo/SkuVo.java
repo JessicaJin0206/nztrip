@@ -131,11 +131,20 @@ public class SkuVo {
         this.duration = duration;
     }
 
+    public String getCityEn() {
+        return cityEn;
+    }
+
+    public void setCityEn(String cityEn) {
+        this.cityEn = cityEn;
+    }
+
     private int id;
     private String uuid;
     private String name;
     private int cityId;
     private String city;
+    private String cityEn;
     private int categoryId;
     private String category;
     private int vendorId;
