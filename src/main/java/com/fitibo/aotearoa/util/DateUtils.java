@@ -29,11 +29,15 @@ public final class DateUtils {
         return DATE_FORMAT.get();
     }
 
-    public static final String formatDate(Date date) {
+    public static String formatDate(Date date) {
         return getDateFormat().format(date);
     }
 
-    public static final Date parseDate(String dateString) {
+    public static String formatDateWithFormat(Date date) {
+        return getDateFormat().format(date) + "(" + getDateFormat().toPattern() + ")";
+    }
+
+    public static Date parseDate(String dateString) {
         try {
             return getDateFormat().parse(dateString);
         } catch (ParseException e) {
@@ -41,7 +45,7 @@ public final class DateUtils {
         }
     }
 
-    public static final DateTime parseDateTime(String dateString) {
+    public static DateTime parseDateTime(String dateString) {
         return DateTime.parse(dateString, DATE_FORMATTER);
     }
 

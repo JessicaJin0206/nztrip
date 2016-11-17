@@ -152,7 +152,7 @@ public class OperationService {
                 }
                 return result.toString();
             })));
-            content = content.replace("#DATE#", DateUtils.formatDate(input.getTicketDate()));
+            content = content.replace("#DATE#", DateUtils.formatDateWithFormat(input.getTicketDate()));
             content = content.replace("#TIME#", input.getTicketTime());
             content = content.replace("#GATHERING_PLACE#", input.getGatheringPlace());
             content = content.replace("#TICKET#", input.getSkuTicket());
@@ -178,7 +178,7 @@ public class OperationService {
                         inner -> tourInfo.append(input.getKey()).append(": ").append(inner.intValue()).append("<br>")));
         tourInfo.append("DETAILS:<br>");
         for (OrderTicket ticket : tickets) {
-            String date = DateUtils.formatDate(ticket.getTicketDate());
+            String date = DateUtils.formatDateWithFormat(ticket.getTicketDate());
             String time = ticket.getTicketTime();
             tourInfo.append(SPACE).append("ITEM: ").append(ticket.getSkuTicket()).append("<br>");
             tourInfo.append(SPACE).append("DATE: ").append(date).append("<br>");
