@@ -59,8 +59,8 @@ template:
       Best Regards<br><br>
       Reservation Team<br>
       <span style="color: dodgerblue">the <span style="font-weight: bold">Easy Efficient Excellent</span> travel with <span style="font-weight: bold">EYOUNZ Limited</span></span><br>
-      Tel & Fax: +64 (0)3 357 4405<br>
-      Address: 30 Durey Rd, Christchurch Airport Internatinal Terminal Building, Christchurch 8053
+      Tel & Fax: +64 (0)3 341 3318<br>
+      Address: 8a/41 Sir William Pickering Dr, Burnside, Christchurch 8053
       </div></body></html>
     guests_info: |
       出行人 Guests:<br>
@@ -68,4 +68,5 @@ template:
       票种 Ticket: #TICKET#<br>
       出发日期 Tour Date(Y/M/D): #DATE#<br>
       场次 Time: #TIME#<br>
+      集合时间 Gathering Time: #GATHERING_TIME#<br>
       集合地点 Meeting Place: #GATHERING_PLACE#

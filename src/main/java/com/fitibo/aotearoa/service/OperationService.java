@@ -154,6 +154,7 @@ public class OperationService {
             })));
             content = content.replace("#DATE#", DateUtils.formatDateWithFormat(input.getTicketDate()));
             content = content.replace("#TIME#", input.getTicketTime());
+            content = content.replace("#GATHERING_TIME#", Optional.of(input.getGatheringTime()).orElse(""));
             content = content.replace("#GATHERING_PLACE#", input.getGatheringPlace());
             content = content.replace("#TICKET#", input.getSkuTicket());
             return content;

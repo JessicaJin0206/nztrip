@@ -157,9 +157,9 @@
                                                        aria-hidden="true"></span></a></#if>
     <div class="form-group"><label>Ticket:</label><span
             id="j_ticket_name_span">${ticket.skuTicket!''}</span></div>
-    <div class="form-group"><label>Time:</label><span
-            id="j_ticket_date_span">${ticket.ticketDate!''}</span></div>
     <div class="form-group"><label>Date:</label><span
+            id="j_ticket_date_span">${ticket.ticketDate!''}</span></div>
+    <div class="form-group"><label>Time:</label><span
             id="j_ticket_time_span">${ticket.ticketTime!''}</span></div>
     <div class="form-group"><label>Price:</label><span id="j_ticket_price_span">${ticket.price?string('0.00')}</span>
     </div>
