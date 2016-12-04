@@ -160,7 +160,7 @@ public interface OrderMapper {
             "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone " +
             "from `order` o left join `sku` s on o.sku_id = s.id " +
             "where 1 = 1 " +
-            "<if test =\"keyword != null and keyword != ''\">and s.name like CONCAT('%',#{keyword},'%') </if> " +
+            "<if test =\"keyword != null and keyword != ''\"> and (s.name like CONCAT('%',#{keyword},'%') or o.primary_contact like CONCAT(#{keyword}, '%')) </if> " +
             "<if test =\"uuid != null and uuid != ''\">and o.uuid = #{uuid} </if> " +
             "<if test =\"referenceNumber != null and referenceNumber != ''\">and o.reference_number = #{referenceNumber} </if> " +
             "<if test =\"status != null and status > 0\">and o.status = #{status} </if> " +
