@@ -1,0 +1,5 @@
+select o.uuid as '订单id', s.name as 'sku', a.name as '代理商', o.price as '总价', o.primary_contact as '联系人', o.primary_contact_email as '联系人email', o.create_time as '订单创建时间', ot.sku_ticket_name as '票种', DATE_FORMAT(ot.ticket_date, '%Y-%M-%D') as '出行日期', ot.ticket_time as '出行时间', ot.price as '单价', ot.gathering_place as '集合地点', ot.gathering_time as '集合时间', otu.name as '姓名'
+from `order` o left join sku s on o.sku_id = s.id left join agent a on o.agent_id = a.id left join order_ticket ot on o.id = ot.order_id left join order_ticket_user otu on ot.id = otu.order_ticket_id;
+
+select o.uuid as '订单id', s.name as 'sku', a.name as '代理商', o.price as '总价', o.primary_contact as '联系人', o.primary_contact_email as '联系人email', o.create_time as '订单创建时间'
+from `order` o left join sku s on o.sku_id = s.id left join agent a on o.agent_id = a.id;
