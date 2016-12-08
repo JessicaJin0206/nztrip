@@ -154,7 +154,7 @@ public class OperationService {
             })));
             content = content.replace("#DATE#", DateUtils.formatDateWithFormat(input.getTicketDate()));
             content = content.replace("#TIME#", input.getTicketTime());
-            content = content.replace("#GATHERING_TIME#", Optional.of(input.getGatheringTime()).orElse(""));
+            content = content.replace("#GATHERING_TIME#", Optional.ofNullable(input.getGatheringTime()).orElse(""));
             content = content.replace("#GATHERING_PLACE#", input.getGatheringPlace());
             content = content.replace("#TICKET#", input.getSkuTicket());
             return content;
@@ -170,7 +170,7 @@ public class OperationService {
         content = content.replace("#VENDORNAME#", vendor.getName());
         content = content.replace("#TOUR#", order.getSku());
         content = content.replace("#NAME#", order.getPrimaryContact());
-        content = content.replace("#REMARK#", Optional.of(order.getRemark()).orElse(""));
+        content = content.replace("#REMARK#", Optional.ofNullable(order.getRemark()).orElse(""));
 
         StringBuilder tourInfo = new StringBuilder();
         tourInfo.append("TOTAL:<br>");

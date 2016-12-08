@@ -9,6 +9,7 @@
         <label class="col-md-2">Action:</label>
     <#if editing = false>
         <button id="j_edit" class="btn btn-default form-group">Modify</button>
+        <button id="j_download_voucher" class="btn btn-default form-group">Voucher</button>
         <#list transitions as transition>
             <button class="btn btn-primary form-group j_operation" operation="${transition.to}">${transition.actionEn}</button>
         </#list>
