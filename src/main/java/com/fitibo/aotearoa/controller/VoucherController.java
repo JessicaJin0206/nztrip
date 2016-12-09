@@ -162,7 +162,7 @@ public class VoucherController extends AuthenticationRequiredController {
                 multimap.put(ticket.getSkuTicket(), ticket);
             }
             ArrayList<String> items = Lists.newArrayList();
-            multimap.keys().forEach(key -> items.add(multimap.get(key).size() + " " + key));
+            multimap.keySet().forEach(key -> items.add(multimap.get(key).size() + " " + key));
             users.setCellValue(Joiner.on(" & ").join(items));
 
             //E15 remarks

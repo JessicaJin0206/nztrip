@@ -9,7 +9,6 @@
         <label class="col-md-2">修改订单:</label>
     <#if editing = false>
         <button id="j_edit" class="btn btn-default form-group">修改订单信息</button>
-        <button id="j_download_voucher" class="btn btn-default form-group">收据</button>
         <#list transitions as transition>
             <button class="btn btn-primary form-group j_operation"
                     operation="${transition.to}">${transition.action}</button>
@@ -31,6 +30,13 @@
     </div>
 </div>
 </#if>
+<div class="form-group">
+    <div class="row">
+        <label class="col-md-2">收据:</label>
+        <button id="j_download_voucher" class="btn btn-default form-group">导出</button>
+    </div>
+</div>
+
 <div class="form-group">
     <div class="row">
         <label class="col-md-2">订单状态:</label>

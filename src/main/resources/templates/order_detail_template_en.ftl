@@ -32,6 +32,12 @@
 </#if>
 <div class="form-group">
     <div class="row">
+        <label class="col-md-2">Voucher:</label>
+        <button id="j_download_voucher" class="btn btn-default form-group">Export</button>
+    </div>
+</div>
+<div class="form-group">
+    <div class="row">
         <label class="col-md-2">Order Status:</label>
         <div class="col-md-offset-2">
         <#list statusList as s>
