@@ -70,3 +70,11 @@ template:
       场次 Time: #TIME#<br>
       集合时间 Gathering Time: #GATHERING_TIME#<br>
       集合地点 Meeting Place: #GATHERING_PLACE#
+
+alitrip:
+  items:
+    - company: lazy cat
+      category: 4500米NZONE
+      category_xpath: //*[@id="J_SkuWrap"]/dd[1]/ul/li[1]
+      price_xpath: //*[@id="J_Price"]/span/text()
+      url: https://items.alitrip.com/item.htm?spm=181.7621407.a1z9b.23.vxpueT&id=41027834971&scm=20140635.1_1_5.0_b.0a67c0bb14819650716067969e
