@@ -73,8 +73,69 @@ template:
 
 alitrip:
   items:
-    - company: lazy cat
+    -
+      company: lazy cat
       category: 4500米NZONE
       category_xpath: //*[@id="J_SkuWrap"]/dd[1]/ul/li[1]
       price_xpath: //*[@id="J_Price"]/span/text()
       url: https://items.alitrip.com/item.htm?spm=181.7621407.a1z9b.23.vxpueT&id=41027834971&scm=20140635.1_1_5.0_b.0a67c0bb14819650716067969e
+    -
+      company: lazy cat
+      category: 3600米NZONE
+      category_xpath: //*[@id="J_SkuWrap"]/dd[1]/ul/li[2]
+      price_xpath: //*[@id="J_Price"]/span/text()
+      url: https://items.alitrip.com/item.htm?spm=181.7621407.a1z9b.23.vxpueT&id=41027834971&scm=20140635.1_1_5.0_b.0a67c0bb14819650716067969e
+    -
+      company: lazy cat
+      category: 2700米NZONE
+      category_xpath: //*[@id="J_SkuWrap"]/dd[1]/ul/li[3]
+      price_xpath: //*[@id="J_Price"]/span/text()
+      url: https://items.alitrip.com/item.htm?spm=181.7621407.a1z9b.23.vxpueT&id=41027834971&scm=20140635.1_1_5.0_b.0a67c0bb14819650716067969e
+    -
+      company: rruu
+      category: 皇后镇9000英尺
+      category_xpath: //*[@id="J_SkuWrap"]/dd[1]/ul/li[1]
+      price_xpath: //*[@id="J_Price"]/span/text()
+      url: https://items.alitrip.com/item.htm?spm=181.7621407.a1z9b.28.vxpueT&id=532640305672&scm=20140635.1_1_6.0_b.0a67c0bb14819650716067969e
+    -
+      company: rruu
+      category: 皇后镇12000英尺
+      category_xpath: //*[@id="J_SkuWrap"]/dd[1]/ul/li[2]
+      price_xpath: //*[@id="J_Price"]/span/text()
+      url: https://items.alitrip.com/item.htm?spm=181.7621407.a1z9b.28.vxpueT&id=532640305672&scm=20140635.1_1_6.0_b.0a67c0bb14819650716067969e
+    -
+      company: rruu
+      category: 皇后镇15000英尺
+      category_xpath: //*[@id="J_SkuWrap"]/dd[1]/ul/li[3]
+      price_xpath: //*[@id="J_Price"]/span/text()
+      url: https://items.alitrip.com/item.htm?spm=181.7621407.a1z9b.28.vxpueT&id=532640305672&scm=20140635.1_1_6.0_b.0a67c0bb14819650716067969e
+    -
+      company: itrip
+      category: 3600米一万二英尺
+      category_xpath: //*[@id="J_SkuWrap"]/dd[1]/ul/li[1]
+      price_xpath: //*[@id="J_Price"]/span/text()
+      url: https://items.alitrip.com/item.htm?spm=181.7621407.a1z9b.33.vxpueT&id=527167821291&scm=20140635.1_1_7.0_b.0a67c0bb14819650716067969e
+    -
+      company: itrip
+      category: 4500米一万五英尺
+      category_xpath: //*[@id="J_SkuWrap"]/dd[1]/ul/li[2]
+      price_xpath: //*[@id="J_Price"]/span/text()
+      url: https://items.alitrip.com/item.htm?spm=181.7621407.a1z9b.33.vxpueT&id=527167821291&scm=20140635.1_1_7.0_b.0a67c0bb14819650716067969e
+    -
+      company: toursforfun
+      category: 2700米高度
+      category_xpath: //*[@id="J_SkuWrap"]/dd[1]/ul/li[1]
+      price_xpath: //*[@id="J_Price"]/span/text()
+      url: https://items.alitrip.com/item.htm?spm=181.7621407.a1z9b.43.vxpueT&id=521354623106&scm=20140635.1_1_9.0_b.0a67c0bb14819650716067969e
+    -
+      company: toursforfun
+      category: 3600米高度
+      category_xpath: //*[@id="J_SkuWrap"]/dd[1]/ul/li[2]
+      price_xpath: //*[@id="J_Price"]/span/text()
+      url: https://items.alitrip.com/item.htm?spm=181.7621407.a1z9b.43.vxpueT&id=521354623106&scm=20140635.1_1_9.0_b.0a67c0bb14819650716067969e
+    -
+      company: toursforfun
+      category: 4500米高度
+      category_xpath: //*[@id="J_SkuWrap"]/dd[1]/ul/li[3]
+      price_xpath: //*[@id="J_Price"]/span/text()
+      url: https://items.alitrip.com/item.htm?spm=181.7621407.a1z9b.43.vxpueT&id=521354623106&scm=20140635.1_1_9.0_b.0a67c0bb14819650716067969e
