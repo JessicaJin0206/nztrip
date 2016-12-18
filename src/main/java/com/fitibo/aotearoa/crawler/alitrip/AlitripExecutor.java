@@ -47,7 +47,7 @@ public class AlitripExecutor {
     @Autowired
     private SimplePool<CustomizedChromeDriver> pool;
 
-    @Scheduled(cron = "* */1 * * * ?")
+    @Scheduled(cron = "* * 0,12 * * ?")
     public void execute() {
         try {
             for (Map<String, String> item : config.getItems()) {
