@@ -28,8 +28,5 @@ public class AlitripConfig implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        for (Map<String, String> item : items) {
-            System.out.println(item);
-        }
     }
 }
