@@ -6,6 +6,8 @@ flyway:
   sql-migration-prefix: V
   sql-migration-suffix: sql
 
+secret: secret
+
 email:
   host: smtp.qq.com
   port: 25

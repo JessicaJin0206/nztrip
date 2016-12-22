@@ -22,6 +22,7 @@ import com.fitibo.aotearoa.mapper.AgentMapper;
 import com.fitibo.aotearoa.mapper.OrderMapper;
 import com.fitibo.aotearoa.mapper.OrderTicketMapper;
 import com.fitibo.aotearoa.mapper.OrderTicketUserMapper;
+import com.fitibo.aotearoa.mapper.PriceRecordMapper;
 import com.fitibo.aotearoa.mapper.SkuMapper;
 import com.fitibo.aotearoa.mapper.SkuTicketMapper;
 import com.fitibo.aotearoa.mapper.SkuTicketPriceMapper;
@@ -30,6 +31,7 @@ import com.fitibo.aotearoa.model.Agent;
 import com.fitibo.aotearoa.model.Order;
 import com.fitibo.aotearoa.model.OrderTicket;
 import com.fitibo.aotearoa.model.OrderTicketUser;
+import com.fitibo.aotearoa.model.PriceRecord;
 import com.fitibo.aotearoa.model.Sku;
 import com.fitibo.aotearoa.model.SkuTicket;
 import com.fitibo.aotearoa.model.SkuTicketPrice;
@@ -41,6 +43,7 @@ import com.fitibo.aotearoa.service.VendorService;
 import com.fitibo.aotearoa.util.DateUtils;
 import com.fitibo.aotearoa.util.GuidGenerator;
 import com.fitibo.aotearoa.util.Md5Utils;
+import com.fitibo.aotearoa.vo.AddPriceRecordRequest;
 import com.fitibo.aotearoa.vo.AddPriceRequest;
 import com.fitibo.aotearoa.vo.AgentVo;
 import com.fitibo.aotearoa.vo.AuthenticationReq;
@@ -59,6 +62,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -121,6 +125,12 @@ public class RestApiController extends AuthenticationRequiredController {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private PriceRecordMapper priceRecordMapper;
+
+    @Value("${secret}")
+    private String secret;
 
     @ExceptionHandler
     public ResponseEntity handleException(AuthenticationFailureException ex) {
@@ -211,6 +221,18 @@ public class RestApiController extends AuthenticationRequiredController {
         vendorService.update(vendor);
         vendorVo.setId(id);
         return vendorVo;
+    }
+
+    @RequestMapping(value = "v1/api/priceRecords", method = RequestMethod.POST)
+    public void createPriceRecord(@RequestBody AddPriceRecordRequest request) {
+        logger.info("create price record:" + request);
+        Preconditions.checkArgument(secret.equals(request.getSecret()), "invalid secret:" + request.getSecret());
+        PriceRecord priceRecord = new PriceRecord();
+        priceRecord.setCompany(request.getCompany());
+        priceRecord.setPrice(BigDecimal.valueOf(request.getPrice()));
+        priceRecord.setCategory(request.getCategory());
+        priceRecord.setUrl(request.getUrl());
+        priceRecordMapper.create(priceRecord);
     }
 
     private Vendor parse(VendorVo vendorVo) {
