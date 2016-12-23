@@ -62,12 +62,15 @@ $('#j_ticket_type_selector li a').on('click', function(e){
         format: "YYYY-MM-DD"
     }).on('dp.change', function(e){
         var url = '/v1/api/skus/' + $('.main').attr('skuId') + '/tickets/' + ticket.attr('value') + '/prices?date=' + e.date.format('YYYY-MM-DD');
+        timeSpan.html("Select time");
+        timeSpan.attr('value', 0);
+        timeSpan.attr('price', 0);
+        timeSelector.empty();
         $.ajax({
             type: 'GET',
             contentType:"application/json; charset=utf-8",
             url: url
         }).success(function(data){
-            timeSelector.empty();
             if (data && data.length > 0) {
                 $.each(data, function(index, price){
                     var item = $('<li><a value="' + price.id + '">' + price.time + '</a></li>');
