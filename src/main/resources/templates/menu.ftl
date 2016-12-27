@@ -26,5 +26,10 @@
         <li <#if module == "create_agent">class="active"</#if>><a href="/create_agent">创建代理商</a></li>
     </ul>
     </#if>
+    <#if role?? && role == "Admin">
+    <ul class="nav nav-sidebar">
+        <li <#if module == "price_record">class="active"</#if>><a href="/prices">价格监控</a></li>
+    </ul>
+    </#if>
 <#--</#if>-->
 </div>

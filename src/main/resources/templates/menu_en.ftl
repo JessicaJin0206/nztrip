@@ -26,5 +26,11 @@
         <li <#if module == "create_agent">class="active"</#if>><a href="/create_agent">Create Agents</a></li>
     </ul>
     </#if>
+    <#if role?? && role == "Admin">
+        <ul class="nav nav-sidebar">
+            <li <#if module == "price_record">class="active"</#if>><a href="/prices">Price Monitoring</a></li>
+        </ul>
+    </#if>
+
 <#--</#if>-->
 </div>

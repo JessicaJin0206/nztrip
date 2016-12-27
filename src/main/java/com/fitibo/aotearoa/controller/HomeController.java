@@ -26,11 +26,13 @@ import com.fitibo.aotearoa.constants.CommonConstants;
 import com.fitibo.aotearoa.constants.OrderStatus;
 import com.fitibo.aotearoa.dto.Role;
 import com.fitibo.aotearoa.dto.Token;
+import com.fitibo.aotearoa.exception.InvalidDateFormatException;
 import com.fitibo.aotearoa.exception.InvalidParamException;
 import com.fitibo.aotearoa.exception.ResourceNotFoundException;
 import com.fitibo.aotearoa.mapper.AgentMapper;
 import com.fitibo.aotearoa.mapper.OrderMapper;
 import com.fitibo.aotearoa.mapper.OrderTicketMapper;
+import com.fitibo.aotearoa.mapper.PriceRecordMapper;
 import com.fitibo.aotearoa.mapper.SkuMapper;
 import com.fitibo.aotearoa.mapper.SkuTicketMapper;
 import com.fitibo.aotearoa.mapper.SkuTicketPriceMapper;
@@ -39,6 +41,7 @@ import com.fitibo.aotearoa.model.Category;
 import com.fitibo.aotearoa.model.City;
 import com.fitibo.aotearoa.model.Duration;
 import com.fitibo.aotearoa.model.Order;
+import com.fitibo.aotearoa.model.PriceRecord;
 import com.fitibo.aotearoa.model.Sku;
 import com.fitibo.aotearoa.model.SkuTicket;
 import com.fitibo.aotearoa.model.SkuTicketPrice;
@@ -51,6 +54,7 @@ import com.fitibo.aotearoa.service.impl.CategoryServiceImpl;
 import com.fitibo.aotearoa.util.DateUtils;
 import com.fitibo.aotearoa.util.ObjectParser;
 import com.fitibo.aotearoa.vo.AgentVo;
+import com.fitibo.aotearoa.vo.PriceRecordVo;
 import com.fitibo.aotearoa.vo.SkuTicketPriceVo;
 import com.fitibo.aotearoa.vo.SkuTicketVo;
 import com.fitibo.aotearoa.vo.SkuVo;
@@ -87,6 +91,7 @@ public class HomeController extends AuthenticationRequiredController {
     private static final String MODULE_QUERY_AGENT = "query_agent";
     private static final String MODULE_AGENT_DETAIL = "agent_detail";
     private static final String MODULE_CREATE_AGENT = "create_agent";
+    private static final String MODULE_PRICE_MONITORING = "price_monitoring";
 
     @Autowired
     private CityService cityService;
@@ -120,6 +125,9 @@ public class HomeController extends AuthenticationRequiredController {
 
     @Autowired
     private AgentMapper agentMapper;
+
+    @Autowired
+    private PriceRecordMapper priceRecordMapper;
 
     @ExceptionHandler
     public String handleException(ResourceNotFoundException ex) {
@@ -289,6 +297,26 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("editing", false);
         model.put("role", getToken().getRole().toString());
         return "sku_detail";
+    }
+
+    @RequestMapping("prices")
+    @Authentication(Role.Admin)
+    public String priceMonitoring(@RequestParam(value = "company", defaultValue = "") String company,
+                                  @RequestParam(value = "date", defaultValue = "") String dateString,
+                                  @RequestParam(value = "pagesize", defaultValue = "10") int pageSize,
+                                  @RequestParam(value = "pagenumber", defaultValue = "0") int pageNumber,
+                                  Map<String, Object> model) {
+        if (dateString != null && !dateString.isEmpty()) {
+            DateUtils.parseDate(dateString);
+        }
+        model.put("module", MODULE_PRICE_MONITORING);
+        model.put("role", getToken().getRole().toString());
+        model.put("priceRecords", Lists.transform(priceRecordMapper.query(company, dateString, new RowBounds(pageNumber * pageSize, pageSize)), HomeController::parse));
+        model.put("pageNumber", pageNumber);
+        model.put("pageSize", pageSize);
+        model.put("date", dateString);
+        model.put("company", company);
+        return "price_monitoring";
     }
 
     @RequestMapping("skus/{id}/_edit")
@@ -494,6 +522,16 @@ public class HomeController extends AuthenticationRequiredController {
                 categoryService.findById(sku.getCategoryId()),
                 vendorService.findById(sku.getVendorId()),
                 durationService.findById(sku.getDurationId()));
+    }
+
+    private static PriceRecordVo parse(PriceRecord input) {
+        PriceRecordVo result = new PriceRecordVo();
+        result.setCategory(input.getCategory());
+        result.setCompany(input.getCompany());
+        result.setUrl(input.getUrl());
+        result.setCreateTime(DateUtils.formatDate(input.getCreateTime()));
+        result.setPrice(input.getPrice().setScale(2).toString());
+        return result;
     }
 
     private static SkuVo parse(Sku sku, City city,
