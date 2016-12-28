@@ -13,6 +13,7 @@ public class PriceRecord extends ModelObject {
     private String category;
     private BigDecimal price;
     private Date createTime;
+    private String sku;
 
     public String getCompany() {
         return company;
@@ -52,5 +53,13 @@ public class PriceRecord extends ModelObject {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getSku() {
+        return sku;
+    }
+
+    public void setSku(String sku) {
+        this.sku = sku;
     }
 }

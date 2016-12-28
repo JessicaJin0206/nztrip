@@ -18,7 +18,7 @@ import java.util.List;
  */
 public interface PriceRecordMapper {
 
-    @Insert("insert into price_record (company, category, url, price) values(#{company}, #{category}, #{url}, #{price})")
+    @Insert("insert into price_record (company, category, url, price, sku) values(#{company}, #{category}, #{url}, #{price}, #{sku})")
     @Options(useGeneratedKeys = true, keyColumn = "id", keyProperty = "id", flushCache = Options.FlushCachePolicy.DEFAULT)
     int create(PriceRecord priceRecord);
 
@@ -33,6 +33,7 @@ public interface PriceRecordMapper {
             @Result(column = "url", property = "url"),
             @Result(column = "create_time", property = "createTime"),
             @Result(column = "category", property = "category"),
+            @Result(column = "sku", property = "sku"),
             @Result(column = "price", property = "price")})
     List<PriceRecord> query(@Param("company") String company, @Param("date")String date, RowBounds rowBounds);
 }

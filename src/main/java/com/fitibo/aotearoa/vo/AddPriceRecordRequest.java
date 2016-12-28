@@ -13,5 +13,6 @@ public class AddPriceRecordRequest {
     private double price;
     private String company;
     private String secret;
+    private String sku;
 
 }

@@ -1,0 +1,1 @@
+ALTER TABLE `price_record` ADD COLUMN sku VARCHAR(30) default "";

@@ -13,8 +13,8 @@
     <#include "menu.ftl"/>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
             <div class="row">
-                <div class="col-md-4"><input type="text" id="j_vendor" class="form-control"
-                                             placeholder="请输入活动公司名称" value="${company!}">
+                <div class="col-md-4"><input type="text" id="j_agent" class="form-control"
+                                             placeholder="请输入公司名称" value="${company!}">
                 </div>
                 <div class="input-group date col-md-3 col-sm-3 col-xs-3 form-group"
                      id="j_date">
@@ -32,7 +32,8 @@
                 <table class="table table-hover">
                     <thead>
                     <tr>
-                        <th>活动公司</th>
+                        <th>活动名称</th>
+                        <th>公司</th>
                         <th>类别</th>
                         <th>日期</th>
                         <th>价格</th>
@@ -41,7 +42,8 @@
                     <tbody>
                     <#list priceRecords as priceRecord>
                     <tr>
-                        <th scope="row">${priceRecord.company}</th>
+                        <th scope="row">${priceRecord.sku!}</th>
+                        <td>${priceRecord.company}</td>
                         <td>${priceRecord.category}</td>
                         <td>${priceRecord.createTime}</td>
                         <td>${priceRecord.price}</td>

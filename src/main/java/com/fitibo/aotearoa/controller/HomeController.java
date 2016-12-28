@@ -531,6 +531,7 @@ public class HomeController extends AuthenticationRequiredController {
         result.setUrl(input.getUrl());
         result.setCreateTime(DateUtils.formatDate(input.getCreateTime()));
         result.setPrice(input.getPrice().setScale(2).toString());
+        result.setSku(input.getSku());
         return result;
     }
 

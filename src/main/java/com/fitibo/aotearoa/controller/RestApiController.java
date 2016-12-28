@@ -232,6 +232,7 @@ public class RestApiController extends AuthenticationRequiredController {
         priceRecord.setPrice(BigDecimal.valueOf(request.getPrice()));
         priceRecord.setCategory(request.getCategory());
         priceRecord.setUrl(request.getUrl());
+        priceRecord.setSku(request.getSku());
         priceRecordMapper.create(priceRecord);
     }
 

@@ -8,7 +8,7 @@ selector.datetimepicker({
 });
 $('#j_search').on('click', function() {
     var searchString = "";
-    var company = $('#j_vendor').val();
+    var company = $('#j_agent').val();
     if (company.length > 0) {
         searchString += "company=" + encodeURI(company) + "&";
     }
