@@ -2,16 +2,13 @@ package com.fitibo.aotearoa.mapper;
 
 import com.fitibo.aotearoa.constants.SkuTicketStatus;
 import com.fitibo.aotearoa.model.SkuTicket;
-
+import java.util.List;
 import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Many;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
-
-import java.util.List;
 
 /**
  * Created by qianhao.zhou on 8/3/16.
@@ -58,8 +55,6 @@ public interface SkuTicketMapper {
             @Result(column = "weight_constraint", property = "weightConstraint"),
             @Result(column = "description", property = "description"),
             @Result(column = "status", property = "status"),
-            @Result(column = "id", property = "ticketPrices", javaType = List.class,
-                    many = @Many(select = "com.fitibo.aotearoa.mapper.SkuTicketPriceMapper.findAvailableBySkuTicketId"))
     })
     List<SkuTicket> findOnlineBySkuId(int skuId);
 

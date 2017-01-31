@@ -17,6 +17,7 @@ import com.fitibo.aotearoa.model.OrderTicket;
 import com.fitibo.aotearoa.model.Sku;
 import com.fitibo.aotearoa.model.SkuTicket;
 import com.fitibo.aotearoa.model.Vendor;
+import com.fitibo.aotearoa.service.SkuService;
 import com.fitibo.aotearoa.util.DateUtils;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
@@ -81,6 +82,9 @@ public class ExportController extends AuthenticationRequiredController {
   @Autowired
   private OrderStatMapper orderStatMapper;
 
+  @Autowired
+  private SkuService skuService;
+
   @Value(value = "classpath:voucher_template.xlsx")
   private Resource voucherTemplate;
 
@@ -104,7 +108,7 @@ public class ExportController extends AuthenticationRequiredController {
     } else {
 
     }
-    Sku sku = skuMapper.findById(order.getSkuId());
+    Sku sku = skuService.findById(order.getSkuId());
     Preconditions.checkNotNull(sku, "invalid sku id:" + order.getSkuId());
 
     Vendor vendor = vendorMapper.findById(sku.getVendorId());
