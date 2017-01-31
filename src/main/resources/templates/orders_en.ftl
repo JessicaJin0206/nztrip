@@ -64,8 +64,7 @@
             <th>Order Status</th>
             <th>Primary Contact</th>
             <th>Email</th>
-            <th>Reference Number</th>
-            <th>Total Price</th>
+            <th>Agent</th>
             <th>Remark</th>
             <th>Action</th>
           </tr>
@@ -84,8 +83,7 @@
             </td>
             <td>${order.primaryContact!''}</td>
             <td>${order.primaryContactEmail!''}</td>
-            <td>${order.referenceNumber!''}</td>
-            <td>${order.price?string('0.00')}</td>
+            <td>${order.agentName!''}</td>
             <td>${order.remark!''}</td>
             <td>
               <div>

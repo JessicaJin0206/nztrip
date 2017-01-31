@@ -49,6 +49,7 @@ import com.fitibo.aotearoa.service.impl.CategoryServiceImpl;
 import com.fitibo.aotearoa.util.DateUtils;
 import com.fitibo.aotearoa.util.ObjectParser;
 import com.fitibo.aotearoa.vo.AgentVo;
+import com.fitibo.aotearoa.vo.OrderVo;
 import com.fitibo.aotearoa.vo.PriceRecordVo;
 import com.fitibo.aotearoa.vo.SkuTicketPriceVo;
 import com.fitibo.aotearoa.vo.SkuTicketVo;
@@ -214,19 +215,21 @@ public class HomeController extends AuthenticationRequiredController {
     model.put("referenceNumber", referenceNumber);
     model.put("role", getToken().getRole().toString());
     model.put("lang", lang);
+    List<OrderVo> orders;
     switch (getToken().getRole()) {
       case Admin:
-        model.put("orders", orderMapper.findAllByMultiFields(uuid, keyword, referenceNumber, status,
-            new RowBounds(pageNumber * pageSize, pageSize)));
+        orders = Lists.transform(orderMapper.findAllByMultiFields(uuid, keyword, referenceNumber, status,
+            new RowBounds(pageNumber * pageSize, pageSize)), ObjectParser::parse);
         break;
       case Agent:
-        model.put("orders", orderMapper
+        orders = Lists.transform(orderMapper
             .findByAgentIdAndMultiFields(getToken().getId(), uuid, keyword, referenceNumber, status,
-                new RowBounds(pageNumber * pageSize, pageSize)));
+                new RowBounds(pageNumber * pageSize, pageSize)), ObjectParser::parse);
         break;
       default:
         throw new ResourceNotFoundException();
     }
+    model.put("orders", orders);
     return "orders";
   }
 

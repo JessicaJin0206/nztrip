@@ -157,10 +157,10 @@ public interface OrderMapper {
             "select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
-            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone " +
-            "from `order` o left join `sku` s on o.sku_id = s.id " +
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, agent.name as agent_name " +
+            "from `order` o left join `sku` s on o.sku_id = s.id left join agent on o.agent_id = agent.id " +
             "where 1 = 1 " +
-            "<if test =\"keyword != null and keyword != ''\"> and (s.name like CONCAT('%',#{keyword},'%') or o.primary_contact like CONCAT(#{keyword}, '%')) </if> " +
+            "<if test =\"keyword != null and keyword != ''\"> and (s.name like CONCAT('%',#{keyword},'%') or o.primary_contact like CONCAT(#{keyword}, '%') or agent.name like CONCAT(#{keyword}, '%')) </if> " +
             "<if test =\"uuid != null and uuid != ''\">and o.uuid = #{uuid} </if> " +
             "<if test =\"referenceNumber != null and referenceNumber != ''\">and o.reference_number = #{referenceNumber} </if> " +
             "<if test =\"status != null and status > 0\">and o.status = #{status} </if> " +
@@ -187,7 +187,8 @@ public interface OrderMapper {
             @Result(column = "secondary_contact_wechat", property = "secondaryContactWechat"),
             @Result(column = "reference_number", property = "referenceNumber"),
             @Result(column = "name", property = "sku"),
-            @Result(column = "vendor_phone", property = "vendorPhone")
+            @Result(column = "vendor_phone", property = "vendorPhone"),
+            @Result(column = "agent_name", property = "agentName")
     })
     List<Order> findAllByMultiFields(@Param("uuid") String uuid,
                                      @Param("keyword") String keyword,

@@ -61,11 +61,10 @@
           <tr>
             <th>编号</th>
             <th>项目</th>
-            <th>订单状态</th>
+            <th>状态</th>
             <th>主联系人</th>
             <th>Email</th>
-            <th>Reference Number</th>
-            <th>总价</th>
+            <th>代理商</th>
             <th>备注</th>
             <th>操作</th>
           </tr>
@@ -84,8 +83,7 @@
             </td>
             <td>${order.primaryContact!''}</td>
             <td>${order.primaryContactEmail!''}</td>
-            <td>${order.referenceNumber!''}</td>
-            <td>${order.price?string('0.00')}</td>
+            <td>${order.agentName!''}</td>
             <td>${order.remark!''}</td>
             <td>
               <div>
