@@ -298,6 +298,23 @@ public class RestApiController extends AuthenticationRequiredController {
     return orderVo;
   }
 
+  @RequestMapping(value = "v1/api/orders/{id}/confirmation", method = RequestMethod.POST)
+  @Authentication(Role.Admin)
+  public void sendConfirmation(@PathVariable("id") int orderId) {
+    Order order = orderMapper.findById(orderId);
+    Preconditions.checkArgument(order.getStatus() == OrderStatus.CONFIRMED.getValue(), "invalid order status:" + order.getStatus());
+    operationService.sendConfirmationEmail(order);
+  }
+
+  @RequestMapping(value = "v1/api/orders/{id}/reservation", method = RequestMethod.POST)
+  @Authentication(Role.Admin)
+  public void sendReservation(@PathVariable("id") int orderId) {
+    Order order = orderMapper.findById(orderId);
+    Preconditions.checkArgument(order.getStatus() == OrderStatus.PENDING.getValue(), "invalid order status:" + order.getStatus());
+    operationService.sendReservationEmail(order);
+  }
+
+
   private void validateTicketUser(OrderTicket orderTicket, List<OrderTicketUserVo> users) {
     String[] ages = orderTicket.getAgeConstraint().split("-");
     int minAge = (Integer.parseInt(ages[0]));
