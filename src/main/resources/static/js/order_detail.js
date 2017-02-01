@@ -98,6 +98,7 @@ $('#j_ticket_type_selector li a').on('click', function (e) {
             timeSpan.html(price.time);
             timeSpan.attr('value', price.id);
             timeSpan.attr('price', price.price);
+            timeSpan.attr('salePrice', price.salePrice);
           });
           timeSelector.append(item);
         });
@@ -132,6 +133,7 @@ $('#add_ticket').on('click', function (e) {
   var time = timeSpan.html();
   var priceId = parseInt(timeSpan.attr('value'));
   var price = parseFloat(timeSpan.attr('price'));
+  var salePrice = parseFloat(timeSpan.attr('salePrice'));
   if (priceId <= 0) {
     return;
   }
@@ -140,7 +142,7 @@ $('#add_ticket').on('click', function (e) {
   var minAge = parseInt(ticket.attr('minAge'));
   var maxAge = parseInt(ticket.attr('maxAge'));
   var ticketContainer = $(
-      '<div class="form-group j_ticket_container" id="j_ticket_container"><a id="j_ticket_delete"><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span></a><div class="form-group"><label>票种:</label><span id="j_ticket_name_span"></span></div><div class="form-group"><label>日期:</label><span id="j_ticket_date_span"></span></div><div class="form-group"><label>时间:</label><span id="j_ticket_time_span"></span></div><div class="form-group"><label>价格:</label><span id="j_ticket_price_span"></span></div><div class="form-group"><label>集合地点:</label><span id="j_gathering_place_span"></span></div><table class="table"><thead><tr><th>姓名</th><th>年龄</th><th>体重</th></tr></thead><tbody></tbody></table></div>');
+      '<div class="form-group j_ticket_container" id="j_ticket_container"><a id="j_ticket_delete"><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span></a><div class="form-group"><label>票种:</label><span id="j_ticket_name_span"></span></div><div class="form-group"><label>日期:</label><span id="j_ticket_date_span"></span></div><div class="form-group"><label>时间:</label><span id="j_ticket_time_span"></span></div><div class="form-group"><label>核算价格:</label><span id="j_ticket_price_span"></span></div><div class="form-group"><label>官网价格:</label><span id="j_ticket_sale_price_span"></span></div><div class="form-group"><label>集合地点:</label><span id="j_gathering_place_span"></span></div><table class="table"><thead><tr><th>姓名</th><th>年龄</th><th>体重</th></tr></thead><tbody></tbody></table></div>');
   var ticketName = ticket.html();
   var ticketCount = parseInt(ticket.attr('count'));
   ticketContainer.attr('ticketId', ticketId);
@@ -150,6 +152,7 @@ $('#add_ticket').on('click', function (e) {
   ticketContainer.find('#j_ticket_date_span').html(date);
   ticketContainer.find('#j_ticket_time_span').html(time);
   ticketContainer.find('#j_ticket_price_span').html(price);
+  ticketContainer.find('#j_ticket_sale_price_span').html(salePrice);
   ticketContainer.find('#j_gathering_place_span').html(place);
   for (var i = 0; i < ticketCount; i++) {
     var ticketDetail = $(

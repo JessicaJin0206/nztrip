@@ -535,6 +535,7 @@ public class RestApiController extends AuthenticationRequiredController {
     return Lists.transform(ticketPrices, (input) -> {
       SkuTicketPriceVo result = new SkuTicketPriceVo();
       result.setPrice(calculateTicketPrice(input, discount));
+      result.setSalePrice(input.getSalePrice());
       result.setId(input.getId());
       result.setSkuId(input.getSkuId());
       result.setSkuTicketId(input.getSkuTicketId());
