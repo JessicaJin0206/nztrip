@@ -65,6 +65,7 @@
             <th>Primary Contact</th>
             <th>Email</th>
             <th>Agent</th>
+            <th>Departure</th>
             <th>Remark</th>
             <th>Action</th>
           </tr>
@@ -84,6 +85,7 @@
             <td>${order.primaryContact!''}</td>
             <td>${order.primaryContactEmail!''}</td>
             <td>${order.agentName!''}</td>
+            <td>${order.ticketDate!''}</td>
             <td>${order.remark!''}</td>
             <td>
               <div>

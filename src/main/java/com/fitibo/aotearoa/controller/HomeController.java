@@ -35,6 +35,7 @@ import com.fitibo.aotearoa.model.Category;
 import com.fitibo.aotearoa.model.City;
 import com.fitibo.aotearoa.model.Duration;
 import com.fitibo.aotearoa.model.Order;
+import com.fitibo.aotearoa.model.OrderTicket;
 import com.fitibo.aotearoa.model.PriceRecord;
 import com.fitibo.aotearoa.model.Sku;
 import com.fitibo.aotearoa.model.SkuTicket;
@@ -218,19 +219,44 @@ public class HomeController extends AuthenticationRequiredController {
     List<OrderVo> orders;
     switch (getToken().getRole()) {
       case Admin:
-        orders = Lists.transform(orderMapper.findAllByMultiFields(uuid, keyword, referenceNumber, status,
-            new RowBounds(pageNumber * pageSize, pageSize)), ObjectParser::parse);
+        orders = getOrders(0, uuid, keyword, referenceNumber, status,
+            new RowBounds(pageNumber * pageSize, pageSize));
         break;
       case Agent:
-        orders = Lists.transform(orderMapper
-            .findByAgentIdAndMultiFields(getToken().getId(), uuid, keyword, referenceNumber, status,
-                new RowBounds(pageNumber * pageSize, pageSize)), ObjectParser::parse);
+        orders = getOrders(getToken().getId(), uuid, keyword, referenceNumber, status,
+            new RowBounds(pageNumber * pageSize, pageSize));
         break;
       default:
         throw new ResourceNotFoundException();
     }
     model.put("orders", orders);
     return "orders";
+  }
+
+  private List<OrderVo> getOrders(int agentId, String uuid, String keyword, String referenceNumber,
+      int status, RowBounds rowBounds) {
+    List<Order> orders;
+    if (agentId > 0) {
+      orders = orderMapper.findByAgentIdAndMultiFields(agentId, uuid, keyword, referenceNumber, status, rowBounds);
+    } else {
+      orders = orderMapper.findAllByMultiFields(uuid, keyword, referenceNumber, status, rowBounds);
+    }
+
+    List<OrderTicket> ticketDates = orderTicketMapper
+        .findOrderTicketDate(Lists.transform(orders, Order::getId));
+    Map<Integer, Date> ticketDateMap = Maps.newHashMap();
+    for (OrderTicket orderTicket : ticketDates) {
+      ticketDateMap.put(orderTicket.getOrderId(), orderTicket.getTicketDate());
+    }
+    return Lists.transform(orders, input -> {
+      OrderVo orderVo = ObjectParser.parse(input);
+      Date date = ticketDateMap.get(input.getId());
+      if (date != null) {
+        orderVo.setTicketDate(DateUtils.formatDate(date));
+      }
+      return orderVo;
+    });
+
   }
 
   @RequestMapping("orders/{id}")

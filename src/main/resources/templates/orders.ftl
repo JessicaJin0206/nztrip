@@ -65,6 +65,7 @@
             <th>主联系人</th>
             <th>Email</th>
             <th>代理商</th>
+            <th>出行日期</th>
             <th>备注</th>
             <th>操作</th>
           </tr>
@@ -84,6 +85,7 @@
             <td>${order.primaryContact!''}</td>
             <td>${order.primaryContactEmail!''}</td>
             <td>${order.agentName!''}</td>
+            <td>${order.ticketDate!''}</td>
             <td>${order.remark!''}</td>
             <td>
               <div>
