@@ -177,8 +177,11 @@
       id="j_ticket_date_span">${ticket.ticketDate!''}</span></div>
   <div class="form-group"><label>Time:</label><span
       id="j_ticket_time_span">${ticket.ticketTime!''}</span></div>
-  <div class="form-group"><label>Price:</label><span
+  <div class="form-group"><label>Wholesale Price:</label><span
       id="j_ticket_price_span">${ticket.price?string('0.00')}</span>
+  </div>
+  <div class="form-group"><label>Retail Price:</label><span
+      id="j_ticket_sale_price_span">${ticket.salePrice?string('0.00')}</span>
   </div>
   <div class="form-group">
     <div class="row">

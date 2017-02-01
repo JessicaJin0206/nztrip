@@ -8,153 +8,162 @@ import java.util.List;
  */
 public class OrderTicketVo {
 
-    public int getId() {
-        return id;
-    }
+  public int getId() {
+    return id;
+  }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+  public void setId(int id) {
+    this.id = id;
+  }
 
-    public int getSkuTicketId() {
-        return skuTicketId;
-    }
+  public int getSkuTicketId() {
+    return skuTicketId;
+  }
 
-    public void setSkuTicketId(int skuTicketId) {
-        this.skuTicketId = skuTicketId;
-    }
+  public void setSkuTicketId(int skuTicketId) {
+    this.skuTicketId = skuTicketId;
+  }
 
-    public List<OrderTicketUserVo> getOrderTicketUsers() {
-        return orderTicketUsers;
-    }
+  public List<OrderTicketUserVo> getOrderTicketUsers() {
+    return orderTicketUsers;
+  }
 
-    public void setOrderTicketUsers(List<OrderTicketUserVo> orderTicketUsers) {
-        this.orderTicketUsers = orderTicketUsers;
-    }
+  public void setOrderTicketUsers(List<OrderTicketUserVo> orderTicketUsers) {
+    this.orderTicketUsers = orderTicketUsers;
+  }
 
-    public String getSkuTicket() {
-        return skuTicket;
-    }
+  public String getSkuTicket() {
+    return skuTicket;
+  }
 
-    public void setSkuTicket(String skuTicket) {
-        this.skuTicket = skuTicket;
-    }
+  public void setSkuTicket(String skuTicket) {
+    this.skuTicket = skuTicket;
+  }
 
-    public String getCountConstraint() {
-        return countConstraint;
-    }
+  public String getCountConstraint() {
+    return countConstraint;
+  }
 
-    public void setCountConstraint(String countConstraint) {
-        this.countConstraint = countConstraint;
-    }
+  public void setCountConstraint(String countConstraint) {
+    this.countConstraint = countConstraint;
+  }
 
-    public String getAgeConstraint() {
-        return ageConstraint;
-    }
+  public String getAgeConstraint() {
+    return ageConstraint;
+  }
 
-    public void setAgeConstraint(String ageConstraint) {
-        this.ageConstraint = ageConstraint;
-    }
+  public void setAgeConstraint(String ageConstraint) {
+    this.ageConstraint = ageConstraint;
+  }
 
-    public String getWeightConstraint() {
-        return weightConstraint;
-    }
+  public String getWeightConstraint() {
+    return weightConstraint;
+  }
 
-    public void setWeightConstraint(String weightConstraint) {
-        this.weightConstraint = weightConstraint;
-    }
+  public void setWeightConstraint(String weightConstraint) {
+    this.weightConstraint = weightConstraint;
+  }
 
-    public String getTicketDescription() {
-        return ticketDescription;
-    }
+  public String getTicketDescription() {
+    return ticketDescription;
+  }
 
-    public void setTicketDescription(String ticketDescription) {
-        this.ticketDescription = ticketDescription;
-    }
+  public void setTicketDescription(String ticketDescription) {
+    this.ticketDescription = ticketDescription;
+  }
 
-    public int getTicketPriceId() {
-        return ticketPriceId;
-    }
+  public int getTicketPriceId() {
+    return ticketPriceId;
+  }
 
-    public void setTicketPriceId(int ticketPriceId) {
-        this.ticketPriceId = ticketPriceId;
-    }
+  public void setTicketPriceId(int ticketPriceId) {
+    this.ticketPriceId = ticketPriceId;
+  }
 
-    public String getTicketDate() {
-        return ticketDate;
-    }
+  public String getTicketDate() {
+    return ticketDate;
+  }
 
-    public void setTicketDate(String ticketDate) {
-        this.ticketDate = ticketDate;
-    }
+  public void setTicketDate(String ticketDate) {
+    this.ticketDate = ticketDate;
+  }
 
-    public String getTicketTime() {
-        return ticketTime;
-    }
+  public String getTicketTime() {
+    return ticketTime;
+  }
 
-    public void setTicketTime(String ticketTime) {
-        this.ticketTime = ticketTime;
-    }
+  public void setTicketTime(String ticketTime) {
+    this.ticketTime = ticketTime;
+  }
 
-    public String getPriceDescription() {
-        return priceDescription;
-    }
+  public String getPriceDescription() {
+    return priceDescription;
+  }
 
-    public void setPriceDescription(String priceDescription) {
-        this.priceDescription = priceDescription;
-    }
+  public void setPriceDescription(String priceDescription) {
+    this.priceDescription = priceDescription;
+  }
 
-    public int getOrderId() {
-        return orderId;
-    }
+  public int getOrderId() {
+    return orderId;
+  }
 
-    public void setOrderId(int orderId) {
-        this.orderId = orderId;
-    }
+  public void setOrderId(int orderId) {
+    this.orderId = orderId;
+  }
 
-    public BigDecimal getPrice() {
-        return price;
-    }
+  public BigDecimal getPrice() {
+    return price;
+  }
 
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
+  public void setPrice(BigDecimal price) {
+    this.price = price;
+  }
 
-    public String getGatheringPlace() {
-        return gatheringPlace;
-    }
+  public String getGatheringPlace() {
+    return gatheringPlace;
+  }
 
-    public void setGatheringPlace(String gatheringPlace) {
-        this.gatheringPlace = gatheringPlace;
-    }
+  public void setGatheringPlace(String gatheringPlace) {
+    this.gatheringPlace = gatheringPlace;
+  }
 
-    public String getGatheringTime() {
-        return gatheringTime;
-    }
+  public String getGatheringTime() {
+    return gatheringTime;
+  }
 
-    public void setGatheringTime(String gatheringTime) {
-        this.gatheringTime = gatheringTime;
-    }
+  public void setGatheringTime(String gatheringTime) {
+    this.gatheringTime = gatheringTime;
+  }
 
-    private int id;
-    private int orderId;
-    //sku_ticket
-    private int skuTicketId;
-    private String skuTicket;
-    private String countConstraint;
-    private String ageConstraint;
-    private String weightConstraint;
-    private String ticketDescription;
-    //sku_ticket_price
-    private int ticketPriceId;
-    private String ticketDate;
-    private String ticketTime;
-    private BigDecimal price;
-    private String priceDescription;
-    //order_ticket_user
-    private List<OrderTicketUserVo> orderTicketUsers;
+  public BigDecimal getSalePrice() {
+    return salePrice;
+  }
 
-    private String gatheringPlace;
-    private String gatheringTime;
+  public void setSalePrice(BigDecimal salePrice) {
+    this.salePrice = salePrice;
+  }
+
+  private int id;
+  private int orderId;
+  //sku_ticket
+  private int skuTicketId;
+  private String skuTicket;
+  private String countConstraint;
+  private String ageConstraint;
+  private String weightConstraint;
+  private String ticketDescription;
+  //sku_ticket_price
+  private int ticketPriceId;
+  private String ticketDate;
+  private String ticketTime;
+  private BigDecimal price;
+  private BigDecimal salePrice;
+  private String priceDescription;
+  //order_ticket_user
+  private List<OrderTicketUserVo> orderTicketUsers;
+
+  private String gatheringPlace;
+  private String gatheringTime;
 
 }

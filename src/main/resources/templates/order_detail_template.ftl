@@ -34,7 +34,7 @@
 <div class="form-group">
   <div class="row">
     <label class="col-md-2">邮件:</label>
-    <#--<button id="j_resend_reservation" class="btn btn-default form-group">重新发送预订邮件</button>-->
+  <#--<button id="j_resend_reservation" class="btn btn-default form-group">重新发送预订邮件</button>-->
     <button id="j_resend_confirmation" class="btn btn-default form-group">重新发送确认邮件</button>
   </div>
 </div>
@@ -178,8 +178,11 @@
       id="j_ticket_date_span">${ticket.ticketDate!''}</span></div>
   <div class="form-group"><label>时间:</label><span
       id="j_ticket_time_span">${ticket.ticketTime!''}</span></div>
-  <div class="form-group"><label>价格:</label><span
+  <div class="form-group"><label>核算价格:</label><span
       id="j_ticket_price_span">${ticket.price?string('0.00')}</span>
+  </div>
+  <div class="form-group"><label>官网价格:</label><span
+      id="j_ticket_sale_price_span">${ticket.salePrice?string('0.00')}</span>
   </div>
   <div class="form-group">
     <div class="row">
