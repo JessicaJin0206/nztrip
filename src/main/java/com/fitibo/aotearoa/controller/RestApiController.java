@@ -302,7 +302,8 @@ public class RestApiController extends AuthenticationRequiredController {
   @Authentication(Role.Admin)
   public void sendConfirmation(@PathVariable("id") int orderId) {
     Order order = orderMapper.findById(orderId);
-    Preconditions.checkArgument(order.getStatus() == OrderStatus.CONFIRMED.getValue(), "invalid order status:" + order.getStatus());
+    Preconditions.checkArgument(order.getStatus() == OrderStatus.CONFIRMED.getValue(),
+        "unable to send confirmation with order id: " + orderId + " with status:" + order.getStatus());
     operationService.sendConfirmationEmail(order);
   }
 
@@ -310,7 +311,8 @@ public class RestApiController extends AuthenticationRequiredController {
   @Authentication(Role.Admin)
   public void sendReservation(@PathVariable("id") int orderId) {
     Order order = orderMapper.findById(orderId);
-    Preconditions.checkArgument(order.getStatus() == OrderStatus.PENDING.getValue(), "invalid order status:" + order.getStatus());
+    Preconditions.checkArgument(order.getStatus() == OrderStatus.PENDING.getValue(),
+        "unable to send reservation with order id: " + orderId + " with status:" + order.getStatus());
     operationService.sendReservationEmail(order);
   }
 

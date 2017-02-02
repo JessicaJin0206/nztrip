@@ -3,9 +3,6 @@ package com.fitibo.aotearoa.service.impl;
 import com.fitibo.aotearoa.mapper.EmailQueueMapper;
 import com.fitibo.aotearoa.model.Email;
 import com.fitibo.aotearoa.service.EmailService;
-import com.fitibo.aotearoa.service.UtilityService;
-import java.util.concurrent.TimeUnit;
-import javax.annotation.PostConstruct;
 import javax.mail.internet.MimeMessage;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -14,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 /**
@@ -31,25 +29,20 @@ public class EmailServiceImpl implements EmailService {
   @Autowired
   private EmailQueueMapper emailQueueMapper;
 
-  @Autowired
-  private UtilityService utilityService;
-
   private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
 
-  @PostConstruct
+  @Scheduled(initialDelay = 10000L, fixedRate = 60000L)
   public void init() {
-    utilityService.getScheduledExecutorService().scheduleAtFixedRate(() -> {
-      logger.info("start auto-resend email task");
-      try {
-        for (Email email : emailQueueMapper.findAllFailedEmails()) {
-          logger.info("resend email id:" + email.getId());
-          new SendEmailTask(email).run();
-        }
-      } catch (Exception e) {
-        logger.error("fail to run auto-resend task", e);
+    logger.info("start auto-resend email task");
+    try {
+      for (Email email : emailQueueMapper.findAllFailedEmails()) {
+        logger.info("resend email id:" + email.getId());
+        new SendEmailTask(email).run();
       }
-      logger.info("finish auto-resend email task");
-    }, 0, 5, TimeUnit.MINUTES);
+    } catch (Throwable e) {
+      logger.error("fail to run auto-resend task", e);
+    }
+    logger.info("finish auto-resend email task");
   }
 
   @Override
@@ -61,8 +54,6 @@ public class EmailServiceImpl implements EmailService {
     email.setSubject(subject);
     email.setOrderId(orderId);
     emailQueueMapper.create(email);
-    utilityService.getScheduledExecutorService()
-        .schedule(new SendEmailTask(email), 1, TimeUnit.SECONDS);
   }
 
   private class SendEmailTask implements Runnable {
