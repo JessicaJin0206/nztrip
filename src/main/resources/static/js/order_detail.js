@@ -361,8 +361,12 @@ $('#j_resend_confirmation').on('click', function () {
     type: 'POST',
     contentType: 'application/json; charset=utf-8',
     url: '/v1/api/orders/' + id + "/confirmation"
-  }).success(function () {
-    success("confirmation letter has been sent");
+  }).success(function (resp) {
+    if (resp.code == 0) {
+      success("confirmation letter has been sent");
+    } else {
+      error(resp.msg);
+    }
   }).error(function () {
     error("failed");
   });

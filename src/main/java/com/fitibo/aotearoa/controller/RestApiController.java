@@ -45,6 +45,7 @@ import com.fitibo.aotearoa.vo.AuthenticationResp;
 import com.fitibo.aotearoa.vo.OrderTicketUserVo;
 import com.fitibo.aotearoa.vo.OrderTicketVo;
 import com.fitibo.aotearoa.vo.OrderVo;
+import com.fitibo.aotearoa.vo.ResultVo;
 import com.fitibo.aotearoa.vo.SkuTicketPriceVo;
 import com.fitibo.aotearoa.vo.SkuTicketVo;
 import com.fitibo.aotearoa.vo.SkuVo;
@@ -300,11 +301,16 @@ public class RestApiController extends AuthenticationRequiredController {
 
   @RequestMapping(value = "v1/api/orders/{id}/confirmation", method = RequestMethod.POST)
   @Authentication(Role.Admin)
-  public void sendConfirmation(@PathVariable("id") int orderId) {
+  public ResultVo sendConfirmation(@PathVariable("id") int orderId) {
     Order order = orderMapper.findById(orderId);
     Preconditions.checkArgument(order.getStatus() == OrderStatus.CONFIRMED.getValue(),
         "unable to send confirmation with order id: " + orderId + " with status:" + order.getStatus());
-    operationService.sendConfirmationEmail(order);
+    boolean result = operationService.sendConfirmationEmail(order);
+    if (result) {
+      return ResultVo.SUCCESS;
+    } else {
+      return new ResultVo(-1, "agent does not have email");
+    }
   }
 
   @RequestMapping(value = "v1/api/orders/{id}/reservation", method = RequestMethod.POST)

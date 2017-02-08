@@ -46,14 +46,22 @@ public class EmailServiceImpl implements EmailService {
   }
 
   @Override
-  public void send(int orderId, String from, String to, String subject, String content) {
+  public boolean send(int orderId, String from, String to, String subject, String content) {
+    if (StringUtils.isEmpty(from)) {
+      logger.warn("from address is empty");
+      return false;
+    }
+    if (StringUtils.isEmpty(to)) {
+      logger.warn("to address is empty");
+      return false;
+    }
     final Email email = new Email();
     email.setContent(content);
     email.setFrom(from);
     email.setTo(to);
     email.setSubject(subject);
     email.setOrderId(orderId);
-    emailQueueMapper.create(email);
+    return emailQueueMapper.create(email) > 0;
   }
 
   private class SendEmailTask implements Runnable {

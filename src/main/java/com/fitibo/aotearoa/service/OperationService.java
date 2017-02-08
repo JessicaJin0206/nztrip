@@ -81,17 +81,17 @@ public class OperationService {
     }
   }
 
-  public void sendConfirmationEmail(Order order) {
+  public boolean sendConfirmationEmail(Order order) {
     int agentId = order.getAgentId();
     if (agentId <= 0) {
       logger.info("agent id is 0");
-      return;
+      return false;
     }
     Agent agent = agentMapper.findById(agentId);
     String to = agent.getEmail();
     String content = formatConfirmationEmailContent(confirmationEmailTemplate, order,
         skuService.findById(order.getSkuId()), agent);
-    emailService.send(order.getId(), confirmationEmailFrom, to, confirmationEmailSubject, content);
+    return emailService.send(order.getId(), confirmationEmailFrom, to, confirmationEmailSubject, content);
   }
 
   public void sendReservationEmail(Order order) {

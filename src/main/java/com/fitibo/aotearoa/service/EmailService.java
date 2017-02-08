@@ -5,6 +5,6 @@ package com.fitibo.aotearoa.service;
  */
 public interface EmailService {
 
-    void send(int orderId, String from, String to, String subject, String content);
+    boolean send(int orderId, String from, String to, String subject, String content);
 
 }
