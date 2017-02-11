@@ -94,7 +94,7 @@ public class OperationService {
     return emailService.send(order.getId(), confirmationEmailFrom, to, confirmationEmailSubject, content);
   }
 
-  public void sendReservationEmail(Order order) {
+  public boolean sendReservationEmail(Order order) {
     List<OrderTicket> ticketList = orderTicketMapper.findByOrderId(order.getId());
     if (ticketList.isEmpty()) {
       throw new ResourceNotFoundException();
@@ -106,12 +106,12 @@ public class OperationService {
     Vendor vendor = vendorService.findById(sku.getVendorId());
     if (vendor.getEmail() == null || vendor.getEmail().length() == 0) {
       logger.info("vendor id:" + vendor.getId() + " email is empty, won't send email");
-      return;
+      return false;
     }
     String content = formatReservationEmailContent(reservationEmailTemplate, vendor, order,
         ticketList);
     String subject = formatReservationEmailSubject(reservationEmailSubject, order);
-    emailService.send(order.getId(), reservationEmailFrom, vendor.getEmail(), subject, content);
+    return emailService.send(order.getId(), reservationEmailFrom, vendor.getEmail(), subject, content);
   }
 
   private String formatReservationEmailSubject(String template, Order order) {
