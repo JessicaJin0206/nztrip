@@ -116,7 +116,7 @@
       <li><a value="${ticket.id?c}" count="${ticket.count?c}" minAge="${ticket.minAge?c}"
              maxAge="${ticket.maxAge?c}" minWeight="${ticket.minWeight?c}"
              maxWeight="${ticket.maxWeight?c}"
-             available_date="<#list availableDateMap[ticket.id?string .number] as date>${date}|</#list>">${ticket.name}</a>
+             available_date="<#list availableDateMap[ticket.id?c] as date>${date}|</#list>">${ticket.name}</a>
       </li>
     </#list>
   </ul>
