@@ -29,6 +29,7 @@ import com.fitibo.aotearoa.model.Sku;
 import com.fitibo.aotearoa.model.SkuTicket;
 import com.fitibo.aotearoa.model.SkuTicketPrice;
 import com.fitibo.aotearoa.model.Vendor;
+import com.fitibo.aotearoa.service.DiscountRateService;
 import com.fitibo.aotearoa.service.OperationService;
 import com.fitibo.aotearoa.service.OrderService;
 import com.fitibo.aotearoa.service.SkuService;
@@ -130,6 +131,9 @@ public class RestApiController extends AuthenticationRequiredController {
 
   @Autowired
   private SkuService skuService;
+
+  @Autowired
+  private DiscountRateService discountRateService;
 
   @Value("${secret}")
   private String secret;
@@ -258,7 +262,7 @@ public class RestApiController extends AuthenticationRequiredController {
     Preconditions.checkNotNull(sku, "invalid sku id:" + orderVo.getSkuId());
     final Vendor vendor = vendorService.findById(sku.getVendorId());
     Preconditions.checkNotNull(vendor, "invalid vendor id:" + sku.getVendorId());
-    final int discount = getDiscount(getToken());
+    final int discount = getDiscount(getToken(), sku.getId());
     Map<Integer, SkuTicketPrice> priceMap = getSkuTicketPriceMap(
         Lists.transform(orderVo.getOrderTickets(), OrderTicketVo::getTicketPriceId));
     Map<Integer, SkuTicket> skuTicketMap = getSkuTicketMap(
@@ -361,7 +365,7 @@ public class RestApiController extends AuthenticationRequiredController {
       throw new InvalidParamException();
     }
     int orderAgentId = order.getAgentId();
-    final int discount = orderAgentId > 0 ? getDiscountByAgentId(orderAgentId) : getDiscount(token);
+    final int discount = orderAgentId > 0 ? getDiscountByAgentId(orderAgentId) : getDiscount(token, order.getSkuId());
     Map<Integer, SkuTicketPrice> priceMap = getSkuTicketPriceMap(
         Lists.transform(orderVo.getOrderTickets(), OrderTicketVo::getTicketPriceId));
     Map<Integer, SkuTicket> skuTicketMap = getSkuTicketMap(
@@ -478,7 +482,7 @@ public class RestApiController extends AuthenticationRequiredController {
     List<OrderTicket> orderTickets = orderTicketMapper.findByOrderId(orderId);
     Map<Integer, SkuTicketPrice> priceMap = getSkuTicketPriceMap(
         Lists.transform(orderTickets, OrderTicket::getTicketPriceId));
-    int discount = getDiscount(token);
+    int discount = getDiscount(token, order.getSkuId());
     BigDecimal total = orderTickets.stream().
         map((orderTicket) -> calculateTicketPrice(priceMap.get(orderTicket.getTicketPriceId()),
             discount)).
@@ -539,7 +543,8 @@ public class RestApiController extends AuthenticationRequiredController {
 
     List<SkuTicketPrice> ticketPrices = skuTicketPriceMapper
         .findAvailableBySkuTicketIdAndDate(ticketId, DateUtils.parseDate(date), new RowBounds());
-    int discount = orderId > 0 ? getDiscountByOrderId(orderId) : getDiscount(getToken());
+    int skuId = ticketPrices.stream().mapToInt(SkuTicketPrice::getSkuId).findFirst().orElse(-1);
+    int discount = orderId > 0 ? discountRateService.getDiscountByOrder(orderId) : getDiscount(getToken(), skuId);
     return Lists.transform(ticketPrices, (input) -> {
       SkuTicketPriceVo result = new SkuTicketPriceVo();
       result.setPrice(calculateTicketPrice(input, discount));
@@ -667,25 +672,16 @@ public class RestApiController extends AuthenticationRequiredController {
     return skuTicketMap;
   }
 
-  private int getDiscountByOrderId(int orderId) {
-    Order order = orderMapper.findById(orderId);
-    Preconditions.checkNotNull(order, "invalid order id:" + orderId);
-    Agent agent = agentMapper.findById(order.getAgentId());
-    Preconditions.checkNotNull(agent,
-        "invalid agent id:" + order.getAgentId() + " with order id:" + orderId);
-    return agent.getDiscount();
-  }
-
-  private int getDiscount(Token token) {
+  private int getDiscount(Token token, int skuId) {
     if (token == null) {
       new AuthenticationFailureException("token cannot be null");
     }
     Preconditions.checkArgument(token != null, "invalid token");
     switch (token.getRole()) {
       case Admin:
-        return adminMapper.findById(getToken().getId()).getDiscount();
+        return discountRateService.getDiscountByAdmin(token.getId());
       case Agent:
-        return agentMapper.findById(getToken().getId()).getDiscount();
+        return discountRateService.getDiscountByAgent(token.getId(), skuId);
       default:
         throw new AuthenticationFailureException("invalid role:" + token.getRole());
     }
