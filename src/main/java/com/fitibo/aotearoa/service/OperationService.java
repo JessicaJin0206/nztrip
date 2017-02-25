@@ -128,7 +128,6 @@ public class OperationService {
     content = content.replace("#ORDER_ID#", order.getUuid());
     content = content.replace("#TOUR_NAME#", sku.getName());
     content = content.replace("#GUEST_NAME#", order.getPrimaryContact());
-    content = content.replace("#MOBILE#", order.getPrimaryContactPhone());
     content = content.replace("#REFERENCE_NUMBER#", order.getReferenceNumber());
     content = content.replace("#PRICE#", order.getPrice().toString());
     content = content.replace("#REMARK#", order.getRemark());

@@ -46,13 +46,14 @@ template:
       <html><body><div>
       #AGENT_NAME#,<br><br>
       Please be noted that your reservation has been confirmed:<br><br>
+      <br>
+      确认号 Confirmation Number: #REFERENCE_NUMBER#<br>
+      备注 Remark: #REMARK#<br>
+      <br>
       订单编号 Order ID: #ORDER_ID#<br>
       预定项目 Book Package: #TOUR_NAME#<br>
       总价 Total Price: #PRICE# NZD<br>
       联系人姓名 Guest Name: #GUEST_NAME#<br>
-      国内手机号 Mobile: #MOBILE#<br>
-      确认号 Confirmation Number: #REFERENCE_NUMBER#<br>
-      备注 Remark: #REMARK#<br>
       出行信息:<br>
       #GUESTS_INFO#
       <br>
@@ -66,7 +67,6 @@ template:
       Address: 8a/41 Sir William Pickering Dr, Burnside, Christchurch 8053
       </div></body></html>
     guests_info: |
-      出行人 Guests:<br>
       #GUESTS#<br>
       票种 Ticket: #TICKET#<br>
       出发日期 Tour Date(Y/M/D): #DATE#<br>
