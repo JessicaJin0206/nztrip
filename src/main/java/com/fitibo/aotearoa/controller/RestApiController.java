@@ -150,7 +150,7 @@ public class RestApiController extends AuthenticationRequiredController {
 
   @ExceptionHandler
   public ResponseEntity handleException(InvalidParamException ex) {
-    return new ResponseEntity(HttpStatus.BAD_REQUEST);
+    return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
   }
 
   @RequestMapping(value = "v1/api/skus", method = RequestMethod.POST)
@@ -339,13 +339,15 @@ public class RestApiController extends AuthenticationRequiredController {
     for (OrderTicketUserVo orderTicketUserVo : users) {
       int age = orderTicketUserVo.getAge();
       if (needCheckAge) {
-        Preconditions.checkArgument(age >= minAge && age <= maxAge,
-            "invalid age:" + age + " rule:" + orderTicket.getAgeConstraint());
+        if (!(age >= minAge && age <= maxAge)) {
+          throw new InvalidParamException("invalid age:" + age + " rule:" + orderTicket.getAgeConstraint());
+        }
       }
       int weight = orderTicketUserVo.getWeight();
       if (needCheckWeight) {
-        Preconditions.checkArgument(weight >= minWeight && weight <= maxWeight,
-            "invalid weight:" + weight + " rule:" + orderTicket.getWeightConstraint());
+        if (!(weight >= minWeight && weight <= maxWeight)) {
+          throw new InvalidParamException("invalid weight:" + weight + " rule:" + orderTicket.getWeightConstraint());
+        }
       }
     }
   }

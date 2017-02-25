@@ -135,6 +135,7 @@ $('#add_ticket').on('click', function (e) {
   var ticketCount = parseInt(ticket.attr('count'));
   ticketContainer.attr('ticketId', ticketId);
   ticketContainer.attr('priceId', priceId);
+  var totalTicketCount = $(".form-group.j_ticket_container").length;
   $('#add_ticket').parent().after(ticketContainer);
   ticketContainer.find('#j_ticket_delete').on('click', function () {
     ticketContainer.remove();
@@ -154,6 +155,7 @@ $('#add_ticket').on('click', function (e) {
     if (minAge == maxAge && minAge == 0) {
       ticketDetail.find('#j_user_age').remove();
     }
+    ticketDetail.find('#j_user_name').val(ticketName + (totalTicketCount+1));
     ticketContainer.find('tbody').append(ticketDetail);
   }
 });
@@ -253,7 +255,11 @@ $('#j_submit').on('click', function () {
   }).success(function (data) {
     success("添加成功");
     window.location.href = "/orders/" + data.id;
-  }).error(function () {
-    error("添加失败");
+  }).complete(function(e) {
+    if (e.status == 400) {
+      error(e.responseText);
+    } else if (e.status != 200) {
+      error("添加失败");
+    }
   });
 });
