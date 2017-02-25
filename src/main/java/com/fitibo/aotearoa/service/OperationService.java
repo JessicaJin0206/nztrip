@@ -175,6 +175,7 @@ public class OperationService {
     content = content.replace("#TOUR#", order.getSku());
     content = content.replace("#NAME#", order.getPrimaryContact());
     content = content.replace("#REMARK#", Optional.ofNullable(order.getRemark()).orElse(""));
+    content = content.replace("#ORDER_ID#", order.getUuid());
 
     StringBuilder tourInfo = new StringBuilder();
     tourInfo.append("TOTAL:<br>");

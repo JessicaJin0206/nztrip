@@ -27,6 +27,7 @@ template:
       Please kindly help us to make the reservation as below:<br><br>
       TOUR: #TOUR#<br>
       NAME: #NAME#<br>
+      ORDER ID: #ORDER_ID#<br>
       REMARK: #REMARK#<br>
       #TOURINFO#<br>
       A prompt replay would greatly oblige us.<br><br>
