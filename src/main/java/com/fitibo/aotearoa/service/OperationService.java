@@ -15,8 +15,10 @@ import com.fitibo.aotearoa.model.Vendor;
 import com.fitibo.aotearoa.util.DateUtils;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -173,7 +175,12 @@ public class OperationService {
     content = content.replace("#VENDORNAME#", vendor.getName());
     content = content.replace("#TOUR#", order.getSku());
     content = content.replace("#NAME#", order.getPrimaryContact());
-    content = content.replace("#REMARK#", Optional.ofNullable(order.getRemark()).orElse(""));
+    content = content.replace("#EMAIL#", Optional.ofNullable(order.getPrimaryContactEmail()).orElse(
+        StringUtils.EMPTY));
+    content = content.replace("#PHONE#", Optional.ofNullable(order.getPrimaryContactPhone()).orElse(
+        StringUtils.EMPTY));
+    content = content.replace("#REMARK#", Optional.ofNullable(order.getRemark()).orElse(
+        StringUtils.EMPTY));
     content = content.replace("#ORDER_ID#", order.getUuid());
 
     StringBuilder tourInfo = new StringBuilder();
@@ -182,6 +189,11 @@ public class OperationService {
         input -> input.count().subscribe(
             inner -> tourInfo.append(input.getKey()).append(": ").append(inner.intValue())
                 .append("<br>")));
+    Optional<String> firstDate = tickets.stream().map(OrderTicket::getTicketDate).map(DateUtils::formatDateWithFormat).findFirst();
+    Optional<String> firstTime = tickets.stream().map(OrderTicket::getTicketTime).findFirst();
+    tourInfo.append("DATE: ").append(firstDate.orElse(StringUtils.EMPTY)).append("<br>");
+    tourInfo.append("TIME: ").append(firstTime.orElse(StringUtils.EMPTY)).append("<br>");
+    tourInfo.append("<br>");
     tourInfo.append("DETAILS:<br>");
     for (OrderTicket ticket : tickets) {
       String date = DateUtils.formatDateWithFormat(ticket.getTicketDate());

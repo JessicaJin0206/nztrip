@@ -97,7 +97,7 @@ public class EmailServiceImpl implements EmailService {
         return true;
       }
       if (!enabled) {
-        to = "will@ctofunds.com";
+        to = "qianhao.zhou@ubike.cn";
       }
       String[] receivers = to.split(";");
       MimeMessage message = mailSender.createMimeMessage();
