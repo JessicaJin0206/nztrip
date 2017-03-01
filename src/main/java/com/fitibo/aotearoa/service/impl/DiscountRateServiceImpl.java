@@ -58,9 +58,6 @@ public class DiscountRateServiceImpl implements DiscountRateService {
   public int getDiscountByOrder(int orderId) {
     Order order = orderMapper.findById(orderId);
     Preconditions.checkNotNull(order, "invalid order id:" + orderId);
-    Agent agent = agentMapper.findById(order.getAgentId());
-    Preconditions.checkNotNull(agent,
-        "invalid agent id:" + order.getAgentId() + " with order id:" + orderId);
-    return agent.getDiscount();
+    return getDiscountByAgent(order.getAgentId(), order.getSkuId());
   }
 }

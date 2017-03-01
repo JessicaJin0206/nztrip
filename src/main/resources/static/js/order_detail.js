@@ -147,6 +147,7 @@ $('#add_ticket').on('click', function (e) {
   var ticketCount = parseInt(ticket.attr('count'));
   ticketContainer.attr('ticketId', ticketId);
   ticketContainer.attr('priceId', priceId);
+  var totalTicketCount = $(".form-group.j_ticket_container").length;
   $('#add_ticket').parent().after(ticketContainer);
   ticketContainer.find('#j_ticket_name_span').html(ticketName);
   ticketContainer.find('#j_ticket_date_span').html(date);
@@ -157,13 +158,14 @@ $('#add_ticket').on('click', function (e) {
   for (var i = 0; i < ticketCount; i++) {
     var ticketDetail = $(
         '<tr><th><input type="text" id="j_user_name" class="form-control"/></th><th><input type="number" id="j_user_age" class="form-control"/></th><th><input type="number" id="j_user_weight" class="form-control"/></th></tr>')
-    ticketContainer.find('tbody').append(ticketDetail);
     if (minWeight == maxWeight && minWeight == 0) {
       ticketDetail.find('#j_user_weight').remove();
     }
     if (minAge == maxAge && minAge == 0) {
       ticketDetail.find('#j_user_age').remove();
     }
+    ticketDetail.find('#j_user_name').val(ticketName + (totalTicketCount+1));
+    ticketContainer.find('tbody').append(ticketDetail);
   }
   ticketContainer.find("a#j_ticket_delete").on('click', function () {
     ticketContainer.remove();
@@ -202,11 +204,11 @@ $('.j_ticket_container').each(function (index, e) {
       }
     });
   })
-})
+});
 
 $('#j_edit').on('click', function () {
   window.location.href = window.location.pathname + "/_edit";
-})
+});
 
 $('#j_update').on('click', function () {
   var isDataValid = true;
@@ -329,9 +331,13 @@ $('#j_update').on('click', function () {
     success("修改成功");
     $('#j_update').attr("disabled", true);
     window.location.href = '/orders/' + id;
-  }).error(function () {
-    error("修改失败");
-  })
+  }).complete(function(e) {
+    if (e.status == 400) {
+      error(e.responseText);
+    } else if (e.status != 200) {
+      error("添加失败");
+    }
+  });
 });
 
 $('#j_download_voucher').on('click', function () {

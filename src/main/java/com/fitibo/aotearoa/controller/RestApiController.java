@@ -271,7 +271,7 @@ public class RestApiController extends AuthenticationRequiredController {
     BigDecimal total = orderVo.getOrderTickets().stream().
         map((orderTicket) -> calculateTicketPrice(priceMap.get(orderTicket.getTicketPriceId()),
             discount)).
-        reduce((a, b) -> a.add(b)).orElseGet(() -> BigDecimal.ZERO);
+        reduce(BigDecimal::add).orElseGet(() -> BigDecimal.ZERO);
     order.setPrice(total);
     order.setVendorPhone(vendor.getPhone());
     order.setUuid(GuidGenerator.generate(14));
@@ -367,7 +367,7 @@ public class RestApiController extends AuthenticationRequiredController {
       throw new InvalidParamException();
     }
     int orderAgentId = order.getAgentId();
-    final int discount = orderAgentId > 0 ? getDiscountByAgentId(orderAgentId) : getDiscount(token, order.getSkuId());
+    final int discount = discountRateService.getDiscountByOrder(order.getId());
     Map<Integer, SkuTicketPrice> priceMap = getSkuTicketPriceMap(
         Lists.transform(orderVo.getOrderTickets(), OrderTicketVo::getTicketPriceId));
     Map<Integer, SkuTicket> skuTicketMap = getSkuTicketMap(
@@ -676,9 +676,8 @@ public class RestApiController extends AuthenticationRequiredController {
 
   private int getDiscount(Token token, int skuId) {
     if (token == null) {
-      new AuthenticationFailureException("token cannot be null");
+      throw new AuthenticationFailureException("token cannot be null");
     }
-    Preconditions.checkArgument(token != null, "invalid token");
     switch (token.getRole()) {
       case Admin:
         return discountRateService.getDiscountByAdmin(token.getId());
@@ -687,12 +686,6 @@ public class RestApiController extends AuthenticationRequiredController {
       default:
         throw new AuthenticationFailureException("invalid role:" + token.getRole());
     }
-  }
-
-  private int getDiscountByAgentId(int agentId) {
-    Agent agent = agentMapper.findById(agentId);
-    Preconditions.checkArgument(agent != null, "invalid agent id:" + agentId);
-    return agent.getDiscount();
   }
 
   private static Order parse(OrderVo order, int agentId) {
