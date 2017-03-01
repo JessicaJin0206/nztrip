@@ -47,14 +47,15 @@ template:
       #AGENT_NAME#,<br><br>
       Please be noted that your reservation has been confirmed:<br><br>
       <br>
-      确认号 Confirmation Number: #REFERENCE_NUMBER#<br>
-      备注 Remark: #REMARK#<br>
+      <b>确认号 Confirmation Number:</b> #REFERENCE_NUMBER#<br>
+      <b>备注 Remark:</b> #REMARK#<br>
       <br>
-      订单编号 Order ID: #ORDER_ID#<br>
-      预定项目 Book Package: #TOUR_NAME#<br>
-      总价 Total Price: #PRICE# NZD<br>
-      联系人姓名 Guest Name: #GUEST_NAME#<br>
-      出行信息:<br>
+      <b>订单编号 Order ID:</b> #ORDER_ID#<br>
+      <b>预定项目 Book Package:</b> #TOUR_NAME#<br>
+      <b>总价 Total Price:</b> #PRICE# NZD<br>
+      <b>联系人姓名 Guest Name:</b> #GUEST_NAME#<br>
+      <br>
+      <b>出行信息:</b><br>
       #GUESTS_INFO#
       <br>
       <br>
