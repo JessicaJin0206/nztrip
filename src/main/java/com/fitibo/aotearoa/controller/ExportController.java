@@ -93,12 +93,24 @@ public class ExportController extends AuthenticationRequiredController {
     @Value(value = "classpath:voucher_template.xlsx")
     private Resource voucherTemplate;
 
+    @Value(value = "classpath:voucher_template_28.xlsx")
+    private Resource voucherTemplate_28;
+
     @Value(value = "classpath:order_template.xlsx")
     private Resource orderTemplate;
 
     @ExceptionHandler
     public ResponseEntity handleException(AuthenticationFailureException ex) {
         return new ResponseEntity(HttpStatus.UNAUTHORIZED);
+    }
+
+    private Resource getVoucherTemplate(Order order) {
+        int agentId = order.getAgentId();
+        if (agentId == 28) {//hard code here
+            return voucherTemplate_28;
+        } else {
+            return voucherTemplate;
+        }
     }
 
     @RequestMapping(value = "/vouchers/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
@@ -127,7 +139,7 @@ public class ExportController extends AuthenticationRequiredController {
         SkuTicket skuTicket = skuTicketMapper.findById(firstOrderTicket.getSkuTicketId());
         Preconditions.checkNotNull(skuTicket, "invalid sku ticket id:" + firstOrderTicket.getSkuTicketId());
 
-        try (InputStream is = voucherTemplate.getInputStream();
+        try (InputStream is = getVoucherTemplate(order).getInputStream();
              ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             Workbook workbook = WorkbookFactory.create(is);
             Sheet sheet = workbook.getSheetAt(0);
