@@ -132,8 +132,7 @@ public class ExportController extends AuthenticationRequiredController {
         Preconditions.checkNotNull(vendor, "invalid vendor id:" + sku.getVendorId());
 
         List<OrderTicket> orderTickets = orderTicketMapper.findByOrderId(orderId);
-        Preconditions
-                .checkArgument(orderTickets.size() > 0, "no available tickets, order id:" + orderId);
+        Preconditions.checkArgument(orderTickets.size() > 0, "no available tickets, order id:" + orderId);
         OrderTicket firstOrderTicket = orderTickets.get(0);
 
         SkuTicket skuTicket = skuTicketMapper.findById(firstOrderTicket.getSkuTicketId());

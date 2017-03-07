@@ -1,0 +1,1 @@
+ALTER TABLE `order` ADD COLUMN agent_order_id VARCHAR(50) default "";

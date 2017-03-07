@@ -22,7 +22,7 @@ public interface OrderMapper {
             "update_time, price, gathering_info, primary_contact, primary_contact_email, " +
             "primary_contact_phone, primary_contact_wechat, secondary_contact, " +
             "secondary_contact_email, secondary_contact_phone, secondary_contact_wechat," +
-            "reference_number, vendor_phone" +
+            "reference_number, vendor_phone, agent_order_id " +
             " from `order` o left join `sku` s on o.sku_id = s.id where o.id = #{id}")
     @Results({
             @Result(column = "id", property = "id"),
@@ -45,13 +45,14 @@ public interface OrderMapper {
             @Result(column = "secondary_contact_wechat", property = "secondaryContactWechat"),
             @Result(column = "reference_number", property = "referenceNumber"),
             @Result(column = "vendor_phone", property = "vendorPhone"),
+            @Result(column = "agent_order_id", property = "agentOrderId")
     })
     Order findById(int id);
 
     @Select("select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
-            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone " +
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id " +
             "from `order` o left join `sku` s on o.sku_id = s.id " +
             "where agent_id = #{agentId} order by o.id desc")
     @Results({
@@ -75,7 +76,8 @@ public interface OrderMapper {
             @Result(column = "secondary_contact_wechat", property = "secondaryContactWechat"),
             @Result(column = "reference_number", property = "referenceNumber"),
             @Result(column = "name", property = "sku"),
-            @Result(column = "vendor_phone", property = "vendorPhone")
+            @Result(column = "vendor_phone", property = "vendorPhone"),
+            @Result(column = "agent_order_id", property = "agentOrderId")
     })
     List<Order> findByAgentId(@Param("agentId") int agentId, RowBounds rowBounds);
 
@@ -83,7 +85,7 @@ public interface OrderMapper {
             "select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
-            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone " +
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id " +
             "from `order` o left join `sku` s on o.sku_id = s.id " +
             "where agent_id = #{agentId} " +
             "<if test =\"keyword != null and keyword != ''\">and s.name like CONCAT('%',#{keyword},'%') </if> " +
@@ -113,7 +115,8 @@ public interface OrderMapper {
             @Result(column = "secondary_contact_wechat", property = "secondaryContactWechat"),
             @Result(column = "reference_number", property = "referenceNumber"),
             @Result(column = "name", property = "sku"),
-            @Result(column = "vendor_phone", property = "vendorPhone")
+            @Result(column = "vendor_phone", property = "vendorPhone"),
+            @Result(column = "agent_order_id", property = "agentOrderId")
     })
     List<Order> findByAgentIdAndMultiFields(@Param("agentId") int agentId,
                                             @Param("uuid") String uuid,
@@ -126,7 +129,7 @@ public interface OrderMapper {
     @Select("select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
-            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone " +
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id " +
             "from `order` o left join `sku` s on o.sku_id = s.id order by o.id desc")
     @Results({
             @Result(column = "id", property = "id"),
@@ -149,7 +152,8 @@ public interface OrderMapper {
             @Result(column = "secondary_contact_wechat", property = "secondaryContactWechat"),
             @Result(column = "reference_number", property = "referenceNumber"),
             @Result(column = "name", property = "sku"),
-            @Result(column = "vendor_phone", property = "vendorPhone")
+            @Result(column = "vendor_phone", property = "vendorPhone"),
+            @Result(column = "agent_order_id", property = "agentOrderId")
     })
     List<Order> findAll(RowBounds rowBounds);
 
@@ -157,7 +161,7 @@ public interface OrderMapper {
             "select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
-            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, agent.name as agent_name " +
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, agent.name as agent_name, o.agent_order_id " +
             "from `order` o left join `sku` s on o.sku_id = s.id left join agent on o.agent_id = agent.id " +
             "where 1 = 1 " +
             "<if test =\"keyword != null and keyword != ''\"> and (s.name like CONCAT('%',#{keyword},'%') or o.primary_contact like CONCAT(#{keyword}, '%') or agent.name like CONCAT(#{keyword}, '%')) </if> " +
@@ -188,7 +192,8 @@ public interface OrderMapper {
             @Result(column = "reference_number", property = "referenceNumber"),
             @Result(column = "name", property = "sku"),
             @Result(column = "vendor_phone", property = "vendorPhone"),
-            @Result(column = "agent_name", property = "agentName")
+            @Result(column = "agent_name", property = "agentName"),
+            @Result(column = "agent_order_id", property = "agentOrderId")
     })
     List<Order> findAllByMultiFields(@Param("uuid") String uuid,
                                      @Param("keyword") String keyword,
@@ -217,18 +222,20 @@ public interface OrderMapper {
             @Result(column = "secondary_contact_phone", property = "secondaryContactPhone"),
             @Result(column = "secondary_contact_wechat", property = "secondaryContactWechat"),
             @Result(column = "reference_number", property = "referenceNumber"),
-            @Result(column = "vendor_phone", property = "vendorPhone")
+            @Result(column = "vendor_phone", property = "vendorPhone"),
+            @Result(column = "agent_order_id", property = "agentOrderId"),
+
     })
     List<Order> findByAgentIdAndStatus(@Param("agentId") int agentId, @Param("status") int status, RowBounds rowBounds);
 
     @Insert("insert into `order` (sku_id, uuid, agent_id, remark, status, price, gathering_info, " +
             "primary_contact, primary_contact_email, primary_contact_phone, primary_contact_wechat, " +
             "secondary_contact, secondary_contact_email, secondary_contact_phone, " +
-            "secondary_contact_wechat, reference_number, vendor_phone) " +
+            "secondary_contact_wechat, reference_number, vendor_phone, agent_order_id) " +
             "values(#{skuId}, #{uuid}, #{agentId}, #{remark}, #{status}, #{price}, #{gatheringInfo}, " +
             "#{primaryContact}, #{primaryContactEmail}, #{primaryContactPhone}, #{primaryContactWechat}, " +
             "#{secondaryContact}, #{secondaryContactEmail}, #{secondaryContactPhone}, " +
-            "#{secondaryContactWechat}, #{referenceNumber}, #{vendorPhone})")
+            "#{secondaryContactWechat}, #{referenceNumber}, #{vendorPhone}, #{agentOrderId})")
     @Options(useGeneratedKeys = true, keyColumn = "id", keyProperty = "id", flushCache = Options.FlushCachePolicy.DEFAULT)
     int create(Order order);
 
@@ -246,7 +253,8 @@ public interface OrderMapper {
             "secondary_contact_phone = #{secondaryContactPhone}, " +
             "secondary_contact_wechat = #{secondaryContactWechat}, " +
             "vendor_phone = #{vendorPhone}, " +
-            "remark = #{remark} " +
+            "remark = #{remark}," +
+            "agent_order_id = #{agentOrderId} " +
             "where id = #{id}")
     int updateOrderInfo(Order order);
 

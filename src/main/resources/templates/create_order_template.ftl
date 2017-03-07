@@ -37,6 +37,9 @@
     </table>
 
 </div>
+<div class="form-group"><input type="text" id="j_agent_order_id" class="form-control"
+                               placeholder="代理商订单号">
+</div>
 <div class="form-group"><input type="text" id="j_remark" class="form-control"
                                placeholder="备注">
 </div>
