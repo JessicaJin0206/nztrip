@@ -3,6 +3,7 @@ package com.fitibo.aotearoa.mapper;
 import com.fitibo.aotearoa.model.Email;
 
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
@@ -15,6 +16,7 @@ import java.util.List;
 /**
  * Created by qianhao.zhou on 9/1/16.
  */
+@Mapper
 public interface EmailQueueMapper {
 
     @Insert("insert into `email_queue` (`order_id`, `from`, `to`, `subject`, `content`) values(#{orderId}, #{from}, #{to}, #{subject}, #{content})")
