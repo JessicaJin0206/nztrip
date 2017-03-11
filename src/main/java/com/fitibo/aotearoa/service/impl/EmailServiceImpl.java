@@ -1,23 +1,31 @@
 package com.fitibo.aotearoa.service.impl;
 
+import com.google.common.collect.Lists;
+
+import com.fitibo.aotearoa.mapper.AttachmentMapper;
 import com.fitibo.aotearoa.mapper.EmailQueueMapper;
 import com.fitibo.aotearoa.model.Attachment;
 import com.fitibo.aotearoa.model.Email;
 import com.fitibo.aotearoa.service.EmailService;
-
-import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
+
+import javax.mail.internet.MimeMessage;
 
 /**
  * Created by qianhao.zhou on 9/1/16.
@@ -26,31 +34,15 @@ import java.util.List;
 public class EmailServiceImpl implements EmailService {
 
     @Autowired
-    private JavaMailSender mailSender;
-
-    @Value("${spring.email-enabled}")
-    private Boolean enabled;
+    private EmailQueueMapper emailQueueMapper;
 
     @Autowired
-    private EmailQueueMapper emailQueueMapper;
+    private AttachmentMapper attachmentMapper;
 
     private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
 
-    @Scheduled(initialDelay = 10000L, fixedRate = 60000L)
-    public void init() {
-        logger.info("start auto-resend email task");
-        try {
-            for (Email email : emailQueueMapper.findAllFailedEmails()) {
-                logger.info("resend email id:" + email.getId());
-                new SendEmailTask(email).run();
-            }
-        } catch (Throwable e) {
-            logger.error("fail to run auto-resend task", e);
-        }
-        logger.info("finish auto-resend email task");
-    }
-
     @Override
+    @Transactional
     public boolean send(int orderId, String from, String to, String subject, String content, List<Attachment> attachments) {
         if (StringUtils.isEmpty(from)) {
             logger.warn("from address is empty");
@@ -66,59 +58,13 @@ public class EmailServiceImpl implements EmailService {
         email.setTo(to);
         email.setSubject(subject);
         email.setOrderId(orderId);
-        return emailQueueMapper.create(email) > 0;
+        emailQueueMapper.create(email);
+        attachmentMapper.create(Lists.transform(attachments, input -> {
+            input.setEmailId(email.getId());
+            return input;
+        }));
+        return true;
     }
 
-    private class SendEmailTask implements Runnable {
-
-        private final Email email;
-
-        private SendEmailTask(Email email) {
-            this.email = email;
-        }
-
-        @Override
-        public void run() {
-            if (sendMail(email)) {
-                try {
-                    emailQueueMapper.updateSucceed(email.getId());
-                } catch (Exception e) {
-                    logger.error("fail to update email status to succeed, mail id:" + email.getId(), e);
-                }
-            } else {
-                try {
-                    emailQueueMapper.updateRetry(email.getId());
-                } catch (Exception e) {
-                    logger.error("fail to update email retry, mail id:" + email.getId(), e);
-                }
-            }
-        }
-    }
-
-    private boolean sendMail(Email email) {
-        try {
-            String to = email.getTo();
-            if (StringUtils.isEmpty(to)) {
-                return true;
-            }
-            if (!enabled) {
-                to = "qianhao.zhou@ubike.cn";
-            }
-            String[] receivers = to.split(";");
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper messageHelper = new MimeMessageHelper(message, false, "utf-8");
-            messageHelper.setFrom(email.getFrom());
-            messageHelper.setSubject(email.getSubject());
-            messageHelper.setText(email.getContent(), true);
-            messageHelper.setTo(receivers);
-            message.saveChanges();
-            message.setHeader("Content-Transfer-Encoding", "base64");
-            mailSender.send(message);
-            return true;
-        } catch (Exception e) {
-            logger.error("failed to send mail id:" + email.getId(), e);
-            return false;
-        }
-    }
 
 }
