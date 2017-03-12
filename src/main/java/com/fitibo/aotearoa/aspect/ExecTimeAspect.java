@@ -1,5 +1,7 @@
 package com.fitibo.aotearoa.aspect;
 
+import com.google.common.base.Joiner;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -7,6 +9,9 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * Created by zhouqianhao on 11/03/2017.
@@ -47,7 +52,9 @@ public class ExecTimeAspect {
             output = joinPoint.proceed();
             long elapsedTime = System.currentTimeMillis() - start;
             String className = joinPoint.getTarget().getClass().getSimpleName();
-            logger.info(String.format("method [%s.%s()] execution time:%sms", className, joinPoint.getSignature().getName(), elapsedTime));
+            String args = Joiner.on(",").join(joinPoint.getArgs());
+            Optional<Class<?>> realClass = Arrays.stream(joinPoint.getTarget().getClass().getInterfaces()).findFirst();
+            logger.info(String.format("method [%s.%s(%s)] execution time:%sms", realClass.isPresent() ? realClass.get().getSimpleName() : className, joinPoint.getSignature().getName(), args, elapsedTime));
         } catch (Throwable throwable) {
             logger.error("aop record method exec time error", throwable);
         }
