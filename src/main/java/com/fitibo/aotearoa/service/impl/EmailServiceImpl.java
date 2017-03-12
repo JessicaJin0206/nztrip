@@ -19,6 +19,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -59,10 +60,12 @@ public class EmailServiceImpl implements EmailService {
         email.setSubject(subject);
         email.setOrderId(orderId);
         emailQueueMapper.create(email);
-        attachmentMapper.create(Lists.transform(attachments, input -> {
-            input.setEmailId(email.getId());
-            return input;
-        }));
+        if (!CollectionUtils.isEmpty(attachments)) {
+            attachmentMapper.create(Lists.transform(attachments, input -> {
+                input.setEmailId(email.getId());
+                return input;
+            }));
+        }
         return true;
     }
 
