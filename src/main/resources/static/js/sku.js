@@ -1,33 +1,46 @@
 var cityDropDown = $('#j_selected_city');
 $.each($('#j_city_drop_down li a'), function (idx, item) {
     var city = $(item);
-    city.on('click', function(){
+    city.on('click', function () {
         cityDropDown.html(city.html());
         cityDropDown.attr('value', city.attr('value'));
     })
-})
+});
 
 var categoryDropDown = $('#j_selected_category');
-$.each($('#j_category_drop_down li a'), function(idx, item){
+$.each($('#j_category_drop_down li a'), function (idx, item) {
     var category = $(item);
-    category.on('click', function(){
+    category.on('click', function () {
         categoryDropDown.html(category.html());
         categoryDropDown.attr('value', category.attr('value'));
     })
-})
-$('#j_search').on('click', function(){
+});
+
+$('#j_search').on('click', doSearch);
+
+$('#j_keyword').keydown(enterKey);
+
+function enterKey(event) {
+    if (event.keyCode == 13) {
+        doSearch();
+    }
+}
+
+function doSearch() {
     var cityId = parseInt(cityDropDown.attr('value'));
     var categoryId = parseInt(categoryDropDown.attr('value'));
     var keyword = $('#j_keyword').val();
-    var seachString = "";
+    var searchString = "";
     if (cityId > 0) {
-        seachString += "cityid=" + cityId + "&";
+        searchString += "cityid=" + cityId + "&";
     }
     if (categoryId > 0) {
-        seachString += "categoryid=" + categoryId + "&";
+        searchString += "categoryid=" + categoryId + "&";
     }
     if (keyword.length > 0) {
-        seachString += "keyword=" + encodeURI(keyword) + "&";
+        searchString += "keyword=" + encodeURI(keyword) + "&";
     }
-    window.location.href = "/skus?" + seachString;
-});
+    if (searchString.length > 0) {
+        window.location.href = "/skus?" + searchString;
+    }
+}
