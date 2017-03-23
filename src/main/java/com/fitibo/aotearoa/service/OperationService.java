@@ -109,13 +109,15 @@ public class OperationService {
         String content = formatConfirmationEmailContent(confirmationEmailTemplate, order,
                 skuService.findById(order.getSkuId()), agent);
         Workbook voucher = archiveService.createVoucher(order);
+        String agentOrderId = order.getAgentOrderId();
+        String subject = agentOrderId != null? confirmationEmailSubject + "(" + agentOrderId + ")":confirmationEmailSubject;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             voucher.write(baos);
             byte[] data = baos.toByteArray();
             Attachment attachment = new Attachment();
             attachment.setName("voucher.xlsx");
             attachment.setData(data);
-            return emailService.send(order.getId(), confirmationEmailFrom, to, confirmationEmailSubject, content, Lists.newArrayList(attachment));
+            return emailService.send(order.getId(), confirmationEmailFrom, to, subject, content, Lists.newArrayList(attachment));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
