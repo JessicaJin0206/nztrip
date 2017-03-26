@@ -53,11 +53,29 @@ public class Agent extends ModelObject {
         this.email = email;
     }
 
+    public String getDefaultContact() {
+        return defaultContact;
+    }
+
+    public void setDefaultContact(String defaultContact) {
+        this.defaultContact = defaultContact;
+    }
+
+    public String getDefaultContactEmail() {
+        return defaultContactEmail;
+    }
+
+    public void setDefaultContactEmail(String defaultContactEmail) {
+        this.defaultContactEmail = defaultContactEmail;
+    }
+
     private String userName;
     private String password;
     private String name;
     private String description;
     private int discount = 100;
     private String email;
+    private String defaultContact;
+    private String defaultContactEmail;
 
 }

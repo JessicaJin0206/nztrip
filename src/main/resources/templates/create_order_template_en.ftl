@@ -7,10 +7,10 @@
     <table class="table">
         <thead>
         <tr>
-            <th><input type="text" id="j_primary_contact" class="form-control" placeholder="Name"/>
+            <th><input type="text" id="j_primary_contact" class="form-control" placeholder="Name" value="<#if agent??>${(agent.defaultContact)!""}</#if>"/>
             </th>
             <th><input type="text" id="j_primary_contact_email" class="form-control"
-                       placeholder="Email"/></th>
+                       placeholder="Email" value="<#if agent??>${(agent.defaultContactEmail)!""}</#if>"/></th>
             <th><input type="text" id="j_primary_contact_phone" class="form-control"
                        placeholder="Phone"/></th>
             <th><input type="text" id="j_primary_contact_wechat" class="form-control"

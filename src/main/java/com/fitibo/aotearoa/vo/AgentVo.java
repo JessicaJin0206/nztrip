@@ -61,6 +61,22 @@ public class AgentVo {
         this.email = email;
     }
 
+    public String getDefaultContact() {
+        return defaultContact;
+    }
+
+    public void setDefaultContact(String defaultContact) {
+        this.defaultContact = defaultContact;
+    }
+
+    public String getDefaultContactEmail() {
+        return defaultContactEmail;
+    }
+
+    public void setDefaultContactEmail(String defaultContactEmail) {
+        this.defaultContactEmail = defaultContactEmail;
+    }
+
     private int id;
     private String userName;
     private String password;
@@ -68,4 +84,7 @@ public class AgentVo {
     private String description;
     private int discount;
     private String email;
+    private String defaultContact;
+    private String defaultContactEmail;
+
 }

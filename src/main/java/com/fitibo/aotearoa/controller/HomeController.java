@@ -196,6 +196,9 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("vendor", vendor);
         model.put("module", MODULE_CREATE_ORDER);
         model.put("role", getToken().getRole().toString());
+        if (getToken().getRole() == Role.Agent) {
+            model.put("agent", parse(agentMapper.findById(getToken().getId())));
+        }
         return "create_order";
     }
 
@@ -620,6 +623,8 @@ public class HomeController extends AuthenticationRequiredController {
         vo.setDescription(agent.getDescription());
         vo.setDiscount(agent.getDiscount());
         vo.setEmail(agent.getEmail());
+        vo.setDefaultContact(agent.getDefaultContact());
+        vo.setDefaultContactEmail(agent.getDefaultContactEmail());
         return vo;
     }
 

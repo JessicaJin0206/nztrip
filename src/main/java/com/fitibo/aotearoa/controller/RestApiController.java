@@ -800,6 +800,8 @@ public class RestApiController extends AuthenticationRequiredController {
         result.setDescription(agentVo.getDescription());
         result.setDiscount(agentVo.getDiscount());
         result.setEmail(agentVo.getEmail());
+        result.setDefaultContact(agentVo.getDefaultContact());
+        result.setDefaultContactEmail(agentVo.getDefaultContactEmail());
         return result;
     }
 

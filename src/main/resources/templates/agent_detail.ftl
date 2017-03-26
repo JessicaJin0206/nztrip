@@ -33,6 +33,14 @@
                                            <#if action != "edit">disabled</#if> placeholder="请输入代理商邮箱"
                                            value="${agent.email}">
             </div>
+            <div class="form-group"><input type="text" id="j_default_contact" class="form-control"
+                                           <#if action != "edit">disabled</#if> placeholder="请输入默认联系人"
+                                           value="${(agent.defaultContact)!""}">
+            </div>
+            <div class="form-group"><input type="text" id="j_default_contact_email" class="form-control"
+                                           <#if action != "edit">disabled</#if> placeholder="请输入默认联系人邮箱"
+                                           value="${(agent.defaultContactEmail)!""}">
+            </div>
             <#if action = "reset"><div class="form-group"><input type="text" id="j_password" class="form-control"
                                            placeholder="请输入代理商用户密码"></div>
             </#if>

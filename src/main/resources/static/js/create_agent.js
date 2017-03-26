@@ -97,12 +97,16 @@ var validateUpdate = function() {
         warn("请输入有效的行程商邮箱");
         return;
     }
+    var defaultContact = $('#j_default_contact').val();
+    var defaultContactEmail = $('#j_default_contact_email').val();
     return {
         userName: userName,
         name: name,
         description: description,
         discount: discount,
-        email: email
+        email: email,
+        defaultContact: defaultContact,
+        defaultContactEmail: defaultContactEmail
     };
 };
 

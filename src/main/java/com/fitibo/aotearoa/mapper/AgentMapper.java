@@ -24,7 +24,9 @@ public interface AgentMapper {
             @Result(column = "email", property = "email"),
             @Result(column = "user_name", property = "userName"),
             @Result(column = "password", property = "password"),
-            @Result(column = "description", property = "description")
+            @Result(column = "description", property = "description"),
+            @Result(column = "default_contact", property = "defaultContact"),
+            @Result(column = "default_contact_email", property = "defaultContactEmail"),
     })
     List<Agent> findAll();
 
@@ -35,7 +37,9 @@ public interface AgentMapper {
             @Result(column = "email", property = "email"),
             @Result(column = "user_name", property = "userName"),
             @Result(column = "password", property = "password"),
-            @Result(column = "description", property = "description")
+            @Result(column = "description", property = "description"),
+            @Result(column = "default_contact", property = "defaultContact"),
+            @Result(column = "default_contact_email", property = "defaultContactEmail"),
     })
     Agent findById(int id);
 
@@ -46,7 +50,9 @@ public interface AgentMapper {
             @Result(column = "email", property = "email"),
             @Result(column = "user_name", property = "userName"),
             @Result(column = "password", property = "password"),
-            @Result(column = "description", property = "description")
+            @Result(column = "description", property = "description"),
+            @Result(column = "default_contact", property = "defaultContact"),
+            @Result(column = "default_contact_email", property = "defaultContactEmail"),
     })
     Agent findByUserName(String user);
 
@@ -70,6 +76,8 @@ public interface AgentMapper {
             "<if test = \"description != null and description != ''\">description = #{description},</if>" +
             "<if test = \"discount != null and discount != 0\">discount = #{discount},</if>" +
             "<if test = \"password != null and password != ''\">password = #{password},</if>" +
+            "<if test = \"defaultContact != null and defaultContact != ''\">default_contact = #{defaultContact},</if>" +
+            "<if test = \"defaultContactEmail != null and defaultContactEmail != ''\">default_contact_email = #{defaultContactEmail},</if>" +
             "</set>" +
             "where id = #{id}" +
             "</script>")
