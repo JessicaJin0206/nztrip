@@ -77,6 +77,7 @@ $('#j_ticket_type_selector li a').on('click', function (e) {
                    url: url
                }).success(function (data) {
             if (data && data.length > 0) {
+                timeSelector.empty();
                 $.each(data, function (index, price) {
                     var item = $(
                         '<li><a value="' + price.id + '">' + price.time + '</a></li>');
