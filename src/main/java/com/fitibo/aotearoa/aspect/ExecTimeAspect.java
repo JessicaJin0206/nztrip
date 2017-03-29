@@ -54,7 +54,9 @@ public class ExecTimeAspect {
             String className = joinPoint.getTarget().getClass().getSimpleName();
             String args = Joiner.on(",").join(joinPoint.getArgs());
             Optional<Class<?>> realClass = Arrays.stream(joinPoint.getTarget().getClass().getInterfaces()).findFirst();
-            logger.info(String.format("method [%s.%s(%s)] execution time:%sms", realClass.isPresent() ? realClass.get().getSimpleName() : className, joinPoint.getSignature().getName(), args, elapsedTime));
+            if (elapsedTime > 500) {
+                logger.warn(String.format("method [%s.%s(%s)] execution time:%sms", realClass.isPresent() ? realClass.get().getSimpleName() : className, joinPoint.getSignature().getName(), args, elapsedTime));
+            }
         } catch (Throwable throwable) {
             logger.error("aop record method exec time error", throwable);
         }

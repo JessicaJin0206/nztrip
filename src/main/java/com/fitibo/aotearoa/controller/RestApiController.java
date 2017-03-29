@@ -544,9 +544,10 @@ public class RestApiController extends AuthenticationRequiredController {
     public List<SkuTicketPriceVo> getPrice(@PathVariable("ticketId") int ticketId,
                                            @RequestParam("date") String date,
                                            @RequestParam(value = "orderId", required = false, defaultValue = "0") int orderId) {
-
+        SkuTicket skuTicket = skuTicketMapper.findById(ticketId);
+        Preconditions.checkNotNull(skuTicket, "invalid ticket id:" + ticketId);
         List<SkuTicketPrice> ticketPrices = skuTicketPriceMapper
-                .findAvailableBySkuTicketIdAndDate(ticketId, DateUtils.parseDate(date), new RowBounds());
+                .findAvailableBySkuTicketIdAndDate(skuTicket.getSkuId(), ticketId, DateUtils.parseDate(date), new RowBounds());
         int skuId = ticketPrices.stream().mapToInt(SkuTicketPrice::getSkuId).findFirst().orElse(-1);
         int discount = orderId > 0 ? discountRateService.getDiscountByOrder(orderId) : getDiscount(getToken(), skuId);
         return Lists.transform(ticketPrices, (input) -> {
