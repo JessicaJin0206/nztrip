@@ -12,7 +12,7 @@
             <th><input type="text" id="j_primary_contact_email" class="form-control"
                        placeholder="Email" value="<#if agent??>${(agent.defaultContactEmail)!""}</#if>"/></th>
             <th><input type="text" id="j_primary_contact_phone" class="form-control"
-                       placeholder="联系电话"/></th>
+                       placeholder="联系电话" value="<#if agent??>${(agent.defaultContactPhone)!""}</#if>"/></th>
             <th><input type="text" id="j_primary_contact_wechat" class="form-control"
                        placeholder="微信"/></th>
         </tr>

@@ -27,6 +27,7 @@ public interface AgentMapper {
             @Result(column = "description", property = "description"),
             @Result(column = "default_contact", property = "defaultContact"),
             @Result(column = "default_contact_email", property = "defaultContactEmail"),
+            @Result(column = "default_contact_phone", property = "defaultContactPhone"),
     })
     List<Agent> findAll();
 
@@ -40,6 +41,7 @@ public interface AgentMapper {
             @Result(column = "description", property = "description"),
             @Result(column = "default_contact", property = "defaultContact"),
             @Result(column = "default_contact_email", property = "defaultContactEmail"),
+            @Result(column = "default_contact_phone", property = "defaultContactPhone"),
     })
     Agent findById(int id);
 
@@ -53,6 +55,7 @@ public interface AgentMapper {
             @Result(column = "description", property = "description"),
             @Result(column = "default_contact", property = "defaultContact"),
             @Result(column = "default_contact_email", property = "defaultContactEmail"),
+            @Result(column = "default_contact_phone", property = "defaultContactPhone")
     })
     Agent findByUserName(String user);
 
@@ -78,6 +81,7 @@ public interface AgentMapper {
             "<if test = \"password != null and password != ''\">password = #{password},</if>" +
             "<if test = \"defaultContact != null and defaultContact != ''\">default_contact = #{defaultContact},</if>" +
             "<if test = \"defaultContactEmail != null and defaultContactEmail != ''\">default_contact_email = #{defaultContactEmail},</if>" +
+            "<if test = \"defaultContactPhone != null and defaultContactPhone != ''\">default_contact_phone = #{defaultContactPhone},</if>" +
             "</set>" +
             "where id = #{id}" +
             "</script>")

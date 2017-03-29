@@ -69,6 +69,14 @@ public class Agent extends ModelObject {
         this.defaultContactEmail = defaultContactEmail;
     }
 
+    public String getDefaultContactPhone() {
+        return defaultContactPhone;
+    }
+
+    public void setDefaultContactPhone(String defaultContactPhone) {
+        this.defaultContactPhone = defaultContactPhone;
+    }
+
     private String userName;
     private String password;
     private String name;
@@ -77,5 +85,6 @@ public class Agent extends ModelObject {
     private String email;
     private String defaultContact;
     private String defaultContactEmail;
+    private String defaultContactPhone;
 
 }

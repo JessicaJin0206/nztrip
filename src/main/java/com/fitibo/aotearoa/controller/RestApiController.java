@@ -803,6 +803,7 @@ public class RestApiController extends AuthenticationRequiredController {
         result.setEmail(agentVo.getEmail());
         result.setDefaultContact(agentVo.getDefaultContact());
         result.setDefaultContactEmail(agentVo.getDefaultContactEmail());
+        result.setDefaultContactPhone(agentVo.getDefaultContactPhone());
         return result;
     }
 

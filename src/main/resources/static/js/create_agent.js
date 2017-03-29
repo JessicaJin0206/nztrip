@@ -99,6 +99,7 @@ var validateUpdate = function() {
     }
     var defaultContact = $('#j_default_contact').val();
     var defaultContactEmail = $('#j_default_contact_email').val();
+    var defaultContactPhone = $('#j_default_contact_phone').val();
     return {
         userName: userName,
         name: name,
@@ -106,7 +107,8 @@ var validateUpdate = function() {
         discount: discount,
         email: email,
         defaultContact: defaultContact,
-        defaultContactEmail: defaultContactEmail
+        defaultContactEmail: defaultContactEmail,
+        defaultContactPhone: defaultContactPhone
     };
 };
 
@@ -178,9 +180,9 @@ $('#j_reset_password').on('click', function () {
 });
 
 $('#j_edit').on('click', function () {
-    window.location.href = window.location.pathname + "/_edit";
+    window.location.href = window.location.pathname + (window.location.pathname.endsWith("/")?"_edit":"/_edit");
 });
 
 $('#j_reset').on('click', function () {
-    window.location.href = window.location.pathname + "/_reset";
-})
+    window.location.href = window.location.pathname + (window.location.pathname.endsWith("/")?"_reset":"/_reset");
+});

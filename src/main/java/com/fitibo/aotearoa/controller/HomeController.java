@@ -625,6 +625,7 @@ public class HomeController extends AuthenticationRequiredController {
         vo.setEmail(agent.getEmail());
         vo.setDefaultContact(agent.getDefaultContact());
         vo.setDefaultContactEmail(agent.getDefaultContactEmail());
+        vo.setDefaultContactPhone(agent.getDefaultContactPhone());
         return vo;
     }
 

@@ -1,81 +1,12 @@
 package com.fitibo.aotearoa.vo;
 
+import lombok.Data;
+
 /**
  * Created by xiaozou on 8/13/16.
  */
+@Data
 public class AgentVo {
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public int getDiscount() {
-        return discount;
-    }
-
-    public void setDiscount(int discount) {
-        this.discount = discount;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getDefaultContact() {
-        return defaultContact;
-    }
-
-    public void setDefaultContact(String defaultContact) {
-        this.defaultContact = defaultContact;
-    }
-
-    public String getDefaultContactEmail() {
-        return defaultContactEmail;
-    }
-
-    public void setDefaultContactEmail(String defaultContactEmail) {
-        this.defaultContactEmail = defaultContactEmail;
-    }
 
     private int id;
     private String userName;
@@ -86,5 +17,6 @@ public class AgentVo {
     private String email;
     private String defaultContact;
     private String defaultContactEmail;
+    private String defaultContactPhone;
 
 }
