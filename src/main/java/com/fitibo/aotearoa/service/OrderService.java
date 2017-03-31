@@ -38,7 +38,7 @@ public class OrderService {
                 Lists.newArrayList(new Transition(OrderStatus.MODIFYING.getValue(), "确认后修改订单", "Modify"), new Transition(OrderStatus.CANCELLED.getValue(), "取消订单", "Cancel")));
 
         transitionMap.put(OrderStatus.MODIFYING.getValue(),
-                Lists.newArrayList(new Transition(OrderStatus.CONFIRMED.getValue(), "预订成功", "Confirm")));
+                Lists.newArrayList(new Transition(OrderStatus.CONFIRMED.getValue(), "预订成功", "Confirm"), new Transition(OrderStatus.CLOSED.getValue(), "关闭订单", "Close")));
 
         transitionMap.put(OrderStatus.CANCELLED.getValue(),
                 Lists.newArrayList());
