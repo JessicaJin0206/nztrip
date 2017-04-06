@@ -96,7 +96,7 @@
                                 <a href="/skus/${sku.id?c}">
                                     <span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span>
                                 </a>
-                                <a href="/create_order?skuId=${sku.id?c}">
+                                <a href="/create_order?skuId=${sku.id?c}" target="_blank">
                                     <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
                                 </a>
                             </div>

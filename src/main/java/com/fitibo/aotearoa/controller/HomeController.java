@@ -237,6 +237,12 @@ public class HomeController extends AuthenticationRequiredController {
                 throw new ResourceNotFoundException();
         }
         model.put("orders", orders);
+        Map<String, Integer> orderCountByStatus = Maps.newHashMap();
+        orderCountByStatus.put(OrderStatus.NEW.getValue() + "", orderMapper.countByStatus(OrderStatus.NEW.getValue()));
+        orderCountByStatus.put(OrderStatus.PENDING.getValue() + "", orderMapper.countByStatus(OrderStatus.PENDING.getValue()));
+        orderCountByStatus.put(OrderStatus.FULL.getValue() + "", orderMapper.countByStatus(OrderStatus.FULL.getValue()));
+        orderCountByStatus.put(OrderStatus.MODIFYING.getValue() + "", orderMapper.countByStatus(OrderStatus.MODIFYING.getValue()));
+        model.put("orderCountByStatus", orderCountByStatus);
         return "orders";
     }
 

@@ -34,8 +34,11 @@
                         <#list statusList as s>
                             <#if (s.getValue() == status)>
                                 <#assign hasStatus = 1>
-                                <span id="j_selected_status"
-                                      value="${s.getValue()}">${s.getDesc()}</span>
+                                <#if orderCountByStatus[s.getValue()?string]??>
+                                    <span id="j_selected_status" value="${s.getValue()}">${s.getDesc()} (${orderCountByStatus[s.getValue()?string]})</span>
+                                <#else>
+                                    <span id="j_selected_status" value="${s.getValue()}">${s.getDesc()}</span>
+                                </#if>
                             </#if>
                         </#list>
                     </#if>
@@ -48,7 +51,11 @@
                         aria-labelledby="selected_status_button">
                         <li><a value="0">选择订单状态</a></li>
                     <#list statusList as s>
-                        <li><a value="${s.getValue()}">${s.getDesc()}</a></li>
+                        <#if orderCountByStatus[s.getValue()?string]??>
+                            <li><a value="${s.getValue()}">${s.getDesc()} (${orderCountByStatus[s.getValue()?string]})</a></li>
+                        <#else>
+                            <li><a value="${s.getValue()}">${s.getDesc()}</a></li>
+                        </#if>
                     </#list>
                     </ul>
                 </div>
@@ -95,7 +102,7 @@
                         <td>${order.remark!''}</td>
                         <td>
                             <div>
-                                <a href="/orders/${order.id?c}">
+                                <a href="/orders/${order.id?c}" target="_blank">
                                     <span class="glyphicon glyphicon-align-justify"
                                           aria-hidden="true"></span>
                                 </a>

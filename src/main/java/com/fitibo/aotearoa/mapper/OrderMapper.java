@@ -263,4 +263,8 @@ public interface OrderMapper {
 
     @Update("update `order` set reference_number = #{referenceNumber} where id = #{id}")
     int updateReferenceNumber(@Param("id") int id, @Param("referenceNumber") String referenceNumber);
+
+
+    @Select("select count(*) from `order` where status = #{status}")
+    int countByStatus(@Param("status") int status);
 }
