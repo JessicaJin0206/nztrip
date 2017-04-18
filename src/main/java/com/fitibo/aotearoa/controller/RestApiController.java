@@ -274,7 +274,7 @@ public class RestApiController extends AuthenticationRequiredController {
         BigDecimal total = orderVo.getOrderTickets().stream().
                 map((orderTicket) -> calculateTicketPrice(priceMap.get(orderTicket.getTicketPriceId()),
                         discount)).
-                reduce(BigDecimal::add).orElseGet(() -> BigDecimal.ZERO);
+                reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
         order.setPrice(total);
         order.setVendorPhone(vendor.getPhone());
         order.setUuid(GuidGenerator.generate(14));

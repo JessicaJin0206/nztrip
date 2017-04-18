@@ -9,8 +9,11 @@ import com.fitibo.aotearoa.service.TokenService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+
+import java.io.IOException;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -40,19 +43,41 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
                     ((AuthenticationRequiredController) handlerMethod.getBean()).setToken(token);
                 }
                 if (token == null || token.isExpired()) {
-                    httpServletResponse.sendRedirect("/signin?redirectUrl=" + httpServletRequest.getRequestURI());
+                    makeResponse(handlerMethod.getBean(), httpServletRequest, httpServletResponse);
                     return false;
                 }
                 if (Lists.newArrayList(authentication.value()).contains(token.getRole())) {
                     return true;
                 } else {
-                    httpServletResponse.sendRedirect("/signin?redirectUrl=" + httpServletRequest.getRequestURI());
+                    makeResponse(handlerMethod.getBean(), httpServletRequest, httpServletResponse);
                     return false;
                 }
             }
         } else {
             return true;
         }
+    }
+
+    private void makeResponse(Object controller, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
+        if (controller.getClass().isAnnotationPresent(RestController.class) ||
+                controller.getClass().getSuperclass().isAnnotationPresent(RestController.class)) {
+            httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        } else {
+            httpServletResponse.sendRedirect("/signin?redirectUrl=" + httpServletRequest.getRequestURI());
+        }
+    }
+
+    private String getTokenFromHeaderOrCookie(HttpServletRequest request, String key) {
+        String header = getHeader(request, key);
+        if (header != null) {
+            return header;
+        }
+        String cookie = getCookie(request, key);
+        return cookie;
+    }
+
+    private String getHeader(HttpServletRequest request, String key) {
+        return request.getHeader(key);
     }
 
     private String getCookie(HttpServletRequest request, String cookieName) {
@@ -69,7 +94,7 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
     }
 
     private Token getToken(HttpServletRequest request) {
-        String tokenString = getCookie(request, "X-TOKEN");
+        String tokenString = getTokenFromHeaderOrCookie(request, "X-TOKEN");
         if (tokenString == null) {
             return null;
         }

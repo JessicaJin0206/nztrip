@@ -5,7 +5,7 @@ import com.fitibo.aotearoa.dto.Token;
 /**
  * Created by qianhao.zhou on 8/18/16.
  */
-public class AuthenticationRequiredController {
+public abstract class AuthenticationRequiredController {
 
     private ThreadLocal<Token> token = new ThreadLocal<>();
 
