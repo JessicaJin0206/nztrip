@@ -86,16 +86,59 @@ public class OperationService {
     @Value("${template.confirmation_email.guests_info}")
     private String confirmationEmailGuestsInfoTemplate;
 
+    @Value("${template.cancel_email.subject}")
+    private String cancellationEmailSubject;
+
+    @Value("${template.cancel_email.content}")
+    private String cancellationEmailTemplate;
+
+    @Value("${template.cancel_email.from}")
+    private String cancellationEmailFrom;
+
     private final static Logger logger = LoggerFactory.getLogger(OperationService.class);
 
-    public void doRelatedOperation(int fromStatus, int toStatus, Order order) {
-        if (toStatus == OrderStatus.PENDING.getValue()) {
-            sendReservationEmail(order);
-        } else if (toStatus == OrderStatus.CONFIRMED.getValue()) {
-            sendConfirmationEmail(order);
-        } else {
-            // do nothing now
+    public void doRelatedOperation(boolean sendEmail, int fromStatus, int toStatus, Order order) {
+        if (sendEmail) {
+            if (toStatus == OrderStatus.PENDING.getValue()) {
+                sendReservationEmail(order);
+            } else if (toStatus == OrderStatus.CONFIRMED.getValue()) {
+                sendConfirmationEmail(order);
+            } else if (toStatus == OrderStatus.CANCELLED.getValue() || toStatus == OrderStatus.CLOSED.getValue()) {
+                sendCancellationEmail(order);
+            } else {
+                // do nothing now
+            }
         }
+    }
+
+    private void sendCancellationEmail(Order order) {
+        int agentId = order.getAgentId();
+        if (agentId <= 0) {
+            logger.info("agent id is 0, don't send cancellation email");
+            return;
+        }
+        Agent agent = agentMapper.findById(agentId);
+        List<OrderTicket> ticketList = orderTicketMapper.findByOrderId(order.getId());
+        if (ticketList.isEmpty()) {
+            throw new ResourceNotFoundException();
+        }
+        String agentOrderId = order.getAgentOrderId();
+        String subject = agentOrderId != null ? cancellationEmailSubject + "(" + agentOrderId + ")" : cancellationEmailSubject;
+        String content = formatCancellationEmailContent(order, agent, skuMapper.findById(order.getSkuId()), ticketList);
+        emailService.send(order.getId(), cancellationEmailFrom, agent.getEmail(), subject, content, Collections.emptyList());
+    }
+
+    private String formatCancellationEmailContent(Order order, Agent agent, Sku sku, List<OrderTicket> tickets) {
+        String content = cancellationEmailTemplate;
+        content = content.replace("#AGENT_NAME#", agent.getName());
+        content = content.replace("#REFERENCE_NUMBER#", Optional.of(order.getReferenceNumber()).orElse(""));
+        content = content.replace("#REMARK#", order.getRemark());
+        content = content.replace("#ORDER_ID#", order.getUuid());
+        content = content.replace("#SKU#", sku.getUuid());
+        content = content.replace("#PRICE#", order.getPrice().toString());
+        content = content.replace("#PRIMARY_CONTACT#", order.getPrimaryContact());
+        content = content.replace("#TOURINFO#", formatTourInfo(tickets));
+        return content;
     }
 
     public boolean sendConfirmationEmail(Order order) {
@@ -110,7 +153,7 @@ public class OperationService {
                 skuService.findById(order.getSkuId()), agent);
         Workbook voucher = archiveService.createVoucher(order);
         String agentOrderId = order.getAgentOrderId();
-        String subject = agentOrderId != null? confirmationEmailSubject + "(" + agentOrderId + ")":confirmationEmailSubject;
+        String subject = agentOrderId != null ? confirmationEmailSubject + "(" + agentOrderId + ")" : confirmationEmailSubject;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             voucher.write(baos);
             byte[] data = baos.toByteArray();
@@ -195,21 +238,7 @@ public class OperationService {
 
     private static final String SPACE = "&nbsp;&nbsp;&nbsp;";
 
-    private String formatReservationEmailContent(String contentTemplate, Vendor vendor, Order order,
-                                                 List<OrderTicket> tickets) {
-
-        String content = contentTemplate;
-        content = content.replace("#VENDORNAME#", vendor.getName());
-        content = content.replace("#TOUR#", order.getSku());
-        content = content.replace("#NAME#", order.getPrimaryContact());
-        content = content.replace("#EMAIL#", Optional.ofNullable(order.getPrimaryContactEmail()).orElse(
-                StringUtils.EMPTY));
-        content = content.replace("#PHONE#", Optional.ofNullable(order.getPrimaryContactPhone()).orElse(
-                StringUtils.EMPTY));
-        content = content.replace("#REMARK#", Optional.ofNullable(order.getRemark()).orElse(
-                StringUtils.EMPTY));
-        content = content.replace("#ORDER_ID#", order.getUuid());
-
+    private String formatTourInfo(List<OrderTicket> tickets) {
         StringBuilder tourInfo = new StringBuilder();
         tourInfo.append("TOTAL:<br>");
         Observable.from(tickets).groupBy(OrderTicket::getSkuTicket).subscribe(
@@ -243,8 +272,25 @@ public class OperationService {
             }
             tourInfo.append("<br>");
         }
+        return tourInfo.toString();
+    }
 
-        content = content.replace("#TOURINFO#", tourInfo.toString());
+    private String formatReservationEmailContent(String contentTemplate, Vendor vendor, Order order,
+                                                 List<OrderTicket> tickets) {
+
+        String content = contentTemplate;
+        content = content.replace("#VENDORNAME#", vendor.getName());
+        content = content.replace("#TOUR#", order.getSku());
+        content = content.replace("#NAME#", order.getPrimaryContact());
+        content = content.replace("#EMAIL#", Optional.ofNullable(order.getPrimaryContactEmail()).orElse(
+                StringUtils.EMPTY));
+        content = content.replace("#PHONE#", Optional.ofNullable(order.getPrimaryContactPhone()).orElse(
+                StringUtils.EMPTY));
+        content = content.replace("#REMARK#", Optional.ofNullable(order.getRemark()).orElse(
+                StringUtils.EMPTY));
+        content = content.replace("#ORDER_ID#", order.getUuid());
+
+        content = content.replace("#TOURINFO#", formatTourInfo(tickets));
         return content;
     }
 }

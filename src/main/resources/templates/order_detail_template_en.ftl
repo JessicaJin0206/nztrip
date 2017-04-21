@@ -11,7 +11,8 @@
             <button id="j_edit" class="btn btn-default form-group">Modify</button>
             <#list transitions as transition>
                 <button class="btn btn-primary form-group j_operation"
-                        operation="${transition.to}">${transition.actionEn}</button>
+                        operation="${transition.to}"
+                        email="${transition.sendEmail?string('true', 'false')}">${transition.actionEn}</button>
             </#list>
         <#else>
             <button id="j_update" class="btn btn-default form-group">Submit</button>

@@ -26,19 +26,25 @@ public class OrderService {
     @PostConstruct
     public void init() {
         transitionMap.put(OrderStatus.NEW.getValue(),
-                Lists.newArrayList(new Transition(OrderStatus.PENDING.getValue(), "审核通过", "Approve"), new Transition(OrderStatus.CLOSED.getValue(), "关闭订单", "Close")));
+                Lists.newArrayList(new Transition(OrderStatus.PENDING.getValue(), "审核通过", "Approve"),
+                        new Transition(OrderStatus.CLOSED.getValue(), "关闭订单", "Close")));
 
         transitionMap.put(OrderStatus.PENDING.getValue(),
-                Lists.newArrayList(new Transition(OrderStatus.FULL.getValue(), "库存已满", "Full"), new Transition(OrderStatus.CONFIRMED.getValue(), "预订成功", "Confirm")));
+                Lists.newArrayList(new Transition(OrderStatus.FULL.getValue(), "库存已满", "Full"),
+                        new Transition(OrderStatus.CONFIRMED.getValue(), "预订成功", "Confirm"),
+                        new Transition(OrderStatus.CONFIRMED.getValue(), "预订成功不发邮件", "Confirm Without Email", false)));
 
         transitionMap.put(OrderStatus.FULL.getValue(),
-                Lists.newArrayList(new Transition(OrderStatus.CLOSED.getValue(), "关闭订单", "Close"), new Transition(OrderStatus.CONFIRMED.getValue(), "预订成功", "Confirm")));
+                Lists.newArrayList(new Transition(OrderStatus.CLOSED.getValue(), "关闭订单", "Close"),
+                        new Transition(OrderStatus.CONFIRMED.getValue(), "预订成功", "Confirm")));
 
         transitionMap.put(OrderStatus.CONFIRMED.getValue(),
-                Lists.newArrayList(new Transition(OrderStatus.MODIFYING.getValue(), "确认后修改订单", "Modify"), new Transition(OrderStatus.CANCELLED.getValue(), "取消订单", "Cancel")));
+                Lists.newArrayList(new Transition(OrderStatus.MODIFYING.getValue(), "确认后修改订单", "Modify"),
+                        new Transition(OrderStatus.CANCELLED.getValue(), "取消订单", "Cancel")));
 
         transitionMap.put(OrderStatus.MODIFYING.getValue(),
-                Lists.newArrayList(new Transition(OrderStatus.CONFIRMED.getValue(), "预订成功", "Confirm"), new Transition(OrderStatus.CLOSED.getValue(), "关闭订单", "Close")));
+                Lists.newArrayList(new Transition(OrderStatus.CONFIRMED.getValue(), "预订成功", "Confirm"),
+                        new Transition(OrderStatus.CLOSED.getValue(), "关闭订单", "Close")));
 
         transitionMap.put(OrderStatus.CANCELLED.getValue(),
                 Lists.newArrayList());

@@ -11,7 +11,8 @@
             <button id="j_edit" class="btn btn-default form-group">修改订单信息</button>
             <#list transitions as transition>
                 <button class="btn btn-primary form-group j_operation"
-                        operation="${transition.to}">${transition.action}</button>
+                        operation="${transition.to}"
+                        email="${transition.sendEmail?string('true', 'false')}">${transition.action}</button>
             </#list>
         <#else>
             <button id="j_update" class="btn btn-default form-group">提交</button>
@@ -97,7 +98,8 @@
     <div class="row">
         <label class="col-md-2">代理商订单号:</label>
         <div class="col-md-offset-2">
-            <input type="text" id="j_agent_order_id" class="form-control" <#if editing=false>disabled</#if>
+            <input type="text" id="j_agent_order_id" class="form-control"
+                   <#if editing=false>disabled</#if>
                    value="${order.agentOrderId!''}">
         </div>
     </div>

@@ -385,6 +385,7 @@ $('.j_operation').on('click', function () {
     var path = window.location.pathname.split('/');
     var id = parseInt(path[path.length - 1]);
     var action = parseInt($(this).attr("operation"));
+    var sendEmail = $(this).attr("email");
     var data = {};
     bootbox.confirm("确认操作订单吗?", function (yes) {
         if (!yes) {
@@ -404,7 +405,7 @@ $('.j_operation').on('click', function () {
                     $.ajax({
                                type: 'PUT',
                                contentType: "application/json; charset=utf-8",
-                               url: '/v1/api/orders/' + id + "/status/" + action,
+                               url: '/v1/api/orders/' + id + "/status/" + action + "?sendEmail=" + sendEmail,
                                data: JSON.stringify(data)
                            }).success(function (data) {
                         if (data == true) {
@@ -422,10 +423,10 @@ $('.j_operation').on('click', function () {
                 $.ajax({
                            type: 'PUT',
                            contentType: "application/json; charset=utf-8",
-                           url: '/v1/api/orders/' + id + "/status/" + action,
+                           url: '/v1/api/orders/' + id + "/status/" + action + "?sendEmail=" + sendEmail,
                            data: JSON.stringify(data)
                        }).success(function (data) {
-                    if (data == true) {
+                    if (data) {
                         bootbox.alert("操作成功", function () {
                             window.location.reload();
                         });
