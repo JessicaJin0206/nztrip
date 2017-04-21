@@ -312,6 +312,10 @@ public class ArchiveServiceImpl implements ArchiveService {
         totalCostPrice.setCellValue(
                 costPriceMap.get(orderStat.getOrderId()).setScale(2, RoundingMode.HALF_EVEN)
                         .doubleValue());
+
+        Cell agentOrderId = row.createCell(col++);
+        agentOrderId.setCellType(Cell.CELL_TYPE_STRING);
+        agentOrderId.setCellValue(orderStat.getAgentOrderId());
     }
 
 }
