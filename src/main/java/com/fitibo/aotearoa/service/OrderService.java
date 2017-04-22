@@ -27,12 +27,12 @@ public class OrderService {
     public void init() {
         transitionMap.put(OrderStatus.NEW.getValue(),
                 Lists.newArrayList(new Transition(OrderStatus.PENDING.getValue(), "审核通过", "Approve"),
+                        new Transition(OrderStatus.PENDING.getValue(), "审核通过不发邮件", "Approve Without Email", false),
                         new Transition(OrderStatus.CLOSED.getValue(), "关闭订单", "Close")));
 
         transitionMap.put(OrderStatus.PENDING.getValue(),
                 Lists.newArrayList(new Transition(OrderStatus.FULL.getValue(), "库存已满", "Full"),
-                        new Transition(OrderStatus.CONFIRMED.getValue(), "预订成功", "Confirm"),
-                        new Transition(OrderStatus.CONFIRMED.getValue(), "预订成功不发邮件", "Confirm Without Email", false)));
+                        new Transition(OrderStatus.CONFIRMED.getValue(), "预订成功", "Confirm")));
 
         transitionMap.put(OrderStatus.FULL.getValue(),
                 Lists.newArrayList(new Transition(OrderStatus.CLOSED.getValue(), "关闭订单", "Close"),
