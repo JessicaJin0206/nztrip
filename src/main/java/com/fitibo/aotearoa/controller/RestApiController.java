@@ -419,7 +419,7 @@ public class RestApiController extends AuthenticationRequiredController {
     @Transactional
     public boolean updateOrderStatus(@PathVariable("id") int id,
                                      @PathVariable("toStatus") int toStatus,
-                                     @RequestParam("sendEmail") boolean sendEmail,
+                                     @RequestParam(value = "sendEmail", defaultValue = "true") boolean sendEmail,
                                      @RequestBody OrderVo extra) {
         Order order = orderMapper.findById(id);
         if (order == null) {
