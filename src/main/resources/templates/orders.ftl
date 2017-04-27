@@ -17,7 +17,7 @@
                                              placeholder="请输入关键词..." value="${keyword}">
                 </div>
                 <div class="col-md-2"><input type="text" id="j_uuid" class="form-control"
-                                             placeholder="请输入编号..." value="${uuid}">
+                                             placeholder="请输入编号,代理商订单号..." value="${uuid}">
                 </div>
                 <div class="col-md-3"><input type="text" id="j_reference_number"
                                              class="form-control"

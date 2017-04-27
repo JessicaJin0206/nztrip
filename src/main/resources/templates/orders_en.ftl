@@ -17,7 +17,7 @@
                                              placeholder="Search Keyword" value="${keyword}">
                 </div>
                 <div class="col-md-2"><input type="text" id="j_uuid" class="form-control"
-                                             placeholder="Order Id" value="${uuid}">
+                                             placeholder="Order Id or Agent Order Id" value="${uuid}">
                 </div>
                 <div class="col-md-3"><input type="text" id="j_reference_number"
                                              class="form-control"
