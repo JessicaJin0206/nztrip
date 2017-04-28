@@ -25,6 +25,7 @@ import com.fitibo.aotearoa.dto.Token;
 import com.fitibo.aotearoa.exception.InvalidParamException;
 import com.fitibo.aotearoa.exception.ResourceNotFoundException;
 import com.fitibo.aotearoa.mapper.AgentMapper;
+import com.fitibo.aotearoa.mapper.HotItemMapper;
 import com.fitibo.aotearoa.mapper.OrderMapper;
 import com.fitibo.aotearoa.mapper.OrderTicketMapper;
 import com.fitibo.aotearoa.mapper.PriceRecordMapper;
@@ -133,6 +134,9 @@ public class HomeController extends AuthenticationRequiredController {
     private PriceRecordMapper priceRecordMapper;
 
     @Autowired
+    private HotItemMapper hotItemMapper;
+
+    @Autowired
     private SkuService skuService;
 
     @ExceptionHandler
@@ -150,6 +154,7 @@ public class HomeController extends AuthenticationRequiredController {
     public String home(Map<String, Object> model) {
         model.put("module", MODULE_DASHBOARD);
         model.put("role", getToken().getRole().toString());
+        model.put("hotItems", Lists.transform(hotItemMapper.query(new RowBounds()), ObjectParser::parse));
         return "dashboard";
     }
 
@@ -158,6 +163,7 @@ public class HomeController extends AuthenticationRequiredController {
     public String dashboard(Map<String, Object> model) {
         model.put("module", MODULE_DASHBOARD);
         model.put("role", getToken().getRole().toString());
+        model.put("hotItems", Lists.transform(hotItemMapper.query(new RowBounds()), ObjectParser::parse));
         return "dashboard";
     }
 

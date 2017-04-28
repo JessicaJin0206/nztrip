@@ -23,7 +23,7 @@
                     </thead>
                     <tbody>
                     <#if vendors?exists>
-                    <#list vendors as vendor>
+                        <#list vendors as vendor>
                         <tr>
                             <td>${vendor.name!''}</td>
                             <td>${vendor.email!''}</td>
@@ -31,12 +31,13 @@
                             <td>
                                 <div>
                                     <a href="/vendors/${vendor.id?c}">
-                                        <span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span>
+                                        <span class="glyphicon glyphicon-align-justify"
+                                              aria-hidden="true"></span>
                                     </a>
                                 </div>
                             </td>
                         </tr>
-                    </#list>
+                        </#list>
                     </#if>
                     </tbody>
                 </table>

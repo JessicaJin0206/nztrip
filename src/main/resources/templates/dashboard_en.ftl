@@ -15,9 +15,9 @@
                 <table class="table table-hover">
                     <thead>
                     <tr>
-                        <th>编号</th>
-                        <th>名称</th>
-                        <th>操作</th>
+                        <th>SKU Id</th>
+                        <th>Name</th>
+                        <th>Action</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -28,11 +28,11 @@
                             <td>${hotItem.sku!''}</td>
                             <td>
                                 <div>
-                                    <a href="${hotItem.createOrderUrl!''}">直接下单</a>
+                                    <a href="${hotItem.createOrderUrl!''}">Make Reservation</a>
                                 </div>
                                 <#if (hotItem.lookupUrl?? && hotItem.lookupUrl != "")>
                                     <div>
-                                        <a href="${hotItem.lookupUrl!''}">官网查位</a>
+                                        <a href="${hotItem.lookupUrl!''}">Lookup in Official Website</a>
                                     </div>
                                 </#if>
                             </td>
