@@ -14,7 +14,7 @@ $('#j_uuid').keydown(enterKey);
 $('#j_reference_number').keydown(enterKey);
 
 function enterKey(event) {
-    if (event.keyCode == 13) {
+    if (event.keyCode === 13) {
         doSearch();
     }
 }
@@ -38,7 +38,13 @@ function doSearch() {
         searchString += "status=" + status + "&";
     }
     if (searchString.length > 0) {
-        window.location.href = "/orders?" + searchString;
+        $('#j_keyword').val("");
+        $('#j_uuid').val("");
+        $('#j_reference_number').val("");
+        var firstStatusItem = $($('#j_status_drop_down li a')[0]);
+        statusDropDown.html(firstStatusItem.html());
+        statusDropDown.attr('value', firstStatusItem.attr('value'));
+        window.open("/orders?" + searchString);
     }
 }
 
