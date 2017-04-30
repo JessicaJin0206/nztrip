@@ -69,6 +69,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -290,7 +291,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("order", order);
         List<OrderTicketVo> orderTickets = Lists.transform(orderTicketMapper.findByOrderId(order.getId()), ObjectParser::parse);
         model.put("tickets", orderTickets);
-        model.put("touristCount", calculateTouristCount(orderTickets) + "");
+        model.put("touristCount", calculateTouristCount(orderTickets));
         model.put("module", MODULE_ORDER_DETAIL);
         model.put("statusList", OrderStatus.values());
         model.put("editing", false);
@@ -300,8 +301,9 @@ public class HomeController extends AuthenticationRequiredController {
         return "order_detail";
     }
 
-    private long calculateTouristCount(List<OrderTicketVo> tickets) {
-        return tickets.stream().flatMap(input -> input.getOrderTicketUsers().stream()).count();
+    private String calculateTouristCount(List<OrderTicketVo> tickets) {
+        Map<String, Long> result = tickets.stream().collect(Collectors.groupingBy(OrderTicketVo::getSkuTicket, Collectors.counting()));
+        return result.entrySet().stream().map(input -> input.getKey() + ":" + input.getValue()).collect(Collectors.joining("  "));
     }
 
     @RequestMapping("orders/{id}/_edit")
@@ -317,7 +319,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("order", order);
         List<OrderTicketVo> orderTickets = Lists.transform(orderTicketMapper.findByOrderId(order.getId()), ObjectParser::parse);
         model.put("tickets", orderTickets);
-        model.put("touristCount", calculateTouristCount(orderTickets) + "");
+        model.put("touristCount", calculateTouristCount(orderTickets));
         Sku sku = skuService.findById(order.getSkuId());
         if (sku == null) {
             throw new ResourceNotFoundException();
