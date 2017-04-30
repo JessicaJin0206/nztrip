@@ -52,6 +52,7 @@ import com.fitibo.aotearoa.service.impl.CategoryServiceImpl;
 import com.fitibo.aotearoa.util.DateUtils;
 import com.fitibo.aotearoa.util.ObjectParser;
 import com.fitibo.aotearoa.vo.AgentVo;
+import com.fitibo.aotearoa.vo.OrderTicketVo;
 import com.fitibo.aotearoa.vo.OrderVo;
 import com.fitibo.aotearoa.vo.PriceRecordVo;
 import com.fitibo.aotearoa.vo.SkuTicketPriceVo;
@@ -287,8 +288,9 @@ public class HomeController extends AuthenticationRequiredController {
             throw new ResourceNotFoundException();
         }
         model.put("order", order);
-        model.put("tickets",
-                Lists.transform(orderTicketMapper.findByOrderId(order.getId()), ObjectParser::parse));
+        List<OrderTicketVo> orderTickets = Lists.transform(orderTicketMapper.findByOrderId(order.getId()), ObjectParser::parse);
+        model.put("tickets", orderTickets);
+        model.put("touristCount", calculateTouristCount(orderTickets) + "");
         model.put("module", MODULE_ORDER_DETAIL);
         model.put("statusList", OrderStatus.values());
         model.put("editing", false);
@@ -296,6 +298,10 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("role", getToken().getRole().toString());
         model.put("lang", lang);
         return "order_detail";
+    }
+
+    private long calculateTouristCount(List<OrderTicketVo> tickets) {
+        return tickets.stream().flatMap(input -> input.getOrderTicketUsers().stream()).count();
     }
 
     @RequestMapping("orders/{id}/_edit")
@@ -309,8 +315,9 @@ public class HomeController extends AuthenticationRequiredController {
         }
         AuthenticationHelper.checkAgentAuthentication(order, token);
         model.put("order", order);
-        model.put("tickets",
-                Lists.transform(orderTicketMapper.findByOrderId(order.getId()), ObjectParser::parse));
+        List<OrderTicketVo> orderTickets = Lists.transform(orderTicketMapper.findByOrderId(order.getId()), ObjectParser::parse);
+        model.put("tickets", orderTickets);
+        model.put("touristCount", calculateTouristCount(orderTickets) + "");
         Sku sku = skuService.findById(order.getSkuId());
         if (sku == null) {
             throw new ResourceNotFoundException();
