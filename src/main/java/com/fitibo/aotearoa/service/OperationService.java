@@ -131,7 +131,7 @@ public class OperationService {
     private String formatCancellationEmailContent(Order order, Agent agent, Sku sku, List<OrderTicket> tickets) {
         String content = cancellationEmailTemplate;
         content = content.replace("#AGENT_NAME#", agent.getName());
-        content = content.replace("#REFERENCE_NUMBER#", Optional.of(order.getReferenceNumber()).orElse(""));
+        content = content.replace("#REFERENCE_NUMBER#", Optional.ofNullable(order.getReferenceNumber()).orElse(""));
         content = content.replace("#REMARK#", order.getRemark());
         content = content.replace("#ORDER_ID#", order.getUuid());
         content = content.replace("#SKU#", sku.getUuid());
