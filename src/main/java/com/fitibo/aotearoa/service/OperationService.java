@@ -124,7 +124,7 @@ public class OperationService {
             throw new ResourceNotFoundException();
         }
         String agentOrderId = order.getAgentOrderId();
-        String subject = agentOrderId != null ? cancellationEmailSubject + "(" + agentOrderId + ")" : cancellationEmailSubject;
+        String subject = StringUtils.isNotEmpty(agentOrderId) ? cancellationEmailSubject + "(" + agentOrderId + ")" : cancellationEmailSubject;
         String content = formatCancellationEmailContent(order, agent, skuMapper.findById(order.getSkuId()), ticketList);
         emailService.send(order.getId(), cancellationEmailFrom, agent.getEmail(), subject, content, Collections.emptyList());
     }
@@ -155,7 +155,7 @@ public class OperationService {
         String content = formatConfirmationEmailContent(confirmationEmailTemplate, order, sku, agent);
         Workbook voucher = archiveService.createVoucher(order);
         String agentOrderId = order.getAgentOrderId();
-        String subject = agentOrderId != null ? confirmationEmailSubject + "(" + agentOrderId + ")" : confirmationEmailSubject;
+        String subject = StringUtils.isNotEmpty(agentOrderId) ? confirmationEmailSubject + "(" + agentOrderId + ")" : confirmationEmailSubject;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             voucher.write(baos);
             byte[] data = baos.toByteArray();
