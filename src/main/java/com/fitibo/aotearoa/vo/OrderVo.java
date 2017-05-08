@@ -14,6 +14,7 @@ public class OrderVo {
 
     private int id;
     private int skuId;
+    private String skuUuid;
     private String uuid;
     private String sku;
     private int agentId;

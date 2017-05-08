@@ -261,8 +261,19 @@ public class RestApiController extends AuthenticationRequiredController {
     public OrderVo createOrder(@RequestBody OrderVo orderVo) {
         Preconditions.checkNotNull(getToken());
         final int agentId = getToken().getRole() == Role.Agent ? getToken().getId() : 0;
-        final Sku sku = skuService.findById(orderVo.getSkuId());
-        Preconditions.checkNotNull(sku, "invalid sku id:" + orderVo.getSkuId());
+        int skuId = orderVo.getSkuId();
+        String skuUuid = orderVo.getSkuUuid();
+        Sku sku;
+        if (skuId > 0) {
+            sku = skuService.findById(skuId);
+            Preconditions.checkNotNull(sku, "invalid sku id:" + skuId);
+        } else if (skuUuid != null) {
+            sku = skuService.findByUuid(skuUuid);
+            Preconditions.checkNotNull(sku, "invalid sku uuid:" + skuUuid);
+            orderVo.setSkuId(sku.getId());
+        } else {
+            throw new IllegalArgumentException("cannot find sku by sku id or uuid");
+        }
         final Vendor vendor = vendorService.findById(sku.getVendorId());
         Preconditions.checkNotNull(vendor, "invalid vendor id:" + sku.getVendorId());
         final int discount = getDiscount(getToken(), sku.getId());

@@ -163,6 +163,7 @@ $('#add_ticket').on('click', function (e) {
 
 $('#j_submit').on('click', function () {
     var skuId = parseInt(getQueryString("skuId"));
+    var skuUuid = getQueryString("uuid");
     var primaryContact = $('#j_primary_contact').val();
     var primaryContactEmail = $('#j_primary_contact_email').val();
     var primaryContactPhone = $('#j_primary_contact_phone').val();
@@ -238,6 +239,7 @@ $('#j_submit').on('click', function () {
     }
     var data = {
         skuId: skuId,
+        skuUuid: skuUuid,
         primaryContact: primaryContact,
         primaryContactEmail: primaryContactEmail,
         primaryContactPhone: primaryContactPhone,
