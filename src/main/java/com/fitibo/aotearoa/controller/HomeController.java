@@ -178,7 +178,7 @@ public class HomeController extends AuthenticationRequiredController {
         if (skuId > 0) {
             sku = skuService.findById(skuId);
             if (sku == null) {
-                throw new ResourceNotFoundException();
+                throw new ResourceNotFoundException("invalid sku id:" + skuId);
             }
         } else if (uuid != null && uuid.length() > 0) {
             sku = skuService.findByUuid(uuid);
@@ -322,7 +322,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("touristCount", calculateTouristCount(orderTickets));
         Sku sku = skuService.findById(order.getSkuId());
         if (sku == null) {
-            throw new ResourceNotFoundException();
+            throw new ResourceNotFoundException("invalid sku id:" + order.getSkuId());
         }
         Map<String, Collection<String>> availableDateMap = Maps.newHashMap();
         SkuVo skuVo = parse(sku);
@@ -358,7 +358,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("module", MODULE_SKU_DETAIL);
         Sku sku = skuService.findById(id);
         if (sku == null) {
-            throw new ResourceNotFoundException();
+            throw new ResourceNotFoundException("invalid sku id:" + id);
         }
         model.put("sku", parse(sku));
         model.put("editing", false);
@@ -393,7 +393,7 @@ public class HomeController extends AuthenticationRequiredController {
     public String editSku(@PathVariable("id") int id, Map<String, Object> model) {
         Sku sku = skuService.findById(id);
         if (sku == null) {
-            throw new ResourceNotFoundException();
+            throw new ResourceNotFoundException("invalid sku id:" + id);
         }
         model.put("module", MODULE_SKU_DETAIL);
         model.put("sku", parse(sku));
@@ -419,8 +419,7 @@ public class HomeController extends AuthenticationRequiredController {
             throw new ResourceNotFoundException();
         }
         Sku sku = skuService.findById(skuId);
-        Preconditions
-                .checkArgument(sku != null && skuId == ticket.getSkuId(), "invalid skuId:" + skuId);
+        Preconditions.checkArgument(sku != null && skuId == ticket.getSkuId(), "invalid skuId:" + skuId);
         List<SkuTicketPrice> skuTicketPrices;
         if (dateString != null) {
             model.put("date", dateString);

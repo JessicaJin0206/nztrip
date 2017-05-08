@@ -1,6 +1,7 @@
 package com.fitibo.aotearoa.service;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import com.fitibo.aotearoa.constants.OrderStatus;
@@ -149,8 +150,9 @@ public class OperationService {
         }
         Agent agent = agentMapper.findById(agentId);
         String to = agent.getEmail();
-        String content = formatConfirmationEmailContent(confirmationEmailTemplate, order,
-                skuService.findById(order.getSkuId()), agent);
+        Sku sku = skuService.findById(order.getSkuId());
+        Preconditions.checkNotNull(sku, "invalid sku id:" + order.getSkuId());
+        String content = formatConfirmationEmailContent(confirmationEmailTemplate, order, sku, agent);
         Workbook voucher = archiveService.createVoucher(order);
         String agentOrderId = order.getAgentOrderId();
         String subject = agentOrderId != null ? confirmationEmailSubject + "(" + agentOrderId + ")" : confirmationEmailSubject;
@@ -172,8 +174,8 @@ public class OperationService {
             throw new ResourceNotFoundException();
         }
         Sku sku = skuService.findById(order.getSkuId());
-        if (ticketList.isEmpty()) {
-            throw new ResourceNotFoundException();
+        if (sku == null) {
+            throw new ResourceNotFoundException("invalid sku id:" + order.getSkuId());
         }
         Vendor vendor = vendorService.findById(sku.getVendorId());
         if (vendor.getEmail() == null || vendor.getEmail().length() == 0) {
