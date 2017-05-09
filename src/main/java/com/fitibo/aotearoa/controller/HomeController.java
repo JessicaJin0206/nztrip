@@ -346,7 +346,8 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("module", MODULE_CREATE_SKU);
         model.put("cities", cityService.findAll());
         model.put("categories", categoryService.findAll());
-        model.put("vendors", vendorService.findAll());
+        List<Vendor> vendors = vendorService.findAll().stream().sorted((a, b) -> a.getName().compareToIgnoreCase(b.getName())).collect(Collectors.toList());
+        model.put("vendors", vendors);
         model.put("durations", durationService.findAll());
         model.put("role", getToken().getRole().toString());
         return "create_sku";
