@@ -1,0 +1,1 @@
+ALTER TABLE `order_ticket_user` MODIFY COLUMN `name` varchar(100);
