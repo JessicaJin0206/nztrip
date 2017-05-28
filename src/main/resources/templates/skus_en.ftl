@@ -86,7 +86,7 @@
                     <#list skus as sku>
                     <tr>
                         <th scope="row">${sku.uuid}</th>
-                        <td>${sku.city}</td>
+                        <td>${sku.cityEn}</td>
                         <td>${sku.category}</td>
                         <td>${sku.name}</td>
                         <td>${sku.description}</td>

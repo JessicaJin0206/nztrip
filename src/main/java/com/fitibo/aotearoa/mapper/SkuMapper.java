@@ -119,4 +119,19 @@ public interface SkuMapper {
   })
   List<Sku> findAllByMultiFields(@Param("keyword") String keyword, @Param("cityId") int cityId,
       @Param("categoryId") int categoryId, RowBounds rowBounds);
+
+  @Select("select * from sku where vendor_id = #{vendorId}")
+  @Results({
+          @Result(column = "id", property = "id"),
+          @Result(column = "uuid", property = "uuid"),
+          @Result(column = "name", property = "name"),
+          @Result(column = "city_id", property = "cityId"),
+          @Result(column = "category_id", property = "categoryId"),
+          @Result(column = "description", property = "description"),
+          @Result(column = "vendor_id", property = "vendorId"),
+          @Result(column = "gathering_place", property = "gatheringPlace"),
+          @Result(column = "pickup_service", property = "pickupService"),
+          @Result(column = "duration_id", property = "durationId")
+  })
+  List<Sku> findByVendorId(int vendorId);
 }

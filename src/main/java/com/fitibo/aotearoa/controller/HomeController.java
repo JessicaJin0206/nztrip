@@ -17,11 +17,11 @@
 package com.fitibo.aotearoa.controller;
 
 import com.fitibo.aotearoa.annotation.Authentication;
-import com.fitibo.aotearoa.annotation.ExecTime;
 import com.fitibo.aotearoa.constants.CommonConstants;
 import com.fitibo.aotearoa.constants.OrderStatus;
 import com.fitibo.aotearoa.dto.Role;
 import com.fitibo.aotearoa.dto.Token;
+import com.fitibo.aotearoa.exception.AuthenticationFailureException;
 import com.fitibo.aotearoa.exception.InvalidParamException;
 import com.fitibo.aotearoa.exception.ResourceNotFoundException;
 import com.fitibo.aotearoa.mapper.AgentMapper;
@@ -98,6 +98,7 @@ public class HomeController extends AuthenticationRequiredController {
     private static final String MODULE_AGENT_DETAIL = "agent_detail";
     private static final String MODULE_CREATE_AGENT = "create_agent";
     private static final String MODULE_PRICE_MONITORING = "price_monitoring";
+    private static final String MODULE_VENDOR_SKU = "vendor_sku";
 
     @Autowired
     private CityService cityService;
@@ -161,11 +162,35 @@ public class HomeController extends AuthenticationRequiredController {
             model.put("hotItems", Lists.transform(hotItemMapper.query(new RowBounds()), ObjectParser::parse));
             return "dashboard";
         } else if (role == Role.Vendor) {
-            return "vendor_home";
+            return vendorSku(model);
         } else {
             throw new IllegalArgumentException("could not happen");
         }
     }
+
+    @RequestMapping("vendor_skus")
+    @Authentication(Role.Vendor)
+    public String vendorSku(Map<String, Object> model) {
+        int vendorId = getToken().getId();
+        model.put("module", MODULE_VENDOR_SKU);
+        model.put("role", Role.Vendor.toString());
+        List<Sku> skus = skuMapper.findByVendorId(vendorId);
+        Map<Integer, City> cityMap = cityService.findByIds(Lists.transform(skus, Sku::getCityId));
+        Map<Integer, Category> categoryMap = categoryService
+                .findByIds(Lists.transform(skus, Sku::getCategoryId));
+        Map<Integer, Vendor> vendorMap = vendorService
+                .findByIds(Lists.transform(skus, Sku::getVendorId));
+        Map<Integer, Duration> durationMap = durationService
+                .findByIds(Lists.transform(skus, Sku::getDurationId));
+        model.put("skus", Lists.transform(skus,
+                input -> parse(input,
+                        cityMap.get(input.getCityId()),
+                        categoryMap.get(input.getCategoryId()),
+                        vendorMap.get(input.getVendorId()),
+                        durationMap.get(input.getDurationId()))));
+        return "vendor_sku";
+    }
+
 
     @RequestMapping("dashboard")
     @Authentication
@@ -361,16 +386,24 @@ public class HomeController extends AuthenticationRequiredController {
     }
 
     @RequestMapping("skus/{id}")
-    @Authentication
+    @Authentication({Role.Vendor, Role.Agent, Role.Admin})
     public String skuDetail(@PathVariable("id") int id, Map<String, Object> model) {
         model.put("module", MODULE_SKU_DETAIL);
         Sku sku = skuService.findById(id);
+        Role role = getToken().getRole();
+        if (role == Role.Vendor) {
+            if (sku.getVendorId() == getToken().getId()) {
+
+            } else {
+                throw new AuthenticationFailureException();
+            }
+        }
         if (sku == null) {
             throw new ResourceNotFoundException("invalid sku id:" + id);
         }
         model.put("sku", parse(sku));
         model.put("editing", false);
-        model.put("role", getToken().getRole().toString());
+        model.put("role", role.toString());
         return "sku_detail";
     }
 
