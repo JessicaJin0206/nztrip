@@ -29,7 +29,16 @@ public class Vendor extends ModelObject {
         this.phone = phone;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     private String name;
     private String email;
     private String phone;
+    private String password;
 }

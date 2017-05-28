@@ -510,7 +510,8 @@ public class RestApiController extends AuthenticationRequiredController {
 
     @RequestMapping(value = "v1/api/signin", method = RequestMethod.POST)
     public AuthenticationResp signin(@RequestBody AuthenticationReq req) {
-        Agent agent = agentMapper.findByUserName(req.getUser());
+        String user = req.getUser();
+        Agent agent = agentMapper.findByUserName(user);
         if (agent != null) {
             if (agent.getPassword().equals(req.getPass())) {
                 AuthenticationResp result = new AuthenticationResp();
@@ -520,11 +521,21 @@ public class RestApiController extends AuthenticationRequiredController {
                 throw new AuthenticationFailureException();
             }
         }
-        Admin admin = adminMapper.findByUser(req.getUser());
+        Admin admin = adminMapper.findByUser(user);
         if (admin != null) {
             if (admin.getPass().equalsIgnoreCase(req.getPass())) {
                 AuthenticationResp result = new AuthenticationResp();
                 result.setToken(tokenService.generateToken(Role.Admin, admin.getId()));
+                return result;
+            } else {
+                throw new AuthenticationFailureException();
+            }
+        }
+        Vendor vendor = vendorService.findByEmail(user);
+        if (vendor != null) {
+            if (vendor.getPassword().equalsIgnoreCase(req.getPass())) {
+                AuthenticationResp result = new AuthenticationResp();
+                result.setToken(tokenService.generateToken(Role.Vendor, vendor.getId()));
                 return result;
             } else {
                 throw new AuthenticationFailureException();

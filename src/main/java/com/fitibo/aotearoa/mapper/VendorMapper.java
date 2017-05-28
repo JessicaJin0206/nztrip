@@ -26,6 +26,16 @@ public interface VendorMapper {
     })
     Vendor findById(int id);
 
+    @Select("select * from vendor where email = #{email}")
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "name", property = "name"),
+            @Result(column = "email", property = "email"),
+            @Result(column = "phone", property = "phone"),
+            @Result(column = "password", property = "password"),
+    })
+    Vendor findByEmail(String email);
+
     @Select("select * from vendor")
     @Results({
             @Result(column = "id", property = "id"),

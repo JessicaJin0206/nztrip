@@ -6,6 +6,7 @@ package com.fitibo.aotearoa.dto;
 public enum Role {
 
     Admin,
-    Agent
+    Agent,
+    Vendor
 
 }

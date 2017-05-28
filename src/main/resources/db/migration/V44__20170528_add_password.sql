@@ -1,0 +1,1 @@
+ALTER TABLE `vendor` ADD COLUMN password VARCHAR(100) NOT NULL default "";

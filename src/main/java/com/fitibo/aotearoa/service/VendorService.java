@@ -18,4 +18,6 @@ public interface VendorService {
     int update(Vendor vendor);
 
     Vendor findById(int id);
+
+    Vendor findByEmail(String email);
 }

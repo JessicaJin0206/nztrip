@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created by qianhao.zhou on 8/4/16.
@@ -43,6 +44,11 @@ public class VendorServiceImpl implements VendorService {
 
     @Override
     public Vendor findById(int id) {
-        return vendorMapper.findById(id);
+        return Optional.ofNullable(vendorMapper.findById(id)).orElse(null);
+    }
+
+    @Override
+    public Vendor findByEmail(String email) {
+        return Optional.ofNullable(vendorMapper.findByEmail(email)).orElse(null);
     }
 }

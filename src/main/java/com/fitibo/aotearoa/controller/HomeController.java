@@ -152,12 +152,19 @@ public class HomeController extends AuthenticationRequiredController {
     }
 
     @RequestMapping("")
-    @Authentication
+    @Authentication({Role.Vendor, Role.Agent, Role.Admin})
     public String home(Map<String, Object> model) {
-        model.put("module", MODULE_DASHBOARD);
-        model.put("role", getToken().getRole().toString());
-        model.put("hotItems", Lists.transform(hotItemMapper.query(new RowBounds()), ObjectParser::parse));
-        return "dashboard";
+        Role role = getToken().getRole();
+        if (role == Role.Agent || role == Role.Admin) {
+            model.put("module", MODULE_DASHBOARD);
+            model.put("role", role.toString());
+            model.put("hotItems", Lists.transform(hotItemMapper.query(new RowBounds()), ObjectParser::parse));
+            return "dashboard";
+        } else if (role == Role.Vendor) {
+            return "vendor_home";
+        } else {
+            throw new IllegalArgumentException("could not happen");
+        }
     }
 
     @RequestMapping("dashboard")
