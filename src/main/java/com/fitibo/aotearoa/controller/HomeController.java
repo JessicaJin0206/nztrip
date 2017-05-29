@@ -242,6 +242,32 @@ public class HomeController extends AuthenticationRequiredController {
         return "create_order";
     }
 
+    @RequestMapping("create_vendor_order")
+    @Authentication({Role.Vendor})
+    public String createVendorOrder(@RequestParam("skuId") int skuId, Map<String, Object> model) {
+        Sku sku = skuService.findById(skuId);
+        if (sku == null) {
+            throw new ResourceNotFoundException("invalid sku id:" + skuId);
+        }
+        Vendor vendor = vendorService.findById(sku.getVendorId());
+        Category category = categoryService.findById(sku.getCategoryId());
+        Duration duration = durationService.findById(sku.getDurationId());
+        City city = cityService.findById(sku.getCityId());
+        SkuVo skuVo = parse(sku, city, category, vendor, duration);
+        Map<String, Collection<String>> availableDateMap = Maps.newHashMap();
+        for (SkuTicketVo skuTicketVo : skuVo.getTickets()) {
+            Set<String> availableDates = Sets.newLinkedHashSet(
+                    Lists.transform(skuTicketVo.getTicketPrices(), SkuTicketPriceVo::getDate));
+            availableDateMap.put(skuTicketVo.getId() + "", availableDates);
+        }
+        model.put("sku", skuVo);
+        model.put("availableDateMap", availableDateMap);
+        model.put("vendor", vendor);
+        model.put("module", MODULE_CREATE_ORDER);
+        model.put("role", getToken().getRole().toString());
+        return "create_vendor_order";
+    }
+
     @RequestMapping("orders")
     @Authentication
     public String queryOrder(@RequestParam(value = "keyword", defaultValue = "") String keyword,
