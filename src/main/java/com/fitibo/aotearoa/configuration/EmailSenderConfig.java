@@ -12,10 +12,10 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 @Configuration
 public class EmailSenderConfig {
 
-    @Bean
-    @ConfigurationProperties(prefix = "email")
-    public JavaMailSender javaMailSender() {
-        return new JavaMailSenderImpl();
-    }
+//    @Bean
+//    @ConfigurationProperties(prefix = "email")
+//    public JavaMailSender javaMailSender() {
+//        return new JavaMailSenderImpl();
+//    }
 
 }

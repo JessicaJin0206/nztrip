@@ -8,13 +8,19 @@ flyway:
 
 secret: secret
 
-email:
-  host: smtp.qq.com
-  port: 25
-  username: eyounz@foxmail.com
-  password: bwczsvngzcxjcbab
-  javaMailProperties:
-    mail.smtp.auth: true
+spring:
+  mail:
+    host: smtp.qq.com
+    port: 25
+    username: eyounz@foxmail.com
+    password: bwczsvngzcxjcbab
+    properties:
+      mail:
+        smtp:
+          connecttimeout: 10000
+          timeout: 10000
+          writetimeout: 10000
+          auth: true
 
 template:
   reservationemail:
