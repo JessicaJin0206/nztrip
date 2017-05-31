@@ -34,7 +34,7 @@
 <div class="form-group">
     <div class="row">
         <label class="col-md-2">E-Mail:</label>
-    <#--<button id="j_resend_reservation" class="btn btn-default form-group">Re-Send Reservation Letter</button>-->
+        <button id="j_resend_reservation" class="btn btn-default form-group">Re-Send Reservation Letter</button>
         <button id="j_resend_confirmation" class="btn btn-default form-group">Re-Send Confirmation
             Letter
         </button>

@@ -356,8 +356,12 @@ $('#j_resend_reservation').on('click', function () {
                type: 'POST',
                contentType: 'application/json; charset=utf-8',
                url: '/v1/api/orders/' + id + "/reservation"
-           }).success(function () {
-        success("reservation letter has been sent");
+           }).success(function (resp) {
+        if (resp.code == 0) {
+            success("reservation letter has been sent");
+        } else {
+            error(resp.msg);
+        }
     }).error(function () {
         error("failed");
     });
@@ -405,7 +409,8 @@ $('.j_operation').on('click', function () {
                     $.ajax({
                                type: 'PUT',
                                contentType: "application/json; charset=utf-8",
-                               url: '/v1/api/orders/' + id + "/status/" + action + "?sendEmail=" + sendEmail,
+                               url: '/v1/api/orders/' + id + "/status/" + action + "?sendEmail="
+                                    + sendEmail,
                                data: JSON.stringify(data)
                            }).success(function (data) {
                         if (data == true) {
@@ -423,7 +428,8 @@ $('.j_operation').on('click', function () {
                 $.ajax({
                            type: 'PUT',
                            contentType: "application/json; charset=utf-8",
-                           url: '/v1/api/orders/' + id + "/status/" + action + "?sendEmail=" + sendEmail,
+                           url: '/v1/api/orders/' + id + "/status/" + action + "?sendEmail="
+                                + sendEmail,
                            data: JSON.stringify(data)
                        }).success(function (data) {
                     if (data) {

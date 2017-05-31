@@ -35,7 +35,7 @@
 <div class="form-group">
     <div class="row">
         <label class="col-md-2">邮件:</label>
-    <#--<button id="j_resend_reservation" class="btn btn-default form-group">重新发送预订邮件</button>-->
+        <button id="j_resend_reservation" class="btn btn-default form-group">重新发送预订邮件</button>
         <button id="j_resend_confirmation" class="btn btn-default form-group">重新发送确认邮件</button>
     </div>
 </div>

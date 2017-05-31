@@ -333,11 +333,16 @@ public class RestApiController extends AuthenticationRequiredController {
 
     @RequestMapping(value = "v1/api/orders/{id}/reservation", method = RequestMethod.POST)
     @Authentication(Role.Admin)
-    public void sendReservation(@PathVariable("id") int orderId) {
+    public ResultVo sendReservation(@PathVariable("id") int orderId) {
         Order order = orderMapper.findById(orderId);
         Preconditions.checkArgument(order.getStatus() == OrderStatus.PENDING.getValue(),
                 "unable to send reservation with order id: " + orderId + " with status:" + order.getStatus());
-        operationService.sendReservationEmail(order);
+        boolean result = operationService.sendReservationEmail(order);
+        if (result) {
+            return ResultVo.SUCCESS;
+        } else {
+            return new ResultVo(-1, "failed to send reservation email");
+        }
     }
 
 
