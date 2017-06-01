@@ -45,10 +45,12 @@ var validate = function() {
         return;
     }
     var phone = $('#j_phone').val();
+    var password = $('#j_password').val();
     return {
         name: name,
         email: email,
-        phone: phone
+        phone: phone,
+        password: $.md5(password)
     };
 };
 

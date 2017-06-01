@@ -252,6 +252,7 @@ public class RestApiController extends AuthenticationRequiredController {
         result.setName(vendorVo.getName());
         result.setPhone(vendorVo.getPhone());
         result.setEmail(vendorVo.getEmail());
+        result.setPassword(vendorVo.getPassword());
         return result;
     }
 

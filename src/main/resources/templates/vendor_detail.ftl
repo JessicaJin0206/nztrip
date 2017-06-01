@@ -25,6 +25,9 @@
                                            <#if editing = false>disabled</#if> placeholder="请输入行程商电话"
                                            value="${vendor.phone!''}">
             </div>
+            <div class="form-group"><input type="text" id="j_password" class="form-control"
+                                           <#if editing = false>disabled</#if> placeholder="请输入密码">
+            </div>
 
         <#if editing = false>
             <button id="j_edit" class="btn btn-primary form-group">修改</button>
@@ -36,6 +39,7 @@
 </div>
 
 <#include "third_party_file.ftl"/>
+<script src="/js/md5.js"></script>
 <script src="/js/vendor_detail.js"></script>
 </body>
 </html>

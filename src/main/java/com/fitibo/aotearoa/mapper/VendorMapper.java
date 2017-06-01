@@ -23,6 +23,7 @@ public interface VendorMapper {
             @Result(column = "name", property = "name"),
             @Result(column = "email", property = "email"),
             @Result(column = "phone", property = "phone"),
+            @Result(column = "password", property = "password"),
     })
     Vendor findById(int id);
 
@@ -41,7 +42,8 @@ public interface VendorMapper {
             @Result(column = "id", property = "id"),
             @Result(column = "name", property = "name"),
             @Result(column = "email", property = "email"),
-            @Result(column = "phone", property = "phone")
+            @Result(column = "phone", property = "phone"),
+            @Result(column = "password", property = "password"),
     })
     List<Vendor> findAll();
 
@@ -61,15 +63,16 @@ public interface VendorMapper {
             @Result(column = "id", property = "id"),
             @Result(column = "name", property = "name"),
             @Result(column = "email", property = "email"),
-            @Result(column = "phone", property = "phone")
+            @Result(column = "phone", property = "phone"),
+            @Result(column = "password", property = "password"),
     })
     List<Vendor> findByIds(List<Integer> ids);
 
-    @Insert("insert into vendor(name, email, phone) values(#{name}, #{email}, #{phone})")
+    @Insert("insert into vendor(name, email, phone, password) values(#{name}, #{email}, #{phone}, #{password})")
     @SelectKey(statement = "select last_insert_id() as id", keyProperty = "id", keyColumn = "id", before = false, resultType = Integer.class)
     @Options(useGeneratedKeys = true, keyColumn = "id", keyProperty = "id", flushCache = Options.FlushCachePolicy.DEFAULT)
     int create(Vendor vendor);
 
-    @Update("update vendor set name=#{name}, email=#{email}, phone=#{phone} where id = #{id}")
+    @Update("update vendor set name=#{name}, email=#{email}, phone=#{phone}, password=#{password} where id = #{id}")
     int update(Vendor vendor);
 }

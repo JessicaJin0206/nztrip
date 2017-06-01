@@ -8,10 +8,12 @@ $('#j_update').on('click', function () {
     var name = $('#j_name').val();
     var email = $('#j_email').val();
     var phone = $('#j_phone').val();
+    var password = $('#j_password').val();
     var data = {
         name: name,
         email: email,
-        phone: phone
+        phone: phone,
+        password: $.md5(password)
     };
     if (data) {
         $('#j_update').attr("disabled", true);
