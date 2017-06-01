@@ -15,36 +15,26 @@
                 <table class="table table-hover">
                     <thead>
                     <tr>
-                        <th>Sku Id</th>
-                        <th>City</th>
-                        <th>Category</th>
+                        <th>SKU Id</th>
                         <th>Name</th>
-                        <th>Description</th>
-                        <th>Duration</th>
                         <th>Action</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <#list skus as sku>
-                    <tr>
-                        <th scope="row">${sku.uuid}</th>
-                        <td>${sku.cityEn}</td>
-                        <td>${sku.category}</td>
-                        <td>${sku.name}</td>
-                        <td>${sku.description}</td>
-                        <td>${sku.duration}</td>
-                        <td>
-                            <div>
-                                <a href="/skus/${sku.id?c}">
-                                    <span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span>
-                                </a>
-                                <a href="/create_vendor_order?skuId=${sku.id?c}" target="_blank">
-                                    <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                    </#list>
+                        <#list skus as sku>
+                        <tr>
+                            <td>${sku.uuid!''}</td>
+                            <td>${sku.name!''}</td>
+                            <td>
+                                <div>
+                                    <a href="/create_vendor_order?skuId=${sku.id?c}">Make a Reservation</a>
+                                </div>
+                                    <div>
+                                        <a href="/skus/${sku.id?c}">Detail</a>
+                                    </div>
+                            </td>
+                        </tr>
+                        </#list>
                     </tbody>
                 </table>
             </div>
