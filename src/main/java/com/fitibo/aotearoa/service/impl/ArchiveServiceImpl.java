@@ -322,7 +322,7 @@ public class ArchiveServiceImpl implements ArchiveService {
             Row currentRow = sheet.createRow(rowIndex++);
             for (; day.isBefore(current.plusMonths(1)); day = day.plusDays(1)) {
                 Date date = day.toDate();
-                List<SkuTicketPrice> skuTicketPrices = skuTicketPriceMap.get(date);
+                List<SkuTicketPrice> skuTicketPrices = Optional.ofNullable(skuTicketPriceMap.get(date)).orElse(Collections.emptyList());
                 String collect = skuTicketPrices.stream().filter(input -> StringUtils.isNoneEmpty(input.getTime())).map(input -> {
                     Map<String, List<OrderTicket>> timeOrderTicketMap = orderTicketMap.containsKey(date) ? orderTicketMap.get(date).stream().collect(Collectors.groupingBy(OrderTicket::getTicketTime)) : Collections.emptyMap();
                     List<OrderTicket> orderTickets = timeOrderTicketMap.get(input.getTime());
