@@ -21,20 +21,20 @@
                     </tr>
                     </thead>
                     <tbody>
-                        <#list skus as sku>
-                        <tr>
-                            <td>${sku.uuid!''}</td>
-                            <td>${sku.name!''}</td>
-                            <td>
-                                <div>
-                                    <a href="/create_vendor_order?skuId=${sku.id?c}">Make a Reservation</a>
-                                </div>
-                                    <div>
-                                        <a href="/skus/${sku.id?c}">Detail</a>
-                                    </div>
-                            </td>
-                        </tr>
-                        </#list>
+                    <#list skus as sku>
+                    <tr>
+                        <td>${sku.uuid!''}</td>
+                        <td>${sku.name!''}</td>
+                        <td>
+                            <div>
+                                <a href="/create_vendor_order?skuId=${sku.id?c}">Reserve</a>
+                            </div>
+                            <div>
+                                <a href="/export/skus/${sku.id?c}">Today's Booking Status</a>
+                            </div>
+                        </td>
+                    </tr>
+                    </#list>
                     </tbody>
                 </table>
             </div>

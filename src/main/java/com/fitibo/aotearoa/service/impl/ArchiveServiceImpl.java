@@ -8,9 +8,11 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
 import com.fitibo.aotearoa.constants.OrderStatus;
+import com.fitibo.aotearoa.mapper.OrderMapper;
 import com.fitibo.aotearoa.mapper.OrderStatMapper;
 import com.fitibo.aotearoa.mapper.OrderTicketMapper;
 import com.fitibo.aotearoa.mapper.SkuTicketMapper;
+import com.fitibo.aotearoa.mapper.SkuTicketPriceMapper;
 import com.fitibo.aotearoa.mapper.VendorMapper;
 import com.fitibo.aotearoa.model.Order;
 import com.fitibo.aotearoa.model.OrderStat;
@@ -25,26 +27,29 @@ import com.fitibo.aotearoa.util.DateUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import rx.Observable;
 
@@ -66,6 +71,9 @@ public class ArchiveServiceImpl implements ArchiveService {
     @Autowired
     private SkuTicketMapper skuTicketMapper;
 
+    @Autowired
+    private SkuTicketPriceMapper skuTicketPriceMapper;
+
     @Value(value = "classpath:voucher_template.xlsx")
     private Resource voucherTemplate;
 
@@ -77,6 +85,9 @@ public class ArchiveServiceImpl implements ArchiveService {
 
     @Autowired
     private OrderStatMapper orderStatMapper;
+
+    @Autowired
+    private OrderMapper orderMapper;
 
     @Override
     public Workbook createVoucher(Order order) {
@@ -225,6 +236,57 @@ public class ArchiveServiceImpl implements ArchiveService {
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
         }
+    }
+
+    @Override
+    public Workbook createSkuDetail(Date date, int skuId) {
+        Workbook workbook = new XSSFWorkbook();
+        Font font = workbook.createFont();
+        font.setFontHeightInPoints((short) 20);
+        Sheet sheet = workbook.createSheet();
+        CellStyle style = workbook.createCellStyle();
+        style.setFont(font);
+        style.setWrapText(true);
+        List<OrderTicket> orderTickets = orderTicketMapper.findBySkuIdAndDate(skuId, date);
+        List<String> allTickets = skuTicketPriceMapper.findDistinctTicketBySkuIdAndDate(skuId, date);
+        Map<String, List<OrderTicket>> ticketsMap = orderTickets.stream().collect(Collectors.groupingBy(OrderTicket::getTicketTime));
+        int rowIndex = 0;
+        int maxColumn = 0;
+        for (String ticketName : allTickets.stream().sorted().collect(Collectors.toList())) {
+            Row row = sheet.createRow(rowIndex++);
+            int columnIndex = 0;
+            Cell cell = row.createCell(columnIndex++);
+            cell.setCellStyle(style);
+            cell.setCellType(Cell.CELL_TYPE_STRING);
+            cell.setCellValue(DateUtils.formatDate(date) + " " + ticketName);
+            if (!ticketsMap.containsKey(ticketName)) {
+                continue;
+            }
+            List<OrderTicket> tickets = ticketsMap.get(ticketName);
+            Map<Integer, List<OrderTicket>> orderTicketMap = tickets.stream().collect(Collectors.groupingBy(OrderTicket::getOrderId));
+            for (Map.Entry<Integer, List<OrderTicket>> singleOrderEntry : orderTicketMap.entrySet()) {
+                Order order = orderMapper.findById(singleOrderEntry.getKey());
+                String orderInfo = formatOrderInfo(columnIndex, order, singleOrderEntry.getValue());
+                Cell infoCell = row.createCell(columnIndex++);
+                infoCell.setCellType(Cell.CELL_TYPE_STRING);
+                infoCell.setCellValue(orderInfo);
+                infoCell.setCellStyle(style);
+            }
+            maxColumn = columnIndex > maxColumn ? columnIndex : maxColumn;
+        }
+        for (int i = 0; i < maxColumn; i++) {
+            sheet.autoSizeColumn(i);
+        }
+        return workbook;
+    }
+
+    private String formatOrderInfo(int index, Order order, List<OrderTicket> orderTickets) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Group").append(index);
+        Map<String, Integer> summary = orderTickets.stream().collect(Collectors.groupingBy(OrderTicket::getSkuTicket, Collectors.summingInt(input -> 1)));
+        sb.append("(").append(summary.entrySet().stream().map(input -> input.getValue() + " " + input.getKey()).collect(Collectors.joining("|"))).append(")").append("\n");
+        sb.append(order.getPrimaryContact()).append(" ").append(order.getPrimaryContactEmail()).append(" ").append(Optional.ofNullable(order.getPrimaryContactPhone()).orElse(""));
+        return sb.toString();
     }
 
     private void fillRowWithOrderStat(Row row, OrderStat orderStat, Map<String, BigDecimal> costPriceMap, Map<String, BigDecimal> salePriceMap) {

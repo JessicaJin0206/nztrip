@@ -113,6 +113,9 @@ public interface SkuTicketPriceMapper {
     List<SkuTicketPrice> findBySkuTicketIdAndDate(@Param("skuTicketId") int skuTicketId,
                                                   @Param("date") Date date, RowBounds rowBounds);
 
+    @Select("select distinct(time) from sku_ticket_price where sku_id = #{skuId} and date = #{date}")
+    List<String> findDistinctTicketBySkuIdAndDate(@Param("skuId") int skuId, @Param("date") Date date);
+
     @Select("select * from sku_ticket_price where sku_id = #{skuId} and sku_ticket_id = #{skuTicketId} and date =#{date} and (total_count = 0 or current_count < total_count)")
     @Results({
             @Result(column = "id", property = "id"),

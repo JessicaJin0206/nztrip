@@ -6,21 +6,26 @@ import com.fitibo.aotearoa.exception.AuthenticationFailureException;
 import com.fitibo.aotearoa.mapper.OrderMapper;
 import com.fitibo.aotearoa.model.Order;
 import com.fitibo.aotearoa.service.ArchiveService;
+import com.fitibo.aotearoa.util.DateUtils;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -73,6 +78,25 @@ public class ExportController extends AuthenticationRequiredController {
             response.setHeader("Content-Disposition", "attachment; filename=\"orders.xlsx\"");
             return new ResponseEntity<>(baos.toByteArray(), HttpStatus.CREATED);
 
+        }
+    }
+
+    @RequestMapping(value = "/export/skus/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @Authentication({Role.Vendor, Role.Vendor})
+    public ResponseEntity<byte[]> downloadSkuDetail(HttpServletResponse response,
+                                                    @PathVariable("id") int skuId,
+                                                    @RequestParam(value = "date", required = false) String dateString) throws IOException {
+        Date date;
+        if (StringUtils.isEmpty(dateString)) {
+            date = DateTime.now().dayOfYear().roundFloorCopy().toDate();
+        } else {
+            date = DateUtils.parseDate(dateString);
+        }
+        Workbook skuDetail = archiveService.createSkuDetail(date, skuId);
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            skuDetail.write(baos);
+            response.setHeader("Content-Disposition", "attachment; filename=\"detail(" + DateUtils.formatDate(date) + ").xlsx\"");
+            return new ResponseEntity<>(baos.toByteArray(), HttpStatus.CREATED);
         }
     }
 
