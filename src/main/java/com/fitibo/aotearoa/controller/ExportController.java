@@ -81,7 +81,7 @@ public class ExportController extends AuthenticationRequiredController {
         }
     }
 
-    @RequestMapping(value = "/export/skus/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @RequestMapping(value = "/export/skus/{id}/detail", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @Authentication({Role.Vendor, Role.Vendor})
     public ResponseEntity<byte[]> downloadSkuDetail(HttpServletResponse response,
                                                     @PathVariable("id") int skuId,
@@ -96,6 +96,20 @@ public class ExportController extends AuthenticationRequiredController {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             skuDetail.write(baos);
             response.setHeader("Content-Disposition", "attachment; filename=\"detail(" + DateUtils.formatDate(date) + ").xlsx\"");
+            return new ResponseEntity<>(baos.toByteArray(), HttpStatus.CREATED);
+        }
+    }
+
+    @RequestMapping(value = "/export/skus/{id}/overview", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @Authentication({Role.Vendor, Role.Vendor})
+    public ResponseEntity<byte[]> downloadSkuOverview(HttpServletResponse response, @PathVariable("id") int skuId) throws IOException {
+        DateTime from = DateTime.now().monthOfYear().roundFloorCopy();
+        DateTime to = from.plusMonths(3);
+
+        Workbook result = archiveService.createSkuOverview(skuId, from, to);
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            result.write(baos);
+            response.setHeader("Content-Disposition", "attachment; filename=\"overview.xlsx\"");
             return new ResponseEntity<>(baos.toByteArray(), HttpStatus.CREATED);
         }
     }

@@ -30,7 +30,10 @@
                                 <a href="/create_vendor_order?skuId=${sku.id?c}">Reserve</a>
                             </div>
                             <div>
-                                <a href="/export/skus/${sku.id?c}">Today's Booking Status</a>
+                                <a href="/export/skus/${sku.id?c}/detail">Today's Booking Status</a>
+                            </div>
+                            <div>
+                                <a href="/export/skus/${sku.id?c}/overview">Coming 3 months</a>
                             </div>
                         </td>
                     </tr>

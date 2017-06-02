@@ -3,6 +3,7 @@ package com.fitibo.aotearoa.service;
 import com.fitibo.aotearoa.model.Order;
 
 import org.apache.poi.ss.usermodel.Workbook;
+import org.joda.time.DateTime;
 
 import java.util.Date;
 import java.util.List;
@@ -17,4 +18,6 @@ public interface ArchiveService {
     Workbook createOrderStats();
 
     Workbook createSkuDetail(Date date, int skuId);
+
+    Workbook createSkuOverview(int skuId, DateTime from, DateTime to);
 }

@@ -19,11 +19,13 @@ import com.fitibo.aotearoa.model.OrderStat;
 import com.fitibo.aotearoa.model.OrderTicket;
 import com.fitibo.aotearoa.model.Sku;
 import com.fitibo.aotearoa.model.SkuTicket;
+import com.fitibo.aotearoa.model.SkuTicketPrice;
 import com.fitibo.aotearoa.model.Vendor;
 import com.fitibo.aotearoa.service.ArchiveService;
 import com.fitibo.aotearoa.service.SkuService;
 import com.fitibo.aotearoa.util.DateUtils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
@@ -34,6 +36,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.joda.time.DateTime;
+import org.joda.time.Weeks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -44,6 +48,7 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -259,6 +264,7 @@ public class ArchiveServiceImpl implements ArchiveService {
             cell.setCellStyle(style);
             cell.setCellType(Cell.CELL_TYPE_STRING);
             cell.setCellValue(DateUtils.formatDate(date) + " " + ticketName);
+            maxColumn = columnIndex > maxColumn ? columnIndex : maxColumn;
             if (!ticketsMap.containsKey(ticketName)) {
                 continue;
             }
@@ -272,7 +278,6 @@ public class ArchiveServiceImpl implements ArchiveService {
                 infoCell.setCellValue(orderInfo);
                 infoCell.setCellStyle(style);
             }
-            maxColumn = columnIndex > maxColumn ? columnIndex : maxColumn;
         }
         for (int i = 0; i < maxColumn; i++) {
             sheet.autoSizeColumn(i);
@@ -287,6 +292,60 @@ public class ArchiveServiceImpl implements ArchiveService {
         sb.append("(").append(summary.entrySet().stream().map(input -> input.getValue() + " " + input.getKey()).collect(Collectors.joining("|"))).append(")").append("\n");
         sb.append(order.getPrimaryContact()).append(" ").append(order.getPrimaryContactEmail()).append(" ").append(Optional.ofNullable(order.getPrimaryContactPhone()).orElse(""));
         return sb.toString();
+    }
+
+    private static final String[] DAY_OF_WEEK = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+
+    @Override
+    public Workbook createSkuOverview(int skuId, DateTime from, DateTime to) {
+        Map<Date, List<SkuTicketPrice>> skuTicketPriceMap = skuTicketPriceMapper.findBySkuIdAndDuration(skuId, from.toDate(), to.toDate()).stream().collect(Collectors.groupingBy(SkuTicketPrice::getDate));
+        Map<Date, List<OrderTicket>> orderTicketMap = orderTicketMapper.findBySkuIdAndDuration(skuId, from.toDate(), to.toDate()).stream().collect(Collectors.groupingBy(OrderTicket::getTicketDate));
+        Workbook workbook = new XSSFWorkbook();
+        Font font = workbook.createFont();
+        font.setFontHeightInPoints((short) 14);
+        CellStyle style = workbook.createCellStyle();
+        style.setFont(font);
+        style.setWrapText(true);
+
+        for (DateTime current = from; current.isBefore(to); current = current.plusMonths(1)) {
+            Sheet sheet = workbook.createSheet(current.toString("YYYY-MM"));
+            int rowIndex = 0;
+            Row row = sheet.createRow(rowIndex++);
+            //header
+            for (int i = 0; i < DAY_OF_WEEK.length; i++) {
+                Cell cell = row.createCell(i);
+                cell.setCellValue(DAY_OF_WEEK[i]);
+                cell.setCellStyle(style);
+            }
+
+            DateTime day = current;
+            Row currentRow = sheet.createRow(rowIndex++);
+            for (; day.isBefore(current.plusMonths(1)); day = day.plusDays(1)) {
+                Date date = day.toDate();
+                List<SkuTicketPrice> skuTicketPrices = skuTicketPriceMap.get(date);
+                String collect = skuTicketPrices.stream().filter(input -> StringUtils.isNoneEmpty(input.getTime())).map(input -> {
+                    Map<String, List<OrderTicket>> timeOrderTicketMap = orderTicketMap.containsKey(date) ? orderTicketMap.get(date).stream().collect(Collectors.groupingBy(OrderTicket::getTicketTime)) : Collections.emptyMap();
+                    List<OrderTicket> orderTickets = timeOrderTicketMap.get(input.getTime());
+                    if (orderTickets == null) {
+                        return input.getTime() + ":  " + 0 + " people";
+                    } else {
+                        return input.getTime() + ":  " + orderTickets.stream().flatMap(orderTicket -> orderTicket.getUsers().stream()).count() + " people";
+                    }
+                }).distinct().sorted().collect((Collectors.joining("\n")));
+                String cellValue = day.getDayOfMonth() + "\n" + collect;
+
+                Cell cell = currentRow.createCell(day.getDayOfWeek() % 7);
+                cell.setCellValue(cellValue);
+                cell.setCellStyle(style);
+                if (day.getDayOfWeek() == 6) {//here dayOfWeek = 6 means Saturday
+                    currentRow = sheet.createRow(rowIndex++);
+                }
+            }
+            for (int i = 0; i < DAY_OF_WEEK.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+        }
+        return workbook;
     }
 
     private void fillRowWithOrderStat(Row row, OrderStat orderStat, Map<String, BigDecimal> costPriceMap, Map<String, BigDecimal> salePriceMap) {
