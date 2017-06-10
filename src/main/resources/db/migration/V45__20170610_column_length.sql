@@ -1,0 +1,1 @@
+ALTER TABLE `order` MODIFY COLUMN reference_number varchar(100);
