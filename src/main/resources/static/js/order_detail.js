@@ -392,75 +392,41 @@ $('.j_operation').on('click', function () {
     var sendEmail = $(this).attr("email");
     var data = {};
     bootbox.confirm("确认操作订单吗?", function (yes) {
-        if (!yes) {
-            return;
-        }
-        if (action == 40) {//reservation confirmed
-            if ($('#j_referencenumber').val().length == 0) {
-                bootbox.prompt("请先填写Reference Number", function (referenceNumber) {
-                    if (referenceNumber === null) {
-                        return;
-                    } else if (referenceNumber.length == 0) {
-                        warn("缺少Reference Number");
-                        return;
-                    } else {
-                        data.referenceNumber = referenceNumber;
-                    }
-                    $.ajax({
-                               type: 'PUT',
-                               contentType: "application/json; charset=utf-8",
-                               url: '/v1/api/orders/' + id + "/status/" + action + "?sendEmail="
-                                    + sendEmail,
-                               data: JSON.stringify(data)
-                           }).success(function (data) {
-                        if (data == true) {
-                            bootbox.alert("操作成功", function () {
-                                window.location.reload();
-                            });
-                        } else {
-                            error("操作失败");
+                        if (!yes) {
+                            return;
                         }
-                    }).error(function () {
-                        error("操作失败");
-                    });
-                });
-            } else {
-                $.ajax({
-                           type: 'PUT',
-                           contentType: "application/json; charset=utf-8",
-                           url: '/v1/api/orders/' + id + "/status/" + action + "?sendEmail="
-                                + sendEmail,
-                           data: JSON.stringify(data)
-                       }).success(function (data) {
-                    if (data) {
-                        bootbox.alert("操作成功", function () {
-                            window.location.reload();
+                        if (action == 40) {//reservation confirmed
+                            if ($('#j_referencenumber').val().length == 0) {
+                                bootbox.prompt("请先填写Reference Number", function (referenceNumber) {
+                                    if (referenceNumber === null) {
+                                        return;
+                                    } else if (referenceNumber.length == 0) {
+                                        warn("缺少Reference Number");
+                                        return;
+                                    } else {
+                                        data.referenceNumber = referenceNumber;
+                                    }
+                                });
+                            }
+                        }
+                        $.ajax({
+                                   type: 'PUT',
+                                   contentType: "application/json; charset=utf-8",
+                                   url: '/v1/api/orders/' + id + "/status/" + action + "?sendEmail="
+                                        + sendEmail,
+                                   data: JSON.stringify(data)
+                               }).success(function (data) {
+                            if (data) {
+                                bootbox.alert("操作成功", function () {
+                                    window.location.reload();
+                                });
+                            } else {
+                                error("操作失败");
+                            }
+                        }).error(function () {
+                            error("操作失败");
                         });
-                    } else {
-                        error("操作失败");
                     }
-                }).error(function () {
-                    error("操作失败");
-                });
-            }
-        } else {
-            console.log('modify status to ' + action);
-            $.ajax({
-                       type: 'PUT',
-                       contentType: "application/json; charset=utf-8",
-                       url: '/v1/api/orders/' + id + "/status/" + action,
-                       data: JSON.stringify(data)
-                   }).success(function (data) {
-                if (data == true) {
-                    alert("操作成功");
-                    window.location.reload();
-                } else {
-                    error("操作失败");
-                }
-            }).error(function () {
-                error("操作失败");
-            })
-        }
-    });
+    );
 
 });
