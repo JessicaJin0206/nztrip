@@ -73,34 +73,33 @@
                 <table class="table table-hover">
                     <thead>
                     <tr>
-                        <th>编号</th>
-                        <th>城市</th>
-                        <th>类别</th>
-                        <th>名称</th>
-                        <th>描述</th>
-                        <th>时长</th>
+                        <th>编号/类别</th>
+                        <th>城市/时长</th>
+                        <th>名称/描述</th>
                         <th>操作</th>
                     </tr>
                     </thead>
                     <tbody>
                     <#list skus as sku>
-                    <tr>
+                    <tr class="first-row">
                         <th scope="row">${sku.uuid}</th>
                         <td>${sku.city}</td>
-                        <td>${sku.category}</td>
                         <td>${sku.name}</td>
-                        <td>${sku.description}</td>
-                        <td>${sku.duration}</td>
                         <td>
                             <div>
                                 <a href="/skus/${sku.id?c}">
                                     <span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span>
                                 </a>
-                                <a href="/create_order?skuId=${sku.id?c}"  target="_blank">
+                                <a href="/create_order?skuId=${sku.id?c}" target="_blank">
                                     <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
                                 </a>
                             </div>
                         </td>
+                    </tr>
+                    <tr class="second-row">
+                        <td>${sku.category}</td>
+                        <td>${sku.duration}</td>
+                        <td colspan="2">${sku.description}</td>
                     </tr>
                     </#list>
                     </tbody>
