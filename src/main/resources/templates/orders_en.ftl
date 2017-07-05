@@ -70,23 +70,20 @@
                 <table class="table table-hover">
                     <thead>
                     <tr>
-                        <th>Id</th>
-                        <th>Sku</th>
-                        <th>Order Status</th>
-                        <th>Primary Contact</th>
-                        <th>Email</th>
-                        <th>Agent</th>
-                        <th>Agent Order</th>
-                        <th>Departure</th>
-                        <th>Remark</th>
-                        <th>Action</th>
+                        <th>Id/Agent Order</th>
+                        <th>Sku/Remark</th>
+                        <th>Primary Contact/Departure</th>
+                        <th>Email/Agent</th>
+                        <th>Order Status/Action</th>
                     </tr>
                     </thead>
                     <tbody>
                     <#list orders as order>
-                    <tr>
+                    <tr class="first-row">
                         <th scope="row">${order.uuid}</th>
                         <th>${order.sku}</th>
+                        <td>${order.primaryContact!''}</td>
+                        <td>${order.primaryContactEmail!''}</td>
                         <td>
                             <#list statusList as s>
                             <#if (s.getValue() == order.status)>
@@ -94,12 +91,12 @@
                             </#if>
                         </#list>
                         </td>
-                        <td>${order.primaryContact!''}</td>
-                        <td>${order.primaryContactEmail!''}</td>
-                        <td>${order.agentName!''}</td>
+                    </tr>
+                    <tr class="second-row">
                         <td>${order.agentOrderId!''}</td>
-                        <td>${order.ticketDate!''}</td>
                         <td>${order.remark!''}</td>
+                        <td>${order.ticketDate!''}</td>
+                        <td>${order.agentName!''}</td>
                         <td>
                             <div>
                                 <a href="/orders/${order.id?c}" target="_blank">

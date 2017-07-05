@@ -70,23 +70,20 @@
                 <table class="table table-hover">
                     <thead>
                     <tr>
-                        <th>编号</th>
-                        <th>项目</th>
-                        <th>状态</th>
-                        <th>主联系人</th>
-                        <th>Email</th>
-                        <th>代理商</th>
-                        <th>代理商订单号</th>
-                        <th>出行日期</th>
-                        <th>备注</th>
-                        <th>操作</th>
+                        <th>编号/代理商订单号</th>
+                        <th>项目/备注</th>
+                        <th>主联系人/出行日期</th>
+                        <th>Email/代理商</th>
+                        <th>状态/操作</th>
                     </tr>
                     </thead>
                     <tbody>
                     <#list orders as order>
-                    <tr>
+                    <tr class="first-row">
                         <th scope="row">${order.uuid}</th>
                         <th>${order.sku}</th>
+                        <td>${order.primaryContact!''}</td>
+                        <td>${order.primaryContactEmail!''}</td>
                         <td>
                             <#list statusList as s>
                             <#if (s.getValue() == order.status)>
@@ -94,12 +91,12 @@
                             </#if>
                         </#list>
                         </td>
-                        <td>${order.primaryContact!''}</td>
-                        <td>${order.primaryContactEmail!''}</td>
-                        <td>${order.agentName!''}</td>
+                    </tr>
+                    <tr class="second-row">
                         <td>${order.agentOrderId!''}</td>
-                        <td>${order.ticketDate!''}</td>
                         <td>${order.remark!''}</td>
+                        <td>${order.ticketDate!''}</td>
+                        <td>${order.agentName!''}</td>
                         <td>
                             <div>
                                 <a href="/orders/${order.id?c}" target="_blank">
