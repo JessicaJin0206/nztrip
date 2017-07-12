@@ -1,0 +1,1 @@
+insert into city(`name`, `name_en`) values('布拉夫', 'Bluff');
