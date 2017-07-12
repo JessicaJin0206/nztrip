@@ -304,10 +304,11 @@ public class HomeController extends AuthenticationRequiredController {
         }
         model.put("orders", orders);
         Map<String, Integer> orderCountByStatus = Maps.newHashMap();
-        orderCountByStatus.put(OrderStatus.NEW.getValue() + "", orderMapper.countByStatus(OrderStatus.NEW.getValue()));
-        orderCountByStatus.put(OrderStatus.PENDING.getValue() + "", orderMapper.countByStatus(OrderStatus.PENDING.getValue()));
-        orderCountByStatus.put(OrderStatus.FULL.getValue() + "", orderMapper.countByStatus(OrderStatus.FULL.getValue()));
-        orderCountByStatus.put(OrderStatus.MODIFYING.getValue() + "", orderMapper.countByStatus(OrderStatus.MODIFYING.getValue()));
+        int agentId = getToken().getRole() == Role.Agent ? getToken().getId() : 0;
+        orderCountByStatus.put(OrderStatus.NEW.getValue() + "", agentId == 0 ? orderMapper.countByStatus(OrderStatus.NEW.getValue()) : orderMapper.countByStatusAndAgentId(OrderStatus.NEW.getValue(), agentId));
+        orderCountByStatus.put(OrderStatus.PENDING.getValue() + "", agentId == 0 ? orderMapper.countByStatus(OrderStatus.PENDING.getValue()) : orderMapper.countByStatusAndAgentId(OrderStatus.PENDING.getValue(), agentId));
+        orderCountByStatus.put(OrderStatus.FULL.getValue() + "", agentId == 0 ? orderMapper.countByStatus(OrderStatus.FULL.getValue()) : orderMapper.countByStatusAndAgentId(OrderStatus.FULL.getValue(), agentId));
+        orderCountByStatus.put(OrderStatus.MODIFYING.getValue() + "", agentId == 0 ? orderMapper.countByStatus(OrderStatus.MODIFYING.getValue()) : orderMapper.countByStatusAndAgentId(OrderStatus.MODIFYING.getValue(), agentId));
         model.put("orderCountByStatus", orderCountByStatus);
         return "orders";
     }
