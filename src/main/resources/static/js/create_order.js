@@ -39,6 +39,7 @@ function getQueryString(name) {
 
 var timeSelector = $('#j_ticket_time_selector');
 var timeSpan = $('#j_ticket_time_span');
+var ticketDescSpan = $('#j_ticket_desc');
 $('#j_ticket_type_selector li a').on('click', function (e) {
     var selected = $(e.target);
     var ticket = $('#j_ticket');
@@ -61,6 +62,7 @@ $('#j_ticket_type_selector li a').on('click', function (e) {
     selector.find('input').val("");
     timeSpan.html('选择时间');
     timeSpan.attr('value', "0");
+    ticketDescSpan.html(selected.attr('desc'));
     selector.datetimepicker({
                                 enabledDates: availableDate,
                                 format: "YYYY-MM-DD"
