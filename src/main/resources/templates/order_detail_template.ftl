@@ -212,8 +212,8 @@
             </div>
         </div>
     </div>
-    <div class="form-group"><label>集合地点:</label><span
-            id="j_gathering_place_span">${ticket.gatheringPlace!''}</span></div>
+    <div class="form-group"><label>集合地点:</label>
+        <input type="text" id="j_gathering_place_span" class="form-control" <#if editing=false>disabled</#if> value="${ticket.gatheringPlace!''}"/></div>
     <table class="table">
         <thead>
         <tr>

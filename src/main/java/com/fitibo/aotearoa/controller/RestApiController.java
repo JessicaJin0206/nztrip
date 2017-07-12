@@ -399,6 +399,7 @@ public class RestApiController extends AuthenticationRequiredController {
                 OrderTicket orderTicket = new OrderTicket();
                 orderTicket.setId(orderTicketVo.getId());
                 orderTicket.setGatheringTime(orderTicketVo.getGatheringTime());
+                orderTicket.setGatheringPlace(orderTicketVo.getGatheringPlace());
                 orderTicketMapper.update(orderTicket);
             } else {//create new
                 OrderTicket orderTicket = parse(orderTicketVo, orderVo, priceMap, skuTicketMap, discount);

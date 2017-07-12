@@ -273,12 +273,13 @@ $('#j_update').on('click', function () {
         orderTicket.costPrice = 0;
         orderTicket.priceDescription = "";
         orderTicket.orderTicketUsers = [];
+        orderTicket.gatheringPlace = node.find('#j_gathering_place_span').val();
         orderTickets.push(orderTicket);
         node.find('tbody tr').each(function (index, e) {
             var ticketUserContainer = $(e);
             var id = ticketUserContainer.attr("value");
             var name = ticketUserContainer.find('#j_user_name').val();
-            if (name.length == 0) {
+            if (name.length === 0) {
                 warn("请添加姓名");
                 isDataValid = false;
                 return;

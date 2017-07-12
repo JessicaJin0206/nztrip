@@ -32,7 +32,8 @@ public interface OrderTicketMapper {
     int create(OrderTicket orderTicket);
 
     @Update("update order_ticket " +
-            "set gathering_time = #{gatheringTime} " +
+            "set gathering_time = #{gatheringTime}," +
+            "gathering_place = #{gatheringPlace} " +
             "where id = #{id}")
     int update(OrderTicket orderTicket);
 
