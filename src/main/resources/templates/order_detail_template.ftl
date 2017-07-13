@@ -137,11 +137,15 @@
             <li><a value="${ticket.id?c}" count="${ticket.count?c}" minAge="${ticket.minAge?c}"
                    maxAge="${ticket.maxAge?c}" minWeight="${ticket.minWeight?c}"
                    maxWeight="${ticket.maxWeight?c}"
+                   desc="${ticket.description}"
                    available_date="<#list availableDateMap[ticket.id?c] as date>${date}|</#list>">${ticket.name}</a>
             </li>
         </#list>
     </ul>
+</div>
 
+<div class="form-group">
+    <label>描述:  </label><span id="j_ticket_desc"></span>
 </div>
 
 <div class="form-group">

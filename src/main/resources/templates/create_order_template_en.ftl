@@ -63,8 +63,8 @@
         </li>
     </#list>
     </ul>
-
 </div>
+
 <div class="form-group">
     <label>Description:  </label><span id="j_ticket_desc"></span>
 </div>

@@ -48,6 +48,7 @@ function getQueryString(name) {
 
 var timeSelector = $('#j_ticket_time_selector');
 var timeSpan = $('#j_ticket_time_span');
+var ticketDescSpan = $('#j_ticket_desc');
 $('#j_ticket_type_selector li a').on('click', function (e) {
     var selected = $(e.target);
     var ticket = $('#j_ticket');
@@ -70,6 +71,7 @@ $('#j_ticket_type_selector li a').on('click', function (e) {
     selector.find('input').val("");
     timeSpan.html('选择时间');
     timeSpan.attr('value', "0");
+    ticketDescSpan.html(selected.attr('desc'));
     var path = window.location.pathname.split('/');
     var orderId = parseInt(path[path.length - 2]);
     selector.datetimepicker({
@@ -208,7 +210,11 @@ $('.j_ticket_container').each(function (index, e) {
 });
 
 $('#j_edit').on('click', function () {
-    window.location.href = window.location.pathname + "/_edit";
+    if (window.location.pathname.endsWith('/')) {
+        window.location.href = window.location.pathname + "_edit";
+    } else {
+        window.location.href = window.location.pathname + "/_edit";
+    }
 });
 
 $('#j_update').on('click', function () {
