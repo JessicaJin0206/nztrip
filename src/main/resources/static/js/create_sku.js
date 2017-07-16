@@ -171,8 +171,8 @@ var validate = function() {
         };
         tickets.push(ticket);
     });
-    if (tickets.length == 0) {
-        warn("至少添加一个票种")
+    if (tickets.length === 0) {
+        warn("至少添加一个票种");
         return;
     }
     return {
@@ -185,7 +185,20 @@ var validate = function() {
         gatheringPlace: gatheringPlace,
         description: description,
         durationId: durationId,
-        tickets: tickets
+        tickets: tickets,
+        officialWebsite: $('#j_official_website').val(),
+        confirmationTime: $('#j_confirmation_time').val(),
+        rescheduleCancelNotice: $('#j_reschedule_cancel_notice').val(),
+        agendaInfo: $('#j_agenda_info').val(),
+        activityTime: $('#j_activity_time').val(),
+        openingTime: $('#j_opening_time').val(),
+        ticketInfo: $('#j_ticket_info').val(),
+        serviceInclude: $('#j_service_include').val(),
+        serviceExclude: $('#j_service_exclude').val(),
+        extraItem: $('#j_extra_item').val(),
+        attention: $('#j_attention').val(),
+        priceConstraint: $('#j_price_constraint').val(),
+        otherInfo: $('#j_other_info').val()
     };
 };
 

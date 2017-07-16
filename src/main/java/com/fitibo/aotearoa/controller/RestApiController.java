@@ -164,8 +164,7 @@ public class RestApiController extends AuthenticationRequiredController {
         skuMapper.create(sku);
         final int skuId = sku.getId();
         skuVo.setId(skuId);
-        skuTicketMapper
-                .batchCreate(Lists.transform(skuVo.getTickets(), (input) -> parse(skuId, input)));
+        skuTicketMapper.batchCreate(Lists.transform(skuVo.getTickets(), (input) -> parse(skuId, input)));
         return skuVo;
     }
 
@@ -775,17 +774,31 @@ public class RestApiController extends AuthenticationRequiredController {
         return result;
     }
 
-    private static Sku parse(SkuVo skuVo) {
+    private static Sku parse(SkuVo sku) {
         Sku result = new Sku();
-        result.setUuid(skuVo.getUuid());
-        result.setName(skuVo.getName());
-        result.setGatheringPlace(Joiner.on(CommonConstants.SEPARATOR).join(skuVo.getGatheringPlace()));
-        result.setPickupService(skuVo.hasPickupService());
-        result.setDurationId(skuVo.getDurationId());
-        result.setDescription(skuVo.getDescription());
-        result.setVendorId(skuVo.getVendorId());
-        result.setCityId(skuVo.getCityId());
-        result.setCategoryId(skuVo.getCategoryId());
+        result.setUuid(sku.getUuid());
+        result.setName(sku.getName());
+        result.setGatheringPlace(Joiner.on(CommonConstants.SEPARATOR).join(sku.getGatheringPlace()));
+        result.setPickupService(sku.isPickupService());
+        result.setDurationId(sku.getDurationId());
+        result.setDescription(sku.getDescription());
+        result.setVendorId(sku.getVendorId());
+        result.setCityId(sku.getCityId());
+        result.setCategoryId(sku.getCategoryId());
+
+        result.setActivityTime(sku.getActivityTime());
+        result.setAgendaInfo(sku.getAgendaInfo());
+        result.setAttention(sku.getAttention());
+        result.setExtraItem(sku.getExtraItem());
+        result.setOfficialWebsite(sku.getOfficialWebsite());
+        result.setOpeningTime(sku.getOpeningTime());
+        result.setServiceExclude(sku.getServiceExclude());
+        result.setServiceInclude(sku.getServiceInclude());
+        result.setConfirmationTime(sku.getConfirmationTime());
+        result.setTicketInfo(sku.getTicketInfo());
+        result.setPriceConstraint(sku.getPriceConstraint());
+        result.setOtherInfo(sku.getOtherInfo());
+        result.setRescheduleCancelNotice(sku.getRescheduleCancelNotice());
         return result;
     }
 

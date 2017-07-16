@@ -95,6 +95,86 @@
                 </#if>
                 </ul>
             </div>
+
+            <div class="form-group">
+                <label>Official Website</label>
+                <input type="text" id="j_official_website" class="form-control"
+                       <#if editing = false>disabled</#if>
+                       value="${sku.officialWebsite!!}">
+            </div>
+            <div class="form-group">
+                <label>Estimated Confirmation Time</label>
+                <input type="text" id="j_confirmation_time" class="form-control"
+                       <#if editing = false>disabled</#if>
+                       value="${sku.confirmationTime!!}">
+            </div>
+            <div class="form-group">
+                <label>Reschedule & Cancellation Policy</label>
+                <input type="text" id="j_reschedule_cancel_notice" class="form-control"
+                       <#if editing = false>disabled</#if>
+                       value="${sku.rescheduleCancelNotice!!}">
+            </div>
+            <div class="form-group">
+                <label>Agenda</label>
+                <input type="text" id="j_agenda_info" class="form-control"
+                       <#if editing = false>disabled</#if>
+                       value="${sku.agendaInfo!!}">
+            </div>
+            <div class="form-group">
+                <label>Activity Time</label>
+                <input type="text" id="j_activity_time" class="form-control"
+                       <#if editing = false>disabled</#if>
+                       value="${sku.activityTime!!}">
+            </div>
+            <div class="form-group">
+                <label>Opening Time</label>
+                <input type="text" id="j_opening_time" class="form-control"
+                       <#if editing = false>disabled</#if>
+                       value="${sku.openingTime!!}">
+            </div>
+            <div class="form-group">
+                <label>Ticket Info</label>
+                <input type="text" id="j_ticket_info" class="form-control"
+                       <#if editing = false>disabled</#if>
+                       value="${sku.ticketInfo!!}">
+            </div>
+            <div class="form-group">
+                <label>Service Include</label>
+                <input type="text" id="j_service_include" class="form-control"
+                       <#if editing = false>disabled</#if>
+                       value="${sku.serviceInclude!!}">
+            </div>
+            <div class="form-group">
+                <label>Service Exclude</label>
+                <input type="text" id="j_service_exclude" class="form-control"
+                       <#if editing = false>disabled</#if>
+                       value="${sku.serviceExclude!!}">
+            </div>
+            <div class="form-group">
+                <label>Extra item</label>
+                <input type="text" id="j_extra_item" class="form-control"
+                       <#if editing = false>disabled</#if>
+                       value="${sku.extraItem!!}">
+            </div>
+            <div class="form-group">
+                <label>Notice</label>
+                <input type="text" id="j_attention" class="form-control"
+                       <#if editing = false>disabled</#if>
+                       value="${sku.attention!!}">
+            </div>
+            <div class="form-group">
+                <label>Price Constraint</label>
+                <input type="text" id="j_price_constraint" class="form-control"
+                       <#if editing = false>disabled</#if>
+                       value="${sku.priceConstraint!!}">
+            </div>
+            <div class="form-group">
+                <label>Other Info</label>
+                <input type="text" id="j_other_info" class="form-control"
+                       <#if editing = false>disabled</#if>
+                       value="${sku.otherInfo!!}">
+            </div>
+
             <div class="form-group" id="j_gathering_place">
                 <span>Gathering Place</span>
             <#if editing = true>

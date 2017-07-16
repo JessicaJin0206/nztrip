@@ -36,16 +36,16 @@ public class ExecTimeAspect {
      * @return object
      */
     @Around("annotationPointCut()")
-    public Object costTime(ProceedingJoinPoint joinPoint) {
+    public Object costTime(ProceedingJoinPoint joinPoint) throws Throwable {
         return logCostTime(joinPoint);
     }
 
     @Around("mapperTime()")
-    public Object mapperCostTime(ProceedingJoinPoint joinPoint) {
+    public Object mapperCostTime(ProceedingJoinPoint joinPoint) throws Throwable {
         return logCostTime(joinPoint);
     }
 
-    private Object logCostTime(ProceedingJoinPoint joinPoint) {
+    private Object logCostTime(ProceedingJoinPoint joinPoint) throws Throwable {
         Object output = null;
         try {
             long start = System.currentTimeMillis();
@@ -59,6 +59,7 @@ public class ExecTimeAspect {
             }
         } catch (Throwable throwable) {
             logger.error("aop record method exec time error", throwable);
+            throw throwable;
         }
         return output;
     }

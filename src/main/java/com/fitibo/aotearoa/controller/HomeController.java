@@ -696,9 +696,23 @@ public class HomeController extends AuthenticationRequiredController {
         result.setGatheringPlace(
                 Lists.newArrayList(sku.getGatheringPlace().split(CommonConstants.SEPARATOR)));
         result.setPickupService(sku.hasPickupService());
+
         result.setDurationId(sku.getDurationId());
         result.setDuration(duration != null ? duration.getName() : "");
         result.setTickets(Lists.transform(sku.getTickets(), ObjectParser::parse));
+        result.setActivityTime(sku.getActivityTime());
+        result.setAgendaInfo(sku.getAgendaInfo());
+        result.setAttention(sku.getAttention());
+        result.setExtraItem(sku.getExtraItem());
+        result.setOfficialWebsite(sku.getOfficialWebsite());
+        result.setOpeningTime(sku.getOpeningTime());
+        result.setServiceExclude(sku.getServiceExclude());
+        result.setServiceInclude(sku.getServiceInclude());
+        result.setConfirmationTime(sku.getConfirmationTime());
+        result.setTicketInfo(sku.getTicketInfo());
+        result.setPriceConstraint(sku.getPriceConstraint());
+        result.setOtherInfo(sku.getOtherInfo());
+        result.setRescheduleCancelNotice(sku.getRescheduleCancelNotice());
         return result;
     }
 
