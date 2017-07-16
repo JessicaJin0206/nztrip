@@ -291,6 +291,12 @@ public class RestApiController extends AuthenticationRequiredController {
         order.setVendorPhone(vendor.getPhone());
         order.setUuid(GuidGenerator.generate(14));
         order.setStatus(OrderStatus.NEW.getValue());
+        String agentOrderId = order.getAgentOrderId();
+        if (StringUtils.isNotEmpty(agentOrderId)) {
+            if (orderMapper.countByAgentOrderId(agentOrderId) > 0) {
+                throw new InvalidParamException("duplicated agent order:" + agentOrderId);
+            }
+        }
         orderMapper.create(order);
         orderVo.setId(order.getId());
         if (CollectionUtils.isEmpty(orderVo.getOrderTickets())) {
@@ -427,6 +433,12 @@ public class RestApiController extends AuthenticationRequiredController {
                 map((orderTicket) -> calculateTicketPrice(priceMap.get(orderTicket.getTicketPriceId()), discount)).
                 reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
         o.setPrice(total);
+        String agentOrderId = o.getAgentOrderId();
+        if (StringUtils.isNotEmpty(agentOrderId)) {
+            if (orderMapper.countByAgentOrderId(agentOrderId) > 0) {
+                throw new InvalidParamException("duplicated agent order:" + agentOrderId);
+            }
+        }
         orderMapper.updateOrderInfo(o);
         return orderVo;
     }

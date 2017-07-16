@@ -270,4 +270,7 @@ public interface OrderMapper {
 
     @Select("select count(*) from `order` where status = #{status} and agent_id = #{agentId}")
     int countByStatusAndAgentId(@Param("status") int status, @Param("agentId") int agentId);
+
+    @Select("select count(*) from `order` where agent_order_id = #{agentOrderId}")
+    int countByAgentOrderId(@Param("agentOrderId") String agentOrderId);
 }
