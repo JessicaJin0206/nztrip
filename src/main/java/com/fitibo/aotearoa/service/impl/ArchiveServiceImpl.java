@@ -88,6 +88,9 @@ public class ArchiveServiceImpl implements ArchiveService {
     @Value(value = "classpath:voucher_template_59.xlsx")
     private Resource voucherTemplate_59;
 
+    @Value(value = "classpath:voucher_template_54.xlsx")
+    private Resource voucherTemplate_54;
+
     @Value(value = "classpath:order_template.xlsx")
     private Resource orderTemplate;
 
@@ -132,6 +135,8 @@ public class ArchiveServiceImpl implements ArchiveService {
         int agentId = order.getAgentId();
         if (agentId == 28) {//FIXME: hard code here
             return voucherTemplate_28;
+        } else if (agentId == 54) {
+            return voucherTemplate_54;
         } else if (agentId == 59) {
             return voucherTemplate_59;
         } else {
