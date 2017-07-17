@@ -271,6 +271,31 @@ public interface OrderMapper {
     @Select("select count(*) from `order` where status = #{status} and agent_id = #{agentId}")
     int countByStatusAndAgentId(@Param("status") int status, @Param("agentId") int agentId);
 
-    @Select("select count(*) from `order` where agent_order_id = #{agentOrderId}")
-    int countByAgentOrderId(@Param("agentOrderId") String agentOrderId);
+    @Select("select * from `order` where agent_order_id = #{agentOrderId}")
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "sku_id", property = "skuId"),
+            @Result(column = "uuid", property = "uuid"),
+            @Result(column = "agent_id", property = "agentId"),
+            @Result(column = "remark", property = "remark"),
+            @Result(column = "status", property = "status"),
+            @Result(column = "create_time", property = "createTime"),
+            @Result(column = "update_time", property = "updateTime"),
+            @Result(column = "price", property = "price"),
+            @Result(column = "gathering_info", property = "gatheringInfo"),
+            @Result(column = "primary_contact", property = "primaryContact"),
+            @Result(column = "primary_contact_email", property = "primaryContactEmail"),
+            @Result(column = "primary_contact_phone", property = "primaryContactPhone"),
+            @Result(column = "primary_contact_wechat", property = "primaryContactWechat"),
+            @Result(column = "secondary_contact", property = "secondaryContact"),
+            @Result(column = "secondary_contact_email", property = "secondaryContactEmail"),
+            @Result(column = "secondary_contact_phone", property = "secondaryContactPhone"),
+            @Result(column = "secondary_contact_wechat", property = "secondaryContactWechat"),
+            @Result(column = "reference_number", property = "referenceNumber"),
+            @Result(column = "vendor_phone", property = "vendorPhone"),
+            @Result(column = "agent_order_id", property = "agentOrderId"),
+
+    })
+    List<Order> findByAgentOrderId(@Param("agentOrderId") String agentOrderId);
+
 }
