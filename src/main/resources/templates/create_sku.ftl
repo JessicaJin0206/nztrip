@@ -71,55 +71,55 @@
 
             <div class="form-group">
                 <label>官网查位链接</label>
-                <input type="text" class="form-control j_official_website" placeholder="">
+                <input type="text" id="j_official_website" class="form-control" placeholder="">
             </div>
             <div class="form-group">
                 <label>预估确认时长</label>
-                <input type="text" class="form-control j_confirmation_time" placeholder="">
+                <input type="text" id="j_confirmation_time" class="form-control " placeholder="">
             </div>
             <div class="form-group">
                 <label>退改签规定</label>
-                <input type="text" class="form-control j_reschedule_cancel_notice" placeholder="">
+                <textarea id="j_reschedule_cancel_notice" rows="2" class="form-control" placeholder=""></textarea>
             </div>
             <div class="form-group">
                 <label>行程概述</label>
-                <input type="text" class="form-control j_agenda_info" placeholder="">
+                <textarea id="j_agenda_info" rows="2" class="form-control" placeholder=""></textarea>
             </div>
             <div class="form-group">
                 <label>活动时间</label>
-                <input type="text" class="form-control j_activity_time" placeholder="">
+                <textarea id="j_activity_time" rows="2" class="form-control" placeholder=""></textarea>
             </div>
             <div class="form-group">
                 <label>营业时间</label>
-                <input type="text" class="form-control j_opening_time" placeholder="">
+                <textarea id="j_opening_time" rows="2" class="form-control" placeholder=""></textarea>
             </div>
             <div class="form-group">
                 <label>门票形式</label>
-                <input type="text" class="form-control j_ticket_info" placeholder="">
+                <input type="text" id="j_ticket_info" class="form-control" placeholder="">
             </div>
             <div class="form-group">
                 <label>服务包含</label>
-                <input type="text" class="form-control j_service_include" placeholder="">
+                <input type="text" id="j_service_include" class="form-control" placeholder="">
             </div>
             <div class="form-group">
                 <label>服务未含</label>
-                <input type="text" class="form-control j_service_exclude" placeholder="">
+                <input type="text" id="j_service_exclude" class="form-control" placeholder="">
             </div>
             <div class="form-group">
                 <label>附加收费项</label>
-                <input type="text" class="form-control j_extra_item" placeholder="">
-            </div>
-            <div class="form-group">
-                <label>注意事项</label>
-                <input type="text" class="form-control j_attention" placeholder="">
+                <input type="text" id="j_extra_item" class="form-control" placeholder="">
             </div>
             <div class="form-group">
                 <label>限价信息</label>
-                <input type="text" class="form-control j_price_constraint" placeholder="">
+                <input type="text" id="j_price_constraint" class="form-control" placeholder="">
             </div>
             <div class="form-group">
                 <label>预订所需其他信息</label>
-                <input type="text" class="form-control j_other_info" placeholder="">
+                <input type="text" id="j_other_info" class="form-control" placeholder="">
+            </div>
+            <div class="form-group">
+                <label>注意事项</label>
+                <textarea id="j_attention" class="form-control" rows="3" placeholder=""></textarea>
             </div>
 
             <div class="form-group" id="j_gathering_place">

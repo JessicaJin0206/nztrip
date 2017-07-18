@@ -110,27 +110,27 @@
             </div>
             <div class="form-group">
                 <label>退改签规定</label>
-                <input type="text" id="j_reschedule_cancel_notice" class="form-control"
+                <textarea id="j_reschedule_cancel_notice" rows="2" class="form-control"
                                            <#if editing = false>disabled</#if>
-                                           value="${sku.rescheduleCancelNotice!!}">
+                          value="">${sku.rescheduleCancelNotice!!}</textarea>
             </div>
             <div class="form-group">
                 <label>行程概述</label>
-                <input type="text" id="j_agenda_info" class="form-control"
+                <textarea id="j_agenda_info" rows="2" class="form-control"
                                            <#if editing = false>disabled</#if>
-                                           value="${sku.agendaInfo!!}">
+                          value="">${sku.agendaInfo!!}</textarea>
             </div>
             <div class="form-group">
                 <label>活动时间</label>
-                <input type="text" id="j_activity_time" class="form-control"
+                <textarea id="j_activity_time" rows="2" class="form-control"
                                            <#if editing = false>disabled</#if>
-                                           value="${sku.activityTime!!}">
+                          value="">${sku.activityTime!!}</textarea>
             </div>
             <div class="form-group">
                 <label>营业时间</label>
-                <input type="text" id="j_opening_time" class="form-control"
+                <textarea id="j_opening_time" class="form-control"
                                            <#if editing = false>disabled</#if>
-                                           value="${sku.openingTime!!}">
+                          value="">${sku.openingTime!!}</textarea>
             </div>
             <div class="form-group">
                 <label>门票形式</label>
@@ -157,12 +157,6 @@
                                            value="${sku.extraItem!!}">
             </div>
             <div class="form-group">
-                <label>注意事项</label>
-                <input type="text" id="j_attention" class="form-control"
-                                           <#if editing = false>disabled</#if>
-                                           value="${sku.attention!!}">
-            </div>
-            <div class="form-group">
                 <label>限价信息</label>
                 <input type="text" id="j_price_constraint" class="form-control"
                                            <#if editing = false>disabled</#if>
@@ -173,6 +167,12 @@
                 <input type="text" id="j_other_info" class="form-control"
                                            <#if editing = false>disabled</#if>
                                            value="${sku.otherInfo!!}">
+            </div>
+            <div class="form-group">
+                <label>注意事项</label>
+                <textarea id="j_attention" rows="3" class="form-control"
+                       <#if editing = false>disabled</#if>
+                          value="">${sku.attention!!}</textarea>
             </div>
 
             <div class="form-group" id="j_gathering_place">
