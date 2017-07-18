@@ -834,6 +834,7 @@ public class RestApiController extends AuthenticationRequiredController {
         result.setPriceDescription(ticketVo.getPriceDescription());
         result.setPrice(ticketVo.getPrice());
         result.setGatheringPlace(ticketVo.getGatheringPlace());
+        result.setGatheringTime(ticketVo.getGatheringTime());
         result.setWeightConstraint(skuTicket.getWeightConstraint());
         result.setAgeConstraint(skuTicket.getAgeConstraint());
         result.setCountConstraint(skuTicket.getCountConstraint());

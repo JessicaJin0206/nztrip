@@ -210,17 +210,18 @@
             id="j_ticket_sale_price_span">${ticket.salePrice?string('0.00')}</span>
     </div>
     <div class="form-group">
-        <div class="row">
-            <label class="col-md-2">Gathering Time:</label>
-            <div class="col-md-offset-2">
-                <input type="text" id="j_gathering_time_span" class="form-control"
-                       <#if editing=false>disabled</#if> value="${ticket.gatheringTime!''}">
-            </div>
+        <div class="row col-md-2">
+            <label for="j_gathering_time_span">Gathering Time:</label>
+            <input type="text" id="j_gathering_time_span" class="form-control"
+                   <#if editing=false>disabled</#if> value="${ticket.gatheringTime!''}">
         </div>
     </div>
     <div class="form-group">
-        <label>Gathering Place:</label>
-        <input type="text" id="j_gathering_place_span" class="form-control" <#if editing=false>disabled</#if> value="${ticket.gatheringPlace!''}"/>
+        <div class="row col-md-2">
+            <label for="j_gathering_place_span">Gathering Place:</label>
+            <input type="text" id="j_gathering_place_span" class="form-control"
+                   <#if editing=false>disabled</#if> value="${ticket.gatheringPlace!''}"/>
+        </div>
     </div>
     <table class="table">
         <thead>

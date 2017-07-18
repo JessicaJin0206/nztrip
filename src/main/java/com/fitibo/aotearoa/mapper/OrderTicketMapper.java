@@ -23,11 +23,11 @@ public interface OrderTicketMapper {
 
     @Insert("insert into order_ticket(`sku_id`, `sku_ticket_id`, `order_id`, `sku_ticket_name`, " +
             "`count_constraint`, `age_constraint`, `weight_constraint`, `ticket_description`, " +
-            "`ticket_price_id`, `ticket_date`, `ticket_time`, `sale_price`, `cost_price`, `price_description`, `price`, `gathering_place`) "
+            "`ticket_price_id`, `ticket_date`, `ticket_time`, `sale_price`, `cost_price`, `price_description`, `price`, `gathering_place`, `gathering_time`) "
             +
             "values(#{skuId}, #{skuTicketId}, #{orderId}, #{skuTicket}, " +
             "#{countConstraint}, #{ageConstraint}, #{weightConstraint}, #{ticketDescription}, " +
-            "#{ticketPriceId}, #{ticketDate}, #{ticketTime}, #{salePrice}, #{costPrice}, #{priceDescription}, #{price}, #{gatheringPlace})")
+            "#{ticketPriceId}, #{ticketDate}, #{ticketTime}, #{salePrice}, #{costPrice}, #{priceDescription}, #{price}, #{gatheringPlace}, #{gatheringTime})")
     @Options(useGeneratedKeys = true, keyColumn = "id", keyProperty = "id", flushCache = Options.FlushCachePolicy.DEFAULT)
     int create(OrderTicket orderTicket);
 

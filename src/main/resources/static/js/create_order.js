@@ -133,7 +133,7 @@ $('#add_ticket').on('click', function (e) {
     var minAge = parseInt(ticket.attr('minAge'));
     var maxAge = parseInt(ticket.attr('maxAge'));
     var ticketContainer = $(
-        '<div class="form-group j_ticket_container" id="j_ticket_container"><a id="j_ticket_delete"><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span></a><div class="form-group"><label>票种:</label><span id="j_ticket_name_span"></span></div><div class="form-group"><label>日期:</label><span id="j_ticket_date_span"></span></div><div class="form-group"><label>时间:</label><span id="j_ticket_time_span"></span></div><div class="form-group"><label>核算价格:</label><span id="j_ticket_price_span"></span></div><div class="form-group"><label>官网价格:</label><span id="j_ticket_sale_price_span"></span></div><div class="form-group"><label>集合地点:</label><span id="j_gathering_place_span"></span></div><table class="table"><thead><tr><th>姓名</th><th>年龄</th><th>体重</th></tr></thead><tbody></tbody></table></div>');
+        '<div class="form-group j_ticket_container" id="j_ticket_container"><a id="j_ticket_delete"><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span></a><div class="form-group"><label>票种:</label><span id="j_ticket_name_span"></span></div><div class="form-group"><label>日期:</label><span id="j_ticket_date_span"></span></div><div class="form-group"><label>时间:</label><span id="j_ticket_time_span"></span></div><div class="form-group"><label>核算价格:</label><span id="j_ticket_price_span"></span></div><div class="form-group"><label>官网价格:</label><span id="j_ticket_sale_price_span"></span></div><div class="form-group"><div class="row col-md-2"><label for="j_gathering_place_span">集合地点:</label><input type="text" id="j_gathering_place_span" class="form-control"</div></div><table class="table"><thead><tr><th>姓名</th><th>年龄</th><th>体重</th></tr></thead><tbody></tbody></table></div>');
     var ticketName = ticket.html();
     var ticketCount = parseInt(ticket.attr('count'));
     ticketContainer.attr('ticketId', ticketId);
@@ -148,7 +148,7 @@ $('#add_ticket').on('click', function (e) {
     ticketContainer.find('#j_ticket_time_span').html(time);
     ticketContainer.find('#j_ticket_price_span').html(price);
     ticketContainer.find('#j_ticket_sale_price_span').html(salePrice);
-    ticketContainer.find('#j_gathering_place_span').html(place);
+    ticketContainer.find('#j_gathering_place_span').val(place);
     for (var i = 0; i < ticketCount; i++) {
         var ticketDetail = $(
             '<tr><th><input type="text" id="j_user_name" class="form-control"/></th><th><input type="number" id="j_user_age" class="form-control"/></th><th><input type="number" id="j_user_weight" class="form-control"/></th></tr>')
@@ -211,7 +211,8 @@ $('#j_submit').on('click', function () {
         orderTicket.costPrice = 0;
         orderTicket.priceDescription = "";
         orderTicket.orderTicketUsers = [];
-        orderTicket.gatheringPlace = node.find("#j_gathering_place_span").html();
+        orderTicket.gatheringPlace = node.find("#j_gathering_place_span").val();
+        orderTicket.gatheringTime = node.find("#j_gathering_time_span").val();
         orderTickets.push(orderTicket);
         node.find('tbody tr').each(function (index, e) {
             var ticketUserContainer = $(e);
