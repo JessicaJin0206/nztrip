@@ -1,0 +1,13 @@
+ALTER TABLE `sku` MODIFY COLUMN official_website TEXT ;
+ALTER TABLE `sku` MODIFY COLUMN confirmation_time TEXT ;
+ALTER TABLE `sku` MODIFY COLUMN reschedule_cancel_notice TEXT ;
+ALTER TABLE `sku` MODIFY COLUMN agenda_info TEXT ;
+ALTER TABLE `sku` MODIFY COLUMN activity_time TEXT ;
+ALTER TABLE `sku` MODIFY COLUMN opening_time TEXT ;
+ALTER TABLE `sku` MODIFY COLUMN ticket_info TEXT ;
+ALTER TABLE `sku` MODIFY COLUMN service_include TEXT ;
+ALTER TABLE `sku` MODIFY COLUMN service_exclude TEXT ;
+ALTER TABLE `sku` MODIFY COLUMN extra_item TEXT ;
+ALTER TABLE `sku` MODIFY COLUMN attention TEXT ;
+ALTER TABLE `sku` MODIFY COLUMN price_constraint TEXT ;
+ALTER TABLE `sku` MODIFY COLUMN other_info TEXT ;
