@@ -5,6 +5,7 @@ import com.fitibo.aotearoa.constants.CommonConstants;
 import com.fitibo.aotearoa.constants.OrderStatus;
 import com.fitibo.aotearoa.constants.SkuTicketStatus;
 import com.fitibo.aotearoa.dto.Role;
+import com.fitibo.aotearoa.dto.SkuInventoryDto;
 import com.fitibo.aotearoa.dto.Token;
 import com.fitibo.aotearoa.dto.Transition;
 import com.fitibo.aotearoa.exception.AuthenticationFailureException;
@@ -183,10 +184,18 @@ public class RestApiController extends AuthenticationRequiredController {
         return parseSkuResponse(sku);
     }
 
+    private void checkViewSkuPriviledge(Sku sku, int agentId) {
+        Agent agent = agentMapper.findById(agentId);
+        if (agent.getVendorId() != 0 && agent.getVendorId() != sku.getVendorId()) {
+            throw new AuthenticationFailureException();
+        }
+    }
+
     private SkuVo parseSkuResponse(Sku sku) {
         if (sku == null) {
             throw new ResourceNotFoundException();
         }
+        checkViewSkuPriviledge(sku, getToken().getId());
         SkuVo result = parse(sku);
         List<SkuTicket> skuTickets = skuTicketMapper.findBySkuId(sku.getId());
         result.setTickets(Lists.transform(skuTickets, ObjectParser::parse));
@@ -300,6 +309,7 @@ public class RestApiController extends AuthenticationRequiredController {
         } else {
             throw new IllegalArgumentException("cannot find sku by sku id or uuid");
         }
+        checkViewSkuPriviledge(sku, agentId);
         final Vendor vendor = vendorService.findById(sku.getVendorId());
         Preconditions.checkNotNull(vendor, "invalid vendor id:" + sku.getVendorId());
         final int discount = getDiscount(getToken(), sku.getId());
@@ -607,14 +617,22 @@ public class RestApiController extends AuthenticationRequiredController {
 
     @RequestMapping(value = "v1/api/skus/{skuId}/tickets/{ticketId}/prices")
     @Authentication
-    public List<SkuTicketPriceVo> getPrice(@PathVariable("ticketId") int ticketId,
+    public List<SkuTicketPriceVo> getPrice(@PathVariable("skuId") int skuId,
+                                           @PathVariable("ticketId") int ticketId,
                                            @RequestParam("date") String date,
                                            @RequestParam(value = "orderId", required = false, defaultValue = "0") int orderId) {
+
+
         SkuTicket skuTicket = skuTicketMapper.findById(ticketId);
         Preconditions.checkNotNull(skuTicket, "invalid ticket id:" + ticketId);
         List<SkuTicketPrice> ticketPrices = skuTicketPriceMapper
                 .findAvailableBySkuTicketIdAndDate(skuTicket.getSkuId(), ticketId, DateUtils.parseDate(date), new RowBounds());
-        int skuId = ticketPrices.stream().mapToInt(SkuTicketPrice::getSkuId).findFirst().orElse(-1);
+        int priceSkuId = ticketPrices.stream().mapToInt(SkuTicketPrice::getSkuId).findFirst().orElse(-1);
+        Preconditions.checkArgument(priceSkuId == skuId, "invalid sku id:" + skuId);
+        Sku sku = skuMapper.findById(skuId);
+        if (getToken().getRole() == Role.Agent) {
+            checkViewSkuPriviledge(sku, getToken().getId());
+        }
         int discount = orderId > 0 ? discountRateService.getDiscountByOrder(orderId) : getDiscount(getToken(), skuId);
         return Lists.transform(ticketPrices, (input) -> {
             SkuTicketPriceVo result = new SkuTicketPriceVo();
@@ -716,6 +734,23 @@ public class RestApiController extends AuthenticationRequiredController {
             }
         }
         return count;
+    }
+
+    @RequestMapping(value = "v1/api/skus/{skuId}/inventories", method = RequestMethod.GET)
+    @Authentication({Role.Admin, Role.Agent, Role.Vendor})
+    public SkuInventoryDto count(@PathVariable("skuId") int skuId,
+                                 @RequestParam("date") String dateString,
+                                 @RequestParam("time") String time) {
+        if (getToken().getRole() == Role.Agent) {
+            int agentId = getToken().getId();
+            checkViewSkuPriviledge(skuMapper.findById(skuId), agentId);
+        } else if (getToken().getRole() == Role.Vendor) {
+            Sku sku = skuMapper.findById(skuId);
+            if (sku.getVendorId() != getToken().getId()) {
+                throw new AuthenticationFailureException();
+            }
+        }
+        return orderService.countTotalUsers(skuId, DateUtils.parseDate(dateString), time);
     }
 
     private Map<Integer, SkuTicketPrice> getSkuTicketPriceMap(List<Integer> ids) {

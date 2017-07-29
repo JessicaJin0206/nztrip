@@ -28,6 +28,7 @@ public interface AgentMapper {
             @Result(column = "default_contact", property = "defaultContact"),
             @Result(column = "default_contact_email", property = "defaultContactEmail"),
             @Result(column = "default_contact_phone", property = "defaultContactPhone"),
+            @Result(column = "vendor_id", property = "vendorId"),
     })
     List<Agent> findAll();
 
@@ -42,6 +43,7 @@ public interface AgentMapper {
             @Result(column = "default_contact", property = "defaultContact"),
             @Result(column = "default_contact_email", property = "defaultContactEmail"),
             @Result(column = "default_contact_phone", property = "defaultContactPhone"),
+            @Result(column = "vendor_id", property = "vendorId"),
     })
     Agent findById(int id);
 
@@ -55,7 +57,8 @@ public interface AgentMapper {
             @Result(column = "description", property = "description"),
             @Result(column = "default_contact", property = "defaultContact"),
             @Result(column = "default_contact_email", property = "defaultContactEmail"),
-            @Result(column = "default_contact_phone", property = "defaultContactPhone")
+            @Result(column = "default_contact_phone", property = "defaultContactPhone"),
+            @Result(column = "vendor_id", property = "vendorId"),
     })
     Agent findByUserName(String user);
 

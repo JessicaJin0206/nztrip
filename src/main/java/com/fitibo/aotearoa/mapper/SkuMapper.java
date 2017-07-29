@@ -169,10 +169,10 @@ public interface SkuMapper {
 
     @Select("<script>" +
             "select * from sku where 1 = 1 " +
-            "<if test =\"keyword != null and keyword != ''\">and (uuid = #{keyword} or name like CONCAT('%',#{keyword},'%')) </if> "
-            +
+            "<if test =\"keyword != null and keyword != ''\">and (uuid = #{keyword} or name like CONCAT('%',#{keyword},'%')) </if> " +
             "<if test =\"categoryId > 0\">and category_id = #{categoryId} </if> " +
             "<if test =\"cityId > 0\">and city_id = #{cityId} </if> " +
+            "<if test =\"vendorId > 0\">and vendor_id = #{vendorId} </if> " +
             "</script>")
     @Results({
             @Result(column = "id", property = "id"),
@@ -199,8 +199,11 @@ public interface SkuMapper {
             @Result(column = "price_constraint", property = "priceConstraint"),
             @Result(column = "other_info", property = "otherInfo"),
     })
-    List<Sku> findAllByMultiFields(@Param("keyword") String keyword, @Param("cityId") int cityId,
-                                   @Param("categoryId") int categoryId, RowBounds rowBounds);
+    List<Sku> findAllByMultiFields(@Param("keyword") String keyword,
+                                   @Param("cityId") int cityId,
+                                   @Param("categoryId") int categoryId,
+                                   @Param("vendorId") int vendorId,
+                                   RowBounds rowBounds);
 
     @Select("select * from sku where vendor_id = #{vendorId}")
     @Results({

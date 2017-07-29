@@ -1,5 +1,6 @@
 package com.fitibo.aotearoa.mapper;
 
+import com.fitibo.aotearoa.constants.OrderStatus;
 import com.fitibo.aotearoa.model.OrderTicket;
 
 import java.util.Date;
@@ -150,4 +151,12 @@ public interface OrderTicketMapper {
             @Result(column = "ticket_date", property = "ticketDate"),
     })
     List<OrderTicket> findOrderTicketDate(@Param("list") List<Integer> orderIds);
+
+
+    @Select("select ot.id from order_ticket ot left join `order` o on ot.order_id = o.id " +
+            "where ot.sku_id = #{skuId} and ticket_date = #{date} and ticket_time = #{time} and o.status = #{status}")
+    List<Integer> findIdsByDateTimeAndOrderStatus(@Param("skuId") int skuId,
+                                                  @Param("date") Date date,
+                                                  @Param("time") String time,
+                                                  @Param("status") int status);
 }

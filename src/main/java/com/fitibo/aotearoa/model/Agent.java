@@ -77,6 +77,14 @@ public class Agent extends ModelObject {
         this.defaultContactPhone = defaultContactPhone;
     }
 
+    public int getVendorId() {
+        return vendorId;
+    }
+
+    public void setVendorId(int vendorId) {
+        this.vendorId = vendorId;
+    }
+
     private String userName;
     private String password;
     private String name;
@@ -86,5 +94,6 @@ public class Agent extends ModelObject {
     private String defaultContact;
     private String defaultContactEmail;
     private String defaultContactPhone;
+    private int vendorId;
 
 }

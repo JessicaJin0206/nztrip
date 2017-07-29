@@ -1,0 +1,1 @@
+ALTER TABLE `agent` ADD COLUMN vendor_id INT default 0;

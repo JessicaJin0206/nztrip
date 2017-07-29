@@ -5,6 +5,7 @@ import com.fitibo.aotearoa.model.OrderTicketUser;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Options;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
@@ -39,4 +40,18 @@ public interface OrderTicketUserMapper {
 
     @Delete("delete from order_ticket_user where order_ticket_id = #{orderTicketId}")
     int deleteByOrderTicketId(int orderTicketId);
+
+
+    @Select({
+            "<script>",
+            "select count(*) from order_ticket_user where false",
+            "<if test='orderTicketIds.size() > 0'>",
+            "or order_ticket_id in ",
+            "<foreach collection='orderTicketIds' open = '(' close = ')' item='id' separator=','>",
+            "#{id}",
+            "</foreach>",
+            "</if>",
+            "</script>"
+    })
+    int countUsersByOrderTicketIds(@Param("orderTicketIds") List<Integer> orderTicketIds);
 }

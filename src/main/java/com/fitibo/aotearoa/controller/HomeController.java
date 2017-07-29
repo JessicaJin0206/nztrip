@@ -529,7 +529,11 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("categories", categoryService.findAll());
         model.put("durations", durationService.findAll());
         model.put("lang", lang);
-        List<Sku> skus = searchSku(keyword, cityId, categoryId, rowBounds);
+        int vendorId = 0;
+        if (getToken().getRole() == Role.Agent) {
+            vendorId = agentMapper.findById(getToken().getId()).getVendorId();
+        }
+        List<Sku> skus = searchSku(keyword, cityId, categoryId, vendorId, rowBounds);
         Map<Integer, City> cityMap = cityService.findByIds(Lists.transform(skus, Sku::getCityId));
         Map<Integer, Category> categoryMap = categoryService
                 .findByIds(Lists.transform(skus, Sku::getCategoryId));
@@ -654,8 +658,8 @@ public class HomeController extends AuthenticationRequiredController {
         return "agent_detail";
     }
 
-    private List<Sku> searchSku(String keyword, int cityId, int categoryId, RowBounds rowBounds) {
-        return skuMapper.findAllByMultiFields(keyword, cityId, categoryId, rowBounds);
+    private List<Sku> searchSku(String keyword, int cityId, int categoryId, int vendorId, RowBounds rowBounds) {
+        return skuMapper.findAllByMultiFields(keyword, cityId, categoryId, vendorId, rowBounds);
     }
 
     private SkuVo parse(Sku sku) {
