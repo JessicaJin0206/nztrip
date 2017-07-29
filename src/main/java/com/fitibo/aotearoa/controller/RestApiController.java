@@ -38,6 +38,7 @@ import com.fitibo.aotearoa.service.VendorService;
 import com.fitibo.aotearoa.util.DateUtils;
 import com.fitibo.aotearoa.util.GuidGenerator;
 import com.fitibo.aotearoa.util.Md5Utils;
+import com.fitibo.aotearoa.util.ObjectParser;
 import com.fitibo.aotearoa.vo.AddPriceRecordRequest;
 import com.fitibo.aotearoa.vo.AddPriceRequest;
 import com.fitibo.aotearoa.vo.AgentVo;
@@ -167,6 +168,31 @@ public class RestApiController extends AuthenticationRequiredController {
         skuTicketMapper.batchCreate(Lists.transform(skuVo.getTickets(), (input) -> parse(skuId, input)));
         return skuVo;
     }
+
+    @RequestMapping(value = "v1/api/skus/{id}", method = RequestMethod.GET)
+    @Authentication(Role.Agent)
+    public SkuVo querySku(@PathVariable("id") int id) {
+        Sku sku = skuMapper.findById(id);
+        return parseSkuResponse(sku);
+    }
+
+    @RequestMapping(value = "v1/api/skus", method = RequestMethod.GET)
+    @Authentication(Role.Agent)
+    public SkuVo querySku(@RequestParam("uuid") String uuid) {
+        Sku sku = skuMapper.findByUuid(uuid);
+        return parseSkuResponse(sku);
+    }
+
+    private SkuVo parseSkuResponse(Sku sku) {
+        if (sku == null) {
+            throw new ResourceNotFoundException();
+        }
+        SkuVo result = parse(sku);
+        List<SkuTicket> skuTickets = skuTicketMapper.findBySkuId(sku.getId());
+        result.setTickets(Lists.transform(skuTickets, ObjectParser::parse));
+        return result;
+    }
+
 
     @RequestMapping(value = "v1/api/skus/{id}", method = RequestMethod.PUT)
     @Transactional(rollbackFor = Exception.class)
@@ -779,6 +805,38 @@ public class RestApiController extends AuthenticationRequiredController {
         result.setUuid(sku.getUuid());
         result.setName(sku.getName());
         result.setGatheringPlace(Joiner.on(CommonConstants.SEPARATOR).join(sku.getGatheringPlace()));
+        result.setPickupService(sku.isPickupService());
+        result.setDurationId(sku.getDurationId());
+        result.setDescription(sku.getDescription());
+        result.setVendorId(sku.getVendorId());
+        result.setCityId(sku.getCityId());
+        result.setCategoryId(sku.getCategoryId());
+
+        result.setActivityTime(sku.getActivityTime());
+        result.setAgendaInfo(sku.getAgendaInfo());
+        result.setAttention(sku.getAttention());
+        result.setExtraItem(sku.getExtraItem());
+        result.setOfficialWebsite(sku.getOfficialWebsite());
+        result.setOpeningTime(sku.getOpeningTime());
+        result.setServiceExclude(sku.getServiceExclude());
+        result.setServiceInclude(sku.getServiceInclude());
+        result.setConfirmationTime(sku.getConfirmationTime());
+        result.setTicketInfo(sku.getTicketInfo());
+        result.setPriceConstraint(sku.getPriceConstraint());
+        result.setOtherInfo(sku.getOtherInfo());
+        result.setRescheduleCancelNotice(sku.getRescheduleCancelNotice());
+        return result;
+    }
+
+    private static SkuVo parse(Sku sku) {
+        SkuVo result = new SkuVo();
+        result.setUuid(sku.getUuid());
+        result.setName(sku.getName());
+        if (sku.getGatheringPlace() == null) {
+            result.setGatheringPlace(Collections.emptyList());
+        } else {
+            result.setGatheringPlace(Lists.newArrayList(sku.getGatheringPlace().split(CommonConstants.SEPARATOR)));
+        }
         result.setPickupService(sku.isPickupService());
         result.setDurationId(sku.getDurationId());
         result.setDescription(sku.getDescription());

@@ -17,6 +17,9 @@ import com.google.common.collect.Lists;
 
 import org.springframework.beans.BeanUtils;
 
+import java.util.Collections;
+import java.util.Optional;
+
 /**
  * Created by qianhao.zhou on 8/17/16.
  */
@@ -52,7 +55,7 @@ public final class ObjectParser {
         String[] weights = input.getWeightConstraint().split("-");
         ticket.setMinWeight(Integer.parseInt(weights[0]));
         ticket.setMaxWeight(Integer.parseInt(weights[1]));
-        ticket.setTicketPrices(Lists.transform(input.getTicketPrices(), ObjectParser::parse));
+        ticket.setTicketPrices(Lists.transform(Optional.ofNullable(input.getTicketPrices()).orElse(Collections.emptyList()), ObjectParser::parse));
         return ticket;
     }
 
