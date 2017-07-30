@@ -10,4 +10,16 @@ public class SkuInventoryDto {
     private String time;
     private int currentCount;
     private int totalCount;
+
+    public boolean isAvailable() {
+        if (hasRealTimeInventory()) {
+            return currentCount < totalCount;
+        } else {
+            return true;
+        }
+    }
+
+    public boolean hasRealTimeInventory() {
+        return totalCount > 0;
+    }
 }

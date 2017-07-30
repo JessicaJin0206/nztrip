@@ -1,5 +1,12 @@
 package com.fitibo.aotearoa.controller;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
 import com.fitibo.aotearoa.annotation.Authentication;
 import com.fitibo.aotearoa.constants.CommonConstants;
 import com.fitibo.aotearoa.constants.OrderStatus;
@@ -33,6 +40,7 @@ import com.fitibo.aotearoa.model.Vendor;
 import com.fitibo.aotearoa.service.DiscountRateService;
 import com.fitibo.aotearoa.service.OperationService;
 import com.fitibo.aotearoa.service.OrderService;
+import com.fitibo.aotearoa.service.SkuInventoryService;
 import com.fitibo.aotearoa.service.SkuService;
 import com.fitibo.aotearoa.service.TokenService;
 import com.fitibo.aotearoa.service.VendorService;
@@ -54,20 +62,6 @@ import com.fitibo.aotearoa.vo.SkuTicketVo;
 import com.fitibo.aotearoa.vo.SkuVo;
 import com.fitibo.aotearoa.vo.VendorVo;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Splitter;
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
-import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.joda.time.DateTime;
@@ -86,6 +80,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by qianhao.zhou on 7/29/16.
@@ -130,6 +131,9 @@ public class RestApiController extends AuthenticationRequiredController {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private SkuInventoryService skuInventoryService;
 
     @Autowired
     private PriceRecordMapper priceRecordMapper;
@@ -506,14 +510,8 @@ public class RestApiController extends AuthenticationRequiredController {
                 orderMapper.updateReferenceNumber(id, referenceNumber);
                 order.setReferenceNumber(referenceNumber);
             }
-            List<OrderTicket> orderTickets = orderTicketMapper.findByOrderId(order.getId());
-            skuTicketPriceMapper
-                    .increaseCurrentCount(Lists.transform(orderTickets, OrderTicket::getTicketPriceId));
         } else if (fromStatus == OrderStatus.CONFIRMED.getValue() && toStatus == OrderStatus.CANCELLED
                 .getValue()) {
-            List<OrderTicket> orderTickets = orderTicketMapper.findByOrderId(order.getId());
-            skuTicketPriceMapper
-                    .decreaseCurrentCount(Lists.transform(orderTickets, OrderTicket::getTicketPriceId));
         }
         if (!statusValid) {
             throw new InvalidParamException("invalid transition from " + fromStatus + " to " + toStatus);
@@ -750,7 +748,7 @@ public class RestApiController extends AuthenticationRequiredController {
                 throw new AuthenticationFailureException();
             }
         }
-        return orderService.countTotalUsers(skuId, DateUtils.parseDate(dateString), time);
+        return skuInventoryService.getSkuInventory(skuId, DateUtils.parseDate(dateString), time);
     }
 
     private Map<Integer, SkuTicketPrice> getSkuTicketPriceMap(List<Integer> ids) {
