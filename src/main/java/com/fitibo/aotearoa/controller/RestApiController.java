@@ -178,6 +178,8 @@ public class RestApiController extends AuthenticationRequiredController {
     @Authentication(Role.Agent)
     public SkuVo querySku(@PathVariable("id") int id) {
         Sku sku = skuMapper.findById(id);
+        int agentId = getToken().getId();
+        checkViewSkuPriviledge(sku, agentId);
         return parseSkuResponse(sku);
     }
 
@@ -185,6 +187,8 @@ public class RestApiController extends AuthenticationRequiredController {
     @Authentication(Role.Agent)
     public SkuVo querySku(@RequestParam("uuid") String uuid) {
         Sku sku = skuMapper.findByUuid(uuid);
+        int agentId = getToken().getId();
+        checkViewSkuPriviledge(sku, agentId);
         return parseSkuResponse(sku);
     }
 
@@ -199,7 +203,6 @@ public class RestApiController extends AuthenticationRequiredController {
         if (sku == null) {
             throw new ResourceNotFoundException();
         }
-        checkViewSkuPriviledge(sku, getToken().getId());
         SkuVo result = parse(sku);
         List<SkuTicket> skuTickets = skuTicketMapper.findBySkuId(sku.getId());
         result.setTickets(Lists.transform(skuTickets, ObjectParser::parse));
@@ -313,7 +316,9 @@ public class RestApiController extends AuthenticationRequiredController {
         } else {
             throw new IllegalArgumentException("cannot find sku by sku id or uuid");
         }
-        checkViewSkuPriviledge(sku, agentId);
+        if (agentId > 0) {
+            checkViewSkuPriviledge(sku, agentId);
+        }
         final Vendor vendor = vendorService.findById(sku.getVendorId());
         Preconditions.checkNotNull(vendor, "invalid vendor id:" + sku.getVendorId());
         final int discount = getDiscount(getToken(), sku.getId());
