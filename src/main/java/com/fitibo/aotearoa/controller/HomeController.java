@@ -717,6 +717,7 @@ public class HomeController extends AuthenticationRequiredController {
         result.setPriceConstraint(sku.getPriceConstraint());
         result.setOtherInfo(sku.getOtherInfo());
         result.setRescheduleCancelNotice(sku.getRescheduleCancelNotice());
+        result.setAutoGenerateReferenceNumber(sku.isAutoGenerateReferenceNumber());
         return result;
     }
 

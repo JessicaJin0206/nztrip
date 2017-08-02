@@ -196,6 +196,14 @@ public class Sku extends ModelObject {
         this.otherInfo = otherInfo;
     }
 
+    public boolean isAutoGenerateReferenceNumber() {
+        return autoGenerateReferenceNumber;
+    }
+
+    public void setAutoGenerateReferenceNumber(boolean autoGenerateReferenceNumber) {
+        this.autoGenerateReferenceNumber = autoGenerateReferenceNumber;
+    }
+
     private String uuid;
     private String name;
     private int cityId;
@@ -220,5 +228,6 @@ public class Sku extends ModelObject {
     private String attention;
     private String priceConstraint;
     private String otherInfo;
+    private boolean autoGenerateReferenceNumber;
 
 }

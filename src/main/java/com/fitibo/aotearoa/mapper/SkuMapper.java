@@ -28,7 +28,7 @@ public interface SkuMapper {
     @Options(useGeneratedKeys = true, keyColumn = "id", keyProperty = "id", flushCache = Options.FlushCachePolicy.DEFAULT)
     int create(Sku sku);
 
-    @Update("update sku set " +
+    @Update({"update sku set " +
             "uuid = #{uuid}, " +
             "name = #{name}, " +
             "city_id = #{cityId}, " +
@@ -50,8 +50,9 @@ public interface SkuMapper {
             "extra_item = #{extraItem}, " +
             "attention = #{attention}, " +
             "price_constraint = #{priceConstraint}, " +
-            "other_info = #{otherInfo} " +
-            "where id = #{id}")
+            "other_info = #{otherInfo}," +
+            "auto_generate_reference_number = #{autoGenerateReferenceNumber} " +
+            "where id = #{id}"})
     int update(Sku sku);
 
     @Select("select * from sku where uuid = #{uuid}")
@@ -79,6 +80,8 @@ public interface SkuMapper {
             @Result(column = "attention", property = "attention"),
             @Result(column = "price_constraint", property = "priceConstraint"),
             @Result(column = "other_info", property = "otherInfo"),
+            @Result(column = "auto_generate_reference_number", property = "autoGenerateReferenceNumber"),
+
     })
     Sku findByUuid(String uuid);
 
@@ -107,6 +110,7 @@ public interface SkuMapper {
             @Result(column = "attention", property = "attention"),
             @Result(column = "price_constraint", property = "priceConstraint"),
             @Result(column = "other_info", property = "otherInfo"),
+            @Result(column = "auto_generate_reference_number", property = "autoGenerateReferenceNumber"),
     })
     Sku findById(int id);
 
@@ -135,6 +139,7 @@ public interface SkuMapper {
             @Result(column = "attention", property = "attention"),
             @Result(column = "price_constraint", property = "priceConstraint"),
             @Result(column = "other_info", property = "otherInfo"),
+            @Result(column = "auto_generate_reference_number", property = "autoGenerateReferenceNumber"),
     })
     List<Sku> findAll(RowBounds rowBounds);
 
@@ -163,6 +168,7 @@ public interface SkuMapper {
             @Result(column = "attention", property = "attention"),
             @Result(column = "price_constraint", property = "priceConstraint"),
             @Result(column = "other_info", property = "otherInfo"),
+            @Result(column = "auto_generate_reference_number", property = "autoGenerateReferenceNumber"),
     })
     List<Sku> findAllByName(String name, RowBounds rowBounds);
 
@@ -198,6 +204,7 @@ public interface SkuMapper {
             @Result(column = "attention", property = "attention"),
             @Result(column = "price_constraint", property = "priceConstraint"),
             @Result(column = "other_info", property = "otherInfo"),
+            @Result(column = "auto_generate_reference_number", property = "autoGenerateReferenceNumber"),
     })
     List<Sku> findAllByMultiFields(@Param("keyword") String keyword,
                                    @Param("cityId") int cityId,
@@ -230,6 +237,7 @@ public interface SkuMapper {
             @Result(column = "attention", property = "attention"),
             @Result(column = "price_constraint", property = "priceConstraint"),
             @Result(column = "other_info", property = "otherInfo"),
+            @Result(column = "auto_generate_reference_number", property = "autoGenerateReferenceNumber"),
     })
     List<Sku> findByVendorId(int vendorId);
 }

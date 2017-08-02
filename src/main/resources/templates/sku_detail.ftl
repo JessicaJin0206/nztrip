@@ -210,6 +210,22 @@
                     </#if>
                 </div>
             </div>
+            <div id="j_auto_generate_reference_number" class="form-group">
+                <span>是否自动生成Reference Number?</span>
+                <div class="btn-group" data-toggle="buttons">
+                    <#if editing = true>
+                        <label class="btn btn-default <#if sku.autoGenerateReferenceNumber = true>active</#if>">
+                            <input type="radio" class="toggle" value="1">是
+                        </label>
+                        <label class="btn btn-default <#if sku.autoGenerateReferenceNumber = false>active</#if>">
+                            <input type="radio" class="toggle" value="0">否
+                        </label>
+                    <#else>
+                        <#if sku.autoGenerateReferenceNumber = true><span>是</span></#if>
+                        <#if sku.autoGenerateReferenceNumber = false><span>否</span></#if>
+                    </#if>
+                </div>
+            </div>
 
             <div class="form-group">
                 <span>票种</span>

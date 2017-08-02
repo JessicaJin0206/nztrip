@@ -87,6 +87,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by qianhao.zhou on 7/29/16.
@@ -174,22 +175,40 @@ public class RestApiController extends AuthenticationRequiredController {
         return skuVo;
     }
 
-    @RequestMapping(value = "v1/api/skus/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/v1/api/skus", method = RequestMethod.GET)
     @Authentication(Role.Agent)
-    public SkuVo querySku(@PathVariable("id") int id) {
-        Sku sku = skuMapper.findById(id);
+    public List<SkuVo> querySkuByKeyword(@RequestParam("keyword") String keyword,
+                                         @RequestParam(value = "pagesize", defaultValue = "10") int pageSize,
+                                         @RequestParam(value = "pagenumber", defaultValue = "0") int pageNumber) {
         int agentId = getToken().getId();
-        checkViewSkuPriviledge(sku, agentId);
-        return parseSkuResponse(sku);
+        Agent agent = agentMapper.findById(agentId);
+        int vendorId = agent.getVendorId();
+        List<Sku> skus = skuMapper.findAllByMultiFields(keyword, 0, 0, vendorId, new RowBounds(pageNumber * pageSize, pageSize));
+        return skus.stream().map(RestApiController::parse).collect(Collectors.toList());
     }
 
-    @RequestMapping(value = "v1/api/skus", method = RequestMethod.GET)
+
+    @RequestMapping(value = "v1/api/skus/{id}", method = RequestMethod.GET)
     @Authentication(Role.Agent)
-    public SkuVo querySku(@RequestParam("uuid") String uuid) {
-        Sku sku = skuMapper.findByUuid(uuid);
-        int agentId = getToken().getId();
-        checkViewSkuPriviledge(sku, agentId);
-        return parseSkuResponse(sku);
+    public SkuVo querySku(@PathVariable("id") String idStr) {
+        int id = 0;
+        try {
+            id = Integer.parseInt(idStr);
+        } catch (NumberFormatException e) {
+            logger.warn("unable to parse " + idStr + " to int");
+        }
+        if (id > 0) {
+            Sku sku = skuMapper.findById(id);
+            int agentId = getToken().getId();
+            checkViewSkuPriviledge(sku, agentId);
+            return parseSkuResponse(sku);
+
+        } else {
+            Sku sku = skuMapper.findByUuid(idStr);
+            int agentId = getToken().getId();
+            checkViewSkuPriviledge(sku, agentId);
+            return parseSkuResponse(sku);
+        }
     }
 
     private void checkViewSkuPriviledge(Sku sku, int agentId) {
@@ -340,6 +359,9 @@ public class RestApiController extends AuthenticationRequiredController {
             if (orderMapper.findByAgentOrderId(agentOrderId).size() > 0) {
                 throw new InvalidParamException("duplicated agent order:" + agentOrderId);
             }
+        }
+        if (sku.isAutoGenerateReferenceNumber()) {
+            order.setReferenceNumber(order.getUuid());
         }
         orderMapper.create(order);
         orderVo.setId(order.getId());
@@ -868,6 +890,7 @@ public class RestApiController extends AuthenticationRequiredController {
         result.setPriceConstraint(sku.getPriceConstraint());
         result.setOtherInfo(sku.getOtherInfo());
         result.setRescheduleCancelNotice(sku.getRescheduleCancelNotice());
+        result.setAutoGenerateReferenceNumber(sku.isAutoGenerateReferenceNumber());
         return result;
     }
 

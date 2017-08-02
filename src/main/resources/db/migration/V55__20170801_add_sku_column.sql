@@ -1,0 +1,1 @@
+ALTER TABLE `sku` ADD COLUMN auto_generate_reference_number BOOL default FALSE;

@@ -210,6 +210,22 @@
                     </#if>
                 </div>
             </div>
+            <div id="j_auto_generate_reference_number" class="form-group">
+                <span>Auto Generate Reference Number?</span>
+                <div class="btn-group" data-toggle="buttons">
+                <#if editing = true>
+                    <label class="btn btn-default <#if sku.autoGenerateReferenceNumber = true>active</#if>">
+                        <input type="radio" class="toggle" value="1">Yes
+                    </label>
+                    <label class="btn btn-default <#if sku.autoGenerateReferenceNumber = false>active</#if>">
+                        <input type="radio" class="toggle" value="0">No
+                    </label>
+                <#else>
+                    <#if sku.autoGenerateReferenceNumber = true><span>Yes</span></#if>
+                    <#if sku.autoGenerateReferenceNumber = false><span>No</span></#if>
+                </#if>
+                </div>
+            </div>
 
             <div class="form-group">
                 <span>Ticket</span>

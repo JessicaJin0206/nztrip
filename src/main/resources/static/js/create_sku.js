@@ -123,6 +123,7 @@ var validate = function() {
     });
     var description = $('#j_description').val();
     var pickupService = parseInt($('#j_pickup_service label.active input').val());
+    var autoGenerateReferenceNumber = parseInt($('#j_auto_generate_reference_number label.active input').val());
     var durationId = parseInt(durationDropDown.attr('value'));
     var tickets = [];
     $('#j_ticket_container tr').each(function(idx, element){
@@ -182,6 +183,7 @@ var validate = function() {
         categoryId: categoryId,
         vendorId: vendorId,
         pickupService: !!pickupService,
+        autoGenerateReferenceNumber: !!autoGenerateReferenceNumber,
         gatheringPlace: gatheringPlace,
         description: description,
         durationId: durationId,
@@ -238,4 +240,4 @@ $('#j_update').on('click', function() {
 
 $('#j_edit').on('click', function(){
     window.location.href = window.location.pathname + "/_edit";
-})
+});
