@@ -365,6 +365,11 @@ public class RestApiController extends AuthenticationRequiredController {
                 orderTicketUserVo.setId(orderTicketUser.getId());
             }
         }
+
+        orderVo.setStatus(order.getStatus());
+        orderVo.setVendorPhone(vendor.getPhone());
+        orderVo.setUuid(order.getUuid());
+        orderVo.setPrice(order.getPrice());
         return orderVo;
     }
 
