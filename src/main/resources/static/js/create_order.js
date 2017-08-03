@@ -16,6 +16,7 @@ var warn = function (message) {
     var alert = create_alert(message);
     alert.addClass('alert-warning');
     $('.main').prepend(alert);
+    console.log(message);
 };
 var success = function (message) {
     var alert = create_alert(message);
@@ -151,11 +152,11 @@ $('#add_ticket').on('click', function (e) {
     ticketContainer.find('#j_gathering_place_span').val(place);
     for (var i = 0; i < ticketCount; i++) {
         var ticketDetail = $(
-            '<tr><th><input type="text" id="j_user_name" class="form-control"/></th><th><input type="number" id="j_user_age" class="form-control"/></th><th><input type="number" id="j_user_weight" class="form-control"/></th></tr>')
-        if (minWeight == maxWeight && minWeight == 0) {
+            '<tr><th><input type="text" id="j_user_name" class="form-control"/></th><th><input type="number" id="j_user_age" class="form-control"/></th><th><input type="number" id="j_user_weight" class="form-control"/></th></tr>');
+        if (minWeight === maxWeight && minWeight === 0) {
             ticketDetail.find('#j_user_weight').remove();
         }
-        if (minAge == maxAge && minAge == 0) {
+        if (minAge === maxAge && minAge === 0) {
             ticketDetail.find('#j_user_age').remove();
         }
         ticketDetail.find('#j_user_name').val(ticketName + (totalTicketCount + 1));
@@ -163,7 +164,9 @@ $('#add_ticket').on('click', function (e) {
     }
 });
 
-$('#j_submit').on('click', function () {
+var submitBtn = $('#j_submit');
+submitBtn.on('click', function () {
+    submitBtn.prop('disabled', true);
     var skuId = parseInt(getQueryString("skuId"));
     var skuUuid = getQueryString("uuid");
     var primaryContact = $('#j_primary_contact').val();
@@ -177,24 +180,24 @@ $('#j_submit').on('click', function () {
     var remark = $('#j_remark').val();
     var agentOrderId = $('#j_agent_order_id').val();
     var orderTickets = [];
-    var isDataValid = true;
 
-    if (primaryContact.length == 0) {
+    if (primaryContact.length === 0) {
         warn("缺少主要联系人信息");
-        isDataValid = false;
+        submitBtn.prop('disabled', false);
         return;
     }
-    if (primaryContactEmail.length == 0) {
+    if (primaryContactEmail.length === 0) {
         warn("缺少主要联系人信息");
-        isDataValid = false;
+        submitBtn.prop('disabled', false);
         return;
     }
     var ticketContainer = $('.j_ticket_container');
-    if (ticketContainer.length == 0) {
+    if (ticketContainer.length === 0) {
         warn("至少需要添加一张票");
-        isDataValid = false;
+        submitBtn.prop('disabled', false);
         return;
     }
+    var isDataValid = true;
     ticketContainer.each(function (index, e) {
         var orderTicket = {};
         var node = $(e);
@@ -219,7 +222,7 @@ $('#j_submit').on('click', function () {
             var name = ticketUserContainer.find('#j_user_name').val();
             var age = parseInt(ticketUserContainer.find('#j_user_age').val());
             var weight = parseInt(ticketUserContainer.find('#j_user_weight').val());
-            if (name.length == 0) {
+            if (name.length === 0) {
                 warn("请添加姓名");
                 isDataValid = false;
                 return;
@@ -238,6 +241,7 @@ $('#j_submit').on('click', function () {
         });
     });
     if (!isDataValid) {
+        submitBtn.prop('disabled', false);
         return;
     }
     var data = {
@@ -264,10 +268,11 @@ $('#j_submit').on('click', function () {
         success("添加成功");
         window.location.href = "/orders/" + data.id;
     }).complete(function (e) {
-        if (e.status == 400) {
+        if (e.status === 400) {
             error(e.responseText);
-        } else if (e.status != 200) {
+        } else if (e.status !== 200) {
             error("添加失败");
         }
+        submitBtn.prop('disabled', false);
     });
 });
