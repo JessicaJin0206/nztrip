@@ -150,16 +150,19 @@ public class RestApiController extends AuthenticationRequiredController {
 
     @ExceptionHandler
     public ResponseEntity handleException(AuthenticationFailureException ex) {
+        logger.error(ex.getMessage(), ex);
         return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler
     public ResponseEntity handleException(ResourceNotFoundException ex) {
+        logger.error(ex.getMessage(), ex);
         return new ResponseEntity(HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler
     public ResponseEntity handleException(InvalidParamException ex) {
+        logger.error(ex.getMessage(), ex);
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
