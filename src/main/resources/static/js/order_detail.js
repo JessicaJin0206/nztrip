@@ -1,6 +1,6 @@
 var create_alert = function (message) {
     var alert = $('.main .alert');
-    if (alert != null) {
+    if (alert !== null) {
         alert.remove();
     }
     return $('<div class="alert ">' +
@@ -40,7 +40,7 @@ $.each($('#j_status_drop_down li a'), function (idx, item) {
 function getQueryString(name) {
     var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
     var r = window.location.search.substr(1).match(reg);
-    if (r != null) {
+    if (r !== null) {
         return unescape(r[2]);
     }
     return null;
@@ -120,7 +120,7 @@ $('#add_ticket').on('click', function (e) {
             place = $(this).find('input.j_place').val();
         }
     });
-    if (place.length == 0) {
+    if (place.length === 0) {
         warn('请输入接送地点');
         return;
     }
@@ -161,10 +161,10 @@ $('#add_ticket').on('click', function (e) {
     for (var i = 0; i < ticketCount; i++) {
         var ticketDetail = $(
             '<tr><th><input type="text" id="j_user_name" class="form-control"/></th><th><input type="number" id="j_user_age" class="form-control"/></th><th><input type="number" id="j_user_weight" class="form-control"/></th></tr>')
-        if (minWeight == maxWeight && minWeight == 0) {
+        if (minWeight === maxWeight && minWeight === 0) {
             ticketDetail.find('#j_user_weight').remove();
         }
-        if (minAge == maxAge && minAge == 0) {
+        if (minAge === maxAge && minAge === 0) {
             ticketDetail.find('#j_user_age').remove();
         }
         ticketDetail.find('#j_user_name').val(ticketName + (totalTicketCount + 1));
@@ -195,7 +195,7 @@ $('.j_ticket_container').each(function (index, e) {
                            url: '/v1/api/orders/tickets/' + id,
                            data: JSON.stringify(data)
                        }).success(function (data) {
-                    if (data == true) {
+                    if (data) {
                         row.remove();
                         success("删除成功");
                     } else {
@@ -242,12 +242,12 @@ $('#j_update').on('click', function () {
     //     isDataValid = false;
     //     return;
     // }
-    if (primaryContact.length == 0) {
+    if (primaryContact.length === 0) {
         warn("缺少主要联系人信息");
         isDataValid = false;
         return;
     }
-    if (primaryContactEmail.length == 0) {
+    if (primaryContactEmail.length === 0) {
         warn("缺少主要联系人信息");
         isDataValid = false;
         return;
@@ -255,7 +255,7 @@ $('#j_update').on('click', function () {
 
     //ticket
     var ticketContainer = $('.j_ticket_container');
-    if (ticketContainer.length == 0) {
+    if (ticketContainer.length === 0) {
         warn("至少需要添加一张票");
         isDataValid = false;
         return;
@@ -341,9 +341,9 @@ $('#j_update').on('click', function () {
         $('#j_update').attr("disabled", true);
         window.location.href = '/orders/' + id;
     }).complete(function (e) {
-        if (e.status == 400) {
+        if (e.status === 400) {
             error(e.responseText);
-        } else if (e.status != 200) {
+        } else if (e.status !== 200) {
             error("修改失败");
         }
     });
@@ -363,7 +363,7 @@ $('#j_resend_reservation').on('click', function () {
                contentType: 'application/json; charset=utf-8',
                url: '/v1/api/orders/' + id + "/reservation"
            }).success(function (resp) {
-        if (resp.code == 0) {
+        if (resp.code === 0) {
             success("reservation letter has been sent");
         } else {
             error(resp.msg);
@@ -381,7 +381,7 @@ $('#j_resend_confirmation').on('click', function () {
                contentType: 'application/json; charset=utf-8',
                url: '/v1/api/orders/' + id + "/confirmation"
            }).success(function (resp) {
-        if (resp.code == 0) {
+        if (resp.code === 0) {
             success("confirmation letter has been sent");
         } else {
             error(resp.msg);
@@ -401,12 +401,12 @@ $('.j_operation').on('click', function () {
                         if (!yes) {
                             return;
                         }
-                        if (action == 40) {//reservation confirmed
-                            if ($('#j_referencenumber').val().length == 0) {
+                        if (action === 40) {//reservation confirmed
+                            if ($('#j_referencenumber').val().length === 0) {
                                 bootbox.prompt("请先填写Reference Number", function (referenceNumber) {
                                     if (referenceNumber === null) {
                                         return;
-                                    } else if (referenceNumber.length == 0) {
+                                    } else if (referenceNumber.length === 0) {
                                         warn("缺少Reference Number");
                                         return;
                                     } else {

@@ -355,7 +355,8 @@ public class RestApiController extends AuthenticationRequiredController {
                 reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
         order.setPrice(total);
         order.setVendorPhone(vendor.getPhone());
-        order.setUuid(GuidGenerator.generate(14));
+        String orderUuid = GuidGenerator.generate(14);
+        order.setUuid(orderUuid);
         order.setStatus(OrderStatus.NEW.getValue());
         String agentOrderId = order.getAgentOrderId();
         if (StringUtils.isNotEmpty(agentOrderId)) {
@@ -393,7 +394,7 @@ public class RestApiController extends AuthenticationRequiredController {
 
         orderVo.setStatus(order.getStatus());
         orderVo.setVendorPhone(vendor.getPhone());
-        orderVo.setUuid(order.getUuid());
+        orderVo.setUuid(orderUuid);
         orderVo.setPrice(order.getPrice());
         return orderVo;
     }
