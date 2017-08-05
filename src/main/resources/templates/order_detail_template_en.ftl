@@ -34,7 +34,9 @@
 <div class="form-group">
     <div class="row">
         <label class="col-md-2">E-Mail:</label>
-        <button id="j_resend_reservation" class="btn btn-default form-group">Re-Send Reservation Letter</button>
+        <button id="j_resend_reservation" class="btn btn-default form-group">Re-Send Reservation
+            Letter
+        </button>
         <button id="j_resend_confirmation" class="btn btn-default form-group">Re-Send Confirmation
             Letter
         </button>
@@ -146,7 +148,7 @@
 </div>
 
 <div class="form-group">
-    <label>Description:  </label><span id="j_ticket_desc"></span>
+    <label>Description: </label><span id="j_ticket_desc"></span>
 </div>
 
 <div class="form-group">
@@ -210,18 +212,14 @@
             id="j_ticket_sale_price_span">${ticket.salePrice?string('0.00')}</span>
     </div>
     <div class="form-group">
-        <div class="row col-md-2">
-            <label for="j_gathering_time_span">Gathering Time:</label>
-            <input type="text" id="j_gathering_time_span" class="form-control"
-                   <#if editing=false>disabled</#if> value="${ticket.gatheringTime!''}">
-        </div>
+        <label for="j_gathering_time_span">Gathering Time:</label>
+        <input id="j_gathering_time_span" class="form-control"
+               <#if editing=false>disabled</#if> value="${ticket.gatheringTime!''}">
     </div>
     <div class="form-group">
-        <div class="row col-md-2">
-            <label for="j_gathering_place_span">Gathering Place:</label>
-            <input type="text" id="j_gathering_place_span" class="form-control"
-                   <#if editing=false>disabled</#if> value="${ticket.gatheringPlace!''}"/>
-        </div>
+        <label for="j_gathering_place_span">Gathering Place:</label>
+        <input id="j_gathering_place_span" class="form-control"
+               <#if editing=false>disabled</#if> value="${ticket.gatheringPlace!''}"/>
     </div>
     <table class="table">
         <thead>
