@@ -152,7 +152,7 @@ $('#add_ticket').on('click', function (e) {
     ticketContainer.find('#j_gathering_place_span').val(place);
     for (var i = 0; i < ticketCount; i++) {
         var ticketDetail = $(
-            '<tr><th><input type="text" id="j_user_name" class="form-control"/></th><th><input type="number" id="j_user_age" class="form-control"/></th><th><input type="number" id="j_user_weight" class="form-control"/></th></tr>');
+            '<tr><th><input id="j_user_name" class="form-control"/></th><th><input type="number" id="j_user_age" class="form-control"/></th><th><input type="number" id="j_user_weight" class="form-control"/></th></tr>');
         if (minWeight === maxWeight && minWeight === 0) {
             ticketDetail.find('#j_user_weight').remove();
         }

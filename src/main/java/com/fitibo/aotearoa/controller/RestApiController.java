@@ -4,8 +4,10 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multiset;
 
 import com.fitibo.aotearoa.annotation.Authentication;
 import com.fitibo.aotearoa.constants.CommonConstants;
@@ -50,6 +52,7 @@ import com.fitibo.aotearoa.util.Md5Utils;
 import com.fitibo.aotearoa.util.ObjectParser;
 import com.fitibo.aotearoa.vo.AddPriceRecordRequest;
 import com.fitibo.aotearoa.vo.AddPriceRequest;
+import com.fitibo.aotearoa.vo.AddSkuInventoryRequest;
 import com.fitibo.aotearoa.vo.AgentVo;
 import com.fitibo.aotearoa.vo.AuthenticationReq;
 import com.fitibo.aotearoa.vo.AuthenticationResp;
@@ -63,6 +66,7 @@ import com.fitibo.aotearoa.vo.SkuVo;
 import com.fitibo.aotearoa.vo.VendorVo;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.ibatis.session.RowBounds;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -166,7 +170,7 @@ public class RestApiController extends AuthenticationRequiredController {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @RequestMapping(value = "v1/api/skus", method = RequestMethod.POST)
+    @RequestMapping(value = "/v1/api/skus", method = RequestMethod.POST)
     @Transactional(rollbackFor = Exception.class)
     @Authentication(Role.Admin)
     public SkuVo createSku(@RequestBody SkuVo skuVo) {
@@ -191,7 +195,7 @@ public class RestApiController extends AuthenticationRequiredController {
     }
 
 
-    @RequestMapping(value = "v1/api/skus/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/v1/api/skus/{id}", method = RequestMethod.GET)
     @Authentication(Role.Agent)
     public SkuVo querySku(@PathVariable("id") String idStr) {
         int id = 0;
@@ -232,7 +236,7 @@ public class RestApiController extends AuthenticationRequiredController {
     }
 
 
-    @RequestMapping(value = "v1/api/skus/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/v1/api/skus/{id}", method = RequestMethod.PUT)
     @Transactional(rollbackFor = Exception.class)
     @Authentication(Role.Admin)
     public SkuVo updateSku(@PathVariable("id") int id, @RequestBody SkuVo skuVo) {
@@ -276,7 +280,7 @@ public class RestApiController extends AuthenticationRequiredController {
         return skuVo;
     }
 
-    @RequestMapping(value = "v1/api/agents/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/v1/api/agents/{id}", method = RequestMethod.PUT)
     @Authentication(Role.Admin)
     public AgentVo updateAgent(@PathVariable("id") int id, @RequestBody AgentVo agentVo) {
         Agent agent = parse(agentVo);
@@ -286,7 +290,7 @@ public class RestApiController extends AuthenticationRequiredController {
         return agentVo;
     }
 
-    @RequestMapping(value = "v1/api/vendors/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/v1/api/vendors/{id}", method = RequestMethod.PUT)
     @Authentication(Role.Admin)
     public VendorVo updateVendor(@PathVariable("id") int id, @RequestBody VendorVo vendorVo) {
         Vendor vendor = parse(vendorVo);
@@ -296,7 +300,7 @@ public class RestApiController extends AuthenticationRequiredController {
         return vendorVo;
     }
 
-    @RequestMapping(value = "v1/api/priceRecords", method = RequestMethod.POST)
+    @RequestMapping(value = "/v1/api/priceRecords", method = RequestMethod.POST)
     public void createPriceRecord(@RequestBody AddPriceRecordRequest request) {
         logger.info("create price record:" + request);
         Preconditions
@@ -319,7 +323,7 @@ public class RestApiController extends AuthenticationRequiredController {
         return result;
     }
 
-    @RequestMapping(value = "v1/api/orders", method = RequestMethod.POST)
+    @RequestMapping(value = "/v1/api/orders", method = RequestMethod.POST)
     @Transactional(rollbackFor = Exception.class)
     @Authentication
     public OrderVo createOrder(@RequestBody OrderVo orderVo) {
@@ -367,6 +371,9 @@ public class RestApiController extends AuthenticationRequiredController {
         if (sku.isAutoGenerateReferenceNumber()) {
             order.setReferenceNumber(order.getUuid());
         }
+
+        checkSkuInventory(sku.getId(), orderVo.getOrderTickets());
+
         orderMapper.create(order);
         orderVo.setId(order.getId());
         if (CollectionUtils.isEmpty(orderVo.getOrderTickets())) {
@@ -399,7 +406,18 @@ public class RestApiController extends AuthenticationRequiredController {
         return orderVo;
     }
 
-    @RequestMapping(value = "v1/api/orders/{id}/confirmation", method = RequestMethod.POST)
+    @RequestMapping(value = "/v1/api/skus/{id}/sessions", method = RequestMethod.GET)
+    @Authentication({Role.Admin, Role.Vendor})
+    public List<String> getSessions(@PathVariable("id") int id,
+                                    @RequestParam("startDate") String startDateString,
+                                    @RequestParam("endDate") String endDateString) {
+        Date startDate = DateUtils.parseDate(startDateString);
+        Date endDate = DateUtils.parseDate(endDateString);
+        Preconditions.checkArgument(startDate.compareTo(endDate) <= 0, "invalid param, startDate:" + startDateString + " endDate:" + endDateString);
+        return skuTicketPriceMapper.getSessionsBySkuIdAndDate(id, startDate, endDate);
+    }
+
+    @RequestMapping(value = "/v1/api/orders/{id}/confirmation", method = RequestMethod.POST)
     @Authentication(Role.Admin)
     public ResultVo sendConfirmation(@PathVariable("id") int orderId) {
         Order order = orderMapper.findById(orderId);
@@ -413,7 +431,7 @@ public class RestApiController extends AuthenticationRequiredController {
         }
     }
 
-    @RequestMapping(value = "v1/api/orders/{id}/reservation", method = RequestMethod.POST)
+    @RequestMapping(value = "/v1/api/orders/{id}/reservation", method = RequestMethod.POST)
     @Authentication(Role.Admin)
     public ResultVo sendReservation(@PathVariable("id") int orderId) {
         Order order = orderMapper.findById(orderId);
@@ -546,8 +564,9 @@ public class RestApiController extends AuthenticationRequiredController {
                 orderMapper.updateReferenceNumber(id, referenceNumber);
                 order.setReferenceNumber(referenceNumber);
             }
-        } else if (fromStatus == OrderStatus.CONFIRMED.getValue() && toStatus == OrderStatus.CANCELLED
-                .getValue()) {
+            checkSkuInventory(order.getSkuId(), Lists.transform(orderTicketMapper.findByOrderId(order.getId()), ObjectParser::parse));
+
+
         }
         if (!statusValid) {
             throw new InvalidParamException("invalid transition from " + fromStatus + " to " + toStatus);
@@ -560,6 +579,21 @@ public class RestApiController extends AuthenticationRequiredController {
 
         operationService.doRelatedOperation(sendEmail, fromStatus, toStatus, order);
         return true;
+    }
+
+    private void checkSkuInventory(int skuId, List<OrderTicketVo> orderTickets) {
+        Multiset<Pair<String, String>> sessionMultiset = HashMultiset.create();
+        for (OrderTicketVo orderTicket : orderTickets) {
+            sessionMultiset.add(Pair.of(orderTicket.getTicketDate(), orderTicket.getTicketTime()), orderTicket.getOrderTicketUsers().size());
+        }
+        for (Pair<String, String> session : sessionMultiset.elementSet()) {
+            int number = sessionMultiset.count(session);
+            Date date = DateUtils.parseDate(session.getLeft());
+            SkuInventoryDto skuInventory = skuInventoryService.getSkuInventory(skuId, date, session.getRight());
+            if (skuInventory.getTotalCount() - skuInventory.getCurrentCount() < number) {
+                throw new InvalidParamException(session.getLeft() + " " + session.getRight() + " has not enough inventory");
+            }
+        }
     }
 
     @RequestMapping(value = "/v1/api/orders/tickets/{id}", method = RequestMethod.DELETE)
@@ -589,13 +623,13 @@ public class RestApiController extends AuthenticationRequiredController {
         BigDecimal total = orderTickets.stream().
                 map((orderTicket) -> calculateTicketPrice(priceMap.get(orderTicket.getTicketPriceId()),
                         discount)).
-                reduce((a, b) -> a.add(b)).orElseGet(() -> BigDecimal.ZERO);
+                reduce((a, b) -> a.add(b)).orElse(BigDecimal.ZERO);
         order.setPrice(total);
         orderMapper.updateOrderInfo(order);
         return true;
     }
 
-    @RequestMapping(value = "v1/api/signin", method = RequestMethod.POST)
+    @RequestMapping(value = "/v1/api/signin", method = RequestMethod.POST)
     public AuthenticationResp signin(@RequestBody AuthenticationReq req) {
         String user = req.getUser();
         Agent agent = agentMapper.findByUserName(user);
@@ -605,7 +639,7 @@ public class RestApiController extends AuthenticationRequiredController {
                 result.setToken(tokenService.generateToken(Role.Agent, agent.getId()));
                 return result;
             } else {
-                throw new AuthenticationFailureException();
+                throw new AuthenticationFailureException("wrong password");
             }
         }
         Admin admin = adminMapper.findByUser(user);
@@ -632,7 +666,7 @@ public class RestApiController extends AuthenticationRequiredController {
 
     }
 
-    @RequestMapping(value = "v1/api/vendors", method = RequestMethod.POST)
+    @RequestMapping(value = "/v1/api/vendors", method = RequestMethod.POST)
     @Authentication(Role.Admin)
     public Vendor createVendor(@RequestBody Vendor vendor) {
         final int vendorId = vendorService.createVendor(vendor);
@@ -640,7 +674,7 @@ public class RestApiController extends AuthenticationRequiredController {
         return vendor;
     }
 
-    @RequestMapping(value = "v1/api/agents", method = RequestMethod.POST)
+    @RequestMapping(value = "/v1/api/agents", method = RequestMethod.POST)
     @Authentication(Role.Admin)
     public AgentVo createAgent(@RequestBody AgentVo agentVo) {
         Agent agent = parse(agentVo);
@@ -649,7 +683,7 @@ public class RestApiController extends AuthenticationRequiredController {
         return agentVo;
     }
 
-    @RequestMapping(value = "v1/api/skus/{skuId}/tickets/{ticketId}/prices")
+    @RequestMapping(value = "/v1/api/skus/{skuId}/tickets/{ticketId}/prices")
     @Authentication
     public List<SkuTicketPriceVo> getPrice(@PathVariable("skuId") int skuId,
                                            @PathVariable("ticketId") int ticketId,
@@ -689,7 +723,7 @@ public class RestApiController extends AuthenticationRequiredController {
                 .divide(BigDecimal.valueOf(100), BigDecimal.ROUND_CEILING));
     }
 
-    @RequestMapping(value = "v1/api/skus/{skuId}/tickets/{ticketId}/prices", method = RequestMethod.POST)
+    @RequestMapping(value = "/v1/api/skus/{skuId}/tickets/{ticketId}/prices", method = RequestMethod.POST)
     @Authentication(Role.Admin)
     @Transactional
     public int addPrice(@PathVariable("skuId") int skuId,
@@ -743,7 +777,7 @@ public class RestApiController extends AuthenticationRequiredController {
         }
     }
 
-    @RequestMapping(value = "v1/api/skus/{skuId}/tickets/{ticketId}/prices", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/v1/api/skus/{skuId}/tickets/{ticketId}/prices", method = RequestMethod.DELETE)
     @Transactional(rollbackFor = Exception.class)
     @Authentication(Role.Admin)
     public int deletePrice(@PathVariable("skuId") int skuId,
@@ -770,11 +804,11 @@ public class RestApiController extends AuthenticationRequiredController {
         return count;
     }
 
-    @RequestMapping(value = "v1/api/skus/{skuId}/inventories", method = RequestMethod.GET)
+    @RequestMapping(value = "/v1/api/skus/{skuId}/inventories", method = RequestMethod.GET)
     @Authentication({Role.Admin, Role.Agent, Role.Vendor})
-    public SkuInventoryDto count(@PathVariable("skuId") int skuId,
-                                 @RequestParam("date") String dateString,
-                                 @RequestParam("time") String time) {
+    public SkuInventoryDto getSkuInventory(@PathVariable("skuId") int skuId,
+                                           @RequestParam("date") String dateString,
+                                           @RequestParam("time") String time) {
         if (getToken().getRole() == Role.Agent) {
             int agentId = getToken().getId();
             checkViewSkuPriviledge(skuMapper.findById(skuId), agentId);
@@ -785,6 +819,24 @@ public class RestApiController extends AuthenticationRequiredController {
             }
         }
         return skuInventoryService.getSkuInventory(skuId, DateUtils.parseDate(dateString), time);
+    }
+
+    @RequestMapping(value = "/v1/api/skus/{skuId}/inventories", method = RequestMethod.POST)
+    @Authentication({Role.Admin, Role.Vendor})
+    public boolean addSkuInventory(@PathVariable("skuId") int skuId, @RequestBody AddSkuInventoryRequest request) {
+        Preconditions.checkArgument(skuId == request.getSkuId(), "invalid sku id");
+        Sku sku = skuMapper.findById(skuId);
+        if (sku == null) {
+            throw new ResourceNotFoundException();
+        }
+        if (getToken().getRole() == Role.Vendor) {
+            if (sku.getVendorId() != getToken().getId()) {
+                throw new AuthenticationFailureException();
+            }
+        }
+        Date startDate = DateUtils.parseDate(request.getStartDate());
+        Date endDate = DateUtils.parseDate(request.getEndDate());
+        return skuInventoryService.addSkuInventory(skuId, startDate, endDate, request.getSessions(), request.getTotalCount());
     }
 
     private Map<Integer, SkuTicketPrice> getSkuTicketPriceMap(List<Integer> ids) {

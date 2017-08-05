@@ -13,8 +13,10 @@ import com.fitibo.aotearoa.model.SkuInventory;
 import com.fitibo.aotearoa.service.SkuInventoryService;
 import com.fitibo.aotearoa.util.DateUtils;
 
+import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -51,10 +53,23 @@ public class SkuInventoryServiceImpl implements SkuInventoryService {
         SkuInventory skuInventory = skuInventoryMapper.findBySkuIdAndDateTime(skuId, date, time);
         SkuInventoryDto result = new SkuInventoryDto();
         result.setCurrentCount(currentCount);
-        result.setTotalCount(Optional.ofNullable(skuInventory).isPresent()?skuInventory.getCount():Integer.MIN_VALUE);
+        result.setTotalCount(Optional.ofNullable(skuInventory).isPresent()?skuInventory.getCount():Integer.MAX_VALUE);
         result.setSkuId(skuId);
         result.setDate(DateUtils.formatDate(date));
         result.setTime(time);
         return result;
     }
+
+    @Override
+    @Transactional
+    public boolean addSkuInventory(int skuId, Date startDate, Date endDate, List<String> sessions, int totalCount) {
+        skuInventoryMapper.delete(skuId, startDate, endDate, sessions);
+        LocalDateTime start = LocalDateTime.fromDateFields(startDate);
+        LocalDateTime end = LocalDateTime.fromDateFields(endDate);
+        for (LocalDateTime date = start; date.compareTo(end) <= 0; date = date.plusDays(1)) {
+            skuInventoryMapper.add(skuId, date.toDate(), sessions, totalCount);
+        }
+        return true;
+    }
+
 }

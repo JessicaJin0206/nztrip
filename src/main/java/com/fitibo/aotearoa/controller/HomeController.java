@@ -99,6 +99,7 @@ public class HomeController extends AuthenticationRequiredController {
     private static final String MODULE_CREATE_AGENT = "create_agent";
     private static final String MODULE_PRICE_MONITORING = "price_monitoring";
     private static final String MODULE_VENDOR_SKU = "vendor_sku";
+    private static final String MODULE_SKU_INVENTORY = "sku_inventory";
 
     @Autowired
     private CityService cityService;
@@ -656,6 +657,25 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("action", "reset");
         model.put("role", getToken().getRole().toString());
         return "agent_detail";
+    }
+
+    @RequestMapping("skus/{id}/inventory")
+    @Authentication({Role.Admin, Role.Vendor})
+    public String skuInventory(@PathVariable("id") int id, Map<String, Object> model) {
+        Sku sku = skuMapper.findById(id);
+        if (sku == null) {
+            throw new ResourceNotFoundException();
+        }
+        if (getToken().getRole() == Role.Vendor) {
+            if (sku.getVendorId() != getToken().getId()) {
+                throw new AuthenticationFailureException();
+            }
+        }
+        model.put("sku", sku);
+        model.put("tickets", skuTicketMapper.findBySkuId(id));
+        model.put("module", MODULE_SKU_INVENTORY);
+        model.put("role", getToken().getRole().toString());
+        return "sku_inventory";
     }
 
     private List<Sku> searchSku(String keyword, int cityId, int categoryId, int vendorId, RowBounds rowBounds) {

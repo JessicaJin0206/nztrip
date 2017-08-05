@@ -13,15 +13,15 @@
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
 
             <div class="form-group"><label>查看代理商</label></div>
-            <div class="form-group"><input type="text" id="j_username" class="form-control"
+            <div class="form-group"><input id="j_username" class="form-control"
                                            <#if action != "edit">disabled</#if> placeholder="请创建代理商用户名"
                                            value="${agent.userName}">
             </div>
-            <div class="form-group"><input type="text" id="j_name" class="form-control"
+            <div class="form-group"><input id="j_name" class="form-control"
                                            <#if action != "edit">disabled</#if> placeholder="请为代理商用户分配密码"
                                            value="${agent.name}">
             </div>
-            <div class="form-group"><input type="text" id="j_description" class="form-control"
+            <div class="form-group"><input id="j_description" class="form-control"
                                            <#if action != "edit">disabled</#if> placeholder="请输入代理商备注"
                                            value="${agent.description}">
             </div>
@@ -29,23 +29,23 @@
                                            <#if action != "edit">disabled</#if> placeholder="请输入代理商折扣"
                                            value="${agent.discount}">
             </div>
-            <div class="form-group"><input type="text" id="j_email" class="form-control"
+            <div class="form-group"><input id="j_email" class="form-control"
                                            <#if action != "edit">disabled</#if> placeholder="请输入代理商邮箱"
                                            value="${agent.email}">
             </div>
-            <div class="form-group"><input type="text" id="j_default_contact" class="form-control"
+            <div class="form-group"><input id="j_default_contact" class="form-control"
                                            <#if action != "edit">disabled</#if> placeholder="请输入默认联系人"
                                            value="${(agent.defaultContact)!""}">
             </div>
-            <div class="form-group"><input type="text" id="j_default_contact_email" class="form-control"
+            <div class="form-group"><input id="j_default_contact_email" class="form-control"
                                            <#if action != "edit">disabled</#if> placeholder="请输入默认联系人邮箱"
                                            value="${(agent.defaultContactEmail)!""}">
             </div>
-            <div class="form-group"><input type="text" id="j_default_contact_phone" class="form-control"
+            <div class="form-group"><input id="j_default_contact_phone" class="form-control"
                                            <#if action != "edit">disabled</#if> placeholder="请输入默认联系人手机"
                                            value="${(agent.defaultContactPhone)!""}">
             </div>
-            <#if action = "reset"><div class="form-group"><input type="text" id="j_password" class="form-control"
+            <#if action = "reset"><div class="form-group"><input id="j_password" class="form-control"
                                            placeholder="请输入代理商用户密码"></div>
             </#if>
 

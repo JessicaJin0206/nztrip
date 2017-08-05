@@ -50,7 +50,7 @@ dateSelector.on("dp.change", function(e){
 $('#j_submit').on('click', function(){
     var startDate = startDateSelector.find('input').val();
     var endDate = endDateSelector.find('input').val();
-    if (startDate.length == 0 || endDate.length == 0) {
+    if (startDate.length === 0 || endDate.length === 0) {
         return;
     }
     var dayOfWeek = [];
@@ -100,7 +100,7 @@ $('#j_submit').on('click', function(){
 $('#j_delete').on('click', function(){
     var startDate = startDateSelector.find('input').val();
     var endDate = endDateSelector.find('input').val();
-    if (startDate.length == 0 || endDate.length == 0) {
+    if (startDate.length === 0 || endDate.length === 0) {
         return;
     }
     var dayOfWeek = [];

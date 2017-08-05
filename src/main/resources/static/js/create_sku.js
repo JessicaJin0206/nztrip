@@ -241,3 +241,11 @@ $('#j_update').on('click', function() {
 $('#j_edit').on('click', function(){
     window.location.href = window.location.pathname + "/_edit";
 });
+
+$('#j_edit_inventory').on('click', function() {
+    if (window.location.pathname.endsWith("/")) {
+        window.location.href = window.location.pathname + "inventory"
+    } else {
+        window.location.href = window.location.pathname + "/inventory"
+    }
+});

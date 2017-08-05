@@ -26,13 +26,13 @@
 
             <div class=" row">
                 <div class="input-group date col-md-3 col-sm-3 col-xs-3 form-group" id="j_start_date">
-                    <input type="text" placeholder="起始日期" class="form-control"/>
+                    <input placeholder="起始日期" class="form-control"/>
                     <span class="input-group-addon">
                             <span class="glyphicon glyphicon-calendar"/>
                         </span>
                 </div>
                 <div class="input-group date col-md-3 col-sm-3 col-xs-3 form-group" id="j_end_date">
-                    <input type="text" placeholder="结束日期" class="form-control"/>
+                    <input placeholder="结束日期" class="form-control"/>
                     <span class="input-group-addon">
                             <span class="glyphicon glyphicon-calendar"/>
                         </span>
@@ -66,7 +66,7 @@
             </div>
 
             <div class="form-group row">
-                <div class="col-md-2"><input type="text" id="j_ticket_time" class="form-control" placeholder="时间">
+                <div class="col-md-2"><input id="j_ticket_time" class="form-control" placeholder="时间">
                 </div>
                 <div class="col-md-2"><input type="number" id="j_ticket_cost_price" class="form-control" placeholder="成本价">
                 </div>
@@ -74,7 +74,7 @@
                 </div>
                 <div class="col-md-2"><input type="number" id="j_ticket_total_count" class="form-control" placeholder="库存">
                 </div>
-                <div class="col-md-4"><input type="text" id="j_ticket_description" class="form-control" placeholder="描述">
+                <div class="col-md-4"><input id="j_ticket_description" class="form-control" placeholder="描述">
                 </div>
             </div>
 
@@ -84,7 +84,7 @@
             </div>
 
             <div class="input-group date col-md-3 col-sm-3 col-xs-3 form-group" id="j_selected_date">
-                <input type="text" placeholder="选择日期" class="form-control" value="${date!''}"/>
+                <input placeholder="选择日期" class="form-control" value="${date!''}"/>
                 <span class="input-group-addon">
                     <span class="glyphicon glyphicon-calendar"/>
                 </span>

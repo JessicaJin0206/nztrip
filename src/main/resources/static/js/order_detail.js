@@ -441,7 +441,11 @@ function updateOrderStatus(id, toStatus, sendEmail, data) {
         } else {
             error("操作失败");
         }
-    }).error(function () {
-        error("操作失败");
+    }).error(function (resp) {
+        if (resp.status === 400) {
+            error(resp.responseText);
+        } else {
+            error("操作失败");
+        }
     });
 }

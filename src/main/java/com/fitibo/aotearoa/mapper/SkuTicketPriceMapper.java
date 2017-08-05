@@ -223,4 +223,9 @@ public interface SkuTicketPriceMapper {
     })
     int decreaseCurrentCount(@Param("ids") List<Integer> ids);
 
+    @Select("select distinct `time` from sku_ticket_price where sku_id = #{skuId} and date >= #{startDate} and date <= #{endDate}")
+    List<String> getSessionsBySkuIdAndDate(@Param("skuId") int skuId,
+                                           @Param("startDate") Date startDate,
+                                           @Param("endDate") Date endDate);
+
 }
