@@ -411,28 +411,37 @@ $('.j_operation').on('click', function () {
                                         return;
                                     } else {
                                         data.referenceNumber = referenceNumber;
+                                        updateOrderStatus(id, action, sendEmail, data);
                                     }
                                 });
-                            }
-                        }
-                        $.ajax({
-                                   type: 'PUT',
-                                   contentType: "application/json; charset=utf-8",
-                                   url: '/v1/api/orders/' + id + "/status/" + action + "?sendEmail="
-                                        + sendEmail,
-                                   data: JSON.stringify(data)
-                               }).success(function (data) {
-                            if (data) {
-                                bootbox.alert("操作成功", function () {
-                                    window.location.reload();
-                                });
                             } else {
-                                error("操作失败");
+                                updateOrderStatus(id, action, sendEmail, data);
                             }
-                        }).error(function () {
-                            error("操作失败");
-                        });
+                        } else {
+                            updateOrderStatus(id, action, sendEmail, data);
+                        }
+
                     }
     );
 
 });
+
+function updateOrderStatus(id, toStatus, sendEmail, data) {
+    $.ajax({
+               type: 'PUT',
+               contentType: "application/json; charset=utf-8",
+               url: '/v1/api/orders/' + id + "/status/" + toStatus + "?sendEmail="
+                    + sendEmail,
+               data: JSON.stringify(data)
+           }).success(function (data) {
+        if (data) {
+            bootbox.alert("操作成功", function () {
+                window.location.reload();
+            });
+        } else {
+            error("操作失败");
+        }
+    }).error(function () {
+        error("操作失败");
+    });
+}
