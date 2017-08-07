@@ -11,7 +11,7 @@ import org.apache.ibatis.annotations.Select;
  */
 public interface SpecialRateMapper {
 
-  @Select("select * from special_rate where sku = #{sku} and agent_id = #{agentId}")
+  @Select("select * from special_rate where sku = #{sku} and agent_id = #{agentId} order by id desc limit 1")
   @Results({
       @Result(column = "id", property = "id"),
       @Result(column = "sku_id", property = "skuId"),
