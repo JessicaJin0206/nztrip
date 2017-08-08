@@ -492,11 +492,11 @@ public class HomeController extends AuthenticationRequiredController {
         if (dateString != null) {
             model.put("date", dateString);
             Date date = DateUtils.parseDate(dateString);
-            skuTicketPrices = skuTicketPriceMapper.findBySkuTicketIdAndDate(ticket.getId(), date,
+            skuTicketPrices = skuTicketPriceMapper.findBySkuTicketIdAndDate(ticket.getSkuId(), ticket.getId(), date,
                     new RowBounds(pageNumber * pageSize, pageSize));
         } else {
             skuTicketPrices = skuTicketPriceMapper
-                    .findBySkuTicketId(ticket.getId(), new RowBounds(pageNumber * pageSize, pageSize));
+                    .findBySkuTicketId(ticket.getSkuId(), ticket.getId(), new RowBounds(pageNumber * pageSize, pageSize));
         }
         model.put("sku", sku);
         model.put("ticket", ticket);
