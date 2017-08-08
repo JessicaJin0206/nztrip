@@ -1,6 +1,6 @@
 var create_alert = function (message) {
     var alert = $('.main .alert');
-    if (alert != null) {
+    if (alert !== null) {
         alert.remove();
     }
     return $('<div class="alert ">' +
@@ -27,20 +27,21 @@ var error = function(message) {
     alert.addClass('alert-danger');
     $('.main').prepend(alert);
 };
+var emailReg = /^([\.a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-])+/;
 
 var validateCreate = function() {
     var userName = $('#j_username').val();
-    if (userName.length == 0) {
+    if (userName.length === 0) {
         warn("请填写行程商用户名");
         return;
     }
     var password = $('#j_password').val();
-    if (password.length == 0) {
+    if (password.length === 0) {
         warn("请填写用户密码");
         return;
     }
     var name = $('#j_name').val();
-    if (name.length == 0) {
+    if (name.length === 0) {
         warn("请填写行程商名称");
         return;
     }
@@ -51,14 +52,11 @@ var validateCreate = function() {
         return;
     }
     var email = $('#j_email').val();
-    if (email.length == 0) {
-        warn("请填写行程商邮箱");
-        return;
-    }
-    var emailReg = /^([\.a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-])+/;
-    if(!emailReg.test(email)) {
-        warn("请输入有效的行程商邮箱");
-        return;
+    if (email.length > 0) {
+        if(!emailReg.test(email)) {
+            warn("请输入有效的行程商邮箱");
+            return;
+        }
     }
     return {
         userName: userName,
@@ -72,12 +70,12 @@ var validateCreate = function() {
 
 var validateUpdate = function() {
     var userName = $('#j_username').val();
-    if (userName.length == 0) {
+    if (userName.length === 0) {
         warn("请填写行程商用户名");
         return;
     }
     var name = $('#j_name').val();
-    if (name.length == 0) {
+    if (name.length === 0) {
         warn("请填写行程商名称");
         return;
     }
@@ -88,15 +86,14 @@ var validateUpdate = function() {
         return;
     }
     var email = $('#j_email').val();
-    if (email.length == 0) {
-        warn("请填写行程商邮箱");
-        return;
+    if (email.length > 0) {
+        if(!emailReg.test(email)) {
+            warn("请输入有效的行程商邮箱");
+            return;
+        }
     }
-    var emailReg = /^([\.a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-])+/;
-    if(!emailReg.test(email)) {
-        warn("请输入有效的行程商邮箱");
-        return;
-    }
+
+
     var defaultContact = $('#j_default_contact').val();
     var defaultContactEmail = $('#j_default_contact_email').val();
     var defaultContactPhone = $('#j_default_contact_phone').val();
@@ -114,7 +111,7 @@ var validateUpdate = function() {
 
 var validateReset = function() {
     var password = $('#j_password').val();
-    if (password.length == 0) {
+    if (password.length === 0) {
         warn("请填写用户密码");
         return;
     }

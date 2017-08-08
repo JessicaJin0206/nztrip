@@ -78,7 +78,7 @@ public interface AgentMapper {
             "<set> " +
             "<if test = \"userName != null and userName != ''\">user_name = #{userName},</if>" +
             "<if test = \"name != null and name != ''\">name = #{name},</if>" +
-            "<if test = \"email != null and email != ''\">email = #{email},</if>" +
+            "email = #{email}," +
             "<if test = \"description != null and description != ''\">description = #{description},</if>" +
             "<if test = \"discount != null and discount != 0\">discount = #{discount},</if>" +
             "<if test = \"password != null and password != ''\">password = #{password},</if>" +
