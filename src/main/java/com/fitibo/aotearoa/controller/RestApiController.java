@@ -526,6 +526,9 @@ public class RestApiController extends AuthenticationRequiredController {
                 map((orderTicket) -> calculateTicketPrice(priceMap.get(orderTicket.getTicketPriceId()), discount)).
                 reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
         o.setPrice(total);
+        if (token.getRole() != Role.Admin) {
+            o.setModifiedPrice(total);
+        }
         String agentOrderId = o.getAgentOrderId();
         if (StringUtils.isNotEmpty(agentOrderId)) {
             if (orderMapper.findByAgentOrderId(agentOrderId).size() > 1) {
@@ -902,7 +905,10 @@ public class RestApiController extends AuthenticationRequiredController {
         Order result = new Order();
         result.setId(order.getId());
         result.setSku(order.getSku());
+        //修改价格
         result.setPrice(order.getPrice());
+        result.setModifiedPrice(order.getPrice());
+
         result.setStatus(order.getStatus());
         result.setReferenceNumber(order.getReferenceNumber());
         result.setGatheringInfo(order.getGatheringInfo());

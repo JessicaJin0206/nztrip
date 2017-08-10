@@ -18,6 +18,23 @@ $.each($('#j_category_drop_down li a'), function (idx, item) {
 
 $('#j_search').on('click', doSearch);
 
+$('#j_export').on('click', function () {
+    var cityId = parseInt(cityDropDown.attr('value'));
+    var categoryId = parseInt(categoryDropDown.attr('value'));
+    var keyword = $('#j_keyword').val();
+    var searchString = "";
+    if (cityId > 0) {
+        searchString += "cityid=" + cityId + "&";
+    }
+    if (categoryId > 0) {
+        searchString += "categoryid=" + categoryId + "&";
+    }
+    if (keyword.length > 0) {
+        searchString += "keyword=" + encodeURI(keyword) + "&";
+    }
+    window.open("/skus/export?"+ searchString);
+});
+
 $('#j_keyword').keydown(enterKey);
 
 function enterKey(event) {

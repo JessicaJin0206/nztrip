@@ -184,6 +184,14 @@ public class Order extends ModelObject {
         this.agentOrderId = agentOrderId;
     }
 
+    public BigDecimal getModifiedPrice() {
+        return modifiedPrice;
+    }
+
+    public void setModifiedPrice(BigDecimal modifiedPrice) {
+        this.modifiedPrice = modifiedPrice;
+    }
+
     private int skuId;
     private String uuid;
     private String sku;
@@ -206,4 +214,5 @@ public class Order extends ModelObject {
     private String vendorPhone;
     private String agentName;
     private String agentOrderId;
+    private BigDecimal modifiedPrice;
 }

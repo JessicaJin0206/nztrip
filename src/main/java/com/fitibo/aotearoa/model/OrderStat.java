@@ -1,9 +1,9 @@
 package com.fitibo.aotearoa.model;
 
+import lombok.Data;
+
 import java.math.BigDecimal;
 import java.util.Date;
-
-import lombok.Data;
 
 /**
  * Created by qianhao.zhou on 17/01/2017.
@@ -23,6 +23,7 @@ public class OrderStat extends ModelObject {
     private Date ticketDate;
     private String ticketTime;
     private String ticketUserName;
+    private BigDecimal modifiedPrice;
     private BigDecimal totalPrice;
     private BigDecimal price;
     private BigDecimal costPrice;

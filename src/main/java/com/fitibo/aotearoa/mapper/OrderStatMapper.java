@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface OrderStatMapper {
 
-    @Select("select o.id, o.uuid as order_id, o.create_time, o.primary_contact, o.status, o.reference_number, sku.uuid as sku_id, sku.name as sku_name, vendor.name as vendor_name, ot.sku_ticket_name, ot.ticket_date, ot.ticket_time, otu.name as order_ticket_user_name, o.price as total_price, ot.cost_price, ot.sale_price, (ot.cost_price + (ot.sale_price - ot.cost_price) * (CASE WHEN sr.discount is not null THEN sr.discount ELSE agent.discount END) / 100) as price, o.agent_order_id, agent.id as agent_id, agent.name as agent_name,\n" +
+    @Select("select o.id, o.uuid as order_id, o.create_time, o.primary_contact, o.status, o.reference_number, sku.uuid as sku_id, sku.name as sku_name, vendor.name as vendor_name, ot.sku_ticket_name, ot.ticket_date, ot.ticket_time, otu.name as order_ticket_user_name, o.price as total_price,o.modified_price , ot.cost_price, ot.sale_price, (ot.cost_price + (ot.sale_price - ot.cost_price) * (CASE WHEN sr.discount is not null THEN sr.discount ELSE agent.discount END) / 100) as price, o.agent_order_id, agent.id as agent_id, agent.name as agent_name,\n" +
             "(CASE WHEN sr.discount is not null THEN sr.discount ELSE agent.discount END) as discount\n" +
             "from `order` o \n" +
             "inner join order_ticket ot on o.id = ot.order_id\n" +
@@ -36,7 +36,7 @@ public interface OrderStatMapper {
             @Result(column = "ticket_time", property = "ticketTime"),
             @Result(column = "order_ticket_user_name", property = "ticketUserName"),
             @Result(column = "total_price", property = "totalPrice"),
-            @Result(column = "total_price", property = "totalPrice"),
+            @Result(column = "modified_price", property = "modifiedPrice"),
             @Result(column = "price", property = "price"),
             @Result(column = "cost_price", property = "costPrice"),
             @Result(column = "sale_price", property = "salePrice"),

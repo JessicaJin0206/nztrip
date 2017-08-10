@@ -1,10 +1,10 @@
 package com.fitibo.aotearoa.vo;
 
+import lombok.Data;
+
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
-
-import lombok.Data;
 
 /**
  * Created by qianhao.zhou on 8/7/16.
@@ -39,5 +39,5 @@ public class OrderVo {
     private List<OrderTicketVo> orderTickets;
     private String ticketDate;
     private String agentOrderId;
-
+    private BigDecimal modifiedPrice;
 }

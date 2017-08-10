@@ -1,19 +1,16 @@
 package com.fitibo.aotearoa.service.impl;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
 import com.fitibo.aotearoa.constants.OrderStatus;
 import com.fitibo.aotearoa.dto.Transition;
 import com.fitibo.aotearoa.service.OrderService;
-
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Map;
-
-import javax.annotation.PostConstruct;
 
 @Service("orderService")
 public class OrderServiceImpl implements OrderService {
@@ -41,7 +38,8 @@ public class OrderServiceImpl implements OrderService {
 
         transitionMap.put(OrderStatus.MODIFYING.getValue(),
                 Lists.newArrayList(new Transition(OrderStatus.CONFIRMED.getValue(), "预订成功", "Confirm"),
-                        new Transition(OrderStatus.CLOSED.getValue(), "关闭订单", "Close")));
+                        new Transition(OrderStatus.CLOSED.getValue(), "关闭订单", "Close"),
+                        new Transition(OrderStatus.CANCELLED.getValue(), "取消订单", "Cancel")));
 
         transitionMap.put(OrderStatus.CANCELLED.getValue(),
                 Lists.newArrayList());
@@ -52,7 +50,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<Transition> getAvailableTransitions(int status)  {
+    public List<Transition> getAvailableTransitions(int status) {
         Preconditions.checkArgument(transitionMap.containsKey(status), "invalid from status:" + status);
         return transitionMap.get(status);
     }

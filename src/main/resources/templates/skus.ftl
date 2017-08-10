@@ -64,8 +64,11 @@
                 </div>
                 <div class="col-md-4"><input type="text" id="j_keyword" class="form-control" placeholder="请输入编号或关键词" value="${keyword}">
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-1">
                     <button id="j_search" class="btn btn-primary">搜索</button>
+                </div>
+                <div class="col-md-1">
+                    <button id="j_export" class="btn btn-primary">导出</button>
                 </div>
             </div>
 
@@ -93,6 +96,11 @@
                                 <a href="/create_order?skuId=${sku.id?c}" target="_blank">
                                     <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
                                 </a>
+                                <#if role?? && (role == "Admin")>
+                                    <a href="/sku_tickets/export/${sku.id?c}" target="_blank">
+                                        <span class="glyphicon glyphicon-download" aria-hidden="true"></span>
+                                    </a>
+                                </#if>
                             </div>
                         </td>
                     </tr>

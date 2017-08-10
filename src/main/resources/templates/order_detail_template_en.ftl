@@ -66,7 +66,7 @@
         <label class="col-md-2">Total Price:</label>
         <div class="col-md-offset-2">
             <input type="number" id="j_order_price" class="form-control"
-                   <#if editing=false>disabled</#if> value="${order.price?string('0.00')}">
+                   <#if editing=false>disabled</#if> value="${order.modifiedPrice?string('0.00')}">
         </div>
     </div>
 </div>

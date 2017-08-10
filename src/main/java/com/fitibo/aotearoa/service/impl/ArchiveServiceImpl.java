@@ -1,62 +1,45 @@
 package com.fitibo.aotearoa.service.impl;
 
+import com.fitibo.aotearoa.constants.OrderStatus;
+import com.fitibo.aotearoa.mapper.*;
+import com.fitibo.aotearoa.model.*;
+import com.fitibo.aotearoa.service.ArchiveService;
+import com.fitibo.aotearoa.service.DiscountRateService;
+import com.fitibo.aotearoa.service.SkuService;
+import com.fitibo.aotearoa.util.DateUtils;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-
-import com.fitibo.aotearoa.constants.OrderStatus;
-import com.fitibo.aotearoa.mapper.OrderMapper;
-import com.fitibo.aotearoa.mapper.OrderStatMapper;
-import com.fitibo.aotearoa.mapper.OrderTicketMapper;
-import com.fitibo.aotearoa.mapper.SkuTicketMapper;
-import com.fitibo.aotearoa.mapper.SkuTicketPriceMapper;
-import com.fitibo.aotearoa.mapper.VendorMapper;
-import com.fitibo.aotearoa.model.Order;
-import com.fitibo.aotearoa.model.OrderStat;
-import com.fitibo.aotearoa.model.OrderTicket;
-import com.fitibo.aotearoa.model.Sku;
-import com.fitibo.aotearoa.model.SkuTicket;
-import com.fitibo.aotearoa.model.SkuTicketPrice;
-import com.fitibo.aotearoa.model.Vendor;
-import com.fitibo.aotearoa.service.ArchiveService;
-import com.fitibo.aotearoa.service.SkuService;
-import com.fitibo.aotearoa.util.DateUtils;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.ibatis.session.RowBounds;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFHyperlink;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.joda.time.DateTime;
-import org.joda.time.Weeks;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import rx.Observable;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
-
-import rx.Observable;
 
 /**
  * Created by zhouqianhao on 11/03/2017.
@@ -64,8 +47,13 @@ import rx.Observable;
 @Service
 public class ArchiveServiceImpl implements ArchiveService {
 
+    private final static Logger logger = LoggerFactory.getLogger(ArchiveService.class);
+
     @Autowired
     private SkuService skuService;
+
+    @Autowired
+    private SkuMapper skuMapper;
 
     @Autowired
     private VendorMapper vendorMapper;
@@ -100,6 +88,9 @@ public class ArchiveServiceImpl implements ArchiveService {
     @Autowired
     private OrderMapper orderMapper;
 
+    @Autowired
+    private DiscountRateService discountRateService;
+
     @Override
     public Workbook createVoucher(Order order) {
 
@@ -123,6 +114,7 @@ public class ArchiveServiceImpl implements ArchiveService {
             Sheet sheet = workbook.getSheetAt(0);
             fillRowWithVoucher(sheet, order, firstOrderTicket, orderTickets, vendor, sku);
             sheet.protectSheet("eyounz2016");
+
             return workbook;
         } catch (InvalidFormatException e) {
             throw new RuntimeException("voucher template invalid format", e);
@@ -207,6 +199,12 @@ public class ArchiveServiceImpl implements ArchiveService {
         remark.setCellValue(order.getRemark());
     }
 
+    private static BigDecimal calculateTicketPrice(SkuTicketPriceForExportKey ticketPrice, int discount) {
+        BigDecimal cost = ticketPrice.getCostPrice();
+        BigDecimal sale = ticketPrice.getSalePrice();
+        return cost.add(sale.subtract(cost).multiply(BigDecimal.valueOf(discount))
+                .divide(BigDecimal.valueOf(100), BigDecimal.ROUND_CEILING));
+    }
 
     @Override
     public Workbook createOrderStats() {
@@ -214,6 +212,15 @@ public class ArchiveServiceImpl implements ArchiveService {
         try (InputStream is = orderTemplate.getInputStream()) {
             Workbook workbook = WorkbookFactory.create(is);
             Sheet sheet = workbook.getSheetAt(0);
+
+            Drawing drawing = sheet.createDrawingPatriarch();
+            CreationHelper creationHelper = workbook.getCreationHelper();
+            ClientAnchor anchor = creationHelper.createClientAnchor();
+            Font font = workbook.createFont();
+            font.setColor(IndexedColors.BLUE.getIndex());
+            CellStyle cellStyle = workbook.createCellStyle();
+            cellStyle.setFont(font);
+
             Map<String, BigDecimal> costPriceMap = Maps.newConcurrentMap();
             Observable.from(orderStats).groupBy(OrderStat::getOrderId)
                     .subscribe(groupedObservable ->
@@ -241,7 +248,7 @@ public class ArchiveServiceImpl implements ArchiveService {
                         OrderStat orderStat = pair.getLeft();
                         int index = pair.getRight();
                         Row row = sheet.createRow(index + 1);
-                        fillRowWithOrderStat(row, orderStat, costPriceMap, salePriceMap);
+                        fillRowWithOrderStat(row, orderStat, costPriceMap, salePriceMap, creationHelper, drawing, anchor, cellStyle);
 
                     });
             sheet.protectSheet("eyounz2016");
@@ -358,7 +365,7 @@ public class ArchiveServiceImpl implements ArchiveService {
         return workbook;
     }
 
-    private void fillRowWithOrderStat(Row row, OrderStat orderStat, Map<String, BigDecimal> costPriceMap, Map<String, BigDecimal> salePriceMap) {
+    private void fillRowWithOrderStat(Row row, OrderStat orderStat, Map<String, BigDecimal> costPriceMap, Map<String, BigDecimal> salePriceMap, CreationHelper creationHelper, Drawing drawing, ClientAnchor anchor, CellStyle cellStyle) {
         int col = 0;
         Cell orderId = row.createCell(col++);
         orderId.setCellType(Cell.CELL_TYPE_STRING);
@@ -428,10 +435,21 @@ public class ArchiveServiceImpl implements ArchiveService {
         price.setCellValue(
                 orderStat.getPrice().setScale(2, RoundingMode.HALF_EVEN).doubleValue());
 
+
+        //
         Cell totalPrice = row.createCell(col++);
         totalPrice.setCellType(Cell.CELL_TYPE_NUMERIC);
         totalPrice.setCellValue(
-                orderStat.getTotalPrice().setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+                orderStat.getModifiedPrice().setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+        if (!orderStat.getTotalPrice().equals(orderStat.getModifiedPrice())) {
+            Comment priceComment = drawing.createCellComment(anchor);
+            RichTextString str1 = creationHelper.createRichTextString("原价为 " + orderStat.getTotalPrice().setScale(2, RoundingMode.HALF_EVEN).doubleValue() + " 此处为修改后的价格");
+            priceComment.setString(str1);
+            totalPrice.setCellComment(priceComment);
+            totalPrice.setCellStyle(cellStyle);
+        } else {
+
+        }
 
         Cell costPrice = row.createCell(col++);
         costPrice.setCellType(Cell.CELL_TYPE_NUMERIC);
@@ -449,4 +467,644 @@ public class ArchiveServiceImpl implements ArchiveService {
         agentOrderId.setCellValue(orderStat.getAgentOrderId());
     }
 
+    @Override
+    public Workbook createSkuDetail(int skuId) {
+        Workbook workbook = new SXSSFWorkbook();
+        Sku sku = skuService.findById(skuId);
+        createSkuDetailSheet(workbook, sku);
+        return workbook;
+    }
+
+    @Override
+    public Pair<String, Workbook> createSkuTickets(int skuId, int agentId) {
+        Workbook workbook = new SXSSFWorkbook();
+        int rowIndex = 1, col = 1;
+        int maxCol = 0;
+        int discount = discountRateService.getDiscountByAgent(agentId, skuId);
+
+        Sku sku = skuMapper.findById(skuId);
+        Sheet sheet = workbook.createSheet(sku.getUuid());
+        Row nameRow = sheet.createRow(rowIndex++);
+        Cell skuNameCell = nameRow.createCell(col);
+        skuNameCell.setCellType(Cell.CELL_TYPE_STRING);
+        skuNameCell.setCellValue("名称：");
+        Cell nameCell1 = nameRow.createCell(col + 1);
+        nameCell1.setCellType(Cell.CELL_TYPE_STRING);
+        nameCell1.setCellValue(sku.getName());
+
+        //skuId
+        Row skuIdRow = sheet.createRow(rowIndex++);
+        Cell skuIdCell = skuIdRow.createCell(col);
+        skuIdCell.setCellType(Cell.CELL_TYPE_STRING);
+        skuIdCell.setCellValue("SKU ID：");
+        Cell skuIdValueCell = skuIdRow.createCell(col + 1);
+        skuIdValueCell.setCellType(Cell.CELL_TYPE_STRING);
+        skuIdValueCell.setCellValue(sku.getUuid());
+
+        rowIndex++;
+        rowIndex++;
+
+        List<SkuTicketPriceForExport> skuTicketPriceForExports = skuTicketPriceMapper.findSkuTicketPriceForExportBySkuId(skuId);
+        List<Map.Entry<String, List<SkuTicketPriceForExport>>> entries = skuTicketPriceForExports.stream()
+                .collect(Collectors.groupingBy(SkuTicketPriceForExport::getTime))//按照场次分组
+                .entrySet().stream().sorted((e1, e2) -> compareTime(e1.getKey(), e2.getKey())).collect(Collectors.toList());//按照场次排序（第一次排序保证合并后同一条里面场次有序）
+
+        CellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setAlignment(CellStyle.ALIGN_CENTER);
+
+        //合并具有相同价格区间的场次
+        Map<Set<SkuTicketPriceForExportKey>, List<String>> timeMap = new HashMap<>();
+        for (Map.Entry<String, List<SkuTicketPriceForExport>> entry : entries) {
+            Set<SkuTicketPriceForExportKey> set = entry.getValue().stream().map(SkuTicketPriceForExport::getKey).collect(Collectors.toSet());
+            if (timeMap.containsKey(set)) {
+                timeMap.get(set).add(entry.getKey());
+            } else {
+                timeMap.put(set, Lists.newArrayList(entry.getKey()));
+            }
+        }
+
+        //按照场次排序（第二次排序保证sheet里面场次有序）
+        for (Map.Entry<Set<SkuTicketPriceForExportKey>, List<String>> entry : timeMap.entrySet().stream().sorted((e1, e2) -> compareTime(e1.getValue().get(0), e2.getValue().get(0))).collect(Collectors.toList())) {
+            //String time = entry.getKey();
+            String time = entry.getValue().stream().collect(Collectors.joining(","));
+            //场次
+            Row timeRow = sheet.createRow(rowIndex++);
+            Cell timeCell = timeRow.createCell(col);
+            timeCell.setCellValue("场次");
+            Cell timeValueCell = timeRow.createCell(col + 1);
+            timeValueCell.setCellValue(time);
+            rowIndex++;
+
+            //Map<String, List<SkuTicketPriceForExportKey>> map = entry.getValue().stream().collect(Collectors.groupingBy(SkuTicketPriceForExportKey::getName));
+            //将票分类
+            Map<String, List<SkuTicketPriceForExportKey>> map = entry.getKey().stream().collect(Collectors.groupingBy(SkuTicketPriceForExportKey::getName));
+            //Set list=map.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey)).collect(Collectors.to);
+            for (Map.Entry<String, List<SkuTicketPriceForExportKey>> stringListEntry : map.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey)).collect(Collectors.toList())) {
+                Row timeRangeRow = sheet.createRow(rowIndex++);
+                Row salePriceRow = sheet.createRow(rowIndex++);
+                Row costPriceRow = sheet.createRow(rowIndex++);
+
+                String name = stringListEntry.getKey();
+                Cell nameCell = salePriceRow.createCell(col);
+                nameCell.setCellValue(name);
+                Cell salePriceCell = salePriceRow.createCell(col + 1);
+                salePriceCell.setCellValue("零售价");
+                Cell costPriceCell = costPriceRow.createCell(col + 1);
+                costPriceCell.setCellValue("核算价");
+
+                int colIndex = col + 1;
+                if (maxCol < stringListEntry.getValue().size()) {
+                    maxCol = stringListEntry.getValue().size();
+                }
+
+                //同一张票里面的按照初始日期排序
+                for (SkuTicketPriceForExportKey skuTicketPriceForExport : stringListEntry.getValue().stream().sorted(Comparator.comparing(SkuTicketPriceForExportKey::getStartDate)).collect(Collectors.toList())) {
+                    colIndex++;
+
+                    Cell timeRangeValueCell = timeRangeRow.createCell(colIndex);
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd");
+                    String startDate = simpleDateFormat.format(skuTicketPriceForExport.getStartDate());
+                    String endDate = simpleDateFormat.format(skuTicketPriceForExport.getEndDate());
+                    timeRangeValueCell.setCellValue(startDate + " - " + endDate);
+
+                    Cell salePriceValueCell = salePriceRow.createCell(colIndex);
+                    salePriceValueCell.setCellValue(skuTicketPriceForExport.getSalePrice().doubleValue());
+                    salePriceValueCell.setCellStyle(cellStyle);
+                    Cell costPriceValueCell = costPriceRow.createCell(colIndex);
+                    costPriceValueCell.setCellValue(calculateTicketPrice(skuTicketPriceForExport, discount).doubleValue());
+                    costPriceValueCell.setCellStyle(cellStyle);
+                }
+                rowIndex++;
+            }
+        }
+        sheet.setColumnWidth(col, 3000);
+        for (int i = 0; i < maxCol; i++) {
+            sheet.setColumnWidth(i + col + 2, 6000);
+        }
+        //保护sheet
+        sheet.protectSheet("eyounz2016");
+        return Pair.of(sku.getName(), workbook);
+    }
+
+    //排序时间的函数
+    private int compareTime(String time1, String time2) {
+        if (time1.equals(time2)) {
+            return 0;
+        }
+        String[] s1 = time1.split(":");
+        String[] s2 = time2.split(":");
+        try {
+            if (Integer.parseInt(s1[0]) == Integer.parseInt(s2[0])) {
+                return Integer.parseInt(s1[1]) - Integer.parseInt(s2[1]);
+            } else {
+                return Integer.parseInt(s1[0]) - Integer.parseInt(s2[0]);
+            }
+        } catch (NumberFormatException e) {
+            logger.warn("invalid format", e);
+            return -1;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            //logger.warn("invalid format", e);
+            return -1;
+        }
+    }
+
+    @Override
+    public Workbook createSkusDetail(String keyword, int cityId, int categoryId, int vendorId) {
+
+        List<Sku> skus = skuMapper.findAllByMultiFields(keyword, cityId, categoryId, vendorId, new RowBounds());
+        Workbook workbook = new SXSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Summary");
+        Font font = workbook.createFont();
+        //font.setFontHeightInPoints((short) 20);
+        font.setBoldweight(Font.BOLDWEIGHT_BOLD);
+        font.setColor(IndexedColors.WHITE.getIndex());
+        CellStyle style = workbook.createCellStyle();
+        style.setFont(font);
+        style.setAlignment(CellStyle.ALIGN_CENTER);
+        style.setFillForegroundColor(IndexedColors.SKY_BLUE.getIndex());
+        style.setFillPattern(CellStyle.SOLID_FOREGROUND);
+
+        style.setBorderBottom(HSSFCellStyle.BORDER_THIN); //下边框
+        style.setBorderLeft(HSSFCellStyle.BORDER_THIN);//左边框
+        style.setBorderTop(HSSFCellStyle.BORDER_THIN);//上边框
+        style.setBorderRight(HSSFCellStyle.BORDER_THIN);//右边框
+
+        style.setBottomBorderColor(IndexedColors.WHITE.getIndex());
+        style.setLeftBorderColor(IndexedColors.WHITE.getIndex());
+        style.setTopBorderColor(IndexedColors.WHITE.getIndex());
+        style.setRightBorderColor(IndexedColors.WHITE.getIndex());
+
+        style.setWrapText(true);
+
+        /*//基础信息
+        sheet.addMergedRegion(new CellRangeAddress(0,0,0,6));
+        Cell baseInfoCell=sheet.createRow(0).createCell(0);
+        baseInfoCell.setCellStyle(style);
+        baseInfoCell.setCellValue("基础信息");
+
+        //预定
+        sheet.addMergedRegion(new CellRangeAddress(0,0,7,13));
+        Cell reserveCell=sheet.getRow(0).createCell(7);
+        reserveCell.setCellStyle(style);
+        reserveCell.setCellValue("预定");
+
+        //出行
+        sheet.addMergedRegion(new CellRangeAddress(0,0,14,16));
+        Cell travelCell=sheet.getRow(0).createCell(14);
+        travelCell.setCellStyle(style);
+        travelCell.setCellValue("出行");
+
+        Cell noteCell=sheet.getRow(0).createCell(15);
+        noteCell.setCellStyle(style);
+        noteCell.setCellValue("备注");*/
+
+        List<String> strings = Lists.newArrayList("SKU ID", "前台Doc", "名称", "简述", "下单链接", "预定确认时间");
+        List<Integer> widths = Lists.newArrayList(3000, 3000, 12000, 12000, 12000, 5000);
+        Row row1 = sheet.createRow(0);
+        for (int i = 0; i < strings.size(); i++) {
+            Cell cell = row1.createCell(i);
+            cell.setCellStyle(style);
+            cell.setCellValue(strings.get(i));
+            sheet.setColumnWidth(i, widths.get(i));
+        }
+
+        int rowIndex = 1;
+        CellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setWrapText(true);
+        cellStyle.setAlignment(CellStyle.ALIGN_CENTER);
+        cellStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+        CellStyle hlinkStyle = workbook.createCellStyle();
+        Font hlinkFont = workbook.createFont();
+        hlinkFont.setUnderline(Font.U_SINGLE);
+        hlinkFont.setColor(IndexedColors.BLUE.getIndex());
+        hlinkStyle.setFont(hlinkFont);
+        hlinkStyle.setAlignment(CellStyle.ALIGN_CENTER);
+        hlinkStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+        for (Sku sku : skus) {
+            createSkuDetailSheet(workbook, sku);
+            int startCol = 0;
+            Sheet skuSheet = workbook.getSheet(sku.getUuid());
+            Row row = sheet.createRow(rowIndex++);
+
+            //skuId
+            Cell skuIdCell = row.createCell(startCol++);
+            skuIdCell.setCellStyle(cellStyle);
+            skuIdCell.setCellValue(sku.getUuid());
+
+            //docId
+            Cell docIdCell = row.createCell(startCol++);
+            docIdCell.setCellStyle(cellStyle);
+            docIdCell.setCellValue(sku.getUuid());
+            Hyperlink link = workbook.getCreationHelper().createHyperlink(Hyperlink.LINK_DOCUMENT);
+            link.setAddress("'" + skuSheet.getSheetName() + "'!A1");
+            docIdCell.setHyperlink(link);
+            docIdCell.setCellStyle(hlinkStyle);
+
+
+            //名称
+            Cell nameCell = row.createCell(startCol++);
+            nameCell.setCellStyle(cellStyle);
+            nameCell.setCellValue(sku.getName());
+
+            //简述
+            Cell descriptionCell = row.createCell(startCol++);
+            descriptionCell.setCellStyle(cellStyle);
+            descriptionCell.setCellValue(sku.getDescription());
+
+            //下单链接
+            XSSFHyperlink link1 = (XSSFHyperlink) workbook.getCreationHelper().createHyperlink(Hyperlink.LINK_URL);
+            String orderURL = "http://order.fitibo.net/create_order?skuId=" + sku.getId();
+            link1.setAddress(orderURL);
+            link1.setLabel(orderURL);
+            Cell addressCell = row.createCell(startCol++);
+            addressCell.setCellValue(orderURL);
+            addressCell.setCellStyle(hlinkStyle);
+            addressCell.setHyperlink(link1);
+
+            //预定确认时间
+            Cell onfirmationTimeCell = row.createCell(startCol++);
+            onfirmationTimeCell.setCellStyle(cellStyle);
+            onfirmationTimeCell.setCellValue(sku.getConfirmationTime());
+
+        }
+        sheet.protectSheet("eyounz2016");
+        return workbook;
+    }
+
+    private void createSkuTicketSheet(Workbook workbook, Sku sku) {
+        List<SkuTicket> skuTickets = sku.getTickets();
+        Sheet sheet = workbook.createSheet(sku.getUuid());
+        Font font = workbook.createFont();
+        font.setBoldweight(Font.BOLDWEIGHT_BOLD);
+        font.setColor(IndexedColors.WHITE.getIndex());
+        CellStyle style = workbook.createCellStyle();
+        style.setFont(font);
+        style.setAlignment(CellStyle.ALIGN_CENTER);
+        style.setFillForegroundColor(IndexedColors.SKY_BLUE.getIndex());
+        style.setFillPattern(CellStyle.SOLID_FOREGROUND);
+
+        style.setBorderBottom(HSSFCellStyle.BORDER_THIN); //下边框
+        style.setBorderLeft(HSSFCellStyle.BORDER_THIN);//左边框
+        style.setBorderTop(HSSFCellStyle.BORDER_THIN);//上边框
+        style.setBorderRight(HSSFCellStyle.BORDER_THIN);//右边框
+
+        style.setBottomBorderColor(IndexedColors.WHITE.getIndex());
+        style.setLeftBorderColor(IndexedColors.WHITE.getIndex());
+        style.setTopBorderColor(IndexedColors.WHITE.getIndex());
+        style.setRightBorderColor(IndexedColors.WHITE.getIndex());
+
+        int rowIndex = 1;
+        //名称
+        Row nameRow = sheet.createRow(rowIndex++);
+        Cell nameCell = nameRow.createCell(2);
+        nameCell.setCellType(Cell.CELL_TYPE_STRING);
+        nameCell.setCellValue("名称：");
+        Cell nameCell1 = nameRow.createCell(3);
+        nameCell1.setCellType(Cell.CELL_TYPE_STRING);
+        nameCell1.setCellValue(sku.getName());
+
+        rowIndex++;
+
+        //skuId
+        Row skuIdRow = sheet.createRow(rowIndex++);
+        Cell skuIdCell = skuIdRow.createCell(2);
+        skuIdCell.setCellType(Cell.CELL_TYPE_STRING);
+        skuIdCell.setCellValue("Eyounz SKU ID：");
+        Cell skuIdValueCell = skuIdRow.createCell(3);
+        skuIdValueCell.setCellType(Cell.CELL_TYPE_STRING);
+        skuIdValueCell.setCellValue(sku.getUuid());
+
+        CellStyle hlinkstyle = workbook.createCellStyle();
+        Font hlinkfont = workbook.createFont();
+        hlinkfont.setUnderline(XSSFFont.U_SINGLE);
+        hlinkfont.setColor(HSSFColor.BLUE.index);
+        hlinkstyle.setFont(hlinkfont);
+
+        //下单地址
+        XSSFHyperlink link = (XSSFHyperlink) workbook.getCreationHelper().createHyperlink(Hyperlink.LINK_URL);
+        String orderURL = "http://order.fitibo.net/create_order?skuId=" + sku.getId();
+        link.setAddress(orderURL);
+        link.setLabel(orderURL);
+        Row addressRow = sheet.createRow(rowIndex++);
+        Cell addressCell = addressRow.createCell(2);
+        addressCell.setCellType(Cell.CELL_TYPE_STRING);
+        addressCell.setCellValue("Eyounz下单地址：");
+        Cell addressValueCell = addressRow.createCell(3);
+        addressValueCell.setCellType(Cell.CELL_TYPE_STRING);
+        addressValueCell.setCellValue(orderURL);
+        addressValueCell.setCellStyle(hlinkstyle);
+        addressValueCell.setHyperlink(link);
+
+        rowIndex++;
+
+        int startCol = 1, startRol = rowIndex;
+
+        Cell ticketNameCell = sheet.createRow(rowIndex++).createCell(startCol);
+        ticketNameCell.setCellStyle(style);
+        ticketNameCell.setCellValue("票种");
+
+        Cell ageCell = sheet.createRow(rowIndex++).createCell(startCol);
+        ageCell.setCellStyle(style);
+        ageCell.setCellValue("票种范围");
+
+        Cell salePriceCell = sheet.createRow(rowIndex++).createCell(startCol);
+        salePriceCell.setCellStyle(style);
+        salePriceCell.setCellValue("官网价格NZD");
+
+        Cell costPriceCell = sheet.createRow(rowIndex++).createCell(startCol);
+        costPriceCell.setCellStyle(style);
+        costPriceCell.setCellValue("核算价格NZD");
+
+        Cell timeCell = sheet.createRow(rowIndex++).createCell(startCol);
+        timeCell.setCellStyle(style);
+        timeCell.setCellValue("有效期");
+        sheet.setColumnWidth(startCol, 4000);
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd");
+        for (SkuTicket skuTicket : skuTickets) {
+            for (SkuTicketPrice skuTicketPrice : skuTicket.getTicketPrices()) {
+                int row = startRol;
+                startCol++;
+                CellStyle cellStyle = workbook.createCellStyle();
+                cellStyle.setWrapText(true);
+                cellStyle.setAlignment(CellStyle.ALIGN_CENTER);
+                Cell ticketNameValueCell = sheet.getRow(row++).createCell(startCol);
+                ticketNameValueCell.setCellStyle(cellStyle);
+                ticketNameValueCell.setCellValue(skuTicket.getName());
+
+                Cell ageValueCell = sheet.getRow(row++).createCell(startCol);
+                ageValueCell.setCellStyle(cellStyle);
+                String age = skuTicket.getAgeConstraint();
+                if (age.startsWith("-")) {
+                    ageValueCell.setCellValue(age.split("-")[0] + "岁以下");
+                } else if (age.endsWith("-")) {
+                    ageValueCell.setCellValue(age.split("-")[0] + "岁以上");
+                } else {
+                    ageValueCell.setCellValue(age + "岁");
+                }
+
+                Cell salePriceValueCell = sheet.getRow(row++).createCell(startCol);
+                salePriceValueCell.setCellStyle(cellStyle);
+                salePriceValueCell.setCellType(Cell.CELL_TYPE_NUMERIC);
+                salePriceValueCell.setCellValue(skuTicketPrice.getSalePrice().doubleValue());
+
+                Cell costPriceValueCell = sheet.getRow(row++).createCell(startCol);
+                costPriceValueCell.setCellStyle(cellStyle);
+                costPriceValueCell.setCellType(Cell.CELL_TYPE_NUMERIC);
+                costPriceValueCell.setCellValue(skuTicketPrice.getCostPrice().doubleValue());
+
+                Cell timeValueCell = sheet.getRow(row++).createCell(startCol);
+                timeValueCell.setCellStyle(cellStyle);
+                costPriceValueCell.setCellType(Cell.CELL_TYPE_NUMERIC);
+                timeValueCell.setCellValue(simpleDateFormat.format(skuTicketPrice.getDate()));
+                sheet.setColumnWidth(startCol, 5000);
+            }
+
+        }
+
+    }
+
+    private void createSkuDetailSheet(Workbook workbook, Sku sku) {
+        Sheet sheet = workbook.createSheet(sku.getUuid());
+        Font font = workbook.createFont();
+        //font.setFontHeightInPoints((short) 20);
+        font.setBoldweight(Font.BOLDWEIGHT_BOLD);
+        font.setColor(IndexedColors.WHITE.getIndex());
+        CellStyle style = workbook.createCellStyle();
+        style.setFont(font);
+        style.setAlignment(CellStyle.ALIGN_CENTER);
+        style.setFillForegroundColor(IndexedColors.SKY_BLUE.getIndex());
+        style.setFillPattern(CellStyle.SOLID_FOREGROUND);
+
+        style.setBorderBottom(HSSFCellStyle.BORDER_THIN); //下边框
+        style.setBorderLeft(HSSFCellStyle.BORDER_THIN);//左边框
+        style.setBorderTop(HSSFCellStyle.BORDER_THIN);//上边框
+        style.setBorderRight(HSSFCellStyle.BORDER_THIN);//右边框
+
+        style.setBottomBorderColor(IndexedColors.WHITE.getIndex());
+        style.setLeftBorderColor(IndexedColors.WHITE.getIndex());
+        style.setTopBorderColor(IndexedColors.WHITE.getIndex());
+        style.setRightBorderColor(IndexedColors.WHITE.getIndex());
+
+        style.setWrapText(true);
+
+
+        int col1 = 1, col2 = 2;
+        //style.setWrapText(true);
+        int rowIndex = 1;
+        Font boldFont = workbook.createFont();
+        //font.setFontHeightInPoints((short) 20);
+        boldFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
+        //名称
+        CellStyle boldStyle = workbook.createCellStyle();
+        boldStyle.setFont(boldFont);
+        Row nameRow = sheet.createRow(rowIndex++);
+        Cell nameCell = nameRow.createCell(2);
+        nameCell.setCellType(Cell.CELL_TYPE_STRING);
+        nameCell.setCellValue("名称：");
+        nameCell.setCellStyle(boldStyle);
+        Cell nameCell1 = nameRow.createCell(3);
+        nameCell1.setCellType(Cell.CELL_TYPE_STRING);
+        nameCell1.setCellValue(sku.getName());
+
+        rowIndex++;
+
+        //skuId
+        Row skuIdRow = sheet.createRow(rowIndex++);
+        Cell skuIdCell = skuIdRow.createCell(2);
+        skuIdCell.setCellType(Cell.CELL_TYPE_STRING);
+        skuIdCell.setCellValue("Eyounz SKU ID：");
+        skuIdCell.setCellStyle(boldStyle);
+        Cell skuIdValueCell = skuIdRow.createCell(3);
+        skuIdValueCell.setCellType(Cell.CELL_TYPE_STRING);
+        skuIdValueCell.setCellValue(sku.getUuid());
+
+        CellStyle hlinkstyle = workbook.createCellStyle();
+        Font hlinkfont = workbook.createFont();
+        hlinkfont.setUnderline(XSSFFont.U_SINGLE);
+        hlinkfont.setColor(HSSFColor.BLUE.index);
+        hlinkstyle.setFont(hlinkfont);
+
+        //下单地址
+        XSSFHyperlink link = (XSSFHyperlink) workbook.getCreationHelper().createHyperlink(Hyperlink.LINK_URL);
+        String orderURL = "http://order.fitibo.net/create_order?skuId=" + sku.getId();
+        link.setAddress(orderURL);
+        link.setLabel(orderURL);
+        Row addressRow = sheet.createRow(rowIndex++);
+        Cell addressCell = addressRow.createCell(2);
+        addressCell.setCellType(Cell.CELL_TYPE_STRING);
+        addressCell.setCellValue("Eyounz下单地址：");
+        addressCell.setCellStyle(boldStyle);
+        Cell addressValueCell = addressRow.createCell(3);
+        addressValueCell.setCellType(Cell.CELL_TYPE_STRING);
+        addressValueCell.setCellValue(orderURL);
+        addressValueCell.setCellStyle(hlinkstyle);
+        addressValueCell.setHyperlink(link);
+        rowIndex++;
+
+        //OfficialWebsite官网查位链接
+        Row officialWebsiteRow = sheet.createRow(rowIndex++);
+        Cell officialWebsiteCell = officialWebsiteRow.createCell(col1);
+        officialWebsiteCell.setCellType(Cell.CELL_TYPE_STRING);
+        officialWebsiteCell.setCellValue("官网查位链接");
+        officialWebsiteCell.setCellStyle(style);
+
+        String url = sku.getOfficialWebsite().trim();
+        Cell officialWebsiteValueCell = officialWebsiteRow.createCell(col2);
+        officialWebsiteValueCell.setCellType(Cell.CELL_TYPE_STRING);
+        officialWebsiteValueCell.setCellValue(url);
+        officialWebsiteValueCell.setCellStyle(hlinkstyle);
+        Hyperlink officialWebsiteLink = workbook.getCreationHelper().createHyperlink(Hyperlink.LINK_URL);
+        try {
+            officialWebsiteLink.setAddress(url);
+            officialWebsiteValueCell.setHyperlink(officialWebsiteLink);
+        } catch (Exception e) {
+            logger.warn("invalid URI in sku , skuId is " + sku.getId(), e);
+        }
+
+        //description行程概述
+        Row descriptionRow = sheet.createRow(rowIndex++);
+        Cell descriptionCell = descriptionRow.createCell(col1);
+        descriptionCell.setCellType(Cell.CELL_TYPE_STRING);
+        descriptionCell.setCellValue("行程概述");
+        descriptionCell.setCellStyle(style);
+        Cell descriptionValueCell = descriptionRow.createCell(col2);
+        descriptionValueCell.setCellType(Cell.CELL_TYPE_STRING);
+        descriptionValueCell.setCellValue(sku.getDescription());
+
+        //confirmationTime预估确认时长
+        Row confirmationTimeRow = sheet.createRow(rowIndex++);
+        Cell confirmationTimeCell = confirmationTimeRow.createCell(col1);
+        confirmationTimeCell.setCellType(Cell.CELL_TYPE_STRING);
+        confirmationTimeCell.setCellValue("预估确认时长");
+        confirmationTimeCell.setCellStyle(style);
+        Cell confirmationTimeValueCell = confirmationTimeRow.createCell(col2);
+        confirmationTimeValueCell.setCellType(Cell.CELL_TYPE_STRING);
+        confirmationTimeValueCell.setCellValue(sku.getConfirmationTime());
+
+        //rescheduleCancelNotice退改签规定
+        Row rescheduleCancelNoticeRow = sheet.createRow(rowIndex++);
+        Cell rescheduleCancelNoticeCell = rescheduleCancelNoticeRow.createCell(col1);
+        rescheduleCancelNoticeCell.setCellType(Cell.CELL_TYPE_STRING);
+        rescheduleCancelNoticeCell.setCellValue("退改签规定");
+        rescheduleCancelNoticeCell.setCellStyle(style);
+        Cell rescheduleCancelNoticeValueCell = rescheduleCancelNoticeRow.createCell(col2);
+        rescheduleCancelNoticeValueCell.setCellType(Cell.CELL_TYPE_STRING);
+        rescheduleCancelNoticeValueCell.setCellValue(sku.getRescheduleCancelNotice());
+
+        //agendaInfo行程概述
+        Row agendaInfoRow = sheet.createRow(rowIndex++);
+        Cell agendaInfoCell = agendaInfoRow.createCell(col1);
+        agendaInfoCell.setCellType(Cell.CELL_TYPE_STRING);
+        agendaInfoCell.setCellValue("行程概述");
+        agendaInfoCell.setCellStyle(style);
+        Cell agendaInfoValueCell = agendaInfoRow.createCell(col2);
+        agendaInfoValueCell.setCellType(Cell.CELL_TYPE_STRING);
+        agendaInfoValueCell.setCellValue(sku.getAgendaInfo());
+
+        //activityTime活动时间
+        Row activityTimeRow = sheet.createRow(rowIndex++);
+        Cell activityTimeCell = activityTimeRow.createCell(col1);
+        activityTimeCell.setCellType(Cell.CELL_TYPE_STRING);
+        activityTimeCell.setCellValue("活动时间");
+        activityTimeCell.setCellStyle(style);
+        Cell activityTimeValueCell = activityTimeRow.createCell(col2);
+        activityTimeValueCell.setCellType(Cell.CELL_TYPE_STRING);
+        activityTimeValueCell.setCellValue(sku.getActivityTime());
+
+        //openingTime营业时间
+        Row openingTimeRow = sheet.createRow(rowIndex++);
+        Cell openingTimeCell = openingTimeRow.createCell(col1);
+        openingTimeCell.setCellType(Cell.CELL_TYPE_STRING);
+        openingTimeCell.setCellValue("营业时间");
+        openingTimeCell.setCellStyle(style);
+        Cell openingTimeValueCell = openingTimeRow.createCell(col2);
+        openingTimeValueCell.setCellType(Cell.CELL_TYPE_STRING);
+        openingTimeValueCell.setCellValue(sku.getOpeningTime());
+
+        //ticketInfo门票形式
+        Row ticketInfoRow = sheet.createRow(rowIndex++);
+        Cell ticketInfoCell = ticketInfoRow.createCell(col1);
+        ticketInfoCell.setCellType(Cell.CELL_TYPE_STRING);
+        ticketInfoCell.setCellValue("门票形式");
+        ticketInfoCell.setCellStyle(style);
+        Cell ticketInfoValueCell = ticketInfoRow.createCell(col2);
+        ticketInfoValueCell.setCellType(Cell.CELL_TYPE_STRING);
+        ticketInfoValueCell.setCellValue(sku.getTicketInfo());
+
+        //serviceInclude服务包含
+        Row serviceIncludeRow = sheet.createRow(rowIndex++);
+        Cell serviceIncludeCell = serviceIncludeRow.createCell(col1);
+        serviceIncludeCell.setCellType(Cell.CELL_TYPE_STRING);
+        serviceIncludeCell.setCellValue("服务包含");
+        serviceIncludeCell.setCellStyle(style);
+        Cell serviceIncludeValueCell = serviceIncludeRow.createCell(col2);
+        serviceIncludeValueCell.setCellType(Cell.CELL_TYPE_STRING);
+        serviceIncludeValueCell.setCellValue(sku.getServiceInclude());
+
+        //serviceExclude服务未含
+        Row serviceExcludeRow = sheet.createRow(rowIndex++);
+        Cell serviceExcludeCell = serviceExcludeRow.createCell(col1);
+        serviceExcludeCell.setCellType(Cell.CELL_TYPE_STRING);
+        serviceExcludeCell.setCellValue("服务未含");
+        serviceExcludeCell.setCellStyle(style);
+        Cell serviceExcludeValueCell = serviceExcludeRow.createCell(col2);
+        serviceExcludeValueCell.setCellType(Cell.CELL_TYPE_STRING);
+        serviceExcludeValueCell.setCellValue(sku.getServiceExclude());
+
+        //extraItem附加收费项
+        Row extraItemRow = sheet.createRow(rowIndex++);
+        Cell extraItemCell = extraItemRow.createCell(col1);
+        extraItemCell.setCellType(Cell.CELL_TYPE_STRING);
+        extraItemCell.setCellValue("附加收费项");
+        extraItemCell.setCellStyle(style);
+        Cell extraItemValueCell = extraItemRow.createCell(col2);
+        extraItemValueCell.setCellType(Cell.CELL_TYPE_STRING);
+        extraItemValueCell.setCellValue(sku.getExtraItem());
+
+        //priceConstraint限价信息
+        Row priceConstraintRow = sheet.createRow(rowIndex++);
+        Cell priceConstraintCell = priceConstraintRow.createCell(col1);
+        priceConstraintCell.setCellType(Cell.CELL_TYPE_STRING);
+        priceConstraintCell.setCellValue("限价信息");
+        priceConstraintCell.setCellStyle(style);
+        Cell priceConstraintValueCell = priceConstraintRow.createCell(col2);
+        priceConstraintValueCell.setCellType(Cell.CELL_TYPE_STRING);
+        priceConstraintValueCell.setCellValue(sku.getPriceConstraint());
+
+        //otherInfo预订所需其他信息
+        Row otherInfoRow = sheet.createRow(rowIndex++);
+        Cell otherInfoCell = otherInfoRow.createCell(col1);
+        otherInfoCell.setCellType(Cell.CELL_TYPE_STRING);
+        otherInfoCell.setCellValue("预订所需其他信息");
+        otherInfoCell.setCellStyle(style);
+        Cell otherInfoValueCell = otherInfoRow.createCell(col2);
+        otherInfoValueCell.setCellType(Cell.CELL_TYPE_STRING);
+        otherInfoValueCell.setCellValue(sku.getOtherInfo());
+
+        //attention注意事项
+        int row1 = rowIndex;
+        String[] attentions = sku.getAttention().split("\\n");
+        for (String s : attentions) {
+            Row row = sheet.createRow(rowIndex++);
+            Cell attentionValueCell = row.createCell(col2);
+            attentionValueCell.setCellType(Cell.CELL_TYPE_STRING);
+            attentionValueCell.setCellValue(s);
+        }
+        Row attentionRow = sheet.getRow(row1);
+        Cell attentionCell = attentionRow.createCell(col1);
+        attentionCell.setCellType(Cell.CELL_TYPE_STRING);
+        attentionCell.setCellValue("注意事项");
+        attentionCell.setCellStyle(style);
+        /*Cell attentionValueCell = attentionRow.createCell(col2);
+        attentionValueCell.setCellType(Cell.CELL_TYPE_STRING);
+        attentionValueCell.setCellValue(sku.getAttention());*/
+
+
+        for (int i = 1; i < 5; i++) {
+            sheet.setColumnWidth(i, 4500);
+        }
+        sheet.protectSheet("eyounz2016");
+
+    }
 }

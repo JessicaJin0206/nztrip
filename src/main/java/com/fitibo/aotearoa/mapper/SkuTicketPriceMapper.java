@@ -1,18 +1,12 @@
 package com.fitibo.aotearoa.mapper;
 
 import com.fitibo.aotearoa.model.SkuTicketPrice;
+import com.fitibo.aotearoa.model.SkuTicketPriceForExport;
+import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.session.RowBounds;
 
 import java.util.Date;
 import java.util.List;
-
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Result;
-import org.apache.ibatis.annotations.Results;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
-import org.apache.ibatis.session.RowBounds;
 
 /**
  * Created by qianhao.zhou on 7/24/16.
@@ -228,4 +222,17 @@ public interface SkuTicketPriceMapper {
                                            @Param("startDate") Date startDate,
                                            @Param("endDate") Date endDate);
 
+    //这个数据库语句用来导出价格（按照时间天数步长为1天的递增确定时间的范围）
+    @Select("SELECT * FROM sku_ticket NATURAL JOIN ( SELECT number, sale_price, cost_price, Min(date) AS start_date, Max(date) AS end_date, time, sku_ticket_id AS id FROM ( SELECT ticket_price.*, IF ( ticket_price.sku_ticket_id =@a AND ticket_price.sale_price = @b AND ticket_price.cost_price = @c AND ticket_price.time =@d AND datediff(ticket_price.date ,@e) = 1,@num :=@num ,@num :=@num + 1 ) AS number, @a := ticket_price.sku_ticket_id, @b := ticket_price.sale_price, @c := ticket_price.cost_price, @d := ticket_price.time, @e := ticket_price.date FROM ( SELECT * FROM sku_ticket_price WHERE sku_id = #{skuId} ORDER BY sku_ticket_id, time, date ) ticket_price, ( SELECT @a := NULL, @b := NULL, @c := NULL, @d := NULL, @e := NULL, @num := 0 ) temp ) result GROUP BY number, sku_ticket_id, sale_price, cost_price, time ) AS price ORDER BY start_date")
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "sku_id", property = "skuId"),
+            @Result(column = "name", property = "name"),
+            @Result(column = "start_date", property = "startDate"),
+            @Result(column = "end_date", property = "endDate"),
+            @Result(column = "time", property = "time"),
+            @Result(column = "cost_price", property = "costPrice"),
+            @Result(column = "sale_price", property = "salePrice"),
+    })
+    List<SkuTicketPriceForExport> findSkuTicketPriceForExportBySkuId(@Param("skuId") int skuId);
 }

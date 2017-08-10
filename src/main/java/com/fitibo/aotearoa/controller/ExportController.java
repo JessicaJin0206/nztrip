@@ -3,11 +3,11 @@ package com.fitibo.aotearoa.controller;
 import com.fitibo.aotearoa.annotation.Authentication;
 import com.fitibo.aotearoa.dto.Role;
 import com.fitibo.aotearoa.exception.AuthenticationFailureException;
+import com.fitibo.aotearoa.mapper.AgentMapper;
 import com.fitibo.aotearoa.mapper.OrderMapper;
 import com.fitibo.aotearoa.model.Order;
 import com.fitibo.aotearoa.service.ArchiveService;
 import com.fitibo.aotearoa.util.DateUtils;
-
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.joda.time.DateTime;
@@ -17,17 +17,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Date;
-
-import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 /**
  * Created by qianhao.zhou on 08/12/2016.
@@ -40,6 +36,9 @@ public class ExportController extends AuthenticationRequiredController {
 
     @Autowired
     private ArchiveService archiveService;
+
+    @Autowired
+    private AgentMapper agentMapper;
 
     @ExceptionHandler
     public ResponseEntity handleException(AuthenticationFailureException ex) {
@@ -59,7 +58,6 @@ public class ExportController extends AuthenticationRequiredController {
 
         }
         Workbook voucher = archiveService.createVoucher(order);
-
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             voucher.write(baos);
             response.setHeader("Content-Disposition", "attachment; filename=\"voucher.xlsx\"");
@@ -76,6 +74,86 @@ public class ExportController extends AuthenticationRequiredController {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             orderStats.write(baos);
             response.setHeader("Content-Disposition", "attachment; filename=\"orders.xlsx\"");
+            return new ResponseEntity<>(baos.toByteArray(), HttpStatus.CREATED);
+
+        }
+    }
+
+    /**
+     * 导出单个sku的价格信息（和并场次的版本）
+     *
+     * @param response
+     * @param skuId
+     * @return
+     * @throws IOException
+     * @throws InvalidFormatException
+     */
+    @RequestMapping(value = "/sku_tickets/export/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @Authentication(Role.Admin)
+    public ResponseEntity<byte[]> downloadSkuTickets(HttpServletResponse response,
+                                                     @PathVariable("id") int skuId)
+            throws IOException, InvalidFormatException {
+        int id = getToken().getId();//agentId
+        Map.Entry<String, Workbook> entry = archiveService.createSkuTickets(skuId, id);
+        Workbook skuTickets = entry.getValue();
+        String fileName = entry.getKey();
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            skuTickets.write(baos);
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + new String(fileName.getBytes("GB2312"), "ISO_8859_1") + ".xlsx\"");
+            return new ResponseEntity<>(baos.toByteArray(), HttpStatus.CREATED);
+
+        }
+    }
+
+    /**
+     * 导出单个sku详情（暂时系统里面没有调用的地方）
+     *
+     * @param response
+     * @param skuId
+     * @return
+     * @throws IOException
+     * @throws InvalidFormatException
+     */
+    @RequestMapping(value = "/sku/export/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @Authentication(Role.Agent)
+    public ResponseEntity<byte[]> downloadSku(HttpServletResponse response,
+                                              @PathVariable("id") int skuId)
+            throws IOException, InvalidFormatException {
+        Workbook skus = archiveService.createSkuDetail(skuId);
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            skus.write(baos);
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + new String("新西兰产品信息表".getBytes("GB2312"), "ISO_8859_1") + ".xlsx\"");
+            return new ResponseEntity<>(baos.toByteArray(), HttpStatus.CREATED);
+
+        }
+    }
+
+    /**
+     * 导出符合搜索条件的sku（所有不带分页），对应skus.ftl里面的导出按钮
+     *
+     * @param response
+     * @param keyword
+     * @param cityId
+     * @param categoryId
+     * @return
+     * @throws IOException
+     * @throws InvalidFormatException
+     */
+    @RequestMapping(value = "/skus/export", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @Authentication
+    public ResponseEntity<byte[]> downloadSkus(HttpServletResponse response,
+                                               @RequestParam(value = "keyword", defaultValue = "") String keyword,
+                                               @RequestParam(value = "cityid", defaultValue = "0") int cityId,
+                                               @RequestParam(value = "categoryid", defaultValue = "0") int categoryId)
+            throws IOException, InvalidFormatException {
+        int vendorId = 0;
+        if (getToken().getRole() == Role.Agent) {
+            vendorId = agentMapper.findById(getToken().getId()).getVendorId();
+        }
+        Workbook orderStats = archiveService.createSkusDetail(keyword, cityId, categoryId, vendorId);
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            orderStats.write(baos);
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + new String("新西兰产品信息表".getBytes("GB2312"), "ISO_8859_1") + ".xlsx\"");
             return new ResponseEntity<>(baos.toByteArray(), HttpStatus.CREATED);
 
         }
