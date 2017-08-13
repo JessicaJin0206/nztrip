@@ -5,6 +5,7 @@ import com.fitibo.aotearoa.mapper.AgentMapper;
 import com.fitibo.aotearoa.mapper.OrderMapper;
 import com.fitibo.aotearoa.mapper.SkuMapper;
 import com.fitibo.aotearoa.mapper.SpecialRateMapper;
+import com.fitibo.aotearoa.mapper.VendorMapper;
 import com.fitibo.aotearoa.model.Agent;
 import com.fitibo.aotearoa.model.Order;
 import com.fitibo.aotearoa.model.Sku;
@@ -37,6 +38,9 @@ public class DiscountRateServiceImpl implements DiscountRateService {
     @Autowired
     private SkuMapper skuMapper;
 
+    @Autowired
+    private VendorMapper vendorMapper;
+
     @Override
     public int getDiscountByAgent(int agentId, int skuId) {
         int defaultRate = agentMapper.findById(agentId).getDiscount();
@@ -66,5 +70,15 @@ public class DiscountRateServiceImpl implements DiscountRateService {
         } else {
             return getDiscountByAdmin(1);
         }
+    }
+
+    @Override
+    public int getDiscountByVendor(int id, int skuId) {
+        Sku sku = skuMapper.findById(skuId);
+        Preconditions.checkNotNull(sku, "invalid skuId:" + skuId);
+        if (sku.getVendorId() != id) {
+            throw new IllegalArgumentException("sku id:" + skuId + " does not belong to vendor id:" + id);
+        }
+        return 0;
     }
 }

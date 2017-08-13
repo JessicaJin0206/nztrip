@@ -55,7 +55,7 @@ $('#j_ticket_type_selector li a').on('click', function (e) {
         function (value) {
             return value.length > 0;
         }).sort();
-    availableDate.push(moment().format('YYYY-MM-DD'));
+    // availableDate.push(moment().format('YYYY-MM-DD'));
     var selector = $('#j_ticket_date');
     if (selector.data('DateTimePicker')) {
         selector.data('DateTimePicker').destroy();

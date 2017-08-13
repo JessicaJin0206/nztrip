@@ -5,10 +5,11 @@ package com.fitibo.aotearoa.service;
  */
 public interface DiscountRateService {
 
-  int getDiscountByAgent(int agentId, int skuId);
+    int getDiscountByAgent(int agentId, int skuId);
 
-  int getDiscountByAdmin(int adminId);
+    int getDiscountByAdmin(int adminId);
 
-  int getDiscountByOrder(int orderId);
+    int getDiscountByOrder(int orderId);
 
+    int getDiscountByVendor(int id, int skuId);
 }

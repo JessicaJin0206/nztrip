@@ -687,7 +687,7 @@ public class RestApiController extends AuthenticationRequiredController {
     }
 
     @RequestMapping(value = "/v1/api/skus/{skuId}/tickets/{ticketId}/prices")
-    @Authentication
+    @Authentication({Role.Admin, Role.Vendor, Role.Agent})
     public List<SkuTicketPriceVo> getPrice(@PathVariable("skuId") int skuId,
                                            @PathVariable("ticketId") int ticketId,
                                            @RequestParam("date") String date,
@@ -703,6 +703,11 @@ public class RestApiController extends AuthenticationRequiredController {
         Sku sku = skuMapper.findById(skuId);
         if (getToken().getRole() == Role.Agent) {
             checkViewSkuPriviledge(sku, getToken().getId());
+        }
+        if (getToken().getRole() == Role.Vendor) {
+            if (sku.getVendorId() != getToken().getId()) {
+                throw new AuthenticationFailureException("sku id:" + sku.getId() + " does not belong to vendor id:" + getToken().getId());
+            }
         }
         int discount = orderId > 0 ? discountRateService.getDiscountByOrder(orderId) : getDiscount(getToken(), skuId);
         return Lists.transform(ticketPrices, (input) -> {
@@ -876,6 +881,8 @@ public class RestApiController extends AuthenticationRequiredController {
                 return discountRateService.getDiscountByAdmin(token.getId());
             case Agent:
                 return discountRateService.getDiscountByAgent(token.getId(), skuId);
+            case Vendor:
+                return discountRateService.getDiscountByVendor(token.getId(), skuId);
             default:
                 throw new AuthenticationFailureException("invalid role:" + token.getRole());
         }
