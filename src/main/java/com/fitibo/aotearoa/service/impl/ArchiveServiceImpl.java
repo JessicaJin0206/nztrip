@@ -354,7 +354,8 @@ public class ArchiveServiceImpl implements ArchiveService {
                     StringBuilder result = new StringBuilder();
                     result.append(skuTicketPrice.getTime()).append(":  ");
                     result.append(Optional.ofNullable(skuOccupationMapByTime.get(skuTicketPrice.getTime())).map(List::size).orElse(0));
-                    Optional<SkuInventory> first = skuInventoryMap.get(date).stream().filter(skuInventory -> skuTicketPrice.getTime().equals(skuTicketPrice.getTime())).findFirst();
+                    List<SkuInventory> skuInventories = skuInventoryMap.containsKey(date) ? skuInventoryMap.get(date) : Collections.emptyList();
+                    Optional<SkuInventory> first = skuInventories.stream().filter(skuInventory -> skuTicketPrice.getTime().equals(skuTicketPrice.getTime())).findFirst();
                     result.append("/").append(first.map(skuInventory -> skuInventory.getCount() + "").orElse("0"));
                     result.append(" people");
                     return result.toString();
