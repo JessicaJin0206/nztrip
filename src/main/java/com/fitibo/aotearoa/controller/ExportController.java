@@ -160,7 +160,7 @@ public class ExportController extends AuthenticationRequiredController {
     }
 
     @RequestMapping(value = "/export/skus/{id}/detail", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    @Authentication({Role.Vendor, Role.Vendor})
+    @Authentication({Role.Admin, Role.Vendor})
     public ResponseEntity<byte[]> downloadSkuDetail(HttpServletResponse response,
                                                     @PathVariable("id") int skuId,
                                                     @RequestParam(value = "date", required = false) String dateString) throws IOException {
@@ -179,10 +179,12 @@ public class ExportController extends AuthenticationRequiredController {
     }
 
     @RequestMapping(value = "/export/skus/{id}/overview", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    @Authentication({Role.Vendor, Role.Vendor})
+    @Authentication({Role.Admin, Role.Vendor})
     public ResponseEntity<byte[]> downloadSkuOverview(HttpServletResponse response, @PathVariable("id") int skuId) throws IOException {
         DateTime from = DateTime.now().monthOfYear().roundFloorCopy();
         DateTime to = from.plusMonths(3);
+        to = DateTime.parse("2018-06-01");//FIXME hard code here
+
 
         Workbook result = archiveService.createSkuOverview(skuId, from, to);
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {

@@ -7,12 +7,14 @@ import com.fitibo.aotearoa.service.ArchiveService;
 import com.fitibo.aotearoa.service.DiscountRateService;
 import com.fitibo.aotearoa.service.SkuService;
 import com.fitibo.aotearoa.util.DateUtils;
+
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.ibatis.session.RowBounds;
@@ -31,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+
 import rx.Observable;
 
 import java.io.IOException;
@@ -60,6 +63,9 @@ public class ArchiveServiceImpl implements ArchiveService {
 
     @Autowired
     private OrderTicketMapper orderTicketMapper;
+
+    @Autowired
+    private SkuInventoryMapper skuInventoryMapper;
 
     @Autowired
     private SkuTicketMapper skuTicketMapper;
@@ -315,8 +321,11 @@ public class ArchiveServiceImpl implements ArchiveService {
 
     @Override
     public Workbook createSkuOverview(int skuId, DateTime from, DateTime to) {
-        Map<Date, List<SkuTicketPrice>> skuTicketPriceMap = skuTicketPriceMapper.findBySkuIdAndDuration(skuId, from.toDate(), to.toDate()).stream().collect(Collectors.groupingBy(SkuTicketPrice::getDate));
-        Map<Date, List<OrderTicket>> orderTicketMap = orderTicketMapper.findBySkuIdAndDuration(skuId, from.toDate(), to.toDate()).stream().collect(Collectors.groupingBy(OrderTicket::getTicketDate));
+        Date fromDate = from.toDate();
+        Date toDate = to.toDate();
+        final Map<Date, List<SkuTicketPrice>> skuTicketPriceMap = skuTicketPriceMapper.findBySkuIdAndDuration(skuId, fromDate, toDate).stream().collect(Collectors.groupingBy(SkuTicketPrice::getDate));
+        final Map<Date, List<SkuOccupation>> skuOccupationMap = skuInventoryMapper.findSkuOccupationBySkuIdAndDate(skuId, fromDate, toDate).stream().collect(Collectors.groupingBy(SkuOccupation::getTicketDate));
+        final Map<Date, List<SkuInventory>> skuInventoryMap = skuInventoryMapper.findBySkuIdAndDate(skuId, fromDate, toDate).stream().collect(Collectors.groupingBy(SkuInventory::getDate));
         Workbook workbook = new XSSFWorkbook();
         Font font = workbook.createFont();
         font.setFontHeightInPoints((short) 14);
@@ -338,16 +347,17 @@ public class ArchiveServiceImpl implements ArchiveService {
             DateTime day = current;
             Row currentRow = sheet.createRow(rowIndex++);
             for (; day.isBefore(current.plusMonths(1)); day = day.plusDays(1)) {
-                Date date = day.toDate();
-                List<SkuTicketPrice> skuTicketPrices = Optional.ofNullable(skuTicketPriceMap.get(date)).orElse(Collections.emptyList());
-                String collect = skuTicketPrices.stream().filter(input -> StringUtils.isNoneEmpty(input.getTime())).map(input -> {
-                    Map<String, List<OrderTicket>> timeOrderTicketMap = orderTicketMap.containsKey(date) ? orderTicketMap.get(date).stream().collect(Collectors.groupingBy(OrderTicket::getTicketTime)) : Collections.emptyMap();
-                    List<OrderTicket> orderTickets = timeOrderTicketMap.get(input.getTime());
-                    if (orderTickets == null) {
-                        return input.getTime() + ":  " + 0 + " people";
-                    } else {
-                        return input.getTime() + ":  " + orderTickets.stream().flatMap(orderTicket -> orderTicket.getUsers().stream()).count() + " people";
-                    }
+                final Date date = day.toDate();
+                List<SkuTicketPrice> skuTicketPrices = skuTicketPriceMap.containsKey(date) ? skuTicketPriceMap.get(date) : Collections.emptyList();
+                String collect = skuTicketPrices.stream().filter(input -> StringUtils.isNoneEmpty(input.getTime())).map(skuTicketPrice -> {
+                    Map<String, List<SkuOccupation>> skuOccupationMapByTime = skuOccupationMap.containsKey(date) ? skuOccupationMap.get(date).stream().collect(Collectors.groupingBy(SkuOccupation::getTicketTime)) : Collections.emptyMap();
+                    StringBuilder result = new StringBuilder();
+                    result.append(skuTicketPrice.getTime()).append(":  ");
+                    result.append(Optional.ofNullable(skuOccupationMapByTime.get(skuTicketPrice.getTime())).map(List::size).orElse(0));
+                    Optional<SkuInventory> first = skuInventoryMap.get(date).stream().filter(skuInventory -> skuTicketPrice.getTime().equals(skuTicketPrice.getTime())).findFirst();
+                    result.append("/").append(first.map(skuInventory -> skuInventory.getCount() + "").orElse("0"));
+                    result.append(" people");
+                    return result.toString();
                 }).distinct().sorted().collect((Collectors.joining("\n")));
                 String cellValue = day.getDayOfMonth() + "\n" + collect;
 
