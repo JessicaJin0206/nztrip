@@ -36,7 +36,7 @@
                                 <a href="/export/skus/${sku.id?c}/detail">Today's Booking Status</a>
                             </div>
                             <div>
-                                <a href="/export/skus/${sku.id?c}/overview">Coming 3 months</a>
+                                <a href="/export/skus/${sku.id?c}/overview">Export Inventory</a>
                             </div>
                         </td>
                     </tr>

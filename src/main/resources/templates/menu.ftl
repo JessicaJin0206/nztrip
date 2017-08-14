@@ -20,6 +20,11 @@
         <li <#if module == "vendor_sku">class="active"</#if>><a href="/vendor_skus">查询库存</a></li>
     </ul>
 </#if>
+<#if role?? && role == "Vendor">
+    <ul class="nav nav-sidebar">
+        <li <#if module == "vendor_orders">class="active"</#if>><a href="/vendor_orders">查询订单</a></li>
+    </ul>
+</#if>
 <#if role?? && role == "Admin">
     <ul class="nav nav-sidebar">
         <li <#if module == "create_sku">class="active"</#if>><a href="/create_sku">创建库存</a></li>

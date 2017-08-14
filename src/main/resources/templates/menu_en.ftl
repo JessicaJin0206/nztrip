@@ -20,6 +20,11 @@
         <li <#if module == "vendor_sku">class="active"</#if>><a href="/vendor_skus">Skus</a></li>
     </ul>
 </#if>
+<#if role?? && role == "Vendor">
+    <ul class="nav nav-sidebar">
+        <li <#if module == "vendor_orders">class="active"</#if>><a href="/vendor_orders">Orders</a></li>
+    </ul>
+</#if>
 <#if role?? && role == "Admin">
     <ul class="nav nav-sidebar">
         <li <#if module == "create_sku">class="active"</#if>><a href="/create_sku">Create Skus</a>

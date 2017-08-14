@@ -99,6 +99,7 @@ public class HomeController extends AuthenticationRequiredController {
     private static final String MODULE_CREATE_AGENT = "create_agent";
     private static final String MODULE_PRICE_MONITORING = "price_monitoring";
     private static final String MODULE_VENDOR_SKU = "vendor_sku";
+    private static final String MODULE_VENDOR_ORDERS = "vendor_orders";
     private static final String MODULE_SKU_INVENTORY = "sku_inventory";
 
     @Autowired
@@ -190,6 +191,23 @@ public class HomeController extends AuthenticationRequiredController {
                         vendorMap.get(input.getVendorId()),
                         durationMap.get(input.getDurationId()))));
         return "vendor_sku";
+    }
+
+    @RequestMapping("vendor_orders")
+    @Authentication(Role.Vendor)
+    public String vendorOrders(@RequestParam(value = "pagesize", defaultValue = "10") int pageSize,
+                               @RequestParam(value = "pagenumber", defaultValue = "0") int pageNumber,
+                               Map<String, Object> model) {
+        int vendorId = getToken().getId();
+        model.put("role", getToken().getRole().toString());
+//        List<Integer> skuIds = skuMapper.findIdsByVendorId(vendorId);
+        List<Order> orders = orderMapper.findBySkuIds(vendorId, new RowBounds(pageNumber * pageSize, pageSize));
+        model.put("statusList", OrderStatus.values());
+        model.put("orders", parse(orders));
+        model.put("pageSize", pageSize);
+        model.put("pageNumber", pageNumber);
+        model.put("module", MODULE_VENDOR_ORDERS);
+        return "vendor_orders";
     }
 
 
@@ -314,15 +332,7 @@ public class HomeController extends AuthenticationRequiredController {
         return "orders";
     }
 
-    private List<OrderVo> getOrders(int agentId, String uuid, String keyword, String referenceNumber,
-                                    int status, RowBounds rowBounds) {
-        List<Order> orders;
-        if (agentId > 0) {
-            orders = orderMapper.findByAgentIdAndMultiFields(agentId, uuid, keyword, referenceNumber, status, rowBounds);
-        } else {
-            orders = orderMapper.findAllByMultiFields(uuid, keyword, referenceNumber, status, rowBounds);
-        }
-
+    private List<OrderVo> parse(List<Order> orders) {
         List<OrderTicket> ticketDates = orderTicketMapper
                 .findOrderTicketDate(Lists.transform(orders, Order::getId));
         Map<Integer, Date> ticketDateMap = Maps.newHashMap();
@@ -337,14 +347,34 @@ public class HomeController extends AuthenticationRequiredController {
             }
             return orderVo;
         });
+    }
 
+    private List<OrderVo> getOrders(int agentId, String uuid, String keyword, String referenceNumber,
+                                    int status, RowBounds rowBounds) {
+        List<Order> orders;
+        if (agentId > 0) {
+            orders = orderMapper.findByAgentIdAndMultiFields(agentId, uuid, keyword, referenceNumber, status, rowBounds);
+        } else {
+            orders = orderMapper.findAllByMultiFields(uuid, keyword, referenceNumber, status, rowBounds);
+        }
+        return parse(orders);
     }
 
     @RequestMapping("orders/{id}")
-    @Authentication
+    @Authentication({Role.Admin, Role.Vendor, Role.Agent})
     public String orderDetail(@PathVariable("id") int id, Map<String, Object> model,
                               @CookieValue(value = "language", defaultValue = "en") String lang) {
         Order order = orderMapper.findById(id);
+        if (getToken().getRole() == Role.Agent) {
+            if (order.getAgentId() != getToken().getId()) {
+                throw new AuthenticationFailureException("order id:" + id + " does not belong to agent id:" + getToken().getId());
+            }
+        } else if (getToken().getRole() == Role.Vendor) {
+            Sku sku = skuMapper.findById(order.getSkuId());
+            if (sku.getVendorId() != getToken().getId()) {
+                throw new AuthenticationFailureException("order id:" + id + " does not belong to vendor id:" + getToken().getId());
+            }
+        }
         if (order == null) {
             throw new ResourceNotFoundException();
         }

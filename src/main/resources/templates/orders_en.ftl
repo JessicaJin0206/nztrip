@@ -13,13 +13,13 @@
     <#include "menu.ftl"/>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
             <div class="row">
-                <div class="col-md-2"><input type="text" id="j_keyword" class="form-control"
+                <div class="col-md-2"><input id="j_keyword" class="form-control"
                                              placeholder="Search Keyword" value="${keyword}">
                 </div>
-                <div class="col-md-2"><input type="text" id="j_uuid" class="form-control"
+                <div class="col-md-2"><input id="j_uuid" class="form-control"
                                              placeholder="Order Id or Agent Order Id" value="${uuid}">
                 </div>
-                <div class="col-md-3"><input type="text" id="j_reference_number"
+                <div class="col-md-3"><input id="j_reference_number"
                                              class="form-control"
                                              placeholder="Reference Number"
                                              value="${referenceNumber}">

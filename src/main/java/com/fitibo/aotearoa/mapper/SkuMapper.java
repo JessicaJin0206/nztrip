@@ -143,6 +143,9 @@ public interface SkuMapper {
     })
     List<Sku> findAll(RowBounds rowBounds);
 
+    @Select("select id from sku where vendor_id = #{vendorId}")
+    List<Integer> findIdsByVendorId(@Param("vendorId") int vendorId);
+
     @Select("select * from sku where name like CONCAT('%',#{name},'%')")
     @Results({
             @Result(column = "id", property = "id"),
