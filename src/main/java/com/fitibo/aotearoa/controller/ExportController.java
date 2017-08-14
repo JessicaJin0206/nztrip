@@ -170,6 +170,7 @@ public class ExportController extends AuthenticationRequiredController {
         } else {
             date = DateUtils.parseDate(dateString);
         }
+        date = DateUtils.parseDate("2017-09-26");
         Workbook skuDetail = archiveService.createSkuDetail(date, skuId);
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             skuDetail.write(baos);

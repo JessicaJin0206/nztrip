@@ -276,33 +276,93 @@ public class ArchiveServiceImpl implements ArchiveService {
         style.setFont(font);
         style.setWrapText(true);
         List<OrderTicket> orderTickets = orderTicketMapper.findBySkuIdAndDate(skuId, date);
+        List<Order> orders = orderMapper.findByIds(orderTickets.stream().map(OrderTicket::getOrderId).distinct().collect(Collectors.toList()));
         List<String> allTickets = skuTicketPriceMapper.findDistinctTicketBySkuIdAndDate(skuId, date);
-        Map<String, List<OrderTicket>> ticketsMap = orderTickets.stream().collect(Collectors.groupingBy(OrderTicket::getTicketTime));
+        List<SkuTicket> skuTickets = skuTicketMapper.findBySkuId(skuId);
         int rowIndex = 0;
-        int maxColumn = 0;
-        for (String ticketName : allTickets.stream().sorted().collect(Collectors.toList())) {
-            Row row = sheet.createRow(rowIndex++);
-            int columnIndex = 0;
-            Cell cell = row.createCell(columnIndex++);
-            cell.setCellStyle(style);
+
+        Row header = sheet.createRow(rowIndex++);
+        Cell time = header.createCell(0);
+        time.setCellType(Cell.CELL_TYPE_STRING);
+        time.setCellValue("TIME");
+        header.createCell(1);
+        for (int i = 0; i < orders.size(); i++) {
+            Cell cell = header.createCell(i + 2);
             cell.setCellType(Cell.CELL_TYPE_STRING);
-            cell.setCellValue(DateUtils.formatDate(date) + " " + ticketName);
-            maxColumn = columnIndex > maxColumn ? columnIndex : maxColumn;
-            if (!ticketsMap.containsKey(ticketName)) {
-                continue;
-            }
-            List<OrderTicket> tickets = ticketsMap.get(ticketName);
-            Map<Integer, List<OrderTicket>> orderTicketMap = tickets.stream().collect(Collectors.groupingBy(OrderTicket::getOrderId));
-            for (Map.Entry<Integer, List<OrderTicket>> singleOrderEntry : orderTicketMap.entrySet()) {
-                Order order = orderMapper.findById(singleOrderEntry.getKey());
-                String orderInfo = formatOrderInfo(columnIndex, order, singleOrderEntry.getValue());
-                Cell infoCell = row.createCell(columnIndex++);
-                infoCell.setCellType(Cell.CELL_TYPE_STRING);
-                infoCell.setCellValue(orderInfo);
-                infoCell.setCellStyle(style);
-            }
+            cell.setCellValue("Group" + (i + 1));
         }
-        for (int i = 0; i < maxColumn; i++) {
+        for (String skuTime : allTickets.stream().sorted().collect(Collectors.toList())) {
+
+            Row row = sheet.createRow(rowIndex);
+            Cell cell = row.createCell(0);
+            cell.setCellType(Cell.CELL_TYPE_STRING);
+            cell.setCellValue(skuTime);
+
+            cell = row.createCell(1);
+            cell.setCellType(Cell.CELL_TYPE_STRING);
+            cell.setCellValue("NAME:");
+
+            row = sheet.createRow(rowIndex + 1);
+            row.createCell(0);
+            cell = row.createCell(1);
+            cell.setCellType(Cell.CELL_TYPE_STRING);
+            cell.setCellValue("EMAIL:");
+
+            row = sheet.createRow(rowIndex + 2);
+            row.createCell(0);
+            cell = row.createCell(1);
+            cell.setCellType(Cell.CELL_TYPE_STRING);
+            cell.setCellValue("MOBILE:");
+
+
+            Map<Integer, List<OrderTicket>> orderTicketsMap = orderTickets.stream().filter(orderTicket -> orderTicket.getTicketTime().equalsIgnoreCase(skuTime)).collect(Collectors.groupingBy(OrderTicket::getOrderId));
+            for (int i = 0; i < skuTickets.size(); i++) {
+                SkuTicket skuTicket = skuTickets.get(i);
+                int rowNum = rowIndex + i + 3;
+                row = sheet.createRow(rowNum);
+                cell = row.createCell(1);
+                cell.setCellType(Cell.CELL_TYPE_STRING);
+                cell.setCellValue(skuTicket.getName());
+            }
+
+            int idx = 0;
+            for (Integer orderId : orderTicketsMap.keySet()) {
+                Optional<Order> orderOptional = orders.stream().filter(order -> order.getId() == orderId).findFirst();
+                Preconditions.checkArgument(orderOptional.isPresent(), "this should not happen");
+                Order order = orderOptional.get();
+                row = sheet.getRow(rowIndex);
+                cell = row.createCell(2 + idx);
+                cell.setCellType(Cell.CELL_TYPE_STRING);
+                cell.setCellValue(order.getPrimaryContact());
+
+                row = sheet.getRow(rowIndex + 1);
+                cell = row.createCell(2 + idx);
+                cell.setCellType(Cell.CELL_TYPE_STRING);
+                cell.setCellValue(order.getPrimaryContactEmail());
+
+                row = sheet.getRow(rowIndex + 2);
+                cell = row.createCell(2 + idx);
+                cell.setCellType(Cell.CELL_TYPE_STRING);
+                cell.setCellValue(order.getPrimaryContactPhone());
+
+                for (int i = 0; i < skuTickets.size(); i++) {
+                    SkuTicket skuTicket = skuTickets.get(i);
+                    int rowNum = rowIndex + i + 3;
+                    row = sheet.getRow(rowNum);
+
+                    cell = row.createCell(2 + idx);
+                    cell.setCellType(Cell.CELL_TYPE_STRING);
+                    cell.setCellValue(orderTicketsMap.get(orderId).stream().filter(orderTicket -> orderTicket.getSkuTicket().equalsIgnoreCase(skuTicket.getName())).count());
+
+                }
+                idx++;
+            }
+
+            rowIndex += skuTickets.size() + 4;
+
+
+        }
+        for (int i = 0; i < 2 + orders.size(); i++) {
             sheet.autoSizeColumn(i);
         }
         return workbook;
