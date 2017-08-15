@@ -325,10 +325,9 @@ public class RestApiController extends AuthenticationRequiredController {
 
     @RequestMapping(value = "/v1/api/orders", method = RequestMethod.POST)
     @Transactional(rollbackFor = Exception.class)
-    @Authentication
+    @Authentication({Role.Vendor, Role.Admin, Role.Agent})
     public OrderVo createOrder(@RequestBody OrderVo orderVo) {
         Preconditions.checkNotNull(getToken());
-        final int agentId = getToken().getRole() == Role.Agent ? getToken().getId() : 0;
         int skuId = orderVo.getSkuId();
         String skuUuid = orderVo.getSkuUuid();
         Sku sku;
@@ -342,9 +341,8 @@ public class RestApiController extends AuthenticationRequiredController {
         } else {
             throw new IllegalArgumentException("cannot find sku by sku id or uuid");
         }
-        if (agentId > 0) {
-            checkViewSkuPriviledge(sku, agentId);
-        }
+        Order order = parse(orderVo);
+
         final Vendor vendor = vendorService.findById(sku.getVendorId());
         Preconditions.checkNotNull(vendor, "invalid vendor id:" + sku.getVendorId());
         final int discount = getDiscount(getToken(), sku.getId());
@@ -352,7 +350,6 @@ public class RestApiController extends AuthenticationRequiredController {
                 Lists.transform(orderVo.getOrderTickets(), OrderTicketVo::getTicketPriceId));
         Map<Integer, SkuTicket> skuTicketMap = getSkuTicketMap(
                 Lists.transform(orderVo.getOrderTickets(), OrderTicketVo::getSkuTicketId));
-        Order order = parse(orderVo, agentId);
         BigDecimal total = orderVo.getOrderTickets().stream().
                 map((orderTicket) -> calculateTicketPrice(priceMap.get(orderTicket.getTicketPriceId()),
                         discount)).
@@ -370,6 +367,15 @@ public class RestApiController extends AuthenticationRequiredController {
         }
         if (sku.isAutoGenerateReferenceNumber()) {
             order.setReferenceNumber(order.getUuid());
+        }
+        if (getToken().getRole() == Role.Agent) {
+            checkViewSkuPriviledge(sku, getToken().getId());
+            order.setAgentId(getToken().getId());
+        } else if (getToken().getRole() == Role.Vendor) {
+            if (sku.getVendorId() != getToken().getId()) {
+                throw new AuthenticationFailureException("sku:" + sku.getId() + " does not belong to vendor:" + getToken().getId());
+            }
+            order.setStatus(OrderStatus.CONFIRMED.getValue());
         }
 
         checkSkuInventory(sku.getId(), orderVo.getOrderTickets());
@@ -888,10 +894,9 @@ public class RestApiController extends AuthenticationRequiredController {
         }
     }
 
-    private static Order parse(OrderVo order, int agentId) {
+    private static Order parse(OrderVo order) {
         Order result = new Order();
         result.setSkuId(order.getSkuId());
-        result.setAgentId(agentId);
         result.setRemark(order.getRemark());
         result.setReferenceNumber(order.getReferenceNumber());
         result.setPrimaryContact(order.getPrimaryContact());

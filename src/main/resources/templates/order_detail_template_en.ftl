@@ -31,6 +31,8 @@
     </div>
 </div>
 </#if>
+
+<#if role?? && role == "Admin">
 <div class="form-group">
     <div class="row">
         <label class="col-md-2">E-Mail:</label>
@@ -42,6 +44,7 @@
         </button>
     </div>
 </div>
+</#if>
 
 <div class="form-group">
     <div class="row">
