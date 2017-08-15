@@ -31,7 +31,7 @@
                             <td>${(agent.name)!""}</td>
                             <td>${(agent.description)!""}</td>
                             <td>${agent.discount}</td>
-                            <td>${agent.email}</td>
+                            <td>${agent.email!""}</td>
                             <td>
                                 <div>
                                     <a href="/agents/${agent.id?c}">
