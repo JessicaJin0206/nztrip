@@ -9,6 +9,8 @@ import com.fitibo.aotearoa.model.Order;
 import com.fitibo.aotearoa.model.OrderRecord;
 import com.fitibo.aotearoa.model.OrderTicket;
 import com.fitibo.aotearoa.util.DateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +30,8 @@ public class OrderRecordService {
     private OrderRecordMapper orderRecordMapper;
     @Autowired
     private OrderTicketMapper orderTicketMapper;
+
+    private final static Logger logger = LoggerFactory.getLogger(OrderRecordService.class);
 
     public void createOrder(Token token, Order order) {
         OrderRecord orderRecord = new OrderRecord();
@@ -57,31 +61,36 @@ public class OrderRecordService {
         orderRecordMapper.insert(orderRecord);
     }
 
-    public void updateOrder(Token token, Order oldOrder, Order newOrder) throws Exception {
+    public void updateOrder(Token token, Order oldOrder, Order newOrder)  {
         Field[] fields = Order.class.getDeclaredFields();
         Date date = new Date();
         for (Field field : fields) {
-            PropertyDescriptor pd = new PropertyDescriptor(field.getName(), Order.class);
-            Method getMethod = pd.getReadMethod();
-            Object o1 = getMethod.invoke(oldOrder);
-            Object o2 = getMethod.invoke(newOrder);
-            String s1 = o1 == null ? "" : o1.toString();
-            String s2 = o2 == null ? "" : o2.toString();
-            if (!s1.equals(s2)) {
-                String fieldName = OrderConstants.getFieldName(field.getName());
-                if (fieldName != null) {
-                    OrderRecord orderRecord = new OrderRecord();
-                    orderRecord.setOperateTime(date);
-                    orderRecord.setOperateType(fieldName);
-                    orderRecord.setOrderId(oldOrder.getId());
-                    orderRecord.setOperatorId(token.getId());
-                    orderRecord.setOperatorType(token.getRole().toString());
-                    orderRecord.setContentChangeFrom(s1);
-                    orderRecord.setContentChangeTo(s2);
-                    orderRecord.setStatusChangeFrom(oldOrder.getStatus());
-                    orderRecord.setStatusChangeTo(oldOrder.getStatus());//不会更改订单状态
-                    orderRecordMapper.insert(orderRecord);
+            try{
+                PropertyDescriptor pd = new PropertyDescriptor(field.getName(), Order.class);
+                Method getMethod = pd.getReadMethod();
+                Object o1 = getMethod.invoke(oldOrder);
+                Object o2 = getMethod.invoke(newOrder);
+                String s1 = o1 == null ? "" : o1.toString();
+                String s2 = o2 == null ? "" : o2.toString();
+                if (!s1.equals(s2)) {
+                    String fieldName = OrderConstants.getFieldName(field.getName());
+                    if (fieldName != null) {
+                        OrderRecord orderRecord = new OrderRecord();
+                        orderRecord.setOperateTime(date);
+                        orderRecord.setOperateType(fieldName);
+                        orderRecord.setOrderId(oldOrder.getId());
+                        orderRecord.setOperatorId(token.getId());
+                        orderRecord.setOperatorType(token.getRole().toString());
+                        orderRecord.setContentChangeFrom(s1);
+                        orderRecord.setContentChangeTo(s2);
+                        orderRecord.setStatusChangeFrom(oldOrder.getStatus());
+                        orderRecord.setStatusChangeTo(oldOrder.getStatus());//不会更改订单状态
+                        orderRecordMapper.insert(orderRecord);
+                    }
                 }
+            }catch (Exception e){
+                logger.error("error in reflect Order.class in updateOrder");
+                throw new RuntimeException(e);
             }
         }
     }

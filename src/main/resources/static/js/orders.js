@@ -12,8 +12,7 @@ $('#j_search').on('click', doSearch);
 $('#j_keyword').keydown(enterKey);
 $('#j_uuid').keydown(enterKey);
 $('#j_reference_number').keydown(enterKey);
-$('#j_create_time input').keydown(enterKey);
-$('#j_ticket_date input').keydown(enterKey);
+
 function enterKey(event) {
     if (event.keyCode === 13) {
         doSearch();
@@ -24,11 +23,11 @@ var createTimeSelector = $('#j_create_time');
 var ticketDateSelector = $('#j_ticket_date');
 createTimeSelector.datetimepicker({
     format: "YYYY-MM-DD"
-});
+}).on('dp.hide', doSearch);
 
 ticketDateSelector.datetimepicker({
     format: "YYYY-MM-DD"
-});
+}).on('dp.hide', doSearch);
 
 function doSearch() {
     var keyword = $('#j_keyword').val();

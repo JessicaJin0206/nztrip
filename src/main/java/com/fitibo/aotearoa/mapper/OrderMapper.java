@@ -4,6 +4,7 @@ import com.fitibo.aotearoa.model.Order;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.session.RowBounds;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -126,8 +127,6 @@ public interface OrderMapper {
             "from `order` o left join `sku` s on o.sku_id = s.id " +
             "where agent_id = #{agentId} " +
             "<if test =\"keyword != null and keyword != ''\">and s.name like CONCAT('%',#{keyword},'%') </if> " +
-            "<if test =\"ticketDate != null and ticketDate != ''\">and o.id in (SELECT order_id FROM `order_ticket` GROUP BY order_id,ticket_date HAVING datediff(ticket_date,#{ticketDate}) = 0)</if> " +
-            "<if test =\"createTime != null and createTime != ''\">and datediff(o.create_time,#{createTime}) = 0 </if> " +
             "<if test =\"uuid != null and uuid != ''\">and (o.uuid like CONCAT('%',#{uuid},'%') or o.agent_order_id like CONCAT('%',#{uuid},'%')) </if> " +
             "<if test =\"referenceNumber != null and referenceNumber != ''\">and o.reference_number like  CONCAT('%',#{referenceNumber},'%') </if> " +
             "<if test =\"status != null and status > 0\">and o.status = #{status} </if> " +
@@ -163,8 +162,81 @@ public interface OrderMapper {
                                             @Param("keyword") String keyword,
                                             @Param("referenceNumber") String referenceNumber,
                                             @Param("status") int status,
-                                            @Param("createTime") String createTime,
-                                            @Param("ticketDate") String ticketDate,
+                                            RowBounds rowBounds);
+
+    @Select("<script>" +
+            "select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
+            "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
+            "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price  " +
+            "from `order` o left join `sku` s on o.sku_id = s.id " +
+            "where agent_id = #{agentId} and o.id in (SELECT order_id FROM `order_ticket` GROUP BY order_id,ticket_date HAVING datediff(ticket_date,#{ticketDate}) = 0) " +
+            " order by o.id desc" +
+            "</script>")
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "sku_id", property = "skuId"),
+            @Result(column = "uuid", property = "uuid"),
+            @Result(column = "agent_id", property = "agentId"),
+            @Result(column = "remark", property = "remark"),
+            @Result(column = "status", property = "status"),
+            @Result(column = "create_time", property = "createTime"),
+            @Result(column = "update_time", property = "updateTime"),
+            @Result(column = "price", property = "price"),
+            @Result(column = "gathering_info", property = "gatheringInfo"),
+            @Result(column = "primary_contact", property = "primaryContact"),
+            @Result(column = "primary_contact_email", property = "primaryContactEmail"),
+            @Result(column = "primary_contact_phone", property = "primaryContactPhone"),
+            @Result(column = "primary_contact_wechat", property = "primaryContactWechat"),
+            @Result(column = "secondary_contact", property = "secondaryContact"),
+            @Result(column = "secondary_contact_email", property = "secondaryContactEmail"),
+            @Result(column = "secondary_contact_phone", property = "secondaryContactPhone"),
+            @Result(column = "secondary_contact_wechat", property = "secondaryContactWechat"),
+            @Result(column = "reference_number", property = "referenceNumber"),
+            @Result(column = "name", property = "sku"),
+            @Result(column = "vendor_phone", property = "vendorPhone"),
+            @Result(column = "agent_order_id", property = "agentOrderId"),
+            @Result(column = "modified_price", property = "modifiedPrice")
+    })
+    List<Order> findByAgentIdAndTicketDate(@Param("agentId") int agentId,
+                                           @Param("ticketDate") Date ticketDate,
+                                            RowBounds rowBounds);
+    @Select("<script>" +
+            "select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
+            "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
+            "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price  " +
+            "from `order` o left join `sku` s on o.sku_id = s.id " +
+            "where agent_id = #{agentId} and datediff(o.create_time,#{createTime}) = 0 " +
+            " order by o.id desc" +
+            "</script>")
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "sku_id", property = "skuId"),
+            @Result(column = "uuid", property = "uuid"),
+            @Result(column = "agent_id", property = "agentId"),
+            @Result(column = "remark", property = "remark"),
+            @Result(column = "status", property = "status"),
+            @Result(column = "create_time", property = "createTime"),
+            @Result(column = "update_time", property = "updateTime"),
+            @Result(column = "price", property = "price"),
+            @Result(column = "gathering_info", property = "gatheringInfo"),
+            @Result(column = "primary_contact", property = "primaryContact"),
+            @Result(column = "primary_contact_email", property = "primaryContactEmail"),
+            @Result(column = "primary_contact_phone", property = "primaryContactPhone"),
+            @Result(column = "primary_contact_wechat", property = "primaryContactWechat"),
+            @Result(column = "secondary_contact", property = "secondaryContact"),
+            @Result(column = "secondary_contact_email", property = "secondaryContactEmail"),
+            @Result(column = "secondary_contact_phone", property = "secondaryContactPhone"),
+            @Result(column = "secondary_contact_wechat", property = "secondaryContactWechat"),
+            @Result(column = "reference_number", property = "referenceNumber"),
+            @Result(column = "name", property = "sku"),
+            @Result(column = "vendor_phone", property = "vendorPhone"),
+            @Result(column = "agent_order_id", property = "agentOrderId"),
+            @Result(column = "modified_price", property = "modifiedPrice")
+    })
+    List<Order> findByAgentIdAndCreateTime(@Param("agentId") int agentId,
+                                            @Param("createTime") Date createTime,
                                             RowBounds rowBounds);
 
     @Select("<script>" +
@@ -249,8 +321,6 @@ public interface OrderMapper {
             "<if test =\"uuid != null and uuid != ''\">and (o.uuid like CONCAT('%',#{uuid},'%') or o.agent_order_id like CONCAT('%',#{uuid},'%')) </if> " +
             "<if test =\"referenceNumber != null and referenceNumber != ''\">and o.reference_number like  CONCAT('%',#{referenceNumber},'%') </if> " +
             "<if test =\"status != null and status > 0\">and o.status = #{status} </if> " +
-            "<if test =\"ticketDate != null and ticketDate != ''\">and o.id in (SELECT order_id FROM `order_ticket` GROUP BY order_id,ticket_date HAVING datediff(ticket_date,#{ticketDate}) = 0)</if> " +
-            "<if test =\"createTime != null and createTime != ''\">and datediff(o.create_time,#{createTime}) = 0 </if> " +
             " order by o.id desc" +
             "</script>")
     @Results({
@@ -283,9 +353,83 @@ public interface OrderMapper {
                                      @Param("keyword") String keyword,
                                      @Param("referenceNumber") String referenceNumber,
                                      @Param("status") int status,
-                                     @Param("createTime") String createTime,
-                                     @Param("ticketDate") String ticketDate,
                                      RowBounds rowBounds);
+
+    @Select("<script>" +
+            "select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
+            "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
+            "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, agent.name as agent_name, o.agent_order_id, o.modified_price " +
+            "from `order` o left join `sku` s on o.sku_id = s.id left join agent on o.agent_id = agent.id " +
+            "where o.id in (SELECT order_id FROM `order_ticket` GROUP BY order_id,ticket_date HAVING datediff(ticket_date,#{ticketDate}) = 0) " +
+            " order by o.id desc" +
+            "</script>")
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "sku_id", property = "skuId"),
+            @Result(column = "uuid", property = "uuid"),
+            @Result(column = "agent_id", property = "agentId"),
+            @Result(column = "remark", property = "remark"),
+            @Result(column = "status", property = "status"),
+            @Result(column = "create_time", property = "createTime"),
+            @Result(column = "update_time", property = "updateTime"),
+            @Result(column = "price", property = "price"),
+            @Result(column = "gathering_info", property = "gatheringInfo"),
+            @Result(column = "primary_contact", property = "primaryContact"),
+            @Result(column = "primary_contact_email", property = "primaryContactEmail"),
+            @Result(column = "primary_contact_phone", property = "primaryContactPhone"),
+            @Result(column = "primary_contact_wechat", property = "primaryContactWechat"),
+            @Result(column = "secondary_contact", property = "secondaryContact"),
+            @Result(column = "secondary_contact_email", property = "secondaryContactEmail"),
+            @Result(column = "secondary_contact_phone", property = "secondaryContactPhone"),
+            @Result(column = "secondary_contact_wechat", property = "secondaryContactWechat"),
+            @Result(column = "reference_number", property = "referenceNumber"),
+            @Result(column = "name", property = "sku"),
+            @Result(column = "vendor_phone", property = "vendorPhone"),
+            @Result(column = "agent_name", property = "agentName"),
+            @Result(column = "agent_order_id", property = "agentOrderId"),
+            @Result(column = "modified_price", property = "modifiedPrice")
+    })
+    List<Order> findAllByTicketDate(@Param("ticketDate") Date ticketDate,
+                                     RowBounds rowBounds);
+
+    @Select("<script>" +
+            "select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
+            "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
+            "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, agent.name as agent_name, o.agent_order_id, o.modified_price " +
+            "from `order` o left join `sku` s on o.sku_id = s.id left join agent on o.agent_id = agent.id " +
+            "where datediff(o.create_time,#{createTime}) = 0 " +
+            " order by o.id desc" +
+            "</script>")
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "sku_id", property = "skuId"),
+            @Result(column = "uuid", property = "uuid"),
+            @Result(column = "agent_id", property = "agentId"),
+            @Result(column = "remark", property = "remark"),
+            @Result(column = "status", property = "status"),
+            @Result(column = "create_time", property = "createTime"),
+            @Result(column = "update_time", property = "updateTime"),
+            @Result(column = "price", property = "price"),
+            @Result(column = "gathering_info", property = "gatheringInfo"),
+            @Result(column = "primary_contact", property = "primaryContact"),
+            @Result(column = "primary_contact_email", property = "primaryContactEmail"),
+            @Result(column = "primary_contact_phone", property = "primaryContactPhone"),
+            @Result(column = "primary_contact_wechat", property = "primaryContactWechat"),
+            @Result(column = "secondary_contact", property = "secondaryContact"),
+            @Result(column = "secondary_contact_email", property = "secondaryContactEmail"),
+            @Result(column = "secondary_contact_phone", property = "secondaryContactPhone"),
+            @Result(column = "secondary_contact_wechat", property = "secondaryContactWechat"),
+            @Result(column = "reference_number", property = "referenceNumber"),
+            @Result(column = "name", property = "sku"),
+            @Result(column = "vendor_phone", property = "vendorPhone"),
+            @Result(column = "agent_name", property = "agentName"),
+            @Result(column = "agent_order_id", property = "agentOrderId"),
+            @Result(column = "modified_price", property = "modifiedPrice")
+    })
+    List<Order> findAllByCreateTime(@Param("createTime") Date createTime,
+                                    RowBounds rowBounds);
 
     @Select("select * from `order` where agent_id = #{agentId} and status = #{status} order by o.id desc")
     @Results({

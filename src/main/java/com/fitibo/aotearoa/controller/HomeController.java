@@ -285,7 +285,7 @@ public class HomeController extends AuthenticationRequiredController {
                              @RequestParam(value = "status", defaultValue = "0") int status,
                              @RequestParam(value = "pagesize", defaultValue = "10") int pageSize,
                              @RequestParam(value = "pagenumber", defaultValue = "0") int pageNumber,
-                             @RequestParam(value = "createtime", defaultValue = "") String createTime,
+                             @RequestParam(value = "createtime", defaultValue = "") String createTimeString,
                              @RequestParam(value = "ticketdate", defaultValue = "") String ticketDateString,
                              @CookieValue(value = "language", defaultValue = "en") String lang,
                              Map<String, Object> model) {
@@ -296,7 +296,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("pageSize", pageSize);
         model.put("pageNumber", pageNumber);
         model.put("keyword", keyword);
-        model.put("createTime", createTime);
+        model.put("createTime", createTimeString);
         model.put("ticketDate", ticketDateString);
         model.put("uuid", uuid);
         model.put("referenceNumber", referenceNumber);
@@ -304,13 +304,15 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("userName", getUserName(getToken()));
         model.put("lang", lang);
         List<OrderVo> orders;
+        Date createTime = createTimeString.isEmpty() ? null : DateUtils.parseDate(createTimeString);
+        Date ticketDate = ticketDateString.isEmpty() ? null : DateUtils.parseDate(ticketDateString);
         switch (getToken().getRole()) {
             case Admin:
-                orders = getOrders(0, uuid, keyword, referenceNumber, status, createTime, ticketDateString,
+                orders = getOrders(0, uuid, keyword, referenceNumber, status, createTime, ticketDate,
                         new RowBounds(pageNumber * pageSize, pageSize));
                 break;
             case Agent:
-                orders = getOrders(getToken().getId(), uuid, keyword, referenceNumber, status, createTime, ticketDateString,
+                orders = getOrders(getToken().getId(), uuid, keyword, referenceNumber, status, createTime, ticketDate,
                         new RowBounds(pageNumber * pageSize, pageSize));
                 break;
             default:
@@ -401,13 +403,35 @@ public class HomeController extends AuthenticationRequiredController {
         });
     }
 
-    private List<OrderVo> getOrders(int agentId, String uuid, String keyword, String referenceNumber,
-                                    int status, String createTime, String ticketDateString, RowBounds rowBounds) {
+    private List<OrderVo> getOrders(int agentId, Date createTime, RowBounds rowBounds) {
         List<Order> orders;
         if (agentId > 0) {
-            orders = orderMapper.findByAgentIdAndMultiFields(agentId, uuid, keyword, referenceNumber, status, createTime, ticketDateString, rowBounds);
+            orders = orderMapper.findByAgentIdAndCreateTime(agentId, createTime, rowBounds);
         } else {
-            orders = orderMapper.findAllByMultiFields(uuid, keyword, referenceNumber, status, createTime, ticketDateString, rowBounds);
+            orders = orderMapper.findAllByCreateTime(createTime, rowBounds);
+        }
+        return parse(orders);
+    }
+
+    private List<OrderVo> getOrders(int agentId, String uuid, String keyword, String referenceNumber,
+                                    int status, Date createTime, Date ticketDate, RowBounds rowBounds) {
+        List<Order> orders;
+        if (agentId > 0) {
+            if (createTime != null) {
+                orders = orderMapper.findByAgentIdAndCreateTime(agentId, createTime, rowBounds);
+            } else if (ticketDate != null) {
+                orders = orderMapper.findByAgentIdAndTicketDate(agentId, ticketDate, rowBounds);
+            } else {
+                orders = orderMapper.findByAgentIdAndMultiFields(agentId, uuid, keyword, referenceNumber, status, rowBounds);
+            }
+        } else {
+            if (createTime != null) {
+                orders = orderMapper.findAllByCreateTime(createTime, rowBounds);
+            } else if (ticketDate != null) {
+                orders = orderMapper.findAllByTicketDate(ticketDate, rowBounds);
+            } else {
+                orders = orderMapper.findAllByMultiFields(uuid, keyword, referenceNumber, status, rowBounds);
+            }
         }
         return parse(orders);
     }

@@ -68,7 +68,7 @@
                     <button id="j_search" class="btn btn-primary">Search</button>
                 </div>
                 <div class="col-md-1">
-                    <button id="j_export_english" class="btn btn-primary">Export</button>
+                    <button id="j_export" class="btn btn-primary">Export</button>
                 </div>
             </div>
 
@@ -97,7 +97,7 @@
                                     <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
                                 </a>
                                 <#if role?? && (role == "Admin")>
-                                    <a href="/sku_tickets/export/english/${sku.id?c}" target="_blank">
+                                    <a href="/sku_tickets/export/${sku.id?c}" target="_blank">
                                         <span class="glyphicon glyphicon-download" aria-hidden="true"></span>
                                     </a>
                                 </#if>

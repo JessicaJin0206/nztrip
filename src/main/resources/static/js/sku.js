@@ -18,13 +18,10 @@ $.each($('#j_category_drop_down li a'), function (idx, item) {
 
 $('#j_search').on('click', doSearch);
 
-$('#j_export_english').on('click', function () {
-    window.open("/skus/export/english?"+ getSearchString());
+$('#j_export').on('click', function () {
+    window.open("/skus/export?"+ getSearchString());
 });
 
-$('#j_export_chinese').on('click', function () {
-    window.open("/skus/export/chinese?"+ getSearchString());
-});
 
 $('#j_keyword').keydown(enterKey);
 

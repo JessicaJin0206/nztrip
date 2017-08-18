@@ -35,7 +35,7 @@ public class SkuConstants {
             map.put("注意事项", "注意事项");
             map.put("Eyounz下单地址", "Eyounz下单地址：");
 
-            languageMap.put("chinese", map);
+            languageMap.put("cn", map);
 
             Map<String, String> enMap = Maps.newHashMap();
             enMap.put("名称", "Name");
@@ -58,7 +58,7 @@ public class SkuConstants {
             enMap.put("注意事项", "Notice");
             enMap.put("Eyounz下单地址", "Eyounz Order Address：");
 
-            languageMap.put("english", enMap);
+            languageMap.put("en", enMap);
             //map.put("","");
             //map.put("","");
 

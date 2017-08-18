@@ -465,6 +465,8 @@ public class RestApiController extends AuthenticationRequiredController {
                 orderTicket.setGatheringPlace(orderTicketVo.getGatheringPlace());
                 //订单日志
                 orderRecordService.updateTicket(orderTicket,token,order);
+                //订单日志
+                orderRecordService.updateTicket(orderTicket, token, order);
                 orderTicketMapper.update(orderTicket);
             } else {//create new
                 OrderTicket orderTicket = parse(orderTicketVo, orderVo, priceMap, skuTicketMap, discount);
@@ -472,6 +474,8 @@ public class RestApiController extends AuthenticationRequiredController {
                 orderTicketMapper.create(orderTicket);
                 //订单日志
                 orderRecordService.addTicket(orderTicket,token,order);
+                //订单日志
+                orderRecordService.addTicket(orderTicket, token, order);
                 orderTicketVo.setId(orderTicket.getId());
             }
             for (OrderTicketUserVo orderTicketUserVo : orderTicketVo.getOrderTicketUsers()) {
@@ -497,8 +501,8 @@ public class RestApiController extends AuthenticationRequiredController {
         if (token.getRole() != Role.Admin || !order.getPrice().equals(o.getPrice())) {
             o.setModifiedPrice(total);
         }
-        if(token.getRole() == Role.Admin&&order.getPrice().equals(o.getPrice())&&!o.getModifiedPrice().equals(order.getModifiedPrice())){
-            orderRecordService.modifiedPrice(token,order,order.getModifiedPrice(),o.getModifiedPrice());
+        if (token.getRole() == Role.Admin && order.getPrice().equals(o.getPrice()) && !o.getModifiedPrice().equals(order.getModifiedPrice())) {
+            orderRecordService.modifiedPrice(token, order, order.getModifiedPrice(), o.getModifiedPrice());
         }
         String agentOrderId = o.getAgentOrderId();
         if (StringUtils.isNotEmpty(agentOrderId)) {
@@ -506,11 +510,7 @@ public class RestApiController extends AuthenticationRequiredController {
                 throw new InvalidParamException("duplicated agent order:" + agentOrderId);
             }
         }
-        try {
-            orderRecordService.updateOrder(getToken(),order,o);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        orderRecordService.updateOrder(getToken(), order, o);
         orderMapper.updateOrderInfo(o);
         return orderVo;
     }
@@ -542,7 +542,7 @@ public class RestApiController extends AuthenticationRequiredController {
                 Preconditions.checkNotNull(referenceNumber, "missing reference number");
                 orderMapper.updateReferenceNumber(id, referenceNumber);
                 //订单日志
-                orderRecordService.updateReferenceNumber(getToken(),id,referenceNumber,fromStatus);
+                orderRecordService.updateReferenceNumber(getToken(), id, referenceNumber, fromStatus);
                 order.setReferenceNumber(referenceNumber);
             }
             checkSkuInventory(order.getSkuId(), Lists.transform(orderTicketMapper.findByOrderId(order.getId()), ObjectParser::parse));

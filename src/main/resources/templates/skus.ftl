@@ -68,7 +68,7 @@
                     <button id="j_search" class="btn btn-primary">搜索</button>
                 </div>
                 <div class="col-md-1">
-                    <button id="j_export_chinese" class="btn btn-primary">导出</button>
+                    <button id="j_export" class="btn btn-primary">导出</button>
                 </div>
             </div>
 
@@ -97,7 +97,7 @@
                                     <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
                                 </a>
                                 <#if role?? && (role == "Admin")>
-                                    <a href="/sku_tickets/export/chinese/${sku.id?c}" target="_blank">
+                                    <a href="/sku_tickets/export/${sku.id?c}" target="_blank">
                                         <span class="glyphicon glyphicon-download" aria-hidden="true"></span>
                                     </a>
                                 </#if>
