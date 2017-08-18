@@ -20,4 +20,6 @@ public interface VendorService {
     Vendor findById(int id);
 
     Vendor findByEmail(String email);
+
+    List<Vendor> findByKeyword(String keyword);
 }

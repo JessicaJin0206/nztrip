@@ -2,13 +2,7 @@ package com.fitibo.aotearoa.mapper;
 
 import com.fitibo.aotearoa.model.Agent;
 
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Options;
-import org.apache.ibatis.annotations.Result;
-import org.apache.ibatis.annotations.Results;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -17,7 +11,10 @@ import java.util.List;
  */
 public interface AgentMapper {
 
-    @Select("select * from agent")
+    @Select("<script>" +
+            "select * from agent "+
+            "<if test = \"keyword != null and keyword != ''\">where name like CONCAT('%',#{keyword},'%')</if>"+
+            "</script>")
     @Results({
             @Result(column = "id", property = "id"),
             @Result(column = "name", property = "name"),
@@ -30,7 +27,7 @@ public interface AgentMapper {
             @Result(column = "default_contact_phone", property = "defaultContactPhone"),
             @Result(column = "vendor_id", property = "vendorId"),
     })
-    List<Agent> findAll();
+    List<Agent> findByKeyword(@Param(value = "keyword")String keyword);
 
     @Select("select * from agent where id = #{id}")
     @Results({

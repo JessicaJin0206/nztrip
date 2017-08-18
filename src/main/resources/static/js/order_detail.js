@@ -217,6 +217,19 @@ $('#j_edit').on('click', function () {
     }
 });
 
+$('#j_record').on('click', function () {
+    var path = window.location.pathname.split('/');
+    var id = parseInt(path[path.length - 1]);
+    //window.location.href = '/order_record/' + id;
+    if (window.location.pathname.endsWith('/_edit')) {
+        id = parseInt(path[path.length - 2]);
+        window.open("/order_record/"+id);
+    } else {
+        id = parseInt(path[path.length - 1]);
+        window.open("/order_record/"+id);
+    }
+});
+
 $('#j_update').on('click', function () {
     var isDataValid = true;
     var skuId = parseInt($('#j_order_sku').attr("skuid"));

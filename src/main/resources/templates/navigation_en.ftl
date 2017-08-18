@@ -13,6 +13,7 @@
                 <span class="icon-bar"></span>
             </button>
             <a class="navbar-brand" href="/">Eyounz Booking System</a>
+            <a class="navbar-brand" href="javascript:void(0)">  Welcome ${userName}</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">

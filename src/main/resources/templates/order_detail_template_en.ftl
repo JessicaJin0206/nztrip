@@ -19,6 +19,12 @@
         </#if>
     </div>
 </div>
+<div class="form-group">
+    <div class="row">
+        <label class="col-md-2">Order Log:</label>
+        <button id="j_record" class="btn btn-default form-group">View Log</button>
+    </div>
+</div>
 <#elseif role?? && role == "Agent" && order.status == 10>
 <div class="form-group">
     <div class="row">

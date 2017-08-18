@@ -24,25 +24,8 @@ import com.fitibo.aotearoa.dto.Token;
 import com.fitibo.aotearoa.exception.AuthenticationFailureException;
 import com.fitibo.aotearoa.exception.InvalidParamException;
 import com.fitibo.aotearoa.exception.ResourceNotFoundException;
-import com.fitibo.aotearoa.mapper.AgentMapper;
-import com.fitibo.aotearoa.mapper.HotItemMapper;
-import com.fitibo.aotearoa.mapper.OrderMapper;
-import com.fitibo.aotearoa.mapper.OrderTicketMapper;
-import com.fitibo.aotearoa.mapper.PriceRecordMapper;
-import com.fitibo.aotearoa.mapper.SkuMapper;
-import com.fitibo.aotearoa.mapper.SkuTicketMapper;
-import com.fitibo.aotearoa.mapper.SkuTicketPriceMapper;
-import com.fitibo.aotearoa.model.Agent;
-import com.fitibo.aotearoa.model.Category;
-import com.fitibo.aotearoa.model.City;
-import com.fitibo.aotearoa.model.Duration;
-import com.fitibo.aotearoa.model.Order;
-import com.fitibo.aotearoa.model.OrderTicket;
-import com.fitibo.aotearoa.model.PriceRecord;
-import com.fitibo.aotearoa.model.Sku;
-import com.fitibo.aotearoa.model.SkuTicket;
-import com.fitibo.aotearoa.model.SkuTicketPrice;
-import com.fitibo.aotearoa.model.Vendor;
+import com.fitibo.aotearoa.mapper.*;
+import com.fitibo.aotearoa.model.*;
 import com.fitibo.aotearoa.service.CityService;
 import com.fitibo.aotearoa.service.DurationService;
 import com.fitibo.aotearoa.service.OrderService;
@@ -51,13 +34,7 @@ import com.fitibo.aotearoa.service.VendorService;
 import com.fitibo.aotearoa.service.impl.CategoryServiceImpl;
 import com.fitibo.aotearoa.util.DateUtils;
 import com.fitibo.aotearoa.util.ObjectParser;
-import com.fitibo.aotearoa.vo.AgentVo;
-import com.fitibo.aotearoa.vo.OrderTicketVo;
-import com.fitibo.aotearoa.vo.OrderVo;
-import com.fitibo.aotearoa.vo.PriceRecordVo;
-import com.fitibo.aotearoa.vo.SkuTicketPriceVo;
-import com.fitibo.aotearoa.vo.SkuTicketVo;
-import com.fitibo.aotearoa.vo.SkuVo;
+import com.fitibo.aotearoa.vo.*;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -101,6 +78,7 @@ public class HomeController extends AuthenticationRequiredController {
     private static final String MODULE_VENDOR_SKU = "vendor_sku";
     private static final String MODULE_VENDOR_ORDERS = "vendor_orders";
     private static final String MODULE_SKU_INVENTORY = "sku_inventory";
+    private static final String MODULE_ORDER_RECORD = "order_record";
 
     @Autowired
     private CityService cityService;
@@ -142,6 +120,12 @@ public class HomeController extends AuthenticationRequiredController {
     private HotItemMapper hotItemMapper;
 
     @Autowired
+    private AdminMapper adminMapper;
+
+    @Autowired
+    private OrderRecordMapper orderRecordMapper;
+
+    @Autowired
     private SkuService skuService;
 
     @ExceptionHandler
@@ -160,6 +144,8 @@ public class HomeController extends AuthenticationRequiredController {
         Role role = getToken().getRole();
         if (role == Role.Agent || role == Role.Admin) {
             model.put("module", MODULE_DASHBOARD);
+            model.put("role", getToken().getRole().toString());
+            model.put("userName", getUserName(getToken()));
             model.put("role", role.toString());
             model.put("hotItems", Lists.transform(hotItemMapper.query(new RowBounds()), ObjectParser::parse));
             return "dashboard";
@@ -176,6 +162,7 @@ public class HomeController extends AuthenticationRequiredController {
         int vendorId = getToken().getId();
         model.put("module", MODULE_VENDOR_SKU);
         model.put("role", Role.Vendor.toString());
+        model.put("userName", getUserName(getToken()));
         List<Sku> skus = skuMapper.findByVendorId(vendorId);
         Map<Integer, City> cityMap = cityService.findByIds(Lists.transform(skus, Sku::getCityId));
         Map<Integer, Category> categoryMap = categoryService
@@ -216,6 +203,7 @@ public class HomeController extends AuthenticationRequiredController {
     public String dashboard(Map<String, Object> model) {
         model.put("module", MODULE_DASHBOARD);
         model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
         model.put("hotItems", Lists.transform(hotItemMapper.query(new RowBounds()), ObjectParser::parse));
         return "dashboard";
     }
@@ -255,6 +243,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("vendor", vendor);
         model.put("module", MODULE_CREATE_ORDER);
         model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
         if (getToken().getRole() == Role.Agent) {
             model.put("agent", parse(agentMapper.findById(getToken().getId())));
         }
@@ -284,6 +273,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("vendor", vendor);
         model.put("module", MODULE_CREATE_ORDER);
         model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
         return "create_vendor_order";
     }
 
@@ -295,6 +285,8 @@ public class HomeController extends AuthenticationRequiredController {
                              @RequestParam(value = "status", defaultValue = "0") int status,
                              @RequestParam(value = "pagesize", defaultValue = "10") int pageSize,
                              @RequestParam(value = "pagenumber", defaultValue = "0") int pageNumber,
+                             @RequestParam(value = "createtime", defaultValue = "") String createTime,
+                             @RequestParam(value = "ticketdate", defaultValue = "") String ticketDateString,
                              @CookieValue(value = "language", defaultValue = "en") String lang,
                              Map<String, Object> model) {
         Preconditions.checkNotNull(getToken());
@@ -304,24 +296,84 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("pageSize", pageSize);
         model.put("pageNumber", pageNumber);
         model.put("keyword", keyword);
+        model.put("createTime", createTime);
+        model.put("ticketDate", ticketDateString);
         model.put("uuid", uuid);
         model.put("referenceNumber", referenceNumber);
         model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
         model.put("lang", lang);
         List<OrderVo> orders;
         switch (getToken().getRole()) {
             case Admin:
-                orders = getOrders(0, uuid, keyword, referenceNumber, status,
+                orders = getOrders(0, uuid, keyword, referenceNumber, status, createTime, ticketDateString,
                         new RowBounds(pageNumber * pageSize, pageSize));
                 break;
             case Agent:
-                orders = getOrders(getToken().getId(), uuid, keyword, referenceNumber, status,
+                orders = getOrders(getToken().getId(), uuid, keyword, referenceNumber, status, createTime, ticketDateString,
                         new RowBounds(pageNumber * pageSize, pageSize));
                 break;
             default:
                 throw new ResourceNotFoundException();
         }
         model.put("orders", orders);
+        Map<String, Integer> orderCountByStatus = Maps.newHashMap();
+        int agentId = getToken().getRole() == Role.Agent ? getToken().getId() : 0;
+        orderCountByStatus.put(OrderStatus.NEW.getValue() + "", agentId == 0 ? orderMapper.countByStatus(OrderStatus.NEW.getValue()) : orderMapper.countByStatusAndAgentId(OrderStatus.NEW.getValue(), agentId));
+        orderCountByStatus.put(OrderStatus.PENDING.getValue() + "", agentId == 0 ? orderMapper.countByStatus(OrderStatus.PENDING.getValue()) : orderMapper.countByStatusAndAgentId(OrderStatus.PENDING.getValue(), agentId));
+        orderCountByStatus.put(OrderStatus.FULL.getValue() + "", agentId == 0 ? orderMapper.countByStatus(OrderStatus.FULL.getValue()) : orderMapper.countByStatusAndAgentId(OrderStatus.FULL.getValue(), agentId));
+        orderCountByStatus.put(OrderStatus.MODIFYING.getValue() + "", agentId == 0 ? orderMapper.countByStatus(OrderStatus.MODIFYING.getValue()) : orderMapper.countByStatusAndAgentId(OrderStatus.MODIFYING.getValue(), agentId));
+        model.put("orderCountByStatus", orderCountByStatus);
+        return "orders";
+    }
+
+    /**
+     * 查看急单的功能
+     */
+    @RequestMapping("urgent_orders")
+    @Authentication(Role.Admin)
+    public String queryUrgentOrder(@RequestParam(value = "keyword", defaultValue = "") String keyword,
+                                   @RequestParam(value = "uuid", defaultValue = "") String uuid,
+                                   @RequestParam(value = "referencenumber", defaultValue = "") String referenceNumber,
+                                   @RequestParam(value = "status", defaultValue = "0") int status,
+                                   @RequestParam(value = "pagesize", defaultValue = "10") int pageSize,
+                                   @RequestParam(value = "pagenumber", defaultValue = "0") int pageNumber,
+                                   @RequestParam(value = "createtime", defaultValue = "") String createTime,
+                                   @RequestParam(value = "ticketdate", defaultValue = "") String ticketDateString,
+                                   @CookieValue(value = "language", defaultValue = "en") String lang,
+                                   Map<String, Object> model) {
+        Preconditions.checkNotNull(getToken());
+        createTime = createTime.trim();
+        ticketDateString = ticketDateString.trim();
+        model.put("module", MODULE_QUERY_ORDER);
+        model.put("statusList", OrderStatus.values());
+        model.put("status", status);
+        model.put("pageSize", pageSize);
+        model.put("pageNumber", pageNumber);
+        model.put("keyword", keyword);
+        model.put("createTime", createTime);
+        model.put("ticketDate", ticketDateString);
+        model.put("uuid", uuid);
+        model.put("referenceNumber", referenceNumber);
+        model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
+        model.put("lang", lang);
+        List<Order> orders = orderMapper.findAllUrgentOrders();
+        List<OrderTicket> ticketDates = orderTicketMapper
+                .findOrderTicketDate(Lists.transform(orders, Order::getId));
+        Map<Integer, Date> ticketDateMap = Maps.newHashMap();
+        for (OrderTicket orderTicket : ticketDates) {
+            ticketDateMap.put(orderTicket.getOrderId(), orderTicket.getTicketDate());
+        }
+        List<OrderVo> orderVos = Lists.transform(orders, input -> {
+            OrderVo orderVo = ObjectParser.parse(input);
+            Date date = ticketDateMap.get(input.getId());
+            if (date != null) {
+                orderVo.setTicketDate(DateUtils.formatDate(date));
+            }
+            return orderVo;
+        });
+        model.put("orders", orderVos);
         Map<String, Integer> orderCountByStatus = Maps.newHashMap();
         int agentId = getToken().getRole() == Role.Agent ? getToken().getId() : 0;
         orderCountByStatus.put(OrderStatus.NEW.getValue() + "", agentId == 0 ? orderMapper.countByStatus(OrderStatus.NEW.getValue()) : orderMapper.countByStatusAndAgentId(OrderStatus.NEW.getValue(), agentId));
@@ -350,12 +402,12 @@ public class HomeController extends AuthenticationRequiredController {
     }
 
     private List<OrderVo> getOrders(int agentId, String uuid, String keyword, String referenceNumber,
-                                    int status, RowBounds rowBounds) {
+                                    int status, String createTime, String ticketDateString, RowBounds rowBounds) {
         List<Order> orders;
         if (agentId > 0) {
-            orders = orderMapper.findByAgentIdAndMultiFields(agentId, uuid, keyword, referenceNumber, status, rowBounds);
+            orders = orderMapper.findByAgentIdAndMultiFields(agentId, uuid, keyword, referenceNumber, status, createTime, ticketDateString, rowBounds);
         } else {
-            orders = orderMapper.findAllByMultiFields(uuid, keyword, referenceNumber, status, rowBounds);
+            orders = orderMapper.findAllByMultiFields(uuid, keyword, referenceNumber, status, createTime, ticketDateString, rowBounds);
         }
         return parse(orders);
     }
@@ -387,8 +439,34 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("editing", false);
         model.put("transitions", orderService.getAvailableTransitions(order.getStatus()));
         model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
         model.put("lang", lang);
         return "order_detail";
+    }
+
+    /**
+     * 查看订单日志
+     */
+    @RequestMapping("order_record/{id}")
+    @Authentication
+    public String orderRecord(@PathVariable("id") int id, Map<String, Object> model,
+                              @CookieValue(value = "language", defaultValue = "en") String lang) {
+        Order order = orderMapper.findById(id);
+        if (order == null) {
+            throw new ResourceNotFoundException();
+        }
+        model.put("module", MODULE_ORDER_RECORD);
+        model.put("order", order);
+        Map<Integer, Admin> adminMap = Maps.newHashMap();
+        Map<Integer, Agent> agentMap = Maps.newHashMap();
+        List<OrderRecordVo> orderRecords = Lists.transform(orderRecordMapper.findByOrderId(order.getId()), orderRecord -> parse(orderRecord, adminMap, agentMap));
+        model.put("orderRecords", orderRecords);
+        model.put("module", MODULE_ORDER_DETAIL);
+        model.put("statusList", OrderStatus.values());
+        model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
+        model.put("lang", lang);
+        return "order_record";
     }
 
     private String calculateTouristCount(List<OrderTicketVo> tickets) {
@@ -426,6 +504,8 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("module", MODULE_ORDER_DETAIL);
         model.put("statusList", OrderStatus.values());
         model.put("editing", true);
+        model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
         model.put("role", role.toString());
         return "order_detail";
     }
@@ -440,6 +520,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("vendors", vendors);
         model.put("durations", durationService.findAll());
         model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
         return "create_sku";
     }
 
@@ -461,6 +542,8 @@ public class HomeController extends AuthenticationRequiredController {
         }
         model.put("sku", parse(sku));
         model.put("editing", false);
+        model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
         model.put("role", role.toString());
         return "sku_detail";
     }
@@ -477,6 +560,7 @@ public class HomeController extends AuthenticationRequiredController {
         }
         model.put("module", MODULE_PRICE_MONITORING);
         model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
         model.put("priceRecords", Lists.transform(priceRecordMapper
                         .query(company, dateString, new RowBounds(pageNumber * pageSize, pageSize)),
                 HomeController::parse));
@@ -502,6 +586,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("durations", durationService.findAll());
         model.put("editing", true);
         model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
         return "sku_detail";
     }
 
@@ -538,6 +623,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("skuId", skuId);
         model.put("ticketId", ticketId);
         model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
         return "sku_ticket_detail";
     }
 
@@ -581,6 +667,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("pageSize", pageSize);
         model.put("pageNumber", pageNumber);
         model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
         return "skus";
     }
 
@@ -589,15 +676,18 @@ public class HomeController extends AuthenticationRequiredController {
     public String createVendor(Map<String, Object> model) {
         model.put("module", MODULE_CREATE_VENDOR);
         model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
         return "create_vendor";
     }
 
     @RequestMapping("vendors")
     @Authentication(Role.Admin)
-    public String queryVendor(Map<String, Object> model) {
+    public String queryVendor(@RequestParam(value = "keyword", defaultValue = "") String keyword, Map<String, Object> model) {
         model.put("module", MODULE_QUERY_VENDOR);
-        model.put("vendors", vendorService.findAll());
+        model.put("keyword", keyword);
+        model.put("vendors", vendorService.findByKeyword(keyword));
         model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
         return "vendors";
     }
 
@@ -612,6 +702,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("vendor", vendor);
         model.put("editing", false);
         model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
         return "vendor_detail";
     }
 
@@ -626,6 +717,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("vendor", vendor);
         model.put("editing", true);
         model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
         return "vendor_detail";
     }
 
@@ -634,16 +726,19 @@ public class HomeController extends AuthenticationRequiredController {
     public String createAgent(Map<String, Object> model) {
         model.put("module", MODULE_CREATE_AGENT);
         model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
         return "create_agent";
     }
 
     @RequestMapping("agents")
     @Authentication(Role.Admin)
-    public String queryAgent(Map<String, Object> model) {
-        List<Agent> agents = agentMapper.findAll();
+    public String queryAgent(@RequestParam(value = "keyword", defaultValue = "") String keyword, Map<String, Object> model) {
+        List<Agent> agents = agentMapper.findByKeyword(keyword);
         model.put("module", MODULE_QUERY_AGENT);
+        model.put("keyword", keyword);
         model.put("agents", Lists.transform(agents, HomeController::parse));
         model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
         return "agents";
     }
 
@@ -658,6 +753,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("agent", parse(agent));
         model.put("action", "check");
         model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
         return "agent_detail";
     }
 
@@ -672,6 +768,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("agent", parse(agent));
         model.put("action", "edit");
         model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
         return "agent_detail";
     }
 
@@ -686,6 +783,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("agent", parse(agent));
         model.put("action", "reset");
         model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
         return "agent_detail";
     }
 
@@ -705,6 +803,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("tickets", skuTicketMapper.findBySkuId(id));
         model.put("module", MODULE_SKU_INVENTORY);
         model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
         return "sku_inventory";
     }
 
@@ -786,4 +885,41 @@ public class HomeController extends AuthenticationRequiredController {
         return vo;
     }
 
+    private OrderRecordVo parse(OrderRecord orderRecord, Map<Integer, Admin> adminMap, Map<Integer, Agent> agentMap) {
+        OrderRecordVo orderRecordVo = new OrderRecordVo();
+        orderRecordVo.setOrderId(orderRecord.getOrderId());
+        orderRecordVo.setOperateType(orderRecord.getOperateType());
+        orderRecordVo.setOperateTime(DateUtils.formatDateTime(orderRecord.getOperateTime()));
+        orderRecordVo.setContentChangeFrom(orderRecord.getContentChangeFrom());
+        orderRecordVo.setContentChangeTo(orderRecord.getContentChangeTo());
+        orderRecordVo.setStatusChangeFrom(OrderStatus.valueOf(orderRecord.getStatusChangeFrom()).getDesc());
+        orderRecordVo.setStatusChangeTo(OrderStatus.valueOf(orderRecord.getStatusChangeTo()).getDesc());
+        if (orderRecord.getOperatorType().equals("Admin")) {
+            Admin admin = adminMap.computeIfAbsent(orderRecord.getOperatorId(), k -> adminMapper.findById(orderRecord.getOperatorId()));
+            orderRecordVo.setOperator(admin.getUser());
+        } else {
+            Agent agent = agentMap.computeIfAbsent(orderRecord.getOperatorId(), k -> agentMapper.findById(orderRecord.getOperatorId()));
+            orderRecordVo.setOperator(agent.getUserName());
+        }
+        return orderRecordVo;
+    }
+
+    /**
+     * 获取登录的用户的用户名（用于欢迎界面）
+     *
+     * @param token
+     * @return
+     */
+    private String getUserName(Token token) {
+        switch (token.getRole()) {
+            case Admin:
+                return adminMapper.findById(token.getId()).getUser();
+            case Agent:
+                return agentMapper.findById(token.getId()).getName();
+            case Vendor:
+                return vendorService.findById(token.getId()).getName();
+            default:
+                return "";
+        }
+    }
 }

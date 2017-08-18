@@ -22,11 +22,24 @@ public final class DateUtils {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormat.forPattern(DateFormatConstants.DATE_FORMAT);
 
+    private static ThreadLocal<SimpleDateFormat> DATE_TIME_FORMAT = new ThreadLocal<>();
+
     private static SimpleDateFormat getDateFormat() {
         if (DATE_FORMAT.get() == null) {
             DATE_FORMAT.set(new SimpleDateFormat(DateFormatConstants.DATE_FORMAT));
         }
         return DATE_FORMAT.get();
+    }
+
+    private static SimpleDateFormat getDateTimeFormat() {
+        if (DATE_TIME_FORMAT.get() == null) {
+            DATE_TIME_FORMAT.set(new SimpleDateFormat(DateFormatConstants.DATE_TIME_FORMAT));
+        }
+        return DATE_TIME_FORMAT.get();
+    }
+
+    public static String formatDateTime(Date date) {
+        return getDateTimeFormat().format(date);
     }
 
     public static String formatDate(Date date) {

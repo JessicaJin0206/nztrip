@@ -51,4 +51,9 @@ public class VendorServiceImpl implements VendorService {
     public Vendor findByEmail(String email) {
         return Optional.ofNullable(vendorMapper.findByEmail(email)).orElse(null);
     }
+
+    @Override
+    public List<Vendor> findByKeyword(String keyword) {
+        return vendorMapper.findByKeyword(keyword);
+    }
 }

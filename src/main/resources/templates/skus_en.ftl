@@ -64,8 +64,11 @@
                 </div>
                 <div class="col-md-4"><input type="text" id="j_keyword" class="form-control" placeholder="Please Input Sku id or Keyword" value="${keyword}">
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-1">
                     <button id="j_search" class="btn btn-primary">Search</button>
+                </div>
+                <div class="col-md-1">
+                    <button id="j_export_english" class="btn btn-primary">Export</button>
                 </div>
             </div>
 
@@ -93,6 +96,11 @@
                                 <a href="/create_order?skuId=${sku.id?c}" target="_blank">
                                     <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
                                 </a>
+                                <#if role?? && (role == "Admin")>
+                                    <a href="/sku_tickets/export/english/${sku.id?c}" target="_blank">
+                                        <span class="glyphicon glyphicon-download" aria-hidden="true"></span>
+                                    </a>
+                                </#if>
                             </div>
                         </td>
                     </tr>

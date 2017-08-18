@@ -1,21 +1,10 @@
 package com.fitibo.aotearoa.mapper;
 
-import com.fitibo.aotearoa.constants.OrderStatus;
 import com.fitibo.aotearoa.model.OrderTicket;
+import org.apache.ibatis.annotations.*;
 
 import java.util.Date;
 import java.util.List;
-
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Many;
-import org.apache.ibatis.annotations.Options;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Result;
-import org.apache.ibatis.annotations.Results;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
-import org.springframework.web.bind.annotation.PathVariable;
 
 /**
  * Created by qianhao.zhou on 8/5/16.
@@ -37,6 +26,35 @@ public interface OrderTicketMapper {
             "gathering_place = #{gatheringPlace} " +
             "where id = #{id}")
     int update(OrderTicket orderTicket);
+
+    @Select("select id, sku_id, sku_ticket_id, order_id, sku_ticket_name, " +
+            "count_constraint, age_constraint, weight_constraint, ticket_description, " +
+            "ticket_price_id, ticket_date, ticket_time, sale_price, cost_price, " +
+            "price_description, price, gathering_place, gathering_time " +
+            "from order_ticket where id = #{id}")
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "sku_id", property = "skuId"),
+            @Result(column = "sku_ticket_id", property = "skuTicketId"),
+            @Result(column = "order_id", property = "orderId"),
+            @Result(column = "sku_ticket_name", property = "skuTicket"),
+            @Result(column = "count_constraint", property = "countConstraint"),
+            @Result(column = "age_constraint", property = "ageConstraint"),
+            @Result(column = "weight_constraint", property = "weightConstraint"),
+            @Result(column = "ticket_description", property = "ticketDescription"),
+            @Result(column = "ticket_price_id", property = "ticketPriceId"),
+            @Result(column = "ticket_date", property = "ticketDate"),
+            @Result(column = "ticket_time", property = "ticketTime"),
+            @Result(column = "sale_price", property = "salePrice"),
+            @Result(column = "cost_price", property = "costPrice"),
+            @Result(column = "price_description", property = "priceDescription"),
+            @Result(column = "price", property = "price"),
+            @Result(column = "gathering_place", property = "gatheringPlace"),
+            @Result(column = "gathering_time", property = "gatheringTime"),
+            @Result(column = "id", property = "users", javaType = List.class, many
+                    = @Many(select = "com.fitibo.aotearoa.mapper.OrderTicketUserMapper.findByOrderTicketId"))
+    })
+    OrderTicket findById(int id);
 
     @Select("select id, sku_id, sku_ticket_id, order_id, sku_ticket_name, " +
             "count_constraint, age_constraint, weight_constraint, ticket_description, " +

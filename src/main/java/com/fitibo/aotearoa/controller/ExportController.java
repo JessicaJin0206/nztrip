@@ -88,13 +88,14 @@ public class ExportController extends AuthenticationRequiredController {
      * @throws IOException
      * @throws InvalidFormatException
      */
-    @RequestMapping(value = "/sku_tickets/export/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @RequestMapping(value = "/sku_tickets/export/{language}/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @Authentication(Role.Admin)
     public ResponseEntity<byte[]> downloadSkuTickets(HttpServletResponse response,
-                                                     @PathVariable("id") int skuId)
+                                                     @PathVariable("id") int skuId,
+                                                     @PathVariable(value = "language") String language)
             throws IOException, InvalidFormatException {
         int id = getToken().getId();//agentId
-        Map.Entry<String, Workbook> entry = archiveService.createSkuTickets(skuId, id);
+        Map.Entry<String, Workbook> entry = archiveService.createSkuTickets(skuId, id, language);
         Workbook skuTickets = entry.getValue();
         String fileName = entry.getKey();
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
@@ -114,12 +115,13 @@ public class ExportController extends AuthenticationRequiredController {
      * @throws IOException
      * @throws InvalidFormatException
      */
-    @RequestMapping(value = "/sku/export/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @RequestMapping(value = "/sku/export/{language}/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @Authentication(Role.Agent)
     public ResponseEntity<byte[]> downloadSku(HttpServletResponse response,
-                                              @PathVariable("id") int skuId)
+                                              @PathVariable("id") int skuId,
+                                              @PathVariable(value = "language") String language)
             throws IOException, InvalidFormatException {
-        Workbook skus = archiveService.createSkuDetail(skuId);
+        Workbook skus = archiveService.createSkuDetail(skuId, language);
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             skus.write(baos);
             response.setHeader("Content-Disposition", "attachment; filename=\"" + new String("新西兰产品信息表".getBytes("GB2312"), "ISO_8859_1") + ".xlsx\"");
@@ -139,18 +141,19 @@ public class ExportController extends AuthenticationRequiredController {
      * @throws IOException
      * @throws InvalidFormatException
      */
-    @RequestMapping(value = "/skus/export", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @RequestMapping(value = "/skus/export/{language}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @Authentication
     public ResponseEntity<byte[]> downloadSkus(HttpServletResponse response,
                                                @RequestParam(value = "keyword", defaultValue = "") String keyword,
                                                @RequestParam(value = "cityid", defaultValue = "0") int cityId,
-                                               @RequestParam(value = "categoryid", defaultValue = "0") int categoryId)
+                                               @RequestParam(value = "categoryid", defaultValue = "0") int categoryId,
+                                               @PathVariable(value = "language") String language)
             throws IOException, InvalidFormatException {
         int vendorId = 0;
         if (getToken().getRole() == Role.Agent) {
             vendorId = agentMapper.findById(getToken().getId()).getVendorId();
         }
-        Workbook orderStats = archiveService.createSkusDetail(keyword, cityId, categoryId, vendorId);
+        Workbook orderStats = archiveService.createSkusDetail(keyword, cityId, categoryId, vendorId, language);
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             orderStats.write(baos);
             response.setHeader("Content-Disposition", "attachment; filename=\"" + new String("新西兰产品信息表".getBytes("GB2312"), "ISO_8859_1") + ".xlsx\"");

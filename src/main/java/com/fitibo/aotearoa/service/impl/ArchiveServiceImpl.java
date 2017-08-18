@@ -1,20 +1,19 @@
 package com.fitibo.aotearoa.service.impl;
 
 import com.fitibo.aotearoa.constants.OrderStatus;
+import com.fitibo.aotearoa.constants.SkuConstants;
 import com.fitibo.aotearoa.mapper.*;
 import com.fitibo.aotearoa.model.*;
 import com.fitibo.aotearoa.service.ArchiveService;
 import com.fitibo.aotearoa.service.DiscountRateService;
 import com.fitibo.aotearoa.service.SkuService;
 import com.fitibo.aotearoa.util.DateUtils;
-
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.ibatis.session.RowBounds;
@@ -33,7 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
-
 import rx.Observable;
 
 import java.io.IOException;
@@ -539,15 +537,16 @@ public class ArchiveServiceImpl implements ArchiveService {
     }
 
     @Override
-    public Workbook createSkuDetail(int skuId) {
+    public Workbook createSkuDetail(int skuId, String language) {
         Workbook workbook = new SXSSFWorkbook();
         Sku sku = skuService.findById(skuId);
-        createSkuDetailSheet(workbook, sku);
+        createSkuDetailSheet(workbook, sku, SkuConstants.getSkuField(language));
         return workbook;
     }
 
     @Override
-    public Pair<String, Workbook> createSkuTickets(int skuId, int agentId) {
+    public Pair<String, Workbook> createSkuTickets(int skuId, int agentId,String language) {
+        Map<String, String> languageMap= SkuConstants.getSkuField(language);
         Workbook workbook = new SXSSFWorkbook();
         int rowIndex = 1, col = 1;
         int maxCol = 0;
@@ -558,7 +557,7 @@ public class ArchiveServiceImpl implements ArchiveService {
         Row nameRow = sheet.createRow(rowIndex++);
         Cell skuNameCell = nameRow.createCell(col);
         skuNameCell.setCellType(Cell.CELL_TYPE_STRING);
-        skuNameCell.setCellValue("名称：");
+        skuNameCell.setCellValue(languageMap.get("名称")+"：");
         Cell nameCell1 = nameRow.createCell(col + 1);
         nameCell1.setCellType(Cell.CELL_TYPE_STRING);
         nameCell1.setCellValue(sku.getName());
@@ -601,7 +600,7 @@ public class ArchiveServiceImpl implements ArchiveService {
             //场次
             Row timeRow = sheet.createRow(rowIndex++);
             Cell timeCell = timeRow.createCell(col);
-            timeCell.setCellValue("场次");
+            timeCell.setCellValue(languageMap.get("场次"));
             Cell timeValueCell = timeRow.createCell(col + 1);
             timeValueCell.setCellValue(time);
             rowIndex++;
@@ -619,9 +618,9 @@ public class ArchiveServiceImpl implements ArchiveService {
                 Cell nameCell = salePriceRow.createCell(col);
                 nameCell.setCellValue(name);
                 Cell salePriceCell = salePriceRow.createCell(col + 1);
-                salePriceCell.setCellValue("零售价");
+                salePriceCell.setCellValue(languageMap.get("零售价"));
                 Cell costPriceCell = costPriceRow.createCell(col + 1);
-                costPriceCell.setCellValue("核算价");
+                costPriceCell.setCellValue(languageMap.get("核算价"));
 
                 int colIndex = col + 1;
                 if (maxCol < stringListEntry.getValue().size()) {
@@ -649,6 +648,7 @@ public class ArchiveServiceImpl implements ArchiveService {
             }
         }
         sheet.setColumnWidth(col, 3000);
+        sheet.setColumnWidth(col+1, 3500);
         for (int i = 0; i < maxCol; i++) {
             sheet.setColumnWidth(i + col + 2, 6000);
         }
@@ -679,8 +679,17 @@ public class ArchiveServiceImpl implements ArchiveService {
         }
     }
 
+    private List<String> getSkuSummaryLanguage(String language) {
+        List<String> chinese = Lists.newArrayList("SKU ID", "前台Doc", "名称", "简述", "下单链接", "预定确认时间");
+        List<String> english = Lists.newArrayList("SKU ID", "Doc ID", "Name", "Description", "Order Address", "Estimated Confirmation Time");
+        Map<String, List<String>> languageMap = Maps.newHashMap();
+        languageMap.put("chinese", chinese);
+        languageMap.put("english", english);
+        return languageMap.get(language);
+    }
+
     @Override
-    public Workbook createSkusDetail(String keyword, int cityId, int categoryId, int vendorId) {
+    public Workbook createSkusDetail(String keyword, int cityId, int categoryId, int vendorId, String language) {
 
         List<Sku> skus = skuMapper.findAllByMultiFields(keyword, cityId, categoryId, vendorId, new RowBounds());
         Workbook workbook = new SXSSFWorkbook();
@@ -729,7 +738,7 @@ public class ArchiveServiceImpl implements ArchiveService {
         noteCell.setCellStyle(style);
         noteCell.setCellValue("备注");*/
 
-        List<String> strings = Lists.newArrayList("SKU ID", "前台Doc", "名称", "简述", "下单链接", "预定确认时间");
+        List<String> strings = getSkuSummaryLanguage(language);
         List<Integer> widths = Lists.newArrayList(3000, 3000, 12000, 12000, 12000, 5000);
         Row row1 = sheet.createRow(0);
         for (int i = 0; i < strings.size(); i++) {
@@ -751,8 +760,10 @@ public class ArchiveServiceImpl implements ArchiveService {
         hlinkStyle.setFont(hlinkFont);
         hlinkStyle.setAlignment(CellStyle.ALIGN_CENTER);
         hlinkStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+
+        Map<String, String> languageMap = SkuConstants.getSkuField(language);
         for (Sku sku : skus) {
-            createSkuDetailSheet(workbook, sku);
+            createSkuDetailSheet(workbook, sku, languageMap);
             int startCol = 0;
             Sheet skuSheet = workbook.getSheet(sku.getUuid());
             Row row = sheet.createRow(rowIndex++);
@@ -935,7 +946,7 @@ public class ArchiveServiceImpl implements ArchiveService {
 
     }
 
-    private void createSkuDetailSheet(Workbook workbook, Sku sku) {
+    private void createSkuDetailSheet(Workbook workbook, Sku sku, Map<String, String> languageMap) {
         Sheet sheet = workbook.createSheet(sku.getUuid());
         Font font = workbook.createFont();
         //font.setFontHeightInPoints((short) 20);
@@ -972,7 +983,7 @@ public class ArchiveServiceImpl implements ArchiveService {
         Row nameRow = sheet.createRow(rowIndex++);
         Cell nameCell = nameRow.createCell(2);
         nameCell.setCellType(Cell.CELL_TYPE_STRING);
-        nameCell.setCellValue("名称：");
+        nameCell.setCellValue(languageMap.get("名称") + "：");
         nameCell.setCellStyle(boldStyle);
         Cell nameCell1 = nameRow.createCell(3);
         nameCell1.setCellType(Cell.CELL_TYPE_STRING);
@@ -1004,7 +1015,7 @@ public class ArchiveServiceImpl implements ArchiveService {
         Row addressRow = sheet.createRow(rowIndex++);
         Cell addressCell = addressRow.createCell(2);
         addressCell.setCellType(Cell.CELL_TYPE_STRING);
-        addressCell.setCellValue("Eyounz下单地址：");
+        addressCell.setCellValue(languageMap.get("Eyounz下单地址"));
         addressCell.setCellStyle(boldStyle);
         Cell addressValueCell = addressRow.createCell(3);
         addressValueCell.setCellType(Cell.CELL_TYPE_STRING);
@@ -1017,7 +1028,7 @@ public class ArchiveServiceImpl implements ArchiveService {
         Row officialWebsiteRow = sheet.createRow(rowIndex++);
         Cell officialWebsiteCell = officialWebsiteRow.createCell(col1);
         officialWebsiteCell.setCellType(Cell.CELL_TYPE_STRING);
-        officialWebsiteCell.setCellValue("官网查位链接");
+        officialWebsiteCell.setCellValue(languageMap.get("官网查位链接"));
         officialWebsiteCell.setCellStyle(style);
 
         String url = sku.getOfficialWebsite().trim();
@@ -1037,7 +1048,7 @@ public class ArchiveServiceImpl implements ArchiveService {
         Row descriptionRow = sheet.createRow(rowIndex++);
         Cell descriptionCell = descriptionRow.createCell(col1);
         descriptionCell.setCellType(Cell.CELL_TYPE_STRING);
-        descriptionCell.setCellValue("行程概述");
+        descriptionCell.setCellValue(languageMap.get("行程描述"));
         descriptionCell.setCellStyle(style);
         Cell descriptionValueCell = descriptionRow.createCell(col2);
         descriptionValueCell.setCellType(Cell.CELL_TYPE_STRING);
@@ -1047,7 +1058,7 @@ public class ArchiveServiceImpl implements ArchiveService {
         Row confirmationTimeRow = sheet.createRow(rowIndex++);
         Cell confirmationTimeCell = confirmationTimeRow.createCell(col1);
         confirmationTimeCell.setCellType(Cell.CELL_TYPE_STRING);
-        confirmationTimeCell.setCellValue("预估确认时长");
+        confirmationTimeCell.setCellValue(languageMap.get("预估确认时长"));
         confirmationTimeCell.setCellStyle(style);
         Cell confirmationTimeValueCell = confirmationTimeRow.createCell(col2);
         confirmationTimeValueCell.setCellType(Cell.CELL_TYPE_STRING);
@@ -1057,7 +1068,7 @@ public class ArchiveServiceImpl implements ArchiveService {
         Row rescheduleCancelNoticeRow = sheet.createRow(rowIndex++);
         Cell rescheduleCancelNoticeCell = rescheduleCancelNoticeRow.createCell(col1);
         rescheduleCancelNoticeCell.setCellType(Cell.CELL_TYPE_STRING);
-        rescheduleCancelNoticeCell.setCellValue("退改签规定");
+        rescheduleCancelNoticeCell.setCellValue(languageMap.get("退改签规定"));
         rescheduleCancelNoticeCell.setCellStyle(style);
         Cell rescheduleCancelNoticeValueCell = rescheduleCancelNoticeRow.createCell(col2);
         rescheduleCancelNoticeValueCell.setCellType(Cell.CELL_TYPE_STRING);
@@ -1067,7 +1078,7 @@ public class ArchiveServiceImpl implements ArchiveService {
         Row agendaInfoRow = sheet.createRow(rowIndex++);
         Cell agendaInfoCell = agendaInfoRow.createCell(col1);
         agendaInfoCell.setCellType(Cell.CELL_TYPE_STRING);
-        agendaInfoCell.setCellValue("行程概述");
+        agendaInfoCell.setCellValue(languageMap.get("行程概述"));
         agendaInfoCell.setCellStyle(style);
         Cell agendaInfoValueCell = agendaInfoRow.createCell(col2);
         agendaInfoValueCell.setCellType(Cell.CELL_TYPE_STRING);
@@ -1077,7 +1088,7 @@ public class ArchiveServiceImpl implements ArchiveService {
         Row activityTimeRow = sheet.createRow(rowIndex++);
         Cell activityTimeCell = activityTimeRow.createCell(col1);
         activityTimeCell.setCellType(Cell.CELL_TYPE_STRING);
-        activityTimeCell.setCellValue("活动时间");
+        activityTimeCell.setCellValue(languageMap.get("活动时间"));
         activityTimeCell.setCellStyle(style);
         Cell activityTimeValueCell = activityTimeRow.createCell(col2);
         activityTimeValueCell.setCellType(Cell.CELL_TYPE_STRING);
@@ -1087,7 +1098,7 @@ public class ArchiveServiceImpl implements ArchiveService {
         Row openingTimeRow = sheet.createRow(rowIndex++);
         Cell openingTimeCell = openingTimeRow.createCell(col1);
         openingTimeCell.setCellType(Cell.CELL_TYPE_STRING);
-        openingTimeCell.setCellValue("营业时间");
+        openingTimeCell.setCellValue(languageMap.get("营业时间"));
         openingTimeCell.setCellStyle(style);
         Cell openingTimeValueCell = openingTimeRow.createCell(col2);
         openingTimeValueCell.setCellType(Cell.CELL_TYPE_STRING);
@@ -1097,7 +1108,7 @@ public class ArchiveServiceImpl implements ArchiveService {
         Row ticketInfoRow = sheet.createRow(rowIndex++);
         Cell ticketInfoCell = ticketInfoRow.createCell(col1);
         ticketInfoCell.setCellType(Cell.CELL_TYPE_STRING);
-        ticketInfoCell.setCellValue("门票形式");
+        ticketInfoCell.setCellValue(languageMap.get("门票形式"));
         ticketInfoCell.setCellStyle(style);
         Cell ticketInfoValueCell = ticketInfoRow.createCell(col2);
         ticketInfoValueCell.setCellType(Cell.CELL_TYPE_STRING);
@@ -1107,7 +1118,7 @@ public class ArchiveServiceImpl implements ArchiveService {
         Row serviceIncludeRow = sheet.createRow(rowIndex++);
         Cell serviceIncludeCell = serviceIncludeRow.createCell(col1);
         serviceIncludeCell.setCellType(Cell.CELL_TYPE_STRING);
-        serviceIncludeCell.setCellValue("服务包含");
+        serviceIncludeCell.setCellValue(languageMap.get("服务包含"));
         serviceIncludeCell.setCellStyle(style);
         Cell serviceIncludeValueCell = serviceIncludeRow.createCell(col2);
         serviceIncludeValueCell.setCellType(Cell.CELL_TYPE_STRING);
@@ -1117,7 +1128,7 @@ public class ArchiveServiceImpl implements ArchiveService {
         Row serviceExcludeRow = sheet.createRow(rowIndex++);
         Cell serviceExcludeCell = serviceExcludeRow.createCell(col1);
         serviceExcludeCell.setCellType(Cell.CELL_TYPE_STRING);
-        serviceExcludeCell.setCellValue("服务未含");
+        serviceExcludeCell.setCellValue(languageMap.get("服务未含"));
         serviceExcludeCell.setCellStyle(style);
         Cell serviceExcludeValueCell = serviceExcludeRow.createCell(col2);
         serviceExcludeValueCell.setCellType(Cell.CELL_TYPE_STRING);
@@ -1127,7 +1138,7 @@ public class ArchiveServiceImpl implements ArchiveService {
         Row extraItemRow = sheet.createRow(rowIndex++);
         Cell extraItemCell = extraItemRow.createCell(col1);
         extraItemCell.setCellType(Cell.CELL_TYPE_STRING);
-        extraItemCell.setCellValue("附加收费项");
+        extraItemCell.setCellValue(languageMap.get("附加收费项"));
         extraItemCell.setCellStyle(style);
         Cell extraItemValueCell = extraItemRow.createCell(col2);
         extraItemValueCell.setCellType(Cell.CELL_TYPE_STRING);
@@ -1137,7 +1148,7 @@ public class ArchiveServiceImpl implements ArchiveService {
         Row priceConstraintRow = sheet.createRow(rowIndex++);
         Cell priceConstraintCell = priceConstraintRow.createCell(col1);
         priceConstraintCell.setCellType(Cell.CELL_TYPE_STRING);
-        priceConstraintCell.setCellValue("限价信息");
+        priceConstraintCell.setCellValue(languageMap.get("限价信息"));
         priceConstraintCell.setCellStyle(style);
         Cell priceConstraintValueCell = priceConstraintRow.createCell(col2);
         priceConstraintValueCell.setCellType(Cell.CELL_TYPE_STRING);
@@ -1147,7 +1158,7 @@ public class ArchiveServiceImpl implements ArchiveService {
         Row otherInfoRow = sheet.createRow(rowIndex++);
         Cell otherInfoCell = otherInfoRow.createCell(col1);
         otherInfoCell.setCellType(Cell.CELL_TYPE_STRING);
-        otherInfoCell.setCellValue("预订所需其他信息");
+        otherInfoCell.setCellValue(languageMap.get("预订所需其他信息"));
         otherInfoCell.setCellStyle(style);
         Cell otherInfoValueCell = otherInfoRow.createCell(col2);
         otherInfoValueCell.setCellType(Cell.CELL_TYPE_STRING);
@@ -1165,7 +1176,7 @@ public class ArchiveServiceImpl implements ArchiveService {
         Row attentionRow = sheet.getRow(row1);
         Cell attentionCell = attentionRow.createCell(col1);
         attentionCell.setCellType(Cell.CELL_TYPE_STRING);
-        attentionCell.setCellValue("注意事项");
+        attentionCell.setCellValue(languageMap.get("注意事项"));
         attentionCell.setCellStyle(style);
         /*Cell attentionValueCell = attentionRow.createCell(col2);
         attentionValueCell.setCellType(Cell.CELL_TYPE_STRING);

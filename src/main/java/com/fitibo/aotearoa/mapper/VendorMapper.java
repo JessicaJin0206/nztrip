@@ -2,13 +2,7 @@ package com.fitibo.aotearoa.mapper;
 
 import com.fitibo.aotearoa.model.Vendor;
 
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Options;
-import org.apache.ibatis.annotations.Result;
-import org.apache.ibatis.annotations.Results;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.SelectKey;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -46,6 +40,19 @@ public interface VendorMapper {
             @Result(column = "password", property = "password"),
     })
     List<Vendor> findAll();
+
+    @Select("<script>" +
+            "select * from vendor " +
+            "<if test = \"keyword != null and keyword != ''\">where name like CONCAT('%',#{keyword},'%')</if>"+
+            "</script>")
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "name", property = "name"),
+            @Result(column = "email", property = "email"),
+            @Result(column = "phone", property = "phone"),
+            @Result(column = "password", property = "password"),
+    })
+    List<Vendor> findByKeyword(@Param(value = "keyword")String keyword);
 
 
     @Select({

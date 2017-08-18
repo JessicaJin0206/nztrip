@@ -87,7 +87,7 @@ public interface OrderMapper {
             "or o.id in " +
             "<foreach  collection='ids' open='(' close=')' item='id' separator=','>#{id}" +
             "</foreach>" +
-            "</if>"+
+            "</if>" +
             "</script>"
     )
     @Results({
@@ -117,6 +117,7 @@ public interface OrderMapper {
     })
     List<Order> findByIds(@Param("ids") List<Integer> ids);
 
+
     @Select("<script>" +
             "select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
@@ -125,8 +126,10 @@ public interface OrderMapper {
             "from `order` o left join `sku` s on o.sku_id = s.id " +
             "where agent_id = #{agentId} " +
             "<if test =\"keyword != null and keyword != ''\">and s.name like CONCAT('%',#{keyword},'%') </if> " +
-            "<if test =\"uuid != null and uuid != ''\">and (o.uuid = #{uuid} or o.agent_order_id = #{uuid}) </if> " +
-            "<if test =\"referenceNumber != null and referenceNumber != ''\">and o.reference_number = #{referenceNumber} </if> " +
+            "<if test =\"ticketDate != null and ticketDate != ''\">and o.id in (SELECT order_id FROM `order_ticket` GROUP BY order_id,ticket_date HAVING datediff(ticket_date,#{ticketDate}) = 0)</if> " +
+            "<if test =\"createTime != null and createTime != ''\">and datediff(o.create_time,#{createTime}) = 0 </if> " +
+            "<if test =\"uuid != null and uuid != ''\">and (o.uuid like CONCAT('%',#{uuid},'%') or o.agent_order_id like CONCAT('%',#{uuid},'%')) </if> " +
+            "<if test =\"referenceNumber != null and referenceNumber != ''\">and o.reference_number like  CONCAT('%',#{referenceNumber},'%') </if> " +
             "<if test =\"status != null and status > 0\">and o.status = #{status} </if> " +
             " order by o.id desc" +
             "</script>")
@@ -160,6 +163,8 @@ public interface OrderMapper {
                                             @Param("keyword") String keyword,
                                             @Param("referenceNumber") String referenceNumber,
                                             @Param("status") int status,
+                                            @Param("createTime") String createTime,
+                                            @Param("ticketDate") String ticketDate,
                                             RowBounds rowBounds);
 
     @Select("<script>" +
@@ -232,6 +237,7 @@ public interface OrderMapper {
     })
     List<Order> findAll(RowBounds rowBounds);
 
+
     @Select("<script>" +
             "select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
@@ -240,9 +246,11 @@ public interface OrderMapper {
             "from `order` o left join `sku` s on o.sku_id = s.id left join agent on o.agent_id = agent.id " +
             "where 1 = 1 " +
             "<if test =\"keyword != null and keyword != ''\"> and (s.name like CONCAT('%',#{keyword},'%') or o.primary_contact like CONCAT(#{keyword}, '%') or agent.name like CONCAT(#{keyword}, '%')) </if> " +
-            "<if test =\"uuid != null and uuid != ''\">and (o.uuid = #{uuid} or o.agent_order_id = #{uuid}) </if> " +
-            "<if test =\"referenceNumber != null and referenceNumber != ''\">and o.reference_number = #{referenceNumber} </if> " +
+            "<if test =\"uuid != null and uuid != ''\">and (o.uuid like CONCAT('%',#{uuid},'%') or o.agent_order_id like CONCAT('%',#{uuid},'%')) </if> " +
+            "<if test =\"referenceNumber != null and referenceNumber != ''\">and o.reference_number like  CONCAT('%',#{referenceNumber},'%') </if> " +
             "<if test =\"status != null and status > 0\">and o.status = #{status} </if> " +
+            "<if test =\"ticketDate != null and ticketDate != ''\">and o.id in (SELECT order_id FROM `order_ticket` GROUP BY order_id,ticket_date HAVING datediff(ticket_date,#{ticketDate}) = 0)</if> " +
+            "<if test =\"createTime != null and createTime != ''\">and datediff(o.create_time,#{createTime}) = 0 </if> " +
             " order by o.id desc" +
             "</script>")
     @Results({
@@ -275,6 +283,8 @@ public interface OrderMapper {
                                      @Param("keyword") String keyword,
                                      @Param("referenceNumber") String referenceNumber,
                                      @Param("status") int status,
+                                     @Param("createTime") String createTime,
+                                     @Param("ticketDate") String ticketDate,
                                      RowBounds rowBounds);
 
     @Select("select * from `order` where agent_id = #{agentId} and status = #{status} order by o.id desc")
@@ -376,4 +386,42 @@ public interface OrderMapper {
     })
     List<Order> findByAgentOrderId(@Param("agentOrderId") String agentOrderId);
 
+    @Select({"select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time,",
+            "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone,",
+            "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone,",
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price  ",
+            "from `order` o left join `sku` s on o.sku_id = s.id ",
+            "WHERE( o.id in (SELECT `order_id` FROM `order_record` GROUP BY `order_id`",
+            "HAVING TIMESTAMPDIFF(HOUR,MAX(operate_time),NOW())>=48) ",
+            "or o.id in(SELECT order_id FROM `order_ticket` ",
+            "GROUP BY order_id,ticket_date ",
+            "HAVING datediff(ticket_date,NOW())BETWEEN 0 AND 2) )",
+            "AND o.status in (10,20,30,50)"})
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "sku_id", property = "skuId"),
+            @Result(column = "uuid", property = "uuid"),
+            @Result(column = "agent_id", property = "agentId"),
+            @Result(column = "remark", property = "remark"),
+            @Result(column = "status", property = "status"),
+            @Result(column = "create_time", property = "createTime"),
+            @Result(column = "update_time", property = "updateTime"),
+            @Result(column = "price", property = "price"),
+            @Result(column = "gathering_info", property = "gatheringInfo"),
+            @Result(column = "primary_contact", property = "primaryContact"),
+            @Result(column = "primary_contact_email", property = "primaryContactEmail"),
+            @Result(column = "primary_contact_phone", property = "primaryContactPhone"),
+            @Result(column = "primary_contact_wechat", property = "primaryContactWechat"),
+            @Result(column = "secondary_contact", property = "secondaryContact"),
+            @Result(column = "secondary_contact_email", property = "secondaryContactEmail"),
+            @Result(column = "secondary_contact_phone", property = "secondaryContactPhone"),
+            @Result(column = "secondary_contact_wechat", property = "secondaryContactWechat"),
+            @Result(column = "reference_number", property = "referenceNumber"),
+            @Result(column = "name", property = "sku"),
+            @Result(column = "vendor_phone", property = "vendorPhone"),
+            @Result(column = "agent_name", property = "agentName"),
+            @Result(column = "agent_order_id", property = "agentOrderId"),
+            @Result(column = "modified_price", property = "modifiedPrice")
+    })
+    List<Order> findAllUrgentOrders();
 }

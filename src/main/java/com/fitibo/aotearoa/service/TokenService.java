@@ -5,17 +5,15 @@ import com.fitibo.aotearoa.dto.Role;
 import com.fitibo.aotearoa.dto.Token;
 import com.fitibo.aotearoa.exception.EncryptionException;
 import com.fitibo.aotearoa.exception.InvalidTokenException;
-
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-
-import javax.annotation.PostConstruct;
 
 /**
  * Created by qianhao.zhou on 3/22/16.
@@ -99,5 +97,6 @@ public class TokenService {
         }
 
     }
+
 
 }

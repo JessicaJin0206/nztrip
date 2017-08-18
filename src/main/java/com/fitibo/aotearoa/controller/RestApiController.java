@@ -1,14 +1,5 @@
 package com.fitibo.aotearoa.controller;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Splitter;
-import com.google.common.base.Strings;
-import com.google.common.collect.HashMultiset;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multiset;
-
 import com.fitibo.aotearoa.annotation.Authentication;
 import com.fitibo.aotearoa.constants.CommonConstants;
 import com.fitibo.aotearoa.constants.OrderStatus;
@@ -20,51 +11,22 @@ import com.fitibo.aotearoa.dto.Transition;
 import com.fitibo.aotearoa.exception.AuthenticationFailureException;
 import com.fitibo.aotearoa.exception.InvalidParamException;
 import com.fitibo.aotearoa.exception.ResourceNotFoundException;
-import com.fitibo.aotearoa.mapper.AdminMapper;
-import com.fitibo.aotearoa.mapper.AgentMapper;
-import com.fitibo.aotearoa.mapper.OrderMapper;
-import com.fitibo.aotearoa.mapper.OrderTicketMapper;
-import com.fitibo.aotearoa.mapper.OrderTicketUserMapper;
-import com.fitibo.aotearoa.mapper.PriceRecordMapper;
-import com.fitibo.aotearoa.mapper.SkuMapper;
-import com.fitibo.aotearoa.mapper.SkuTicketMapper;
-import com.fitibo.aotearoa.mapper.SkuTicketPriceMapper;
-import com.fitibo.aotearoa.model.Admin;
-import com.fitibo.aotearoa.model.Agent;
-import com.fitibo.aotearoa.model.Order;
-import com.fitibo.aotearoa.model.OrderTicket;
-import com.fitibo.aotearoa.model.OrderTicketUser;
-import com.fitibo.aotearoa.model.PriceRecord;
-import com.fitibo.aotearoa.model.Sku;
-import com.fitibo.aotearoa.model.SkuTicket;
-import com.fitibo.aotearoa.model.SkuTicketPrice;
-import com.fitibo.aotearoa.model.Vendor;
-import com.fitibo.aotearoa.service.DiscountRateService;
-import com.fitibo.aotearoa.service.OperationService;
-import com.fitibo.aotearoa.service.OrderService;
-import com.fitibo.aotearoa.service.SkuInventoryService;
-import com.fitibo.aotearoa.service.SkuService;
-import com.fitibo.aotearoa.service.TokenService;
-import com.fitibo.aotearoa.service.VendorService;
+import com.fitibo.aotearoa.mapper.*;
+import com.fitibo.aotearoa.model.*;
+import com.fitibo.aotearoa.service.*;
 import com.fitibo.aotearoa.util.DateUtils;
 import com.fitibo.aotearoa.util.GuidGenerator;
 import com.fitibo.aotearoa.util.Md5Utils;
 import com.fitibo.aotearoa.util.ObjectParser;
-import com.fitibo.aotearoa.vo.AddPriceRecordRequest;
-import com.fitibo.aotearoa.vo.AddPriceRequest;
-import com.fitibo.aotearoa.vo.AddSkuInventoryRequest;
-import com.fitibo.aotearoa.vo.AgentVo;
-import com.fitibo.aotearoa.vo.AuthenticationReq;
-import com.fitibo.aotearoa.vo.AuthenticationResp;
-import com.fitibo.aotearoa.vo.OrderTicketUserVo;
-import com.fitibo.aotearoa.vo.OrderTicketVo;
-import com.fitibo.aotearoa.vo.OrderVo;
-import com.fitibo.aotearoa.vo.ResultVo;
-import com.fitibo.aotearoa.vo.SkuTicketPriceVo;
-import com.fitibo.aotearoa.vo.SkuTicketVo;
-import com.fitibo.aotearoa.vo.SkuVo;
-import com.fitibo.aotearoa.vo.VendorVo;
-
+import com.fitibo.aotearoa.vo.*;
+import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multiset;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.ibatis.session.RowBounds;
@@ -77,20 +39,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -148,6 +100,9 @@ public class RestApiController extends AuthenticationRequiredController {
 
     @Autowired
     private DiscountRateService discountRateService;
+
+    @Autowired
+    private OrderRecordService orderRecordService;
 
     @Value("${secret}")
     private String secret;
@@ -381,6 +336,9 @@ public class RestApiController extends AuthenticationRequiredController {
         checkSkuInventory(sku.getId(), orderVo.getOrderTickets());
 
         orderMapper.create(order);
+        //订单日志
+        orderRecordService.createOrder(getToken(),order);
+
         orderVo.setId(order.getId());
         if (CollectionUtils.isEmpty(orderVo.getOrderTickets())) {
             throw new InvalidParamException("order tickets cannot be empty");
@@ -505,11 +463,15 @@ public class RestApiController extends AuthenticationRequiredController {
                 orderTicket.setId(orderTicketVo.getId());
                 orderTicket.setGatheringTime(orderTicketVo.getGatheringTime());
                 orderTicket.setGatheringPlace(orderTicketVo.getGatheringPlace());
+                //订单日志
+                orderRecordService.updateTicket(orderTicket,token,order);
                 orderTicketMapper.update(orderTicket);
             } else {//create new
                 OrderTicket orderTicket = parse(orderTicketVo, orderVo, priceMap, skuTicketMap, discount);
                 validateTicketUser(orderTicket, orderTicketVo.getOrderTicketUsers());
                 orderTicketMapper.create(orderTicket);
+                //订单日志
+                orderRecordService.addTicket(orderTicket,token,order);
                 orderTicketVo.setId(orderTicket.getId());
             }
             for (OrderTicketUserVo orderTicketUserVo : orderTicketVo.getOrderTicketUsers()) {
@@ -532,14 +494,22 @@ public class RestApiController extends AuthenticationRequiredController {
                 map((orderTicket) -> calculateTicketPrice(priceMap.get(orderTicket.getTicketPriceId()), discount)).
                 reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
         o.setPrice(total);
-        if (token.getRole() != Role.Admin) {
+        if (token.getRole() != Role.Admin || !order.getPrice().equals(o.getPrice())) {
             o.setModifiedPrice(total);
+        }
+        if(token.getRole() == Role.Admin&&order.getPrice().equals(o.getPrice())&&!o.getModifiedPrice().equals(order.getModifiedPrice())){
+            orderRecordService.modifiedPrice(token,order,order.getModifiedPrice(),o.getModifiedPrice());
         }
         String agentOrderId = o.getAgentOrderId();
         if (StringUtils.isNotEmpty(agentOrderId)) {
             if (orderMapper.findByAgentOrderId(agentOrderId).size() > 1) {
                 throw new InvalidParamException("duplicated agent order:" + agentOrderId);
             }
+        }
+        try {
+            orderRecordService.updateOrder(getToken(),order,o);
+        }catch (Exception e){
+            e.printStackTrace();
         }
         orderMapper.updateOrderInfo(o);
         return orderVo;
@@ -571,6 +541,8 @@ public class RestApiController extends AuthenticationRequiredController {
                 String referenceNumber = extra.getReferenceNumber();
                 Preconditions.checkNotNull(referenceNumber, "missing reference number");
                 orderMapper.updateReferenceNumber(id, referenceNumber);
+                //订单日志
+                orderRecordService.updateReferenceNumber(getToken(),id,referenceNumber,fromStatus);
                 order.setReferenceNumber(referenceNumber);
             }
             checkSkuInventory(order.getSkuId(), Lists.transform(orderTicketMapper.findByOrderId(order.getId()), ObjectParser::parse));
@@ -585,7 +557,8 @@ public class RestApiController extends AuthenticationRequiredController {
         if (row != 1) {
             return false;
         }
-
+        //订单日志
+        orderRecordService.updateOrderStatus(getToken(), id, fromStatus, toStatus);
         operationService.doRelatedOperation(sendEmail, fromStatus, toStatus, order);
         return true;
     }
@@ -616,6 +589,8 @@ public class RestApiController extends AuthenticationRequiredController {
             throw new ResourceNotFoundException("invalid order id:" + orderId);
         }
         AuthenticationHelper.checkAgentAuthentication(order, token);
+        //订单日志
+        orderRecordService.deleteTicket(order, token, id);
         //后续是否添加验证
         int rowTicket = orderTicketMapper.deleteTicket(id, orderId);
         if (rowTicket == 0) {
