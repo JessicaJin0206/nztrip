@@ -16,6 +16,11 @@
 
 package com.fitibo.aotearoa.controller;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+
 import com.fitibo.aotearoa.annotation.Authentication;
 import com.fitibo.aotearoa.constants.CommonConstants;
 import com.fitibo.aotearoa.constants.OrderStatus;
@@ -24,8 +29,29 @@ import com.fitibo.aotearoa.dto.Token;
 import com.fitibo.aotearoa.exception.AuthenticationFailureException;
 import com.fitibo.aotearoa.exception.InvalidParamException;
 import com.fitibo.aotearoa.exception.ResourceNotFoundException;
-import com.fitibo.aotearoa.mapper.*;
-import com.fitibo.aotearoa.model.*;
+import com.fitibo.aotearoa.mapper.AdminMapper;
+import com.fitibo.aotearoa.mapper.AgentMapper;
+import com.fitibo.aotearoa.mapper.HotItemMapper;
+import com.fitibo.aotearoa.mapper.OrderMapper;
+import com.fitibo.aotearoa.mapper.OrderRecordMapper;
+import com.fitibo.aotearoa.mapper.OrderTicketMapper;
+import com.fitibo.aotearoa.mapper.PriceRecordMapper;
+import com.fitibo.aotearoa.mapper.SkuMapper;
+import com.fitibo.aotearoa.mapper.SkuTicketMapper;
+import com.fitibo.aotearoa.mapper.SkuTicketPriceMapper;
+import com.fitibo.aotearoa.model.Admin;
+import com.fitibo.aotearoa.model.Agent;
+import com.fitibo.aotearoa.model.Category;
+import com.fitibo.aotearoa.model.City;
+import com.fitibo.aotearoa.model.Duration;
+import com.fitibo.aotearoa.model.Order;
+import com.fitibo.aotearoa.model.OrderRecord;
+import com.fitibo.aotearoa.model.OrderTicket;
+import com.fitibo.aotearoa.model.PriceRecord;
+import com.fitibo.aotearoa.model.Sku;
+import com.fitibo.aotearoa.model.SkuTicket;
+import com.fitibo.aotearoa.model.SkuTicketPrice;
+import com.fitibo.aotearoa.model.Vendor;
 import com.fitibo.aotearoa.service.CityService;
 import com.fitibo.aotearoa.service.DurationService;
 import com.fitibo.aotearoa.service.OrderService;
@@ -34,19 +60,14 @@ import com.fitibo.aotearoa.service.VendorService;
 import com.fitibo.aotearoa.service.impl.CategoryServiceImpl;
 import com.fitibo.aotearoa.util.DateUtils;
 import com.fitibo.aotearoa.util.ObjectParser;
-import com.fitibo.aotearoa.vo.*;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import com.fitibo.aotearoa.vo.AgentVo;
+import com.fitibo.aotearoa.vo.OrderRecordVo;
+import com.fitibo.aotearoa.vo.OrderTicketVo;
+import com.fitibo.aotearoa.vo.OrderVo;
+import com.fitibo.aotearoa.vo.PriceRecordVo;
+import com.fitibo.aotearoa.vo.SkuTicketPriceVo;
+import com.fitibo.aotearoa.vo.SkuTicketVo;
+import com.fitibo.aotearoa.vo.SkuVo;
 
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +77,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 public class HomeController extends AuthenticationRequiredController {
@@ -930,9 +958,6 @@ public class HomeController extends AuthenticationRequiredController {
 
     /**
      * 获取登录的用户的用户名（用于欢迎界面）
-     *
-     * @param token
-     * @return
      */
     private String getUserName(Token token) {
         switch (token.getRole()) {

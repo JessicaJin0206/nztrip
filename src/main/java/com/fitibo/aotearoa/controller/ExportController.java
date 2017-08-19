@@ -8,6 +8,7 @@ import com.fitibo.aotearoa.mapper.OrderMapper;
 import com.fitibo.aotearoa.model.Order;
 import com.fitibo.aotearoa.service.ArchiveService;
 import com.fitibo.aotearoa.util.DateUtils;
+
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.joda.time.DateTime;
@@ -17,13 +18,19 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Created by qianhao.zhou on 08/12/2016.
@@ -81,12 +88,6 @@ public class ExportController extends AuthenticationRequiredController {
 
     /**
      * 导出单个sku的价格信息（和并场次的版本）
-     *
-     * @param response
-     * @param skuId
-     * @return
-     * @throws IOException
-     * @throws InvalidFormatException
      */
     @RequestMapping(value = "/sku_tickets/export/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @Authentication(Role.Admin)
@@ -108,12 +109,6 @@ public class ExportController extends AuthenticationRequiredController {
 
     /**
      * 导出单个sku详情（暂时系统里面没有调用的地方）
-     *
-     * @param response
-     * @param skuId
-     * @return
-     * @throws IOException
-     * @throws InvalidFormatException
      */
     @RequestMapping(value = "/sku/export/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @Authentication(Role.Agent)
@@ -132,14 +127,6 @@ public class ExportController extends AuthenticationRequiredController {
 
     /**
      * 导出符合搜索条件的sku（所有不带分页），对应skus.ftl里面的导出按钮
-     *
-     * @param response
-     * @param keyword
-     * @param cityId
-     * @param categoryId
-     * @return
-     * @throws IOException
-     * @throws InvalidFormatException
      */
     @RequestMapping(value = "/skus/export", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @Authentication

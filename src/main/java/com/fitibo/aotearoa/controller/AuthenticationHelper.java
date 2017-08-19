@@ -11,7 +11,8 @@ import com.fitibo.aotearoa.model.Order;
  */
 final class AuthenticationHelper {
 
-    private AuthenticationHelper() {}
+    private AuthenticationHelper() {
+    }
 
     static void checkAgentAuthentication(Order order, Token token) {
         if (token.getRole() == Role.Agent) {

@@ -1,6 +1,7 @@
 package com.fitibo.aotearoa.mapper;
 
 import com.fitibo.aotearoa.model.OrderRecord;
+
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -26,16 +27,16 @@ public interface OrderRecordMapper {
 
     @Select({"select * from `order_record` where order_id = #{orderId}"})
     @Results({
-            @Result(column="id", property="id"),
-            @Result(column="order_id", property="orderId"),
-            @Result(column="operator_type", property="operatorType"),
-            @Result(column="operator_id", property="operatorId"),
-            @Result(column="operate_type", property="operateType"),
-            @Result(column="operate_time", property="operateTime"),
-            @Result(column="status_change_from", property="statusChangeFrom"),
-            @Result(column="status_change_to", property="statusChangeTo"),
-            @Result(column="content_change_from", property="contentChangeFrom"),
-            @Result(column="content_change_to", property="contentChangeTo")
+            @Result(column = "id", property = "id"),
+            @Result(column = "order_id", property = "orderId"),
+            @Result(column = "operator_type", property = "operatorType"),
+            @Result(column = "operator_id", property = "operatorId"),
+            @Result(column = "operate_type", property = "operateType"),
+            @Result(column = "operate_time", property = "operateTime"),
+            @Result(column = "status_change_from", property = "statusChangeFrom"),
+            @Result(column = "status_change_to", property = "statusChangeTo"),
+            @Result(column = "content_change_from", property = "contentChangeFrom"),
+            @Result(column = "content_change_to", property = "contentChangeTo")
     })
     List<OrderRecord> findByOrderId(Integer orderId);
 }
