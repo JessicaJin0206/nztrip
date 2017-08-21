@@ -61,11 +61,11 @@ public class OrderRecordService {
         orderRecordMapper.insert(orderRecord);
     }
 
-    public void updateOrder(Token token, Order oldOrder, Order newOrder)  {
+    public void updateOrder(Token token, Order oldOrder, Order newOrder) {
         Field[] fields = Order.class.getDeclaredFields();
         Date date = new Date();
         for (Field field : fields) {
-            try{
+            try {
                 PropertyDescriptor pd = new PropertyDescriptor(field.getName(), Order.class);
                 Method getMethod = pd.getReadMethod();
                 Object o1 = getMethod.invoke(oldOrder);
@@ -88,7 +88,7 @@ public class OrderRecordService {
                         orderRecordMapper.insert(orderRecord);
                     }
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 logger.error("error in reflect Order.class in updateOrder");
                 throw new RuntimeException(e);
             }
