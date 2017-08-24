@@ -497,7 +497,7 @@ public class RestApiController extends AuthenticationRequiredController {
         if (token.getRole() != Role.Admin || !order.getPrice().equals(o.getPrice())) {
             o.setModifiedPrice(total);
         }
-        if (token.getRole() == Role.Admin && order.getPrice().equals(o.getPrice()) && !o.getModifiedPrice().equals(order.getModifiedPrice())) {
+        if (token.getRole() == Role.Admin && order.getPrice().equals(o.getPrice()) && o.getModifiedPrice().compareTo(order.getModifiedPrice()) != 0) {
             orderRecordService.modifiedPrice(token, order, order.getModifiedPrice(), o.getModifiedPrice());
         }
         String agentOrderId = o.getAgentOrderId();
