@@ -365,7 +365,7 @@ $('#j_update').on('click', function () {
 $('#j_download_voucher').on('click', function () {
     var path = window.location.pathname.split('/');
     var id = parseInt(path[path.length - 1]);
-    window.open("/vouchers/" + id);
+    window.open("/orders/" + id + "/voucher");
 });
 
 $('#j_resend_reservation').on('click', function () {

@@ -45,17 +45,15 @@ public class ExportController extends AuthenticationRequiredController {
         return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
-    @RequestMapping(value = "/vouchers/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @RequestMapping(value = "/orders/{id}/voucher", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @Authentication
     public ResponseEntity<byte[]> downLoadVoucher(@PathVariable("id") int orderId,
                                                   HttpServletResponse response) throws IOException, InvalidFormatException {
         Order order = orderMapper.findById(orderId);
         if (getToken().getRole() == Role.Agent) {
             if (order.getAgentId() != getToken().getId()) {
-                throw new AuthenticationFailureException();
+                throw new AuthenticationFailureException("order:" + orderId + " does not belong to agent:" + getToken().getId());
             }
-        } else {
-
         }
         Workbook voucher = archiveService.createVoucher(order);
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
