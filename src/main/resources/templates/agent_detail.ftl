@@ -23,7 +23,7 @@
             </div>
             <div class="form-group"><input id="j_description" class="form-control"
                                            <#if action != "edit">disabled</#if> placeholder="请输入代理商备注"
-                                           value="${agent.description}">
+                                           value="${agent.description}!""">
             </div>
             <div class="form-group"><input type="number" id="j_discount" class="form-control"
                                            <#if action != "edit">disabled</#if> placeholder="请输入代理商折扣"
@@ -31,7 +31,7 @@
             </div>
             <div class="form-group"><input id="j_email" class="form-control"
                                            <#if action != "edit">disabled</#if> placeholder="请输入代理商邮箱"
-                                           value="${agent.email}">
+                                           value="${agent.email}!""">
             </div>
             <div class="form-group"><input id="j_default_contact" class="form-control"
                                            <#if action != "edit">disabled</#if> placeholder="请输入默认联系人"
