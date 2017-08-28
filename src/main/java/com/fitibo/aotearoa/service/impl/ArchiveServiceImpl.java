@@ -683,8 +683,8 @@ public class ArchiveServiceImpl implements ArchiveService {
         List<String> chinese = Lists.newArrayList("SKU ID", "前台Doc", "名称", "简述", "下单链接", "预定确认时间");
         List<String> english = Lists.newArrayList("SKU ID", "Doc ID", "Name", "Description", "Order Address", "Estimated Confirmation Time");
         Map<String, List<String>> languageMap = Maps.newHashMap();
-        languageMap.put("chinese", chinese);
-        languageMap.put("english", english);
+        languageMap.put("cn", chinese);
+        languageMap.put("en", english);
         return languageMap.get(language);
     }
 
