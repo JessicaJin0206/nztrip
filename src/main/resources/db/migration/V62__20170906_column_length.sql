@@ -1,0 +1,1 @@
+ALTER TABLE `sku` MODIFY COLUMN `gathering_place` varchar(400);
