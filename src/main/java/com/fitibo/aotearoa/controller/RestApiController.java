@@ -934,6 +934,7 @@ public class RestApiController extends AuthenticationRequiredController {
         result.setSecondaryContactWechat(order.getSecondaryContactWechat());
         result.setVendorPhone(order.getVendorPhone());
         result.setAgentOrderId(order.getAgentOrderId());
+        result.setRefund(order.getRefund());
         return result;
     }
 
