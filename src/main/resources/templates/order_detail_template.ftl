@@ -25,7 +25,7 @@
         <button id="j_record" class="btn btn-default form-group">查看日志</button>
     </div>
 </div>
-<#elseif role?? && role == "Agent" && order.status == 10>
+<#elseif role?? && role == "Agent" && (order.status == 10 || order.status == 11 || order.status == 30 )>
 <div class="form-group">
     <div class="row">
         <label class="col-md-2">修改订单:</label>
@@ -44,6 +44,7 @@
         <label class="col-md-2">邮件:</label>
         <button id="j_resend_reservation" class="btn btn-default form-group">重新发送预订邮件</button>
         <button id="j_resend_confirmation" class="btn btn-default form-group">重新发送确认邮件</button>
+        <button id="j_resend_full" class="btn btn-default form-group">重新发送已满邮件</button>
     </div>
 </div>
 </#if>
@@ -55,7 +56,7 @@
     </div>
 </div>
 
-<div class="form-group">
+<div class="form-group" id="j_order_status" value="${order.status?c}">
     <div class="row">
         <label class="col-md-2">订单状态:</label>
         <div class="col-md-offset-2">
@@ -76,6 +77,17 @@
         </div>
     </div>
 </div>
+<#if order.status == 70 || order.status == 80 >
+<div class="form-group">
+    <div class="row">
+        <label class="col-md-2">退款金额:</label>
+        <div class="col-md-offset-2">
+            <input type="number" id="j_refund" class="form-control"
+                   <#if editing=false>disabled</#if> value="${order.refund?string('0.00')}">
+        </div>
+    </div>
+</div>
+</#if>
 <div class="form-group">
     <div class="row">
         <label class="col-md-2">编号:</label>

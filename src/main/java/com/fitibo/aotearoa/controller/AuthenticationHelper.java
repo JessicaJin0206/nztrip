@@ -16,8 +16,13 @@ final class AuthenticationHelper {
 
     static void checkAgentAuthentication(Order order, Token token) {
         if (token.getRole() == Role.Agent) {
-            if (order.getStatus() != OrderStatus.NEW.getValue()) {
-                throw new AuthenticationFailureException("agent can not edit this page");
+            switch (OrderStatus.valueOf(order.getStatus())) {
+                case NEW:
+                case FULL:
+                case RESUBMIT:
+                    break;
+                default:
+                    throw new AuthenticationFailureException("agent can not edit this page");
             }
             if (order.getAgentId() != token.getId()) {
                 throw new AuthenticationFailureException("invalid agent id:" + token.getId());

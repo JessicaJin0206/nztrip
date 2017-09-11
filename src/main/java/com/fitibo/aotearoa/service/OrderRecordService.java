@@ -47,7 +47,7 @@ public class OrderRecordService {
         orderRecordMapper.insert(orderRecord);
     }
 
-    public void modifiedPrice(Token token, Order order, BigDecimal oldPrice, BigDecimal newPrice) {
+    public void modifyPrice(Token token, Order order, BigDecimal oldPrice, BigDecimal newPrice) {
         OrderRecord orderRecord = new OrderRecord();
         orderRecord.setOperateTime(new Date());
         orderRecord.setOperateType("总价");
@@ -56,6 +56,20 @@ public class OrderRecordService {
         orderRecord.setOperatorType(token.getRole().toString());
         orderRecord.setContentChangeFrom(oldPrice.toString());
         orderRecord.setContentChangeTo(newPrice.toString());
+        orderRecord.setStatusChangeFrom(order.getStatus());
+        orderRecord.setStatusChangeTo(order.getStatus());
+        orderRecordMapper.insert(orderRecord);
+    }
+
+    public void modifyRefund(Token token, Order order, BigDecimal oldRefund, BigDecimal newRefund) {
+        OrderRecord orderRecord = new OrderRecord();
+        orderRecord.setOperateTime(new Date());
+        orderRecord.setOperateType("退款金额");
+        orderRecord.setOrderId(order.getId());
+        orderRecord.setOperatorId(token.getId());
+        orderRecord.setOperatorType(token.getRole().toString());
+        orderRecord.setContentChangeFrom(oldRefund.toString());
+        orderRecord.setContentChangeTo(newRefund.toString());
         orderRecord.setStatusChangeFrom(order.getStatus());
         orderRecord.setStatusChangeTo(order.getStatus());
         orderRecordMapper.insert(orderRecord);
@@ -174,8 +188,13 @@ public class OrderRecordService {
         orderRecord.setOperateTime(new Date());
         orderRecord.setOperateType("订单状态");
         orderRecord.setOrderId(orderId);
-        orderRecord.setOperatorId(token.getId());
-        orderRecord.setOperatorType(token.getRole().toString());
+        if (token == null) {
+            orderRecord.setOperatorId(0);
+            orderRecord.setOperatorType("System");
+        } else {
+            orderRecord.setOperatorId(token.getId());
+            orderRecord.setOperatorType(token.getRole().toString());
+        }
         orderRecord.setContentChangeFrom(OrderStatus.valueOf(oldStatus).getDesc());
         orderRecord.setContentChangeTo(OrderStatus.valueOf(newStatus).getDesc());
         orderRecord.setStatusChangeFrom(oldStatus);

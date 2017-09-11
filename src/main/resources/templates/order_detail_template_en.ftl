@@ -25,7 +25,7 @@
         <button id="j_record" class="btn btn-default form-group">View Log</button>
     </div>
 </div>
-<#elseif role?? && role == "Agent" && order.status == 10>
+<#elseif role?? && role == "Agent" && (order.status == 10 || order.status == 11 || order.status == 30 )>
 <div class="form-group">
     <div class="row">
         <label class="col-md-2">Action:</label>
@@ -48,6 +48,7 @@
         <button id="j_resend_confirmation" class="btn btn-default form-group">Re-Send Confirmation
             Letter
         </button>
+        <button id="j_resend_full" class="btn btn-default form-group">Re-Send Full Letter</button>
     </div>
 </div>
 </#if>
@@ -58,7 +59,7 @@
         <button id="j_download_voucher" class="btn btn-default form-group">Export</button>
     </div>
 </div>
-<div class="form-group">
+<div class="form-group" id="j_order_status" value="${order.status?c}">
     <div class="row">
         <label class="col-md-2">Order Status:</label>
         <div class="col-md-offset-2">
@@ -79,6 +80,17 @@
         </div>
     </div>
 </div>
+<#if order.status == 70 || order.status == 80 >
+<div class="form-group">
+    <div class="row">
+        <label class="col-md-2">Refund:</label>
+        <div class="col-md-offset-2">
+            <input type="number" id="j_refund" class="form-control"
+                   <#if editing=false>disabled</#if> value="${order.refund?string('0.00')}">
+        </div>
+    </div>
+</div>
+</#if>
 <div class="form-group">
     <div class="row">
         <label class="col-md-2">Order Number:</label>

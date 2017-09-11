@@ -114,3 +114,37 @@ template:
       Tel & Fax: +64 (0)3 357 4405<br>
       Address: 8a/41 Sir William Pickering Dr, Burnside, Christchurch 8053
       </div></body></html>
+
+  full_email:
+    from: eyounz@foxmail.com
+    subject: Reservation Failed
+    content: |
+          <html><body><div>
+          #AGENT_NAME#,<br><br>
+          Please kindly be noted that your reservation is failed due to following reason.<br><br>
+          <br>
+          <b>备注 Remark:</b> #REMARK#<br>
+          <br>
+          <b>订单编号 Order ID:</b> #ORDER_ID#<br>
+          <b>预定项目 Book Package:</b> #TOUR_NAME#<br>
+          <b>总价 Total Price:</b> #PRICE# NZD<br>
+          <b>联系人姓名 Guest Name:</b> #GUEST_NAME#<br>
+          <br>
+          <b>出行信息:</b><br>
+          #GUESTS_INFO#
+          <br>
+          <br>
+          Many thanks for your support.<br><br>
+          Best Regards<br><br>
+          Reservation Team<br>
+          <span style="color: dodgerblue">the <span style="font-weight: bold">Easy Efficient Excellent</span> travel with <span style="font-weight: bold">EYOUNZ Limited</span></span><br>
+          Tel & Fax: +64 (0)3 341 3318<br>
+          Address: 8a/41 Sir William Pickering Dr, Burnside, Christchurch 8053
+          </div></body></html>
+    guests_info: |
+          #GUESTS#<br>
+          票种 Ticket: #TICKET#<br>
+          出发日期 Tour Date(Y/M/D): #DATE#<br>
+          场次 Time: #TIME#<br>
+          集合时间 Gathering Time: #GATHERING_TIME#<br>
+          集合地点 Meeting Place: #GATHERING_PLACE#

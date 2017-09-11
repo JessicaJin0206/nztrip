@@ -96,19 +96,51 @@ public class OperationService {
     @Value("${template.cancel_email.from}")
     private String cancellationEmailFrom;
 
+    @Value("${template.full_email.from}")
+    private String fullEmailFrom;
+
+    @Value("${template.full_email.subject}")
+    private String fullEmailSubject;
+
+    @Value("${template.full_email.content}")
+    private String fullEmailTemplate;
+
+    @Value("${template.full_email.guests_info}")
+    private String fullEmailGuestsInfoTemplate;
+
     private final static Logger logger = LoggerFactory.getLogger(OperationService.class);
 
     public void doRelatedOperation(boolean sendEmail, int fromStatus, int toStatus, Order order) {
         if (sendEmail) {
-            if (toStatus == OrderStatus.PENDING.getValue()) {
+            switch (OrderStatus.valueOf(toStatus)) {
+                case PENDING:
+                case RECONFIRMING:
+                    sendReservationEmail(order);
+                    break;
+                case CONFIRMED:
+                    sendConfirmationEmail(order);
+                    break;
+                case CLOSED:
+                case CANCELLED:
+                    sendCancellationEmail(order);
+                    break;
+                case FULL:
+                    sendFullEmail(order);
+                    break;
+                default:
+                    break;
+            }
+            /*if (toStatus == OrderStatus.PENDING.getValue()) {
                 sendReservationEmail(order);
             } else if (toStatus == OrderStatus.CONFIRMED.getValue()) {
                 sendConfirmationEmail(order);
             } else if (toStatus == OrderStatus.CANCELLED.getValue() || toStatus == OrderStatus.CLOSED.getValue()) {
                 sendCancellationEmail(order);
+            } else if(toStatus == ){
+
             } else {
                 // do nothing now
-            }
+            }*/
         }
     }
 
@@ -168,6 +200,22 @@ public class OperationService {
         }
     }
 
+    public boolean sendFullEmail(Order order) {
+        int agentId = order.getAgentId();
+        if (agentId <= 0) {
+            logger.info("agent id is 0");
+            return false;
+        }
+        Agent agent = agentMapper.findById(agentId);
+        String to = agent.getEmail();
+        Sku sku = skuService.findById(order.getSkuId());
+        Preconditions.checkNotNull(sku, "invalid sku id:" + order.getSkuId());
+        String content = formatFullEmailContent(fullEmailTemplate, order, sku, agent);
+        String agentOrderId = order.getAgentOrderId();
+        String subject = StringUtils.isNotEmpty(agentOrderId) ? fullEmailSubject + "(" + agentOrderId + ")" : fullEmailSubject;
+        return emailService.send(order.getId(), fullEmailFrom, to, subject, content, Collections.emptyList());
+    }
+
     public boolean sendReservationEmail(Order order) {
         List<OrderTicket> ticketList = orderTicketMapper.findByOrderId(order.getId());
         if (ticketList.isEmpty()) {
@@ -207,6 +255,21 @@ public class OperationService {
         content = content.replace("#REMARK#", order.getRemark());
         content = content.replace("#GUESTS_INFO#",
                 formatGuestsInfo(confirmationEmailGuestsInfoTemplate,
+                        orderTicketMapper.findByOrderId(order.getId())));
+        return content;
+    }
+
+    private String formatFullEmailContent(String template, Order order, Sku sku,
+                                          Agent agent) {
+        String content = template;
+        content = content.replace("#AGENT_NAME#", agent.getName());
+        content = content.replace("#ORDER_ID#", order.getUuid());
+        content = content.replace("#TOUR_NAME#", sku.getName());
+        content = content.replace("#GUEST_NAME#", order.getPrimaryContact());
+        content = content.replace("#PRICE#", order.getPrice().toString());
+        content = content.replace("#REMARK#", order.getRemark());
+        content = content.replace("#GUESTS_INFO#",
+                formatGuestsInfo(fullEmailGuestsInfoTemplate,
                         orderTicketMapper.findByOrderId(order.getId())));
         return content;
     }

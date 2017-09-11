@@ -192,6 +192,14 @@ public class Order extends ModelObject {
         this.modifiedPrice = modifiedPrice;
     }
 
+    public BigDecimal getRefund() {
+        return refund;
+    }
+
+    public void setRefund(BigDecimal refund) {
+        this.refund = refund;
+    }
+
     private int skuId;
     private String uuid;
     private String sku;
@@ -215,4 +223,5 @@ public class Order extends ModelObject {
     private String agentName;
     private String agentOrderId;
     private BigDecimal modifiedPrice;
+    private BigDecimal refund;
 }

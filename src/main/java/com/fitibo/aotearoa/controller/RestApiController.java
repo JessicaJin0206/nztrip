@@ -14,10 +14,7 @@ import com.fitibo.aotearoa.exception.ResourceNotFoundException;
 import com.fitibo.aotearoa.mapper.*;
 import com.fitibo.aotearoa.model.*;
 import com.fitibo.aotearoa.service.*;
-import com.fitibo.aotearoa.util.DateUtils;
-import com.fitibo.aotearoa.util.GuidGenerator;
-import com.fitibo.aotearoa.util.Md5Utils;
-import com.fitibo.aotearoa.util.ObjectParser;
+import com.fitibo.aotearoa.util.*;
 import com.fitibo.aotearoa.vo.*;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
@@ -296,6 +293,9 @@ public class RestApiController extends AuthenticationRequiredController {
         } else {
             throw new IllegalArgumentException("cannot find sku by sku id or uuid");
         }
+
+        Preconditions.checkArgument(StringUtils.isAsciiPrintable(orderVo.getPrimaryContact()), "primary contact must use english");
+
         Order order = parse(orderVo);
 
         final Vendor vendor = vendorService.findById(sku.getVendorId());
@@ -409,6 +409,18 @@ public class RestApiController extends AuthenticationRequiredController {
         }
     }
 
+    @RequestMapping(value = "/v1/api/orders/{id}/full", method = RequestMethod.POST)
+    @Authentication(Role.Admin)
+    public ResultVo sendFull(@PathVariable("id") int orderId) {
+        Order order = orderMapper.findById(orderId);
+        boolean result = operationService.sendFullEmail(order);
+        if (result) {
+            return ResultVo.SUCCESS;
+        } else {
+            return new ResultVo(-1, "failed to send full email");
+        }
+    }
+
 
     private void validateTicketUser(OrderTicket orderTicket, List<OrderTicketUserVo> users) {
         String[] ages = orderTicket.getAgeConstraint().split("-");
@@ -449,6 +461,9 @@ public class RestApiController extends AuthenticationRequiredController {
         if (CollectionUtils.isEmpty(orderVo.getOrderTickets())) {
             throw new InvalidParamException();
         }
+
+        Preconditions.checkArgument(StringUtils.isAsciiPrintable(orderVo.getPrimaryContact()), "primary contact must use english");
+
         final int discount = discountRateService.getDiscountByOrder(order.getId());
         Map<Integer, SkuTicketPrice> priceMap = getSkuTicketPriceMap(
                 Lists.transform(orderVo.getOrderTickets(), OrderTicketVo::getTicketPriceId));
@@ -498,7 +513,10 @@ public class RestApiController extends AuthenticationRequiredController {
             o.setModifiedPrice(total);
         }
         if (token.getRole() == Role.Admin && order.getPrice().equals(o.getPrice()) && o.getModifiedPrice().compareTo(order.getModifiedPrice()) != 0) {
-            orderRecordService.modifiedPrice(token, order, order.getModifiedPrice(), o.getModifiedPrice());
+            orderRecordService.modifyPrice(token, order, order.getModifiedPrice(), o.getModifiedPrice());
+        }
+        if (token.getRole() == Role.Admin && o.getRefund().compareTo(order.getRefund()) != 0) {
+            orderRecordService.modifyRefund(token, order, order.getRefund(), o.getRefund());
         }
         String agentOrderId = o.getAgentOrderId();
         if (StringUtils.isNotEmpty(agentOrderId)) {
@@ -509,6 +527,13 @@ public class RestApiController extends AuthenticationRequiredController {
         //订单日志
         orderRecordService.updateOrder(getToken(), order, o);
         orderMapper.updateOrderInfo(o);
+
+        //自动更新Full状态为Full New
+        if (order.getStatus() == OrderStatus.FULL.getValue() && token.getRole() == Role.Agent) {
+            orderMapper.updateOrderStatus(o.getId(), order.getStatus(), OrderStatus.RESUBMIT.getValue());
+            orderRecordService.updateOrderStatus(null, o.getId(), order.getStatus(), OrderStatus.RESUBMIT.getValue());
+        }
+
         return orderVo;
     }
 
@@ -892,6 +917,7 @@ public class RestApiController extends AuthenticationRequiredController {
         //修改价格
         result.setPrice(order.getPrice());
         result.setModifiedPrice(order.getPrice());
+        result.setRefund(order.getRefund());
 
         result.setStatus(order.getStatus());
         result.setReferenceNumber(order.getReferenceNumber());

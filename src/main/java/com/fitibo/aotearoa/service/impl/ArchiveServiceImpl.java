@@ -531,6 +531,10 @@ public class ArchiveServiceImpl implements ArchiveService {
                 costPriceMap.get(orderStat.getOrderId()).setScale(2, RoundingMode.HALF_EVEN)
                         .doubleValue());
 
+        Cell refund = row.createCell(col++);
+        refund.setCellType(Cell.CELL_TYPE_NUMERIC);
+        refund.setCellValue(orderStat.getRefund().setScale(2, RoundingMode.HALF_EVEN).doubleValue());
+        
         Cell agentOrderId = row.createCell(col++);
         agentOrderId.setCellType(Cell.CELL_TYPE_STRING);
         agentOrderId.setCellValue(orderStat.getAgentOrderId());
@@ -545,8 +549,8 @@ public class ArchiveServiceImpl implements ArchiveService {
     }
 
     @Override
-    public Pair<String, Workbook> createSkuTickets(int skuId, int agentId,String language) {
-        Map<String, String> languageMap= SkuConstants.getSkuField(language);
+    public Pair<String, Workbook> createSkuTickets(int skuId, int agentId, String language) {
+        Map<String, String> languageMap = SkuConstants.getSkuField(language);
         Workbook workbook = new SXSSFWorkbook();
         int rowIndex = 1, col = 1;
         int maxCol = 0;
@@ -557,7 +561,7 @@ public class ArchiveServiceImpl implements ArchiveService {
         Row nameRow = sheet.createRow(rowIndex++);
         Cell skuNameCell = nameRow.createCell(col);
         skuNameCell.setCellType(Cell.CELL_TYPE_STRING);
-        skuNameCell.setCellValue(languageMap.get("名称")+"：");
+        skuNameCell.setCellValue(languageMap.get("名称") + "：");
         Cell nameCell1 = nameRow.createCell(col + 1);
         nameCell1.setCellType(Cell.CELL_TYPE_STRING);
         nameCell1.setCellValue(sku.getName());
@@ -648,7 +652,7 @@ public class ArchiveServiceImpl implements ArchiveService {
             }
         }
         sheet.setColumnWidth(col, 3000);
-        sheet.setColumnWidth(col+1, 3500);
+        sheet.setColumnWidth(col + 1, 3500);
         for (int i = 0; i < maxCol; i++) {
             sheet.setColumnWidth(i + col + 2, 6000);
         }

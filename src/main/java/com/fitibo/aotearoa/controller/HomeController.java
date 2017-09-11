@@ -353,6 +353,9 @@ public class HomeController extends AuthenticationRequiredController {
         orderCountByStatus.put(OrderStatus.PENDING.getValue() + "", agentId == 0 ? orderMapper.countByStatus(OrderStatus.PENDING.getValue()) : orderMapper.countByStatusAndAgentId(OrderStatus.PENDING.getValue(), agentId));
         orderCountByStatus.put(OrderStatus.FULL.getValue() + "", agentId == 0 ? orderMapper.countByStatus(OrderStatus.FULL.getValue()) : orderMapper.countByStatusAndAgentId(OrderStatus.FULL.getValue(), agentId));
         orderCountByStatus.put(OrderStatus.MODIFYING.getValue() + "", agentId == 0 ? orderMapper.countByStatus(OrderStatus.MODIFYING.getValue()) : orderMapper.countByStatusAndAgentId(OrderStatus.MODIFYING.getValue(), agentId));
+        orderCountByStatus.put(OrderStatus.RESUBMIT.getValue() + "", agentId == 0 ? orderMapper.countByStatus(OrderStatus.RESUBMIT.getValue()) : orderMapper.countByStatusAndAgentId(OrderStatus.RESUBMIT.getValue(), agentId));
+        orderCountByStatus.put(OrderStatus.RECONFIRMING.getValue() + "", agentId == 0 ? orderMapper.countByStatus(OrderStatus.RECONFIRMING.getValue()) : orderMapper.countByStatusAndAgentId(OrderStatus.RECONFIRMING.getValue(), agentId));
+        orderCountByStatus.put(OrderStatus.AFTER_SALE.getValue() + "", agentId == 0 ? orderMapper.countByStatus(OrderStatus.AFTER_SALE.getValue()) : orderMapper.countByStatusAndAgentId(OrderStatus.AFTER_SALE.getValue(), agentId));
         model.put("orderCountByStatus", orderCountByStatus);
         return "orders";
     }
@@ -946,12 +949,21 @@ public class HomeController extends AuthenticationRequiredController {
         orderRecordVo.setContentChangeTo(orderRecord.getContentChangeTo());
         orderRecordVo.setStatusChangeFrom(OrderStatus.valueOf(orderRecord.getStatusChangeFrom()).getDesc());
         orderRecordVo.setStatusChangeTo(OrderStatus.valueOf(orderRecord.getStatusChangeTo()).getDesc());
-        if (orderRecord.getOperatorType().equals("Admin")) {
-            Admin admin = adminMap.computeIfAbsent(orderRecord.getOperatorId(), k -> adminMapper.findById(orderRecord.getOperatorId()));
-            orderRecordVo.setOperator(admin.getUser());
-        } else {
-            Agent agent = agentMap.computeIfAbsent(orderRecord.getOperatorId(), k -> agentMapper.findById(orderRecord.getOperatorId()));
-            orderRecordVo.setOperator(agent.getUserName());
+        switch (orderRecord.getOperatorType()) {
+            case "Admin":
+                Admin admin = adminMap.computeIfAbsent(orderRecord.getOperatorId(), k -> adminMapper.findById(orderRecord.getOperatorId()));
+                orderRecordVo.setOperator(admin.getUser());
+                break;
+            case "Agent":
+                Agent agent = agentMap.computeIfAbsent(orderRecord.getOperatorId(), k -> agentMapper.findById(orderRecord.getOperatorId()));
+                orderRecordVo.setOperator(agent.getUserName());
+                break;
+            case "System":
+                orderRecordVo.setOperator("System");
+                break;
+            default:
+                orderRecordVo.setOperator("");
+                break;
         }
         return orderRecordVo;
     }

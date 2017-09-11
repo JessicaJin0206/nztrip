@@ -40,4 +40,5 @@ public class OrderVo {
     private String ticketDate;
     private String agentOrderId;
     private BigDecimal modifiedPrice;
+    private BigDecimal refund;
 }

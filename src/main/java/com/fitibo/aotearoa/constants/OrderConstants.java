@@ -22,6 +22,7 @@ public class OrderConstants {
             map.put("remark", "备注");
             //map.put("status", "订单状态");
             //map.put("modifiedPrice", "总价");
+            //map.put("refund", "退款金额");
             map.put("referenceNumber", "Reference Number");
             map.put("vendorPhone", "行程商电话");
             map.put("primaryContact", "主要联系人");

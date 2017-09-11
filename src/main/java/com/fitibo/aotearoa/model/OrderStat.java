@@ -30,5 +30,6 @@ public class OrderStat extends ModelObject {
     private BigDecimal salePrice;
     private String agent;
     private String agentOrderId;
+    private BigDecimal refund;
 
 }

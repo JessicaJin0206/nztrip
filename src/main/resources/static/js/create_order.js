@@ -186,6 +186,12 @@ submitBtn.on('click', function () {
         submitBtn.prop('disabled', false);
         return;
     }
+    var reg = /^[a-zA-Z ]+$/;
+    if(!reg.test(primaryContact)){
+        warn("主要联系人必须为英文");
+        submitBtn.prop('disabled', false);
+        return;
+    }
     if (primaryContactEmail.length === 0) {
         warn("缺少主要联系人信息");
         submitBtn.prop('disabled', false);

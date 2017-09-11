@@ -35,7 +35,7 @@ $.each($('#j_status_drop_down li a'), function (idx, item) {
         statusDropDown.html(status.html());
         statusDropDown.attr('value', status.attr('value'));
     })
-})
+});
 
 function getQueryString(name) {
     var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
@@ -234,7 +234,7 @@ $('#j_update').on('click', function () {
     var isDataValid = true;
     var skuId = parseInt($('#j_order_sku').attr("skuid"));
     var price = parseFloat($('#j_order_price').val());
-    var status = parseInt(statusDropDown.attr("value"));
+    var status = parseInt($('#j_order_status').attr("value"));
     var referenceNumber = $('#j_referencenumber').val();
     var gatheringInfo = $('#j_gatheringinfo').val();
     var primaryContact = $('#j_primary_contact').val();
@@ -250,13 +250,28 @@ $('#j_update').on('click', function () {
     var vendorPhone = $('#j_vendor_phone').val();
     var orderTickets = [];
 
-    // if (price <= 0) {
-    //     warn("订单价格有误");
-    //     isDataValid = false;
-    //     return;
-    // }
+    var refund = 0;
+    if (status === 70 || status === 80) {
+        refund = parseFloat($('#j_refund').val());
+        if (refund < 0) {
+            warn("退款金额有误");
+            isDataValid = false;
+            return;
+        }
+    }
+    if (price <= 0) {
+        warn("订单价格有误");
+        isDataValid = false;
+        return;
+    }
     if (primaryContact.length === 0) {
         warn("缺少主要联系人信息");
+        isDataValid = false;
+        return;
+    }
+    var reg = /^[a-zA-Z ]+$/;
+    if(!reg.test(primaryContact)){
+        warn("主要联系人必须为英文");
         isDataValid = false;
         return;
     }
@@ -276,7 +291,7 @@ $('#j_update').on('click', function () {
     ticketContainer.each(function (index, e) {
         var orderTicket = {};
         var node = $(e);
-        orderTicket.id = parseInt(node.attr("value"))
+        orderTicket.id = parseInt(node.attr("value"));
         orderTicket.skuTicket = node.find("#j_ticket_name_span").html();
         orderTicket.ticketDate = node.find("#j_ticket_date_span").html();
         orderTicket.ticketTime = node.find("#j_ticket_time_span").html();
@@ -343,6 +358,7 @@ $('#j_update').on('click', function () {
         orderTickets: orderTickets,
         vendorPhone: vendorPhone,
         agentOrderId: agentOrderId,
+        refund: refund
     };
     $.ajax({
                type: 'PUT',
@@ -396,6 +412,24 @@ $('#j_resend_confirmation').on('click', function () {
            }).success(function (resp) {
         if (resp.code === 0) {
             success("confirmation letter has been sent");
+        } else {
+            error(resp.msg);
+        }
+    }).error(function () {
+        error("failed");
+    });
+});
+
+$('#j_resend_full').on('click', function () {
+    var path = window.location.pathname.split('/');
+    var id = parseInt(path[path.length - 1]);
+    $.ajax({
+        type: 'POST',
+        contentType: 'application/json; charset=utf-8',
+        url: '/v1/api/orders/' + id + "/full"
+    }).success(function (resp) {
+        if (resp.code === 0) {
+            success("full letter has been sent");
         } else {
             error(resp.msg);
         }
