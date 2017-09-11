@@ -5,7 +5,9 @@ import com.fitibo.aotearoa.dto.Role;
 import com.fitibo.aotearoa.exception.AuthenticationFailureException;
 import com.fitibo.aotearoa.mapper.AgentMapper;
 import com.fitibo.aotearoa.mapper.OrderMapper;
+import com.fitibo.aotearoa.mapper.SkuMapper;
 import com.fitibo.aotearoa.model.Order;
+import com.fitibo.aotearoa.model.Sku;
 import com.fitibo.aotearoa.service.ArchiveService;
 import com.fitibo.aotearoa.util.DateUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -35,6 +37,9 @@ public class ExportController extends AuthenticationRequiredController {
     private OrderMapper orderMapper;
 
     @Autowired
+    private SkuMapper skuMapper;
+
+    @Autowired
     private ArchiveService archiveService;
 
     @Autowired
@@ -46,13 +51,18 @@ public class ExportController extends AuthenticationRequiredController {
     }
 
     @RequestMapping(value = "/orders/{id}/voucher", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    @Authentication
-    public ResponseEntity<byte[]> downLoadVoucher(@PathVariable("id") int orderId,
+    @Authentication(value = {Role.Admin, Role.Agent, Role.Vendor})
+    public ResponseEntity<byte[]> downloadVoucher(@PathVariable("id") int orderId,
                                                   HttpServletResponse response) throws IOException, InvalidFormatException {
         Order order = orderMapper.findById(orderId);
         if (getToken().getRole() == Role.Agent) {
             if (order.getAgentId() != getToken().getId()) {
                 throw new AuthenticationFailureException("order:" + orderId + " does not belong to agent:" + getToken().getId());
+            }
+        } else if (getToken().getRole() == Role.Vendor) {
+            Sku sku = skuMapper.findById(order.getSkuId());
+            if (sku.getVendorId() != getToken().getId()) {
+                throw new AuthenticationFailureException("order:" + orderId + " does not belong to vendor:" + getToken().getId());
             }
         }
         Workbook voucher = archiveService.createVoucher(order);

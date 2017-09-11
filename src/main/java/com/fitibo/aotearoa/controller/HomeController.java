@@ -215,13 +215,15 @@ public class HomeController extends AuthenticationRequiredController {
                                Map<String, Object> model) {
         int vendorId = getToken().getId();
         model.put("role", getToken().getRole().toString());
-//        List<Integer> skuIds = skuMapper.findIdsByVendorId(vendorId);
+        Vendor vendor = vendorService.findById(vendorId);
+        Preconditions.checkNotNull(vendor, "invalid token:" + getToken().toString());
         List<Order> orders = orderMapper.findBySkuIds(vendorId, new RowBounds(pageNumber * pageSize, pageSize));
         model.put("statusList", OrderStatus.values());
         model.put("orders", parse(orders));
         model.put("pageSize", pageSize);
         model.put("pageNumber", pageNumber);
         model.put("module", MODULE_VENDOR_ORDERS);
+        model.put("userName", vendor.getName());
         return "vendor_orders";
     }
 
