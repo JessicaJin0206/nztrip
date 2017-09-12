@@ -178,7 +178,7 @@
             </div>
 
             <div class="form-group" id="j_gathering_place">
-                <span>Gathering Place</span>
+                <label>Gathering Place</>
             <#if editing = true>
                 <a>
                     <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
@@ -192,9 +192,11 @@
                        value="${place}" <#if editing = false>disabled</#if>>
             </#list>
             </div>
-            <div class="form-group"><input id="j_description" class="form-control"
-                                           <#if editing = false>disabled</#if>
-                                           placeholder="Description" value="${sku.description}">
+            <div class="form-group">
+                <label>Description</label>
+                <input id="j_description" class="form-control"
+                       <#if editing = false>disabled</#if>
+                       placeholder="Description" value="${sku.description}">
             </div>
             <div id="j_pickup_service" class="form-group">
                 <span>Has Pickup Service?</span>

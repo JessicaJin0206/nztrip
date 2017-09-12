@@ -174,8 +174,6 @@ public class ExportController extends AuthenticationRequiredController {
     public ResponseEntity<byte[]> downloadSkuOverview(HttpServletResponse response, @PathVariable("id") int skuId) throws IOException {
         DateTime from = DateTime.now().monthOfYear().roundFloorCopy();
         DateTime to = from.plusMonths(3);
-        to = DateTime.parse("2018-06-01");//FIXME hard code here
-
 
         Workbook result = archiveService.createSkuOverview(skuId, from, to);
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {

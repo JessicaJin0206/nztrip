@@ -178,7 +178,7 @@
             </div>
 
             <div class="form-group" id="j_gathering_place">
-                <span>集合地点</span>
+                <label>集合地点</label>
             <#if editing = true>
                 <a>
                     <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
@@ -192,9 +192,11 @@
                        value="${place}" <#if editing = false>disabled</#if>>
             </#list>
             </div>
-            <div class="form-group"><input id="j_description" class="form-control"
-                                           <#if editing = false>disabled</#if>
-                                           placeholder="请输入项目详情..." value="${sku.description}">
+            <div class="form-group">
+                <label>项目详情</label>
+                <input id="j_description" class="form-control"
+                       <#if editing = false>disabled</#if>
+                       placeholder="请输入项目详情..." value="${sku.description}">
             </div>
             <div id="j_pickup_service" class="form-group">
                 <span>是否有接送服务?</span>

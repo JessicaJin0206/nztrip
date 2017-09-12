@@ -33,7 +33,7 @@
                                 <a href="/skus/${sku.id?c}">Detail</a>
                             </div>
                             <div>
-                                <a href="/export/skus/${sku.id?c}/detail">Today's Booking Status</a>
+                                <a class="j_booking_status" sku_id="${sku.id?c}" href="javascript:void(0)">Booking Status</a>
                             </div>
                             <div>
                                 <a href="/export/skus/${sku.id?c}/overview">Export Inventory</a>
@@ -50,5 +50,8 @@
 </div>
 
 <#include "third_party_file.ftl"/>
+<script type="text/javascript" src="/js/bootbox.min.js"></script>
+<script type="text/javascript" src="/js/moment.js"></script>
+<script type="text/javascript" src="/js/vendor_sku.js"></script>
 </body>
 </html>
