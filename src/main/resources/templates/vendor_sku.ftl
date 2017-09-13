@@ -36,6 +36,9 @@
                                 <a class="j_booking_status" sku_id="${sku.id?c}" href="javascript:void(0)">Booking Status</a>
                             </div>
                             <div>
+                                <a href="/skus/${sku.id?c}/inventory">Edit Inventory</a>
+                            </div>
+                            <div>
                                 <a href="/export/skus/${sku.id?c}/overview">Export Inventory</a>
                             </div>
                         </td>
