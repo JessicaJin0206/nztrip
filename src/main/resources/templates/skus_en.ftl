@@ -96,7 +96,7 @@
                                 <a href="/create_order?skuId=${sku.id?c}" target="_blank">
                                     <span class="glyphicon glyphicon-check" aria-hidden="true"></span>
                                 </a>
-                                <#if role?? && (role == "Admin")>
+                                <#if role?? && (role == "Admin" || role =="Agent")>
                                     <a href="/sku_tickets/export/${sku.id?c}" target="_blank">
                                         <span class="glyphicon glyphicon-download" aria-hidden="true"></span>
                                     </a>
