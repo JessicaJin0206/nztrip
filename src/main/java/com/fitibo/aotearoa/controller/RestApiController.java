@@ -316,8 +316,11 @@ public class RestApiController extends AuthenticationRequiredController {
         order.setStatus(OrderStatus.NEW.getValue());
         String agentOrderId = order.getAgentOrderId();
         if (StringUtils.isNotEmpty(agentOrderId)) {
-            if (orderMapper.findByAgentOrderId(agentOrderId).size() > 0) {
-                throw new InvalidParamException("duplicated agent order:" + agentOrderId);
+            List<Order> orders = orderMapper.findByAgentOrderId(agentOrderId);
+            for (Order order1 : orders) {
+                if (order1.getSkuId() == sku.getId()) {
+                    throw new InvalidParamException("duplicated agent order:" + agentOrderId);
+                }
             }
         }
         if (sku.isAutoGenerateReferenceNumber()) {
@@ -473,6 +476,7 @@ public class RestApiController extends AuthenticationRequiredController {
             if (CollectionUtils.isEmpty(orderTicketVo.getOrderTicketUsers())) {
                 throw new InvalidParamException();
             }
+            validateTicketUser(parse(orderTicketVo, orderVo, priceMap, skuTicketMap, discount), orderTicketVo.getOrderTicketUsers());
             if (orderTicketVo.getId() > 0) {//update
                 OrderTicket orderTicket = new OrderTicket();
                 orderTicket.setId(orderTicketVo.getId());
@@ -520,8 +524,11 @@ public class RestApiController extends AuthenticationRequiredController {
         }
         String agentOrderId = o.getAgentOrderId();
         if (StringUtils.isNotEmpty(agentOrderId)) {
-            if (orderMapper.findByAgentOrderId(agentOrderId).size() > 1) {
-                throw new InvalidParamException("duplicated agent order:" + agentOrderId);
+            List<Order> orders = orderMapper.findByAgentOrderId(agentOrderId);
+            for (Order order1 : orders) {
+                if (order1.getSkuId() == order.getSkuId()) {
+                    throw new InvalidParamException("duplicated agent order:" + agentOrderId);
+                }
             }
         }
         //订单日志
