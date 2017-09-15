@@ -91,7 +91,7 @@ public interface SkuTicketPriceMapper {
     })
     List<SkuTicketPrice> findBySkuId(@Param("skuId") int skuId);
 
-    @Select("select * from sku_ticket_price where sku_id = #{skuId} and date >= #{from} and date < #{to}")
+    @Select("select * from sku_ticket_price where sku_id = #{skuId} and date >= #{from} and date < #{to} and valid = 1 ")
     @Results({
             @Result(column = "id", property = "id"),
             @Result(column = "sku_id", property = "skuId"),
@@ -106,7 +106,7 @@ public interface SkuTicketPriceMapper {
     })
     List<SkuTicketPrice> findBySkuIdAndDuration(@Param("skuId") int skuId, @Param("from") Date from, @Param("to") Date to);
 
-    @Select("select * from sku_ticket_price where sku_id = #{skuId} and sku_ticket_id = #{skuTicketId} and date =#{date}")
+    @Select("select * from sku_ticket_price where sku_id = #{skuId} and sku_ticket_id = #{skuTicketId} and date =#{date} and valid = 1 ")
     @Results({
             @Result(column = "id", property = "id"),
             @Result(column = "sku_id", property = "skuId"),
@@ -124,10 +124,10 @@ public interface SkuTicketPriceMapper {
                                                   @Param("date") Date date,
                                                   RowBounds rowBounds);
 
-    @Select("select distinct(time) from sku_ticket_price where sku_id = #{skuId} and date = #{date}")
+    @Select("select distinct(time) from sku_ticket_price where sku_id = #{skuId} and date = #{date} and valid = 1 ")
     List<String> findDistinctTicketBySkuIdAndDate(@Param("skuId") int skuId, @Param("date") Date date);
 
-    @Select("select * from sku_ticket_price where sku_id = #{skuId} and sku_ticket_id = #{skuTicketId} and date =#{date} and (total_count = 0 or current_count < total_count)")
+    @Select("select * from sku_ticket_price where sku_id = #{skuId} and sku_ticket_id = #{skuTicketId} and date =#{date} and valid = 1 ")
     @Results({
             @Result(column = "id", property = "id"),
             @Result(column = "sku_id", property = "skuId"),
@@ -143,7 +143,7 @@ public interface SkuTicketPriceMapper {
     List<SkuTicketPrice> findAvailableBySkuTicketIdAndDate(@Param("skuId") int skuId, @Param("skuTicketId") int skuTicketId,
                                                            @Param("date") Date date, RowBounds rowBounds);
 
-    @Select("select * from sku_ticket_price where sku_id = #{skuId} and sku_ticket_id = #{skuTicketId} and date > date_add(now(), interval -1 day) order by date desc")
+    @Select("select * from sku_ticket_price where sku_id = #{skuId} and sku_ticket_id = #{skuTicketId} and date > date_add(now(), interval -1 day) and valid = 1 order by date desc")
     @Results({
             @Result(column = "id", property = "id"),
             @Result(column = "sku_id", property = "skuId"),
@@ -160,7 +160,7 @@ public interface SkuTicketPriceMapper {
                                            @Param("skuTicketId") int skuTicketId,
                                            RowBounds rowBounds);
 
-    @Select("select * from sku_ticket_price where sku_id = #{skuId} and sku_ticket_id = #{skuTicketId} and date > date_add(now(), interval -1 day) and (total_count = 0 or current_count < total_count) order by date desc")
+    @Select("select * from sku_ticket_price where sku_id = #{skuId} and sku_ticket_id = #{skuTicketId} and date > date_add(now(), interval -1 day) and valid = 1 order by date desc")
     @Results({
             @Result(column = "id", property = "id"),
             @Result(column = "sku_id", property = "skuId"),
@@ -176,17 +176,10 @@ public interface SkuTicketPriceMapper {
     List<SkuTicketPrice> findAvailableBySkuTicketId(@Param("skuId") int skuId,
                                                     @Param("skuTicketId") int skuTicketId, RowBounds rowBounds);
 
-    @Delete({
-            "<script>",
-            "delete from sku_ticket_price where sku_id = #{skuId} and sku_ticket_id = #{skuTicketId} and date = #{date}",
-            "<if test =\"time != null and time != ''\">and time = #{time} </if>",
-            "</script>"
-    })
-    int deleteTicketPrice(SkuTicketPrice price);
 
     @Delete({
             "<script>",
-            "delete from sku_ticket_price where sku_id = #{skuId} and sku_ticket_id = #{skuTicketId} and date = #{date} ",
+            "update sku_ticket_price set valid = 0 where sku_id = #{skuId} and sku_ticket_id = #{skuTicketId} and date = #{date} ",
             "<if test ='times != null and times.size() > 0'>",
             "and time in ",
             "<foreach  collection='times' open='(' close=')' item='item' separator=','>#{item}",
@@ -199,31 +192,13 @@ public interface SkuTicketPriceMapper {
                     @Param("date") Date date,
                     @Param("times") List<String> times);
 
-    @Update({
-            "<script>",
-            "update sku_ticket_price set current_count = current_count+1 where id in ",
-            "<foreach collection='ids' item='id' index='index' open='(' separator=',' close=')'>#{id}",
-            "</foreach>",
-            "</script>"
-    })
-    int increaseCurrentCount(@Param("ids") List<Integer> ids);
-
-    @Update({
-            "<script>",
-            "update sku_ticket_price set current_count = current_count-1 where id in ",
-            "<foreach collection='ids' item='id' index='index' open='(' separator=',' close=')'>#{id}",
-            "</foreach>",
-            "</script>"
-    })
-    int decreaseCurrentCount(@Param("ids") List<Integer> ids);
-
     @Select("select distinct `time` from sku_ticket_price where sku_id = #{skuId} and date >= #{startDate} and date <= #{endDate}")
     List<String> getSessionsBySkuIdAndDate(@Param("skuId") int skuId,
                                            @Param("startDate") Date startDate,
                                            @Param("endDate") Date endDate);
 
     //这个数据库语句用来导出价格（按照时间天数步长为1天的递增确定时间的范围）
-    @Select("SELECT * FROM sku_ticket NATURAL JOIN ( SELECT number, sale_price, cost_price, Min(date) AS start_date, Max(date) AS end_date, time, sku_ticket_id AS id FROM ( SELECT ticket_price.*, IF ( ticket_price.sku_ticket_id =@a AND ticket_price.sale_price = @b AND ticket_price.cost_price = @c AND ticket_price.time =@d AND datediff(ticket_price.date ,@e) = 1,@num :=@num ,@num :=@num + 1 ) AS number, @a := ticket_price.sku_ticket_id, @b := ticket_price.sale_price, @c := ticket_price.cost_price, @d := ticket_price.time, @e := ticket_price.date FROM ( SELECT * FROM sku_ticket_price WHERE sku_id = #{skuId} AND datediff(date,NOW())>=0 ORDER BY sku_ticket_id, time, date ) ticket_price, ( SELECT @a := NULL, @b := NULL, @c := NULL, @d := NULL, @e := NULL, @num := 0 ) temp ) result GROUP BY number, sku_ticket_id, sale_price, cost_price, time ) AS price ORDER BY start_date")
+    @Select("SELECT * FROM sku_ticket NATURAL JOIN ( SELECT number, sale_price, cost_price, Min(date) AS start_date, Max(date) AS end_date, time, sku_ticket_id AS id FROM ( SELECT ticket_price.*, IF ( ticket_price.sku_ticket_id =@a AND ticket_price.sale_price = @b AND ticket_price.cost_price = @c AND ticket_price.time =@d AND datediff(ticket_price.date ,@e) = 1,@num :=@num ,@num :=@num + 1 ) AS number, @a := ticket_price.sku_ticket_id, @b := ticket_price.sale_price, @c := ticket_price.cost_price, @d := ticket_price.time, @e := ticket_price.date FROM ( SELECT * FROM sku_ticket_price WHERE sku_id = #{skuId} AND datediff(date,NOW())>=0 and valid = 1 ORDER BY sku_ticket_id, time, date ) ticket_price, ( SELECT @a := NULL, @b := NULL, @c := NULL, @d := NULL, @e := NULL, @num := 0 ) temp ) result GROUP BY number, sku_ticket_id, sale_price, cost_price, time ) AS price ORDER BY start_date")
     @Results({
             @Result(column = "id", property = "id"),
             @Result(column = "sku_id", property = "skuId"),

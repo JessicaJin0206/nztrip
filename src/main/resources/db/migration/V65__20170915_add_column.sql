@@ -1,0 +1,1 @@
+ALTER TABLE `sku_ticket_price` ADD COLUMN valid TINYINT(2) default 1;
