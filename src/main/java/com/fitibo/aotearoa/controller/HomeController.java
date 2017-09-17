@@ -107,6 +107,7 @@ public class HomeController extends AuthenticationRequiredController {
     private static final String MODULE_VENDOR_ORDERS = "vendor_orders";
     private static final String MODULE_SKU_INVENTORY = "sku_inventory";
     private static final String MODULE_ORDER_RECORD = "order_record";
+    private static final String MODULE_URGENT_ORDER = "urgent_orders";
 
     @Autowired
     private CityService cityService;
@@ -367,29 +368,11 @@ public class HomeController extends AuthenticationRequiredController {
      */
     @RequestMapping("urgent_orders")
     @Authentication(Role.Admin)
-    public String queryUrgentOrder(@RequestParam(value = "keyword", defaultValue = "") String keyword,
-                                   @RequestParam(value = "uuid", defaultValue = "") String uuid,
-                                   @RequestParam(value = "referencenumber", defaultValue = "") String referenceNumber,
-                                   @RequestParam(value = "status", defaultValue = "0") int status,
-                                   @RequestParam(value = "pagesize", defaultValue = "10") int pageSize,
-                                   @RequestParam(value = "pagenumber", defaultValue = "0") int pageNumber,
-                                   @RequestParam(value = "createtime", defaultValue = "") String createTime,
-                                   @RequestParam(value = "ticketdate", defaultValue = "") String ticketDateString,
-                                   @CookieValue(value = "language", defaultValue = "en") String lang,
+    public String queryUrgentOrder(@CookieValue(value = "language", defaultValue = "en") String lang,
                                    Map<String, Object> model) {
         Preconditions.checkNotNull(getToken());
-        createTime = createTime.trim();
-        ticketDateString = ticketDateString.trim();
-        model.put("module", MODULE_QUERY_ORDER);
+        model.put("module", MODULE_URGENT_ORDER);
         model.put("statusList", OrderStatus.values());
-        model.put("status", status);
-        model.put("pageSize", pageSize);
-        model.put("pageNumber", pageNumber);
-        model.put("keyword", keyword);
-        model.put("createTime", createTime);
-        model.put("ticketDate", ticketDateString);
-        model.put("uuid", uuid);
-        model.put("referenceNumber", referenceNumber);
         model.put("role", getToken().getRole().toString());
         model.put("userName", getUserName(getToken()));
         model.put("lang", lang);
@@ -409,14 +392,7 @@ public class HomeController extends AuthenticationRequiredController {
             return orderVo;
         });
         model.put("orders", orderVos);
-        Map<String, Integer> orderCountByStatus = Maps.newHashMap();
-        int agentId = getToken().getRole() == Role.Agent ? getToken().getId() : 0;
-        orderCountByStatus.put(OrderStatus.NEW.getValue() + "", agentId == 0 ? orderMapper.countByStatus(OrderStatus.NEW.getValue()) : orderMapper.countByStatusAndAgentId(OrderStatus.NEW.getValue(), agentId));
-        orderCountByStatus.put(OrderStatus.PENDING.getValue() + "", agentId == 0 ? orderMapper.countByStatus(OrderStatus.PENDING.getValue()) : orderMapper.countByStatusAndAgentId(OrderStatus.PENDING.getValue(), agentId));
-        orderCountByStatus.put(OrderStatus.FULL.getValue() + "", agentId == 0 ? orderMapper.countByStatus(OrderStatus.FULL.getValue()) : orderMapper.countByStatusAndAgentId(OrderStatus.FULL.getValue(), agentId));
-        orderCountByStatus.put(OrderStatus.MODIFYING.getValue() + "", agentId == 0 ? orderMapper.countByStatus(OrderStatus.MODIFYING.getValue()) : orderMapper.countByStatusAndAgentId(OrderStatus.MODIFYING.getValue(), agentId));
-        model.put("orderCountByStatus", orderCountByStatus);
-        return "orders";
+        return "urgent_orders";
     }
 
     private List<OrderVo> parse(List<Order> orders) {
