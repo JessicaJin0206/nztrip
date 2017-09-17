@@ -13,15 +13,8 @@
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
             <div class="form-group"><label>Edit Sku Inventory</label></div>
             <div class="form-group row">
-                <div class="input-group date col-md-4 col-sm-4 col-xs-4" id="j_start_date">
-                    <input placeholder="Start Date" class="form-control"/>
-                    <span class="input-group-addon">
-                        <span class="glyphicon glyphicon-calendar"></span>
-                    </span>
-                </div>
-
-                <div class="input-group date col-md-4 col-sm-4 col-xs-4" id="j_end_date">
-                    <input placeholder="End Date" class="form-control"/>
+                <div class="input-group date col-md-4 col-sm-4 col-xs-4" id="j_date">
+                    <input placeholder="Date" class="form-control"/>
                     <span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
                     </span>
@@ -30,14 +23,10 @@
 
 
             <div class="form-group">
-                <button id="j_refresh" class="btn btn-primary form-group">Refresh</button>
                 <div class="btn-group" id="j_session_container" data-toggle="buttons"></div>
             </div>
 
-            <div class="form-group"><input type="number" id="j_total_count" class="form-control" placeholder="Total Count"
-                                           value="">
-            </div>
-            <button id="j_submit" class="btn btn-primary form-group">Submit</button>
+            <button id="j_close" class="btn btn-primary form-group">Close</button>
         </div>
     </div>
 </div>
@@ -48,6 +37,6 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.css"/>
 <script type="text/javascript"
         src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
-<script type="text/javascript" src="/js/sku_inventory.js"></script>
+<script type="text/javascript" src="/js/edit_sku_inventory.js"></script>
 </body>
 </html>

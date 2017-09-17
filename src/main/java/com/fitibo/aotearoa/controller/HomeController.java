@@ -106,6 +106,7 @@ public class HomeController extends AuthenticationRequiredController {
     private static final String MODULE_VENDOR_SKU = "vendor_sku";
     private static final String MODULE_VENDOR_ORDERS = "vendor_orders";
     private static final String MODULE_SKU_INVENTORY = "sku_inventory";
+    private static final String MODULE_EDIT_SKU_INVENTORY = "edit_sku_inventory";
     private static final String MODULE_ORDER_RECORD = "order_record";
     private static final String MODULE_URGENT_ORDER = "urgent_orders";
 
@@ -844,6 +845,26 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("role", getToken().getRole().toString());
         model.put("userName", getUserName(getToken()));
         return "sku_inventory";
+    }
+
+    @RequestMapping("skus/{id}/inventory/_edit")
+    @Authentication({Role.Admin, Role.Vendor})
+    public String editSkuInventory(@PathVariable("id") int id, Map<String, Object> model) {
+        Sku sku = skuMapper.findById(id);
+        if (sku == null) {
+            throw new ResourceNotFoundException();
+        }
+        if (getToken().getRole() == Role.Vendor) {
+            if (sku.getVendorId() != getToken().getId()) {
+                throw new AuthenticationFailureException();
+            }
+        }
+        model.put("sku", sku);
+        model.put("module", MODULE_EDIT_SKU_INVENTORY);
+        model.put("tickets", skuTicketMapper.findBySkuId(id));
+        model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
+        return "edit_sku_inventory";
     }
 
     private List<Sku> searchSku(String keyword, int cityId, int categoryId, int vendorId, RowBounds rowBounds) {

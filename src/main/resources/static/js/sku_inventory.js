@@ -39,7 +39,7 @@ endDateSelector.datetimepicker(
         format: "YYYY-MM-DD"
     });
 var path = window.location.pathname.split('/');
-var skuId = parseInt(path[path.length - 2]);
+var skuId = parseInt(path[2]);
 var container = $("#j_session_container");
 
 $('#j_refresh').on('click', function () {

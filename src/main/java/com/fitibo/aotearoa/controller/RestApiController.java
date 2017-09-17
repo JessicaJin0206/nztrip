@@ -860,6 +860,22 @@ public class RestApiController extends AuthenticationRequiredController {
         return skuInventoryService.addSkuInventory(skuId, startDate, endDate, request.getSessions(), request.getTotalCount());
     }
 
+    @RequestMapping(value = "/v1/api/skus/{skuId}/inventories", method = RequestMethod.DELETE)
+    @Authentication({Role.Admin, Role.Vendor})
+    public boolean deleteSkuInventory(@PathVariable("skuId") int skuId, @RequestBody DeleteSkuInventoryRequest request) {
+        Preconditions.checkArgument(skuId == request.getSkuId(), "invalid sku id");
+        Sku sku = skuMapper.findById(skuId);
+        if (sku == null) {
+            throw new ResourceNotFoundException();
+        }
+        if (getToken().getRole() == Role.Vendor) {
+            if (sku.getVendorId() != getToken().getId()) {
+                throw new AuthenticationFailureException();
+            }
+        }
+        return true;
+    }
+
     private Map<Integer, SkuTicketPrice> getSkuTicketPriceMap(List<Integer> ids) {
         if (ids.isEmpty()) {
             return Collections.emptyMap();
