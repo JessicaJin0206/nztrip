@@ -534,7 +534,7 @@ public class ArchiveServiceImpl implements ArchiveService {
         Cell refund = row.createCell(col++);
         refund.setCellType(Cell.CELL_TYPE_NUMERIC);
         refund.setCellValue(orderStat.getRefund().setScale(2, RoundingMode.HALF_EVEN).doubleValue());
-        
+
         Cell agentOrderId = row.createCell(col++);
         agentOrderId.setCellType(Cell.CELL_TYPE_STRING);
         agentOrderId.setCellValue(orderStat.getAgentOrderId());
@@ -693,9 +693,12 @@ public class ArchiveServiceImpl implements ArchiveService {
     }
 
     @Override
-    public Workbook createSkusDetail(String keyword, int cityId, int categoryId, int vendorId, String language) {
+    public Workbook createSkusDetail(String keyword, int cityId, int categoryId, int vendorId, int agentId, String language) {
 
         List<Sku> skus = skuMapper.findAllByMultiFields(keyword, cityId, categoryId, vendorId, new RowBounds());
+        if (agentId > 0) {
+            skus = skus.stream().filter(Sku::isAvailable).collect(Collectors.toList());
+        }
         Workbook workbook = new SXSSFWorkbook();
         Sheet sheet = workbook.createSheet("Summary");
         Font font = workbook.createFont();

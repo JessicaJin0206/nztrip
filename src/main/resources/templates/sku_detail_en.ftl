@@ -230,7 +230,24 @@
                 </#if>
                 </div>
             </div>
+            <div id="j_available" class="form-group">
+                <span>Online?</span>
+                <div class="btn-group" data-toggle="buttons">
+                <#if editing = true>
+                    <label class="btn btn-default <#if sku.available = true>active</#if>">
+                        <input type="radio" class="toggle" value="1">Yes
+                    </label>
+                    <label class="btn btn-default <#if sku.available = false>active</#if>">
+                        <input type="radio" class="toggle" value="0">No
+                    </label>
+                <#else>
+                    <#if sku.available = true><span>Yes<span></#if>
+                    <#if sku.available = false><span>No</span></#if>
+                </#if>
+                </div>
+                <div class="form-group">
 
+                </div>
             <div class="form-group">
                 <span>Ticket</span>
             <#if editing = true>

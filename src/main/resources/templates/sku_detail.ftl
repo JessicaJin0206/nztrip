@@ -230,7 +230,24 @@
                 </#if>
                 </div>
             </div>
+            <div id="j_available" class="form-group">
+                <span>是否上架?</span>
+                <div class="btn-group" data-toggle="buttons">
+                <#if editing = true>
+                    <label class="btn btn-default <#if sku.available = true>active</#if>">
+                        <input type="radio" class="toggle" value="1">是
+                    </label>
+                    <label class="btn btn-default <#if sku.available = false>active</#if>">
+                        <input type="radio" class="toggle" value="0">否
+                    </label>
+                <#else>
+                    <#if sku.available = true><span>是</span></#if>
+                    <#if sku.available = false><span>否</span></#if>
+                </#if>
+                </div>
+                <div class="form-group">
 
+                </div>
             <div class="form-group">
                 <span>票种</span>
             <#if editing = true>

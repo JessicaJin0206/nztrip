@@ -41,4 +41,5 @@ public class SkuVo {
     private String priceConstraint;
     private String otherInfo;
     private boolean autoGenerateReferenceNumber;
+    private boolean available;
 }

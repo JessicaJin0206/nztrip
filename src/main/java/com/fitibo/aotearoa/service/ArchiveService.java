@@ -22,10 +22,10 @@ public interface ArchiveService {
 
     //Workbook createSkuOverview(int skuId, DateTime from, DateTime to);
 
-    Workbook createSkuDetail(int skuId,String language);
+    Workbook createSkuDetail(int skuId, String language);
 
-    Workbook createSkusDetail(String keyword, int cityId, int categoryId,int vendorId,String language);
+    Workbook createSkusDetail(String keyword, int cityId, int categoryId, int vendorId, int agentId, String language);
 
-    Pair<String,Workbook> createSkuTickets(int skuId,int agentId,String language);
+    Pair<String, Workbook> createSkuTickets(int skuId, int agentId, String language);
 
 }

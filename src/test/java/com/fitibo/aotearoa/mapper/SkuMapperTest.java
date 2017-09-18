@@ -22,7 +22,7 @@ public class SkuMapperTest extends BaseTest {
     assertEquals(sku.getDescription(), other.getDescription());
     assertEquals(sku.getCityId(), other.getCityId());
     assertEquals(sku.getCategoryId(), other.getCategoryId());
-    assertEquals(sku.hasPickupService(), other.hasPickupService());
+    assertEquals(sku.isPickupService(), other.isPickupService());
     assertEquals(sku.getGatheringPlace(), other.getGatheringPlace());
     assertEquals(sku.getVendorId(), other.getVendorId());
   }

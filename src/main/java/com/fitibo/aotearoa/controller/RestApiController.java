@@ -143,7 +143,7 @@ public class RestApiController extends AuthenticationRequiredController {
         Agent agent = agentMapper.findById(agentId);
         int vendorId = agent.getVendorId();
         List<Sku> skus = skuMapper.findAllByMultiFields(keyword, 0, 0, vendorId, new RowBounds(pageNumber * pageSize, pageSize));
-        return skus.stream().map(RestApiController::parse).collect(Collectors.toList());
+        return skus.stream().filter(Sku::isAvailable).map(RestApiController::parse).collect(Collectors.toList());
     }
 
 
@@ -174,6 +174,9 @@ public class RestApiController extends AuthenticationRequiredController {
         Agent agent = agentMapper.findById(agentId);
         if (agent.getVendorId() != 0 && agent.getVendorId() != sku.getVendorId()) {
             throw new AuthenticationFailureException();
+        }
+        if(!sku.isAvailable()){
+            throw new AuthenticationFailureException("the sku is offline ");
         }
     }
 
@@ -970,6 +973,7 @@ public class RestApiController extends AuthenticationRequiredController {
         result.setOtherInfo(sku.getOtherInfo());
         result.setRescheduleCancelNotice(sku.getRescheduleCancelNotice());
         result.setAutoGenerateReferenceNumber(sku.isAutoGenerateReferenceNumber());
+        result.setAvailable(sku.isAvailable());
         return result;
     }
 
@@ -988,6 +992,7 @@ public class RestApiController extends AuthenticationRequiredController {
         result.setVendorId(sku.getVendorId());
         result.setCityId(sku.getCityId());
         result.setCategoryId(sku.getCategoryId());
+        result.setAvailable(sku.isAvailable());
 
         result.setActivityTime(sku.getActivityTime());
         result.setAgendaInfo(sku.getAgendaInfo());

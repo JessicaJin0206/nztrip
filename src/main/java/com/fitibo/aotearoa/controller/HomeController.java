@@ -573,6 +573,9 @@ public class HomeController extends AuthenticationRequiredController {
         if (sku == null) {
             throw new ResourceNotFoundException("invalid sku id:" + id);
         }
+        if (role == Role.Agent && !sku.isAvailable()) {
+            throw new AuthenticationFailureException("sku is offline");
+        }
         model.put("sku", parse(sku));
         model.put("editing", false);
         model.put("role", getToken().getRole().toString());
@@ -684,6 +687,9 @@ public class HomeController extends AuthenticationRequiredController {
             vendorId = agentMapper.findById(getToken().getId()).getVendorId();
         }
         List<Sku> skus = searchSku(keyword, cityId, categoryId, vendorId, rowBounds);
+        if (getToken().getRole() == Role.Agent) {
+            skus = skus.stream().filter(Sku::isAvailable).collect(Collectors.toList());
+        }
         Map<Integer, City> cityMap = cityService.findByIds(Lists.transform(skus, Sku::getCityId));
         Map<Integer, Category> categoryMap = categoryService
                 .findByIds(Lists.transform(skus, Sku::getCategoryId));
@@ -881,7 +887,7 @@ public class HomeController extends AuthenticationRequiredController {
         result.setCityEn(city.getNameEn());
         result.setGatheringPlace(
                 Lists.newArrayList(sku.getGatheringPlace().split(CommonConstants.SEPARATOR)));
-        result.setPickupService(sku.hasPickupService());
+        result.setPickupService(sku.isPickupService());
 
         result.setDurationId(sku.getDurationId());
         result.setDuration(duration != null ? duration.getName() : "");
@@ -900,6 +906,7 @@ public class HomeController extends AuthenticationRequiredController {
         result.setOtherInfo(sku.getOtherInfo());
         result.setRescheduleCancelNotice(sku.getRescheduleCancelNotice());
         result.setAutoGenerateReferenceNumber(sku.isAutoGenerateReferenceNumber());
+        result.setAvailable(sku.isAvailable());
         return result;
     }
 

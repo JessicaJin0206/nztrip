@@ -27,7 +27,7 @@ public interface VendorMapper {
             @Result(column = "name", property = "name"),
             @Result(column = "email", property = "email"),
             @Result(column = "phone", property = "phone"),
-            @Result(column = "password", property = "password"),
+            @Result(column = "password", property = "password")
     })
     Vendor findByEmail(String email);
 

@@ -51,7 +51,8 @@ public interface SkuMapper {
             "attention = #{attention}, " +
             "price_constraint = #{priceConstraint}, " +
             "other_info = #{otherInfo}," +
-            "auto_generate_reference_number = #{autoGenerateReferenceNumber} " +
+            "auto_generate_reference_number = #{autoGenerateReferenceNumber}, " +
+            "available = #{available} "+
             "where id = #{id}"})
     int update(Sku sku);
 
@@ -81,6 +82,7 @@ public interface SkuMapper {
             @Result(column = "price_constraint", property = "priceConstraint"),
             @Result(column = "other_info", property = "otherInfo"),
             @Result(column = "auto_generate_reference_number", property = "autoGenerateReferenceNumber"),
+            @Result(column = "available", property = "available")
 
     })
     Sku findByUuid(String uuid);
@@ -111,6 +113,7 @@ public interface SkuMapper {
             @Result(column = "price_constraint", property = "priceConstraint"),
             @Result(column = "other_info", property = "otherInfo"),
             @Result(column = "auto_generate_reference_number", property = "autoGenerateReferenceNumber"),
+            @Result(column = "available", property = "available")
     })
     Sku findById(int id);
 
@@ -140,6 +143,7 @@ public interface SkuMapper {
             @Result(column = "price_constraint", property = "priceConstraint"),
             @Result(column = "other_info", property = "otherInfo"),
             @Result(column = "auto_generate_reference_number", property = "autoGenerateReferenceNumber"),
+            @Result(column = "available", property = "available")
     })
     List<Sku> findAll(RowBounds rowBounds);
 
@@ -172,6 +176,7 @@ public interface SkuMapper {
             @Result(column = "price_constraint", property = "priceConstraint"),
             @Result(column = "other_info", property = "otherInfo"),
             @Result(column = "auto_generate_reference_number", property = "autoGenerateReferenceNumber"),
+            @Result(column = "available", property = "available")
     })
     List<Sku> findAllByName(String name, RowBounds rowBounds);
 
@@ -208,6 +213,7 @@ public interface SkuMapper {
             @Result(column = "price_constraint", property = "priceConstraint"),
             @Result(column = "other_info", property = "otherInfo"),
             @Result(column = "auto_generate_reference_number", property = "autoGenerateReferenceNumber"),
+            @Result(column = "available", property = "available")
     })
     List<Sku> findAllByMultiFields(@Param("keyword") String keyword,
                                    @Param("cityId") int cityId,
@@ -241,6 +247,7 @@ public interface SkuMapper {
             @Result(column = "price_constraint", property = "priceConstraint"),
             @Result(column = "other_info", property = "otherInfo"),
             @Result(column = "auto_generate_reference_number", property = "autoGenerateReferenceNumber"),
+            @Result(column = "available", property = "available")
     })
     List<Sku> findByVendorId(int vendorId);
 }

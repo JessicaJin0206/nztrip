@@ -138,12 +138,14 @@ public class ExportController extends AuthenticationRequiredController {
                                                @CookieValue(value = "language", defaultValue = "en") String language)
             throws IOException, InvalidFormatException {
         int vendorId = 0;
+        int agentId = 0;
         if (getToken().getRole() == Role.Agent) {
             vendorId = agentMapper.findById(getToken().getId()).getVendorId();
+            agentId = getToken().getId();
         }
-        Workbook orderStats = archiveService.createSkusDetail(keyword, cityId, categoryId, vendorId, language);
+        Workbook skusDetail = archiveService.createSkusDetail(keyword, cityId, categoryId, vendorId, agentId, language);
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            orderStats.write(baos);
+            skusDetail.write(baos);
             response.setHeader("Content-Disposition", "attachment; filename=\"" + new String("新西兰产品信息表".getBytes("GB2312"), "ISO_8859_1") + ".xlsx\"");
             return new ResponseEntity<>(baos.toByteArray(), HttpStatus.CREATED);
 

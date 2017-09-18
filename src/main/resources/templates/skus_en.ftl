@@ -90,7 +90,7 @@
                         <td>${sku.name}</td>
                         <td>
                             <div>
-                                <a href="/skus/${sku.id?c}">
+                                <a href="/skus/${sku.id?c}" target="_blank">
                                     <span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span>
                                 </a>
                                 <a href="/create_order?skuId=${sku.id?c}" target="_blank">
