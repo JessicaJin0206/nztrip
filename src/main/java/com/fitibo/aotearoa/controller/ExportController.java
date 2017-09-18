@@ -91,7 +91,7 @@ public class ExportController extends AuthenticationRequiredController {
      * 导出单个sku的价格信息（和并场次的版本）
      */
     @RequestMapping(value = "/sku_tickets/export/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    @Authentication(Role.Admin)
+    @Authentication({Role.Admin, Role.Agent})
     public ResponseEntity<byte[]> downloadSkuTickets(HttpServletResponse response,
                                                      @PathVariable("id") int skuId,
                                                      @CookieValue(value = "language", defaultValue = "en") String language)
