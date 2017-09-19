@@ -175,7 +175,7 @@ public class RestApiController extends AuthenticationRequiredController {
         if (agent.getVendorId() != 0 && agent.getVendorId() != sku.getVendorId()) {
             throw new AuthenticationFailureException();
         }
-        if(!sku.isAvailable()){
+        if (!sku.isAvailable()) {
             throw new AuthenticationFailureException("the sku is offline ");
         }
     }
@@ -529,7 +529,7 @@ public class RestApiController extends AuthenticationRequiredController {
         if (StringUtils.isNotEmpty(agentOrderId)) {
             List<Order> orders = orderMapper.findByAgentOrderId(agentOrderId);
             for (Order order1 : orders) {
-                if (order1.getSkuId() == order.getSkuId()) {
+                if (order1.getSkuId() == order.getSkuId() && order1.getId() != order.getId()) {
                     throw new InvalidParamException("duplicated agent order:" + agentOrderId);
                 }
             }
