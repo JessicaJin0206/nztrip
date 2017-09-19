@@ -10,22 +10,30 @@ import com.fitibo.aotearoa.model.Order;
 import com.fitibo.aotearoa.model.Sku;
 import com.fitibo.aotearoa.service.ArchiveService;
 import com.fitibo.aotearoa.util.DateUtils;
+
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormatterBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Created by qianhao.zhou on 08/12/2016.
@@ -175,7 +183,9 @@ public class ExportController extends AuthenticationRequiredController {
     @Authentication({Role.Admin, Role.Vendor})
     public ResponseEntity<byte[]> downloadSkuOverview(HttpServletResponse response, @PathVariable("id") int skuId) throws IOException {
         DateTime from = DateTime.now().monthOfYear().roundFloorCopy();
-        DateTime to = from.plusMonths(3);
+        DateTime to = DateTime.parse("2018-06", new DateTimeFormatterBuilder().appendPattern("YYYY-MM").toFormatter());
+        //FIXME don't hard code
+//        DateTime to = from.plusMonths(3);
 
         Workbook result = archiveService.createSkuOverview(skuId, from, to);
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
