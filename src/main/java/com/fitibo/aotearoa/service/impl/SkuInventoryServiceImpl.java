@@ -14,6 +14,8 @@ import com.fitibo.aotearoa.service.SkuInventoryService;
 import com.fitibo.aotearoa.util.DateUtils;
 
 import org.joda.time.LocalDateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,8 @@ import java.util.Optional;
 
 @Service("skuInventoryService")
 public class SkuInventoryServiceImpl implements SkuInventoryService {
+
+    private static final Logger logger = LoggerFactory.getLogger(SkuInventoryService.class);
 
     @Autowired
     private OrderMapper orderMapper;
@@ -70,6 +74,11 @@ public class SkuInventoryServiceImpl implements SkuInventoryService {
             skuInventoryMapper.add(skuId, date.toDate(), sessions, totalCount);
         }
         return true;
+    }
+
+    @Override
+    public boolean updateSkuInventory(int skuId, Date date, String time, int totalCount) {
+        return skuInventoryMapper.updateBySkuIdAndDateTime(skuId, date, time, totalCount) == 1;
     }
 
 }

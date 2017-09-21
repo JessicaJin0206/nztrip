@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.Date;
 import java.util.List;
@@ -34,6 +35,12 @@ public interface SkuInventoryMapper {
     SkuInventory findBySkuIdAndDateTime(@Param("skuId") int skuId,
                                         @Param("date") Date date,
                                         @Param("time") String time);
+
+    @Update("update sku_inventory set count = #{totalCount} where sku_id = #{skuId} and `date` = #{date} and time = #{time}")
+    int updateBySkuIdAndDateTime(@Param("skuId") int skuId,
+                                 @Param("date") Date date,
+                                 @Param("time") String time,
+                                 @Param("totalCount") int totalCount);
 
     @Delete({
             "<script>",

@@ -88,8 +88,21 @@ $("#j_close").on('click', function (e) {
                url: '/v1/api/skus/' + skuId + '/inventories',
                data: JSON.stringify(data)
            }).success(function (resp) {
-        success("inventory deleted");
+               if (resp.code === 0) {
+                   success("inventory deleted");
+               } else {
+                   error("inventory not closed");
+               }
     }).error(function (resp) {
-        error("inventory failed to be deleted");
+        if (resp.status === 400 || resp.status === 404) {
+            if (resp.responseText) {
+                error(resp.responseText);
+            } else {
+                error("inventory not closed");
+            }
+        } else {
+            error("inventory not closed");
+        }
+
     });
 });

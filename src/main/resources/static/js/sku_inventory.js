@@ -112,6 +112,10 @@ $("#j_submit").on('click', function (e) {
            }).success(function (resp) {
         success("inventory added");
     }).error(function (resp) {
-        error("inventory not added");
+        if (resp.status === 400) {
+            error(resp.responseText);
+        } else {
+            error("inventory not added");
+        }
     });
 });

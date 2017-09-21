@@ -113,7 +113,7 @@ public class RestApiController extends AuthenticationRequiredController {
     @ExceptionHandler
     public ResponseEntity handleException(ResourceNotFoundException ex) {
         logger.error(ex.getMessage(), ex);
-        return new ResponseEntity(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler
@@ -862,7 +862,7 @@ public class RestApiController extends AuthenticationRequiredController {
 
     @RequestMapping(value = "/v1/api/skus/{skuId}/inventories", method = RequestMethod.DELETE)
     @Authentication({Role.Admin, Role.Vendor})
-    public boolean deleteSkuInventory(@PathVariable("skuId") int skuId, @RequestBody DeleteSkuInventoryRequest request) {
+    public ResultVo deleteSkuInventory(@PathVariable("skuId") int skuId, @RequestBody DeleteSkuInventoryRequest request) {
         Preconditions.checkArgument(skuId == request.getSkuId(), "invalid sku id");
         Sku sku = skuMapper.findById(skuId);
         if (sku == null) {
@@ -873,7 +873,22 @@ public class RestApiController extends AuthenticationRequiredController {
                 throw new AuthenticationFailureException();
             }
         }
-        return true;
+        Date requestedDate = DateUtils.parseDate(request.getDate());
+        String requestedTime = request.getSession();
+        SkuInventoryDto skuInventory = skuInventoryService.getSkuInventory(skuId, requestedDate, requestedTime);
+        if (skuInventory == null) {
+            throw new ResourceNotFoundException(request.getDate() + " " + requestedTime + " does not exist");
+        }
+        if (skuInventory.getCurrentCount() > 0) {
+            throw new InvalidParamException(sku.getName() + " " + request.getDate() + " " + requestedTime + " has already been booked by " + skuInventory.getCurrentCount() + " people");
+        }
+        boolean result = skuInventoryService.updateSkuInventory(skuId, requestedDate, requestedTime, 0);
+        logger.info("inventory skuId:" + skuId + " date:" + request.getDate() + " session:" + requestedTime + " has been closed by " + getToken().getRole() + " " + getToken().getId());
+        if (!result) {
+            logger.warn(request.getDate() + " " + requestedTime + " does not exist");
+            throw new ResourceNotFoundException(request.getDate() + " " + requestedTime + " does not exist");
+        }
+        return ResultVo.SUCCESS;
     }
 
     private Map<Integer, SkuTicketPrice> getSkuTicketPriceMap(List<Integer> ids) {
