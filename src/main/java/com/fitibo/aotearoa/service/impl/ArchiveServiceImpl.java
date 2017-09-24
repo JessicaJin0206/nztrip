@@ -275,6 +275,11 @@ public class ArchiveServiceImpl implements ArchiveService {
         style.setWrapText(true);
         List<OrderTicket> orderTickets = orderTicketMapper.findBySkuIdAndDate(skuId, date);
         List<Order> orders = orderMapper.findByIds(orderTickets.stream().map(OrderTicket::getOrderId).distinct().collect(Collectors.toList()));
+        //filter only confirmed order
+        orders = orders.stream().filter(input -> input.getStatus() == OrderStatus.CONFIRMED.getValue()).collect(Collectors.toList());
+        List<Integer> confirmedOrderIds = orders.stream().map(Order::getId).collect(Collectors.toList());
+        //filter order tickets
+        orderTickets = orderTickets.stream().filter(input -> confirmedOrderIds.contains(input.getOrderId())).collect(Collectors.toList());
         List<String> allTickets = skuTicketPriceMapper.findDistinctTicketBySkuIdAndDate(skuId, date);
         List<SkuTicket> skuTickets = skuTicketMapper.findBySkuId(skuId);
         int rowIndex = 0;

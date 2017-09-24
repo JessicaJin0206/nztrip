@@ -1,16 +1,19 @@
 package com.fitibo.aotearoa.service.impl;
 
-import com.fitibo.aotearoa.constants.OrderStatus;
-import com.fitibo.aotearoa.dto.Transition;
-import com.fitibo.aotearoa.service.OrderService;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
+import com.fitibo.aotearoa.constants.OrderStatus;
+import com.fitibo.aotearoa.dto.Transition;
+import com.fitibo.aotearoa.service.OrderService;
+
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Map;
+
+import javax.annotation.PostConstruct;
 
 @Service("orderService")
 public class OrderServiceImpl implements OrderService {

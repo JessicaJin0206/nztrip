@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Created by qianhao.zhou on 8/5/16.
  */
-public class OrderTicket extends ModelObject{
+public class OrderTicket extends ModelObject {
 
     public int getSkuId() {
         return skuId;
