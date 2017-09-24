@@ -407,18 +407,17 @@ public class ArchiveServiceImpl implements ArchiveService {
                 cell.setCellStyle(style);
             }
 
-            DateTime day = current;
             Row currentRow = sheet.createRow(rowIndex++);
-            for (; day.isBefore(current.plusMonths(1)); day = day.plusDays(1)) {
+            for (DateTime day = current; day.isBefore(current.plusMonths(1)); day = day.plusDays(1)) {
                 final Date date = day.toDate();
                 List<SkuTicketPrice> skuTicketPrices = skuTicketPriceMap.containsKey(date) ? skuTicketPriceMap.get(date) : Collections.emptyList();
+                List<SkuInventory> skuInventories = skuInventoryMap.containsKey(date) ? skuInventoryMap.get(date) : Collections.emptyList();
                 String collect = skuTicketPrices.stream().filter(input -> StringUtils.isNoneEmpty(input.getTime())).map(skuTicketPrice -> {
                     Map<String, List<SkuOccupation>> skuOccupationMapByTime = skuOccupationMap.containsKey(date) ? skuOccupationMap.get(date).stream().collect(Collectors.groupingBy(SkuOccupation::getTicketTime)) : Collections.emptyMap();
                     StringBuilder result = new StringBuilder();
                     result.append(skuTicketPrice.getTime()).append(":  ");
                     result.append(Optional.ofNullable(skuOccupationMapByTime.get(skuTicketPrice.getTime())).map(List::size).orElse(0));
-                    List<SkuInventory> skuInventories = skuInventoryMap.containsKey(date) ? skuInventoryMap.get(date) : Collections.emptyList();
-                    Optional<SkuInventory> first = skuInventories.stream().filter(skuInventory -> skuTicketPrice.getTime().equals(skuTicketPrice.getTime())).findFirst();
+                    Optional<SkuInventory> first = skuInventories.stream().filter(skuInventory -> skuInventory.getTime().equals(skuTicketPrice.getTime())).findFirst();
                     result.append("/").append(first.map(skuInventory -> skuInventory.getCount() + "").orElse("0"));
                     result.append(" people");
                     return result.toString();
