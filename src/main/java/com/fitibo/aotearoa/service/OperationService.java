@@ -30,9 +30,13 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import rx.Observable;
 
@@ -65,6 +69,9 @@ public class OperationService {
 
     @Autowired
     private ArchiveService archiveService;
+
+    @Autowired
+    private ResourceLoaderService resourceLoaderService;
 
     @Value("${template.reservationemail.from}")
     private String reservationEmailFrom;
@@ -194,7 +201,20 @@ public class OperationService {
             Attachment attachment = new Attachment();
             attachment.setName("voucher.xlsx");
             attachment.setData(data);
-            return emailService.send(order.getId(), confirmationEmailFrom, to, subject, content, Lists.newArrayList(attachment));
+
+            ArrayList<Attachment> attachments = Lists.newArrayList(attachment);
+            attachments.addAll(resourceLoaderService.getConfirmationLetterAttachments(sku.getVendorId()).stream().map(input -> {
+                Attachment result = new Attachment();
+                result.setName(input.getName());
+                try {
+                    result.setData(Files.readAllBytes(input.toPath()));
+                } catch (IOException e) {
+                    logger.error("error convert file to byte[]", e);
+                    return null;
+                }
+                return result;
+            }).filter(Objects::nonNull).collect(Collectors.toList()));
+            return emailService.send(order.getId(), confirmationEmailFrom, to, subject, content, attachments);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
