@@ -36,6 +36,16 @@
         </#if>
     </div>
 </div>
+<#elseif role?? && role == "Vendor" && (order.status == 40)>
+<div class="form-group">
+    <div class="row">
+        <label class="col-md-2">修改订单:</label>
+        <button class="btn btn-primary form-group j_operation"
+                operation="${60}"
+                email="false">取消订单
+        </button>
+    </div>
+</div>
 </#if>
 
 <#if role?? && role == "Admin">

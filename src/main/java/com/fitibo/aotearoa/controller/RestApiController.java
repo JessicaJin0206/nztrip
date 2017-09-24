@@ -16,6 +16,7 @@ import com.fitibo.aotearoa.model.*;
 import com.fitibo.aotearoa.service.*;
 import com.fitibo.aotearoa.util.*;
 import com.fitibo.aotearoa.vo.*;
+
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
@@ -24,6 +25,7 @@ import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multiset;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.ibatis.session.RowBounds;
@@ -548,7 +550,7 @@ public class RestApiController extends AuthenticationRequiredController {
     }
 
     @RequestMapping(value = "/v1/api/orders/{id}/status/{toStatus}", method = RequestMethod.PUT)
-    @Authentication(Role.Admin)
+    @Authentication({Role.Admin, Role.Vendor})
     @Transactional
     public boolean updateOrderStatus(@PathVariable("id") int id,
                                      @PathVariable("toStatus") int toStatus,
@@ -557,6 +559,11 @@ public class RestApiController extends AuthenticationRequiredController {
         Order order = orderMapper.findById(id);
         if (order == null) {
             throw new ResourceNotFoundException();
+        }
+        if (getToken().getRole() == Role.Vendor) {
+            int vendorId = getToken().getId();
+            Preconditions.checkArgument(skuMapper.findById(order.getSkuId()).getVendorId() == vendorId,
+                    "order id:" + id + " does not belong to vendor id:" + vendorId);
         }
         int fromStatus = order.getStatus();
         List<Transition> transitions = orderService.getAvailableTransitions(fromStatus);

@@ -36,6 +36,16 @@
         </#if>
     </div>
 </div>
+<#elseif role?? && role == "Vendor" && (order.status == 40)>
+<div class="form-group">
+    <div class="row">
+        <label class="col-md-2">Action:</label>
+        <button class="btn btn-primary form-group j_operation"
+                operation="${60}"
+                email="false">Cancel
+        </button>
+    </div>
+</div>
 </#if>
 
 <#if role?? && role == "Admin">
