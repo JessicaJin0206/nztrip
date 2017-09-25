@@ -12,8 +12,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -21,9 +19,9 @@ import javax.annotation.PostConstruct;
 @Service
 public class ResourceLoaderService {
 
-    Multimap<Integer, File> confirmationAttachments;
+    Multimap<Integer, Pair<String, Resource>> confirmationAttachments;
 
-    Multimap<Integer, File> voucherTemplates;
+    Multimap<Integer, Pair<String, Resource>> voucherTemplates;
 
     @Autowired
     ResourcePatternResolver resourcePatternResolver;
@@ -32,37 +30,36 @@ public class ResourceLoaderService {
 
     @PostConstruct
     public void init() {
-        confirmationAttachments = loadFiles("classpath:confirmation/vendor/*");
-        voucherTemplates = loadFiles("classpath:voucher/agent/*");
-        logger.info("confirmation letter attachments: " + confirmationAttachments);
+        confirmationAttachments = loadFiles("classpath:confirmation_attachments/*");
+        voucherTemplates = loadFiles("classpath:voucher/*");
+        logger.info("confirmation_attachments: " + confirmationAttachments);
         logger.info("voucher templates: " + voucherTemplates);
     }
 
-    private Multimap<Integer, File> loadFiles(String path) {
+    private Multimap<Integer, Pair<String, Resource>> loadFiles(String path) {
         try {
             Resource[] resources = resourcePatternResolver.getResources(path);
-            ArrayListMultimap<Integer, File> result = ArrayListMultimap.create();
+            ArrayListMultimap<Integer, Pair<String, Resource>> result = ArrayListMultimap.create();
             for (Resource resource : resources) {
-                if (resource.getFile().isDirectory()) {
-                    int vendorId = Integer.parseInt(resource.getFile().getName());
-                    File[] attachments = resource.getFile().listFiles();
-                    result.putAll(vendorId, Arrays.asList(attachments));
-                }
-
+                logger.info("load resource from: " + path + resource.getFilename());
+                String[] strings = resource.getFilename().split("#");
+                int id = Integer.parseInt(strings[0]);
+                String name = strings[1];
+                result.put(id, Pair.of(name, resource));
             }
             return result;
         } catch (Exception e) {
-            logger.error("error init confirmationAttachments");
+            logger.error("error loading:" + path, e);
             throw new RuntimeException(e);
         }
 
     }
 
-    public List<File> getConfirmationLetterAttachments(int vendorId) {
+    public List<Pair<String, Resource>> getConfirmationLetterAttachments(int vendorId) {
         return Lists.newArrayList(confirmationAttachments.get(vendorId));
     }
 
-    public File getVoucher(int agentId) {
+    public Pair<String, Resource> getVoucher(int agentId) {
         if (voucherTemplates.containsKey(agentId)) {
             return voucherTemplates.get(agentId).stream().findFirst().orElseThrow(() -> new RuntimeException("this should not happen"));
         } else {

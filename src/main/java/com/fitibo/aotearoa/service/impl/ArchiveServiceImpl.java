@@ -163,7 +163,7 @@ public class ArchiveServiceImpl implements ArchiveService {
 
     private Resource getVoucherTemplate(Order order) {
         int agentId = order.getAgentId();
-        return new FileSystemResource(resourceLoaderService.getVoucher(agentId));
+        return resourceLoaderService.getVoucher(agentId).getRight();
     }
 
     private void fillRowWithVoucher(Sheet sheet, Order order, OrderTicket firstOrderTicket, List<OrderTicket> orderTickets, Vendor vendor, Sku sku) {
