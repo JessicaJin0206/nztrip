@@ -23,6 +23,8 @@ public class ResourceLoaderService {
 
     Multimap<Integer, File> confirmationAttachments;
 
+    Multimap<Integer, File> voucherTemplates;
+
     @Autowired
     ResourcePatternResolver resourcePatternResolver;
 
@@ -30,26 +32,39 @@ public class ResourceLoaderService {
 
     @PostConstruct
     public void init() {
+        confirmationAttachments = loadFiles("classpath:confirmation/vendor/*");
+        voucherTemplates = loadFiles("classpath:voucher/agent/*");
+    }
+
+    private Multimap<Integer, File> loadFiles(String path) {
         try {
-            Resource[] resources = resourcePatternResolver.getResources("classpath:confirmation/vendor/*");
-            confirmationAttachments = ArrayListMultimap.create();
+            Resource[] resources = resourcePatternResolver.getResources(path);
+            ArrayListMultimap<Integer, File> result = ArrayListMultimap.create();
             for (Resource resource : resources) {
                 if (resource.getFile().isDirectory()) {
                     int vendorId = Integer.parseInt(resource.getFile().getName());
                     File[] attachments = resource.getFile().listFiles();
-                    confirmationAttachments.putAll(vendorId, Arrays.asList(attachments));
+                    result.putAll(vendorId, Arrays.asList(attachments));
                 }
 
             }
+            return result;
         } catch (Exception e) {
             logger.error("error init confirmationAttachments");
             throw new RuntimeException(e);
         }
+
     }
-
-
 
     public List<File> getConfirmationLetterAttachments(int vendorId) {
         return Lists.newArrayList(confirmationAttachments.get(vendorId));
+    }
+
+    public File getVoucher(int agentId) {
+        if (voucherTemplates.containsKey(agentId)) {
+            return voucherTemplates.get(agentId).stream().findFirst().orElseThrow(() -> new RuntimeException("this should not happen"));
+        } else {
+            return voucherTemplates.get(0).stream().findFirst().orElseThrow(() -> new RuntimeException("this should not happen"));
+        }
     }
 }

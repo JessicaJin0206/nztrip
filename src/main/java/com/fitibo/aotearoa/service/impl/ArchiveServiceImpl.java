@@ -1,26 +1,59 @@
 package com.fitibo.aotearoa.service.impl;
 
-import com.fitibo.aotearoa.constants.OrderStatus;
-import com.fitibo.aotearoa.constants.SkuConstants;
-import com.fitibo.aotearoa.mapper.*;
-import com.fitibo.aotearoa.model.*;
-import com.fitibo.aotearoa.service.ArchiveService;
-import com.fitibo.aotearoa.service.DiscountRateService;
-import com.fitibo.aotearoa.service.SkuService;
-import com.fitibo.aotearoa.util.DateUtils;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+
+import com.fitibo.aotearoa.constants.OrderStatus;
+import com.fitibo.aotearoa.constants.SkuConstants;
+import com.fitibo.aotearoa.mapper.OrderMapper;
+import com.fitibo.aotearoa.mapper.OrderStatMapper;
+import com.fitibo.aotearoa.mapper.OrderTicketMapper;
+import com.fitibo.aotearoa.mapper.SkuInventoryMapper;
+import com.fitibo.aotearoa.mapper.SkuMapper;
+import com.fitibo.aotearoa.mapper.SkuTicketMapper;
+import com.fitibo.aotearoa.mapper.SkuTicketPriceMapper;
+import com.fitibo.aotearoa.mapper.VendorMapper;
+import com.fitibo.aotearoa.model.Order;
+import com.fitibo.aotearoa.model.OrderStat;
+import com.fitibo.aotearoa.model.OrderTicket;
+import com.fitibo.aotearoa.model.Sku;
+import com.fitibo.aotearoa.model.SkuInventory;
+import com.fitibo.aotearoa.model.SkuOccupation;
+import com.fitibo.aotearoa.model.SkuTicket;
+import com.fitibo.aotearoa.model.SkuTicketPrice;
+import com.fitibo.aotearoa.model.SkuTicketPriceForExport;
+import com.fitibo.aotearoa.model.SkuTicketPriceForExportKey;
+import com.fitibo.aotearoa.model.Vendor;
+import com.fitibo.aotearoa.service.ArchiveService;
+import com.fitibo.aotearoa.service.DiscountRateService;
+import com.fitibo.aotearoa.service.ResourceLoaderService;
+import com.fitibo.aotearoa.service.SkuService;
+import com.fitibo.aotearoa.util.DateUtils;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.ClientAnchor;
+import org.apache.poi.ss.usermodel.Comment;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Drawing;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Hyperlink;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.RichTextString;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFHyperlink;
@@ -30,17 +63,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
-import rx.Observable;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import rx.Observable;
 
 /**
  * Created by zhouqianhao on 11/03/2017.
@@ -71,18 +114,6 @@ public class ArchiveServiceImpl implements ArchiveService {
     @Autowired
     private SkuTicketPriceMapper skuTicketPriceMapper;
 
-    @Value(value = "classpath:voucher_template.xlsx")
-    private Resource voucherTemplate;
-
-    @Value(value = "classpath:voucher_template_28.xlsx")
-    private Resource voucherTemplate_28;
-
-    @Value(value = "classpath:voucher_template_59.xlsx")
-    private Resource voucherTemplate_59;
-
-    @Value(value = "classpath:voucher_template_54.xlsx")
-    private Resource voucherTemplate_54;
-
     @Value(value = "classpath:order_template.xlsx")
     private Resource orderTemplate;
 
@@ -94,6 +125,9 @@ public class ArchiveServiceImpl implements ArchiveService {
 
     @Autowired
     private DiscountRateService discountRateService;
+
+    @Autowired
+    private ResourceLoaderService resourceLoaderService;
 
     @Override
     public Workbook createVoucher(Order order) {
@@ -129,15 +163,7 @@ public class ArchiveServiceImpl implements ArchiveService {
 
     private Resource getVoucherTemplate(Order order) {
         int agentId = order.getAgentId();
-        if (agentId == 28) {//FIXME: hard code here
-            return voucherTemplate_28;
-        } else if (agentId == 54) {
-            return voucherTemplate_54;
-        } else if (agentId == 59) {
-            return voucherTemplate_59;
-        } else {
-            return voucherTemplate;
-        }
+        return new FileSystemResource(resourceLoaderService.getVoucher(agentId));
     }
 
     private void fillRowWithVoucher(Sheet sheet, Order order, OrderTicket firstOrderTicket, List<OrderTicket> orderTickets, Vendor vendor, Sku sku) {
