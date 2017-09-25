@@ -17,9 +17,9 @@ spring:
     properties:
       mail:
         smtp:
-          connecttimeout: 10000
-          timeout: 10000
-          writetimeout: 10000
+          connecttimeout: 3000
+          timeout: 5000
+          writetimeout: 5000
           auth: true
   jackson:
     default-property-inclusion: non_null

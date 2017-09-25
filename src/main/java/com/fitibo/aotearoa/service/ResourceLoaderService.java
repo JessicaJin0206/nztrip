@@ -34,6 +34,8 @@ public class ResourceLoaderService {
     public void init() {
         confirmationAttachments = loadFiles("classpath:confirmation/vendor/*");
         voucherTemplates = loadFiles("classpath:voucher/agent/*");
+        logger.info("confirmation letter attachments: " + confirmationAttachments);
+        logger.info("voucher templates: " + voucherTemplates);
     }
 
     private Multimap<Integer, File> loadFiles(String path) {
