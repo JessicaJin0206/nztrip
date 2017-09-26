@@ -113,7 +113,10 @@ public class EmailScheduler {
         }
         logger.info("start auto-resend email task");
         try {
-            for (Email email : emailQueueMapper.findAllFailedEmails()) {
+            List<Email> allFailedEmails = emailQueueMapper.findAllFailedEmails();
+            List<Email> subList = allFailedEmails.subList(0, Math.min(allFailedEmails.size(), 4));
+            //at most 4 emails per minute
+            for (Email email : subList) {
                 logger.info("resend email id:" + email.getId());
                 List<Attachment> attachments = attachmentMapper.findByEmailId(email.getId());
                 new SendEmailTask(email, attachments).run();
