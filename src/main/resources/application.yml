@@ -10,10 +10,11 @@ secret: secret
 
 spring:
   mail:
-    host: smtp.qq.com
-    port: 25
-    username: eyounz@foxmail.com
-    password: bwczsvngzcxjcbab
+    from: eyounz01@gmail.com
+    host: smtp.gmail.com
+    port: 465
+    username: eyounz01@gmail.com
+    password: eyounz2017
     properties:
       mail:
         smtp:
@@ -21,6 +22,7 @@ spring:
           timeout: 5000
           writetimeout: 5000
           auth: true
+    protocol: smtps
   jackson:
     default-property-inclusion: non_null
 

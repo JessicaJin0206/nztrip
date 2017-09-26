@@ -73,17 +73,14 @@ public class OperationService {
     @Autowired
     private ResourceLoaderService resourceLoaderService;
 
-    @Value("${template.reservationemail.from}")
-    private String reservationEmailFrom;
+    @Value("${spring.email.from}")
+    private String emailFrom;
 
     @Value("${template.reservationemail.subject}")
     private String reservationEmailSubject;
 
     @Value("${template.reservationemail.content}")
     private String reservationEmailTemplate;
-
-    @Value("${template.confirmation_email.from}")
-    private String confirmationEmailFrom;
 
     @Value("${template.confirmation_email.subject}")
     private String confirmationEmailSubject;
@@ -99,12 +96,6 @@ public class OperationService {
 
     @Value("${template.cancel_email.content}")
     private String cancellationEmailTemplate;
-
-    @Value("${template.cancel_email.from}")
-    private String cancellationEmailFrom;
-
-    @Value("${template.full_email.from}")
-    private String fullEmailFrom;
 
     @Value("${template.full_email.subject}")
     private String fullEmailSubject;
@@ -165,7 +156,7 @@ public class OperationService {
         String agentOrderId = order.getAgentOrderId();
         String subject = StringUtils.isNotEmpty(agentOrderId) ? cancellationEmailSubject + "(" + agentOrderId + ")" : cancellationEmailSubject;
         String content = formatCancellationEmailContent(order, agent, skuMapper.findById(order.getSkuId()), ticketList);
-        emailService.send(order.getId(), cancellationEmailFrom, agent.getEmail(), subject, content, Collections.emptyList());
+        emailService.send(order.getId(), emailFrom, agent.getEmail(), subject, content, Collections.emptyList());
     }
 
     private String formatCancellationEmailContent(Order order, Agent agent, Sku sku, List<OrderTicket> tickets) {
@@ -214,7 +205,7 @@ public class OperationService {
                 }
                 return result;
             }).filter(Objects::nonNull).collect(Collectors.toList()));
-            return emailService.send(order.getId(), confirmationEmailFrom, to, subject, content, attachments);
+            return emailService.send(order.getId(), emailFrom, to, subject, content, attachments);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -233,7 +224,7 @@ public class OperationService {
         String content = formatFullEmailContent(fullEmailTemplate, order, sku, agent);
         String agentOrderId = order.getAgentOrderId();
         String subject = StringUtils.isNotEmpty(agentOrderId) ? fullEmailSubject + "(" + agentOrderId + ")" : fullEmailSubject;
-        return emailService.send(order.getId(), fullEmailFrom, to, subject, content, Collections.emptyList());
+        return emailService.send(order.getId(), emailFrom, to, subject, content, Collections.emptyList());
     }
 
     public boolean sendReservationEmail(Order order) {
@@ -253,7 +244,7 @@ public class OperationService {
         String content = formatReservationEmailContent(reservationEmailTemplate, vendor, order,
                 ticketList);
         String subject = formatReservationEmailSubject(reservationEmailSubject, order);
-        return emailService.send(order.getId(), reservationEmailFrom, vendor.getEmail(), subject, content, Collections.emptyList());
+        return emailService.send(order.getId(), emailFrom, vendor.getEmail(), subject, content, Collections.emptyList());
     }
 
     private String formatReservationEmailSubject(String template, Order order) {
