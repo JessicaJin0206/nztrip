@@ -24,6 +24,8 @@ spring:
   jackson:
     default-property-inclusion: non_null
 
+mock-receiver:
+
 template:
   reservationemail:
     from: eyounz@foxmail.com

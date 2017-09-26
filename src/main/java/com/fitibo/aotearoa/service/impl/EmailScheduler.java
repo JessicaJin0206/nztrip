@@ -35,6 +35,9 @@ public class EmailScheduler {
     @Value("${spring.email-enabled}")
     private Boolean enabled;
 
+    @Value("${mock-receiver}")
+    private String mockReceiver;
+
     @Autowired
     private JavaMailSender mailSender;
 
@@ -79,8 +82,8 @@ public class EmailScheduler {
             if (StringUtils.isEmpty(to)) {
                 return true;
             }
-            if (!enabled) {
-                to = "qianhao.zhou@ubike.cn";
+            if (StringUtils.isNotBlank(mockReceiver)) {
+                to = mockReceiver;
             }
             String[] receivers = to.split(";");
             MimeMessage message = mailSender.createMimeMessage();
@@ -104,6 +107,10 @@ public class EmailScheduler {
 
     @Scheduled(initialDelay = 10000L, fixedRate = 60000L)
     public void init() {
+        if (!enabled) {
+            logger.info("EmailScheduler is not enabled");
+            return;
+        }
         logger.info("start auto-resend email task");
         try {
             for (Email email : emailQueueMapper.findAllFailedEmails()) {
