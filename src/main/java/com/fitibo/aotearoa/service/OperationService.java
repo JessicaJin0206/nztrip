@@ -73,7 +73,7 @@ public class OperationService {
     @Autowired
     private ResourceLoaderService resourceLoaderService;
 
-    @Value("${spring.email.username}")
+    @Value("${email-from}")
     private String emailFrom;
 
     @Value("${template.reservationemail.subject}")
