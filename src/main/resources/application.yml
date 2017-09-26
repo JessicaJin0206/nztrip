@@ -10,7 +10,6 @@ secret: secret
 
 spring:
   mail:
-    from: eyounz01@gmail.com
     host: smtp.gmail.com
     port: 465
     username: eyounz01@gmail.com
