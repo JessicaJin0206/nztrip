@@ -13,10 +13,10 @@
                 <span class="icon-bar"></span>
             </button>
             <a class="navbar-brand" href="/">Eyounz Booking System</a>
-            <a class="navbar-brand" href="javascript:void(0)">  欢迎 ${userName}</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
+                <li><a href="javascript:void(0)"> 欢迎 ${userName}</a></li>
                 <li><a id="j_en"
                        onclick="document.cookie='language=en;path=/';window.location.reload()">English</a>
                 </li>
@@ -25,9 +25,6 @@
                 </li>
                 <li><a id="j_logout">退出</a></li>
             </ul>
-            <form class="navbar-form navbar-right">
-                <input type="text" class="form-control" placeholder="Search...">
-            </form>
         </div>
     </div>
 </nav>
