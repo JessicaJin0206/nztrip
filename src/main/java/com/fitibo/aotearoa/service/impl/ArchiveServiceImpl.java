@@ -692,7 +692,7 @@ public class ArchiveServiceImpl implements ArchiveService {
     }
 
     //排序时间的函数
-    private int compareTime(String time1, String time2) {
+    public static int compareTime(String time1, String time2) {
         if (time1.equals(time2)) {
             return 0;
         }

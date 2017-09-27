@@ -197,6 +197,9 @@ public interface SkuTicketPriceMapper {
                                            @Param("startDate") Date startDate,
                                            @Param("endDate") Date endDate);
 
+    @Select("select distinct(`time`) FROM sku_ticket_price p JOIN sku_ticket t ON p.sku_ticket_id = t.id WHERE p.sku_id = #{skuId} AND t.sku_id = #{skuId} AND status = 10 AND p.date >= NOW()")
+    List<String> getSessionsBySkuId(@Param("skuId") int skuId);
+
     //这个数据库语句用来导出价格（按照时间天数步长为1天的递增确定时间的范围）
     @Select("SELECT * FROM sku_ticket NATURAL JOIN ( SELECT number, sale_price, cost_price, Min(date) AS start_date, Max(date) AS end_date, time, sku_ticket_id AS id FROM ( SELECT ticket_price.*, IF ( ticket_price.sku_ticket_id =@a AND ticket_price.sale_price = @b AND ticket_price.cost_price = @c AND ticket_price.time =@d AND datediff(ticket_price.date ,@e) = 1,@num :=@num ,@num :=@num + 1 ) AS number, @a := ticket_price.sku_ticket_id, @b := ticket_price.sale_price, @c := ticket_price.cost_price, @d := ticket_price.time, @e := ticket_price.date FROM ( SELECT * FROM sku_ticket_price WHERE sku_id = #{skuId} AND datediff(date,NOW()) >= 0 and valid = 1 ORDER BY sku_ticket_id, time, date ) ticket_price, ( SELECT @a := NULL, @b := NULL, @c := NULL, @d := NULL, @e := NULL, @num := 0 ) temp ) result GROUP BY number, sku_ticket_id, sale_price, cost_price, time ) AS price WHERE status = 10 ORDER BY start_date")
     @Results({

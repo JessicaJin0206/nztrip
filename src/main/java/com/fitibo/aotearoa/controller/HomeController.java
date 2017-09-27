@@ -16,6 +16,9 @@
 
 package com.fitibo.aotearoa.controller;
 
+import com.fitibo.aotearoa.service.*;
+import com.fitibo.aotearoa.service.impl.ArchiveServiceImpl;
+import com.fitibo.aotearoa.vo.*;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -52,37 +55,16 @@ import com.fitibo.aotearoa.model.Sku;
 import com.fitibo.aotearoa.model.SkuTicket;
 import com.fitibo.aotearoa.model.SkuTicketPrice;
 import com.fitibo.aotearoa.model.Vendor;
-import com.fitibo.aotearoa.service.CityService;
-import com.fitibo.aotearoa.service.DurationService;
-import com.fitibo.aotearoa.service.OrderService;
-import com.fitibo.aotearoa.service.SkuService;
-import com.fitibo.aotearoa.service.VendorService;
 import com.fitibo.aotearoa.service.impl.CategoryServiceImpl;
 import com.fitibo.aotearoa.util.DateUtils;
 import com.fitibo.aotearoa.util.ObjectParser;
-import com.fitibo.aotearoa.vo.AgentVo;
-import com.fitibo.aotearoa.vo.OrderRecordVo;
-import com.fitibo.aotearoa.vo.OrderTicketVo;
-import com.fitibo.aotearoa.vo.OrderVo;
-import com.fitibo.aotearoa.vo.PriceRecordVo;
-import com.fitibo.aotearoa.vo.SkuTicketPriceVo;
-import com.fitibo.aotearoa.vo.SkuTicketVo;
-import com.fitibo.aotearoa.vo.SkuVo;
 
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -109,6 +91,7 @@ public class HomeController extends AuthenticationRequiredController {
     private static final String MODULE_EDIT_SKU_INVENTORY = "edit_sku_inventory";
     private static final String MODULE_ORDER_RECORD = "order_record";
     private static final String MODULE_URGENT_ORDER = "urgent_orders";
+    private static final String MODULE_SCAN_ORDER = "scan_order";
 
     @Autowired
     private CityService cityService;
@@ -157,6 +140,9 @@ public class HomeController extends AuthenticationRequiredController {
 
     @Autowired
     private SkuService skuService;
+
+    @Autowired
+    private ScanService scanService;
 
     @ExceptionHandler
     public String handleException(ResourceNotFoundException ex) {
@@ -988,5 +974,41 @@ public class HomeController extends AuthenticationRequiredController {
             default:
                 return "";
         }
+    }
+
+    @RequestMapping("scan_order/{id}")
+    @Authentication(Role.Admin)
+    public String scanOrder(@PathVariable("id") int id, Map<String, Object> model) {
+        model.put("module", MODULE_CREATE_VENDOR);
+        model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
+        model.put("skuId", id);
+        model.put("dates", skuTicketPriceMapper.getSessionsBySkuId(id).stream().sorted(ArchiveServiceImpl::compareTime).collect(Collectors.toList()));
+        return "scan_order";
+    }
+
+    @RequestMapping("scan_order/sub")
+    @Authentication(Role.Admin)
+    public String sub(@ModelAttribute Scan scan, Map<String, Object> model) {
+        model.put("module", MODULE_SCAN_ORDER);
+        model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
+        model.put("order", scanService.scanOrder(scan));
+        Sku sku = skuService.findById(scan.getSkuId());
+        Vendor vendor = vendorService.findById(sku.getVendorId());
+        Category category = categoryService.findById(sku.getCategoryId());
+        Duration duration = durationService.findById(sku.getDurationId());
+        City city = cityService.findById(sku.getCityId());
+        SkuVo skuVo = parse(sku, city, category, vendor, duration);
+        Map<String, Collection<String>> availableDateMap = Maps.newHashMap();
+        for (SkuTicketVo skuTicketVo : skuVo.getTickets()) {
+            Set<String> availableDates = Sets.newLinkedHashSet(
+                    Lists.transform(skuTicketVo.getTicketPrices(), SkuTicketPriceVo::getDate));
+            availableDateMap.put(skuTicketVo.getId() + "", availableDates);
+        }
+        model.put("sku", skuVo);
+        model.put("availableDateMap", availableDateMap);
+        model.put("vendor", vendor);
+        return "create_scan_order";
     }
 }

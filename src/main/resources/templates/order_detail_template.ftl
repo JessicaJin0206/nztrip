@@ -221,7 +221,7 @@
 </#if>
 
 <#list tickets as ticket>
-<div class="form-group j_ticket_container" value="${ticket.id?c}" ticketId="${ticket.skuTicketId?c}"
+<div class="form-group j_ticket_container" ticketId="${ticket.skuTicketId?c}"
      priceId="${ticket.ticketPriceId?c}">
     <#if editing == true><a id="j_ticket_delete"><span class="glyphicon glyphicon-remove pull-right"
                                                        aria-hidden="true"></span></a></#if>

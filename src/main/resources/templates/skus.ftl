@@ -101,6 +101,11 @@
                                         <span class="glyphicon glyphicon-download" aria-hidden="true"></span>
                                     </a>
                                 </#if>
+                                <#if role?? && (role == "Admin")>
+                                    <a href="/scan_order/${sku.id?c}" target="_blank">
+                                        <span class="glyphicon glyphicon-flash" aria-hidden="true"></span>
+                                    </a>
+                                </#if>
                             </div>
                         </td>
                     </tr>
