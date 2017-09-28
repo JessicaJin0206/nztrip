@@ -1133,7 +1133,7 @@ public class RestApiController extends AuthenticationRequiredController {
 
         final Vendor vendor = vendorService.findById(sku.getVendorId());
         Preconditions.checkNotNull(vendor, "invalid vendor id:" + sku.getVendorId());
-        final int discount = getDiscount(getToken(), sku.getId());
+        final int discount = discountRateService.getDiscountByAgent(orderVo.getAgentId(), skuId);
         Map<Integer, SkuTicketPrice> priceMap = getSkuTicketPriceMap(
                 Lists.transform(orderVo.getOrderTickets(), OrderTicketVo::getTicketPriceId));
         Map<Integer, SkuTicket> skuTicketMap = getSkuTicketMap(
