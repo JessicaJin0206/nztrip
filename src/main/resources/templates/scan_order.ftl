@@ -26,6 +26,7 @@
                         <li><a value="${city.id?c}">${city.name}</a></li>
                     </#list>-->
                         <li><a value="62">懒猫</a></li>
+                        <li><a value="24">Klook</a></li>
                     </ul>
                 </div>
                 <div class="form-group dropdown">
@@ -58,8 +59,10 @@
 <script type="text/javascript" src="/js/moment.js"></script>
 <script type="text/javascript" src="/js/transition.js"></script>
 <script type="text/javascript" src="/js/collapse.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.css"/>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.css"/>
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
 <script src="/js/scan_order.js"></script>
 
 </body>

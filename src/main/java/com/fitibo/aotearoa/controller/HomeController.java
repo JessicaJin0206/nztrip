@@ -979,7 +979,7 @@ public class HomeController extends AuthenticationRequiredController {
     @RequestMapping("scan_order/{id}")
     @Authentication(Role.Admin)
     public String scanOrder(@PathVariable("id") int id, Map<String, Object> model) {
-        model.put("module", MODULE_CREATE_VENDOR);
+        model.put("module", MODULE_SCAN_ORDER);
         model.put("role", getToken().getRole().toString());
         model.put("userName", getUserName(getToken()));
         model.put("skuId", id);
