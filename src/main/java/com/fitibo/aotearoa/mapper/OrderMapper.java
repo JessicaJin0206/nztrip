@@ -41,7 +41,8 @@ public interface OrderMapper {
             @Result(column = "vendor_phone", property = "vendorPhone"),
             @Result(column = "agent_order_id", property = "agentOrderId"),
             @Result(column = "modified_price", property = "modifiedPrice"),
-            @Result(column = "refund", property = "refund")
+            @Result(column = "refund", property = "refund"),
+            @Result(column = "from_vendor", property = "fromVendor"),
     })
     Order findById(int id);
 
@@ -75,7 +76,8 @@ public interface OrderMapper {
             @Result(column = "vendor_phone", property = "vendorPhone"),
             @Result(column = "agent_order_id", property = "agentOrderId"),
             @Result(column = "modified_price", property = "modifiedPrice"),
-            @Result(column = "refund", property = "refund")
+            @Result(column = "refund", property = "refund"),
+            @Result(column = "from_vendor", property = "fromVendor"),
     })
     List<Order> findByAgentId(@Param("agentId") int agentId, RowBounds rowBounds);
 
@@ -117,7 +119,8 @@ public interface OrderMapper {
             @Result(column = "vendor_phone", property = "vendorPhone"),
             @Result(column = "agent_order_id", property = "agentOrderId"),
             @Result(column = "modified_price", property = "modifiedPrice"),
-            @Result(column = "refund", property = "refund")
+            @Result(column = "refund", property = "refund"),
+            @Result(column = "from_vendor", property = "fromVendor"),
     })
     List<Order> findByIds(@Param("ids") List<Integer> ids);
 
@@ -159,7 +162,8 @@ public interface OrderMapper {
             @Result(column = "vendor_phone", property = "vendorPhone"),
             @Result(column = "agent_order_id", property = "agentOrderId"),
             @Result(column = "modified_price", property = "modifiedPrice"),
-            @Result(column = "refund", property = "refund")
+            @Result(column = "refund", property = "refund"),
+            @Result(column = "from_vendor", property = "fromVendor"),
     })
     List<Order> findByAgentIdAndMultiFields(@Param("agentId") int agentId,
                                             @Param("uuid") String uuid,
@@ -201,7 +205,8 @@ public interface OrderMapper {
             @Result(column = "vendor_phone", property = "vendorPhone"),
             @Result(column = "agent_order_id", property = "agentOrderId"),
             @Result(column = "modified_price", property = "modifiedPrice"),
-            @Result(column = "refund", property = "refund")
+            @Result(column = "refund", property = "refund"),
+            @Result(column = "from_vendor", property = "fromVendor"),
     })
     List<Order> findByAgentIdAndTicketDate(@Param("agentId") int agentId,
                                            @Param("ticketDate") Date ticketDate,
@@ -239,7 +244,8 @@ public interface OrderMapper {
             @Result(column = "vendor_phone", property = "vendorPhone"),
             @Result(column = "agent_order_id", property = "agentOrderId"),
             @Result(column = "modified_price", property = "modifiedPrice"),
-            @Result(column = "refund", property = "refund")
+            @Result(column = "refund", property = "refund"),
+            @Result(column = "from_vendor", property = "fromVendor"),
     })
     List<Order> findByAgentIdAndCreateTime(@Param("agentId") int agentId,
                                             @Param("createTime") Date createTime,
@@ -278,7 +284,8 @@ public interface OrderMapper {
             @Result(column = "vendor_phone", property = "vendorPhone"),
             @Result(column = "agent_order_id", property = "agentOrderId"),
             @Result(column = "modified_price", property = "modifiedPrice"),
-            @Result(column = "refund", property = "refund")
+            @Result(column = "refund", property = "refund"),
+            @Result(column = "from_vendor", property = "fromVendor"),
     })
     List<Order> findBySkuIds(@Param("vendorId") int vendorId,
                              RowBounds rowBounds);
@@ -313,7 +320,8 @@ public interface OrderMapper {
             @Result(column = "vendor_phone", property = "vendorPhone"),
             @Result(column = "agent_order_id", property = "agentOrderId"),
             @Result(column = "modified_price", property = "modifiedPrice"),
-            @Result(column = "refund", property = "refund")
+            @Result(column = "refund", property = "refund"),
+            @Result(column = "from_vendor", property = "fromVendor"),
     })
     List<Order> findAll(RowBounds rowBounds);
 
@@ -356,7 +364,8 @@ public interface OrderMapper {
             @Result(column = "agent_name", property = "agentName"),
             @Result(column = "agent_order_id", property = "agentOrderId"),
             @Result(column = "modified_price", property = "modifiedPrice"),
-            @Result(column = "refund", property = "refund")
+            @Result(column = "refund", property = "refund"),
+            @Result(column = "from_vendor", property = "fromVendor"),
     })
     List<Order> findAllByMultiFields(@Param("uuid") String uuid,
                                      @Param("keyword") String keyword,
@@ -398,7 +407,8 @@ public interface OrderMapper {
             @Result(column = "agent_name", property = "agentName"),
             @Result(column = "agent_order_id", property = "agentOrderId"),
             @Result(column = "modified_price", property = "modifiedPrice"),
-            @Result(column = "refund", property = "refund")
+            @Result(column = "refund", property = "refund"),
+            @Result(column = "from_vendor", property = "fromVendor"),
     })
     List<Order> findAllByTicketDate(@Param("ticketDate") Date ticketDate,
                                      RowBounds rowBounds);
@@ -437,7 +447,8 @@ public interface OrderMapper {
             @Result(column = "agent_name", property = "agentName"),
             @Result(column = "agent_order_id", property = "agentOrderId"),
             @Result(column = "modified_price", property = "modifiedPrice"),
-            @Result(column = "refund", property = "refund")
+            @Result(column = "refund", property = "refund"),
+            @Result(column = "from_vendor", property = "fromVendor"),
     })
     List<Order> findAllByCreateTime(@Param("createTime") Date createTime,
                                     RowBounds rowBounds);
@@ -466,7 +477,8 @@ public interface OrderMapper {
             @Result(column = "vendor_phone", property = "vendorPhone"),
             @Result(column = "agent_order_id", property = "agentOrderId"),
             @Result(column = "modified_price", property = "modifiedPrice"),
-            @Result(column = "refund", property = "refund")
+            @Result(column = "refund", property = "refund"),
+            @Result(column = "from_vendor", property = "fromVendor"),
 
     })
     List<Order> findByAgentIdAndStatus(@Param("agentId") int agentId, @Param("status") int status, RowBounds rowBounds);
@@ -474,11 +486,11 @@ public interface OrderMapper {
     @Insert("insert into `order` (sku_id, uuid, agent_id, remark, status, price, gathering_info, " +
             "primary_contact, primary_contact_email, primary_contact_phone, primary_contact_wechat, " +
             "secondary_contact, secondary_contact_email, secondary_contact_phone, " +
-            "secondary_contact_wechat, reference_number, vendor_phone, agent_order_id, modified_price, refund) " +
+            "secondary_contact_wechat, reference_number, vendor_phone, agent_order_id, modified_price, refund, from_vendor) " +
             "values(#{skuId}, #{uuid}, #{agentId}, #{remark}, #{status}, #{price}, #{gatheringInfo}, " +
             "#{primaryContact}, #{primaryContactEmail}, #{primaryContactPhone}, #{primaryContactWechat}, " +
             "#{secondaryContact}, #{secondaryContactEmail}, #{secondaryContactPhone}, " +
-            "#{secondaryContactWechat}, #{referenceNumber}, #{vendorPhone}, #{agentOrderId}, #{price},0)")
+            "#{secondaryContactWechat}, #{referenceNumber}, #{vendorPhone}, #{agentOrderId}, #{price}, 0, #{fromVendor})")
     @Options(useGeneratedKeys = true, keyColumn = "id", keyProperty = "id", flushCache = Options.FlushCachePolicy.DEFAULT)
     int create(Order order);
 
@@ -540,7 +552,8 @@ public interface OrderMapper {
             @Result(column = "vendor_phone", property = "vendorPhone"),
             @Result(column = "agent_order_id", property = "agentOrderId"),
             @Result(column = "modified_price", property = "modifiedPrice"),
-            @Result(column = "refund", property = "refund")
+            @Result(column = "refund", property = "refund"),
+            @Result(column = "from_vendor", property = "fromVendor"),
     })
     List<Order> findByAgentOrderId(@Param("agentOrderId") String agentOrderId);
 
@@ -580,7 +593,8 @@ public interface OrderMapper {
             @Result(column = "agent_name", property = "agentName"),
             @Result(column = "agent_order_id", property = "agentOrderId"),
             @Result(column = "modified_price", property = "modifiedPrice"),
-            @Result(column = "refund", property = "refund")
+            @Result(column = "refund", property = "refund"),
+            @Result(column = "from_vendor", property = "fromVendor"),
     })
     List<Order> findAllUrgentOrders();
 }

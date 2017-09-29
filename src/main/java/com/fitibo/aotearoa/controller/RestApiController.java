@@ -339,6 +339,7 @@ public class RestApiController extends AuthenticationRequiredController {
                 throw new AuthenticationFailureException("sku:" + sku.getId() + " does not belong to vendor:" + getToken().getId());
             }
             order.setStatus(OrderStatus.CONFIRMED.getValue());
+            order.setFromVendor(true);
         } else {
             order.setAgentId(orderVo.getAgentId());
         }
@@ -377,6 +378,10 @@ public class RestApiController extends AuthenticationRequiredController {
         orderVo.setVendorPhone(vendor.getPhone());
         orderVo.setUuid(orderUuid);
         orderVo.setPrice(order.getPrice());
+        if (getToken().getRole() == Role.Vendor) {
+            logger.info("create order by vendor: " + getToken().getId());
+            operationService.sendConfirmationEmail(order);
+        }
         return orderVo;
     }
 

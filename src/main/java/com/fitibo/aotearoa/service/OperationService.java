@@ -173,16 +173,26 @@ public class OperationService {
     }
 
     public boolean sendConfirmationEmail(Order order) {
-        int agentId = order.getAgentId();
-        if (agentId <= 0) {
-            logger.info("agent id is 0");
-            return false;
-        }
-        Agent agent = agentMapper.findById(agentId);
-        String to = agent.getEmail();
         Sku sku = skuService.findById(order.getSkuId());
         Preconditions.checkNotNull(sku, "invalid sku id:" + order.getSkuId());
-        String content = formatConfirmationEmailContent(confirmationEmailTemplate, order, sku, agent);
+        String to = null;
+        String content = null;
+        if (order.isFromVendor()) {
+            Vendor vendor = vendorService.findById(sku.getVendorId());
+            Preconditions.checkNotNull(vendor, "order info not correct, id:" + order.getId());
+            to = vendor.getEmail();
+            content = formatConfirmationEmailContent(confirmationEmailTemplate, order, sku, order.getPrimaryContact());
+        } else {
+            int agentId = order.getAgentId();
+            if (agentId <= 0) {
+                logger.info("agent id is 0");
+                return false;
+            }
+            Agent agent = agentMapper.findById(agentId);
+            to = agent.getEmail();
+            content = formatConfirmationEmailContent(confirmationEmailTemplate, order, sku, agent.getName());
+        }
+
         Workbook voucher = archiveService.createVoucher(order);
         String agentOrderId = order.getAgentOrderId();
         String subject = StringUtils.isNotEmpty(agentOrderId) ? confirmationEmailSubject + "(" + agentOrderId + ")" : confirmationEmailSubject;
@@ -255,9 +265,9 @@ public class OperationService {
     }
 
     private String formatConfirmationEmailContent(String template, Order order, Sku sku,
-                                                  Agent agent) {
+                                                  String name) {
         String content = template;
-        content = content.replace("#AGENT_NAME#", agent.getName());
+        content = content.replace("#AGENT_NAME#", name);
         content = content.replace("#ORDER_ID#", order.getUuid());
         content = content.replace("#TOUR_NAME#", sku.getName());
         content = content.replace("#GUEST_NAME#", order.getPrimaryContact());

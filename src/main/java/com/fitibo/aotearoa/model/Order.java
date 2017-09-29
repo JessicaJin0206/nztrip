@@ -35,4 +35,5 @@ public class Order extends ModelObject {
     private String agentOrderId;
     private BigDecimal modifiedPrice;
     private BigDecimal refund;
+    private boolean fromVendor;
 }
