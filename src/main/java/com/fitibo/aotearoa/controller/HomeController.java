@@ -299,6 +299,11 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("module", MODULE_CREATE_ORDER);
         model.put("role", getToken().getRole().toString());
         model.put("userName", getUserName(getToken()));
+
+        OrderVo orderVo = new OrderVo();
+        orderVo.setOrderTickets(Lists.newArrayList());
+        model.put("order", orderVo);
+
         return "create_vendor_order";
     }
 
