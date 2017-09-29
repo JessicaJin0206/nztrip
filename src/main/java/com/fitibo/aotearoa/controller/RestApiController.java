@@ -569,7 +569,7 @@ public class RestApiController extends AuthenticationRequiredController {
         }
         if (getToken().getRole() == Role.Vendor) {
             int vendorId = getToken().getId();
-            Preconditions.checkArgument(skuMapper.findById(order.getSkuId()).getVendorId() == vendorId,
+            Preconditions.checkArgument(skuMapper.findById(order.getSkuId()).getVendorId() == vendorId && order.isFromVendor(),
                     "order id:" + id + " does not belong to vendor id:" + vendorId);
         }
         int fromStatus = order.getStatus();

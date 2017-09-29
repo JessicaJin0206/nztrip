@@ -36,7 +36,7 @@
         </#if>
     </div>
 </div>
-<#elseif role?? && role == "Vendor" && (order.status == 40)>
+<#elseif role?? && role == "Vendor" && (order.status == 40) && (order.fromVendor == true)>
 <div class="form-group">
     <div class="row">
         <label class="col-md-2">修改订单:</label>

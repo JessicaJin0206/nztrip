@@ -16,7 +16,7 @@ public interface OrderMapper {
             "update_time, price, gathering_info, primary_contact, primary_contact_email, " +
             "primary_contact_phone, primary_contact_wechat, secondary_contact, " +
             "secondary_contact_email, secondary_contact_phone, secondary_contact_wechat," +
-            "reference_number, vendor_phone, agent_order_id, modified_price, refund" +
+            "reference_number, vendor_phone, agent_order_id, modified_price, refund, from_vendor" +
             " from `order` o left join `sku` s on o.sku_id = s.id where o.id = #{id}")
     @Results({
             @Result(column = "id", property = "id"),
@@ -49,7 +49,7 @@ public interface OrderMapper {
     @Select("select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
-            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund " +
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund, o.from_vendor " +
             "from `order` o left join `sku` s on o.sku_id = s.id " +
             "where agent_id = #{agentId} order by o.id desc")
     @Results({
@@ -85,7 +85,7 @@ public interface OrderMapper {
             "select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
-            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund " +
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund, o.from_vendor " +
             "from `order` o left join `sku` s on o.sku_id = s.id " +
             "where false " +
             "<if test ='ids != null and ids.size() > 0'>" +
@@ -129,7 +129,7 @@ public interface OrderMapper {
             "select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
-            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund  " +
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund, o.from_vendor  " +
             "from `order` o left join `sku` s on o.sku_id = s.id " +
             "where agent_id = #{agentId} " +
             "<if test =\"keyword != null and keyword != ''\"> and (s.name like CONCAT('%',#{keyword},'%') or o.primary_contact like CONCAT(#{keyword}, '%') ) </if> " +
@@ -176,7 +176,7 @@ public interface OrderMapper {
             "select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
-            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund  " +
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund, o.from_vendor " +
             "from `order` o left join `sku` s on o.sku_id = s.id " +
             "where agent_id = #{agentId} and o.id in (SELECT order_id FROM `order_ticket` GROUP BY order_id,ticket_date HAVING datediff(ticket_date,#{ticketDate}) = 0) " +
             " order by o.id desc" +
@@ -215,7 +215,7 @@ public interface OrderMapper {
             "select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
-            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund  " +
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund, o.from_vendor " +
             "from `order` o left join `sku` s on o.sku_id = s.id " +
             "where agent_id = #{agentId} and datediff(o.create_time,#{createTime}) = 0 " +
             " order by o.id desc" +
@@ -255,7 +255,7 @@ public interface OrderMapper {
             "select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
-            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund  " +
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund, o.from_vendor " +
             "from `order` o left join `sku` s on o.sku_id = s.id " +
             "where s.vendor_id = #{vendorId} " +
             " order by o.id desc" +
@@ -294,7 +294,7 @@ public interface OrderMapper {
     @Select("select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
-            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund " +
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund, o.from_vendor " +
             "from `order` o left join `sku` s on o.sku_id = s.id order by o.id desc")
     @Results({
             @Result(column = "id", property = "id"),
@@ -330,7 +330,7 @@ public interface OrderMapper {
             "select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
-            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, agent.name as agent_name, o.agent_order_id, o.modified_price, o.refund " +
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, agent.name as agent_name, o.agent_order_id, o.modified_price, o.refund, o.from_vendor " +
             "from `order` o left join `sku` s on o.sku_id = s.id left join agent on o.agent_id = agent.id " +
             "where 1 = 1 " +
             "<if test =\"keyword != null and keyword != ''\"> and (s.name like CONCAT('%',#{keyword},'%') or o.primary_contact like CONCAT(#{keyword}, '%') or agent.name like CONCAT(#{keyword}, '%')) </if> " +
@@ -377,7 +377,7 @@ public interface OrderMapper {
             "select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
-            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, agent.name as agent_name, o.agent_order_id, o.modified_price, o.refund " +
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, agent.name as agent_name, o.agent_order_id, o.modified_price, o.refund, o.from_vendor " +
             "from `order` o left join `sku` s on o.sku_id = s.id left join agent on o.agent_id = agent.id " +
             "where o.id in (SELECT order_id FROM `order_ticket` GROUP BY order_id,ticket_date HAVING datediff(ticket_date,#{ticketDate}) = 0) " +
             " order by o.id desc" +
@@ -417,7 +417,7 @@ public interface OrderMapper {
             "select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
-            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, agent.name as agent_name, o.agent_order_id, o.modified_price, o.refund " +
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, agent.name as agent_name, o.agent_order_id, o.modified_price, o.refund, o.from_vendor " +
             "from `order` o left join `sku` s on o.sku_id = s.id left join agent on o.agent_id = agent.id " +
             "where datediff(o.create_time,#{createTime}) = 0 " +
             " order by o.id desc" +
@@ -560,7 +560,7 @@ public interface OrderMapper {
     @Select({"select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time,",
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone,",
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone,",
-            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, agent.name as agent_name, o.agent_order_id, o.modified_price, o.refund  ",
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, agent.name as agent_name, o.agent_order_id, o.modified_price, o.refund, o.from_vendor ",
             "from `order` o left join `sku` s on o.sku_id = s.id left join agent on o.agent_id = agent.id ",
             "WHERE( o.id in (SELECT `order_id` FROM `order_record` GROUP BY `order_id`",
             "HAVING TIMESTAMPDIFF(HOUR,MAX(operate_time),NOW())>=48) ",
