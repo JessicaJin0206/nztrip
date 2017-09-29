@@ -1,3 +1,6 @@
+<#if role == "Admin">
+<div class="form-group"><label>正在帮</label><span> ${order.agentName!''} </span><label>下单</label></div>
+</#if>
 <div class="form-group"><label>订单详情</label></div>
 <div class="form-group"><label>名称:</label><span>   ${sku.name!''}</span></div>
 <div class="form-group"><label>行程商电话:</label><span>   ${vendor.phone!''}</span></div>
@@ -7,12 +10,13 @@
     <table class="table">
         <thead>
         <tr>
-            <th><input type="text" id="j_primary_contact" class="form-control" placeholder="姓名" value="<#if agent??>${(agent.defaultContact)!""}</#if>"/>
+            <th><input type="text" id="j_primary_contact" class="form-control" placeholder="姓名"
+                       value="${(order.primaryContact)!""}"/>
             </th>
             <th><input type="text" id="j_primary_contact_email" class="form-control"
-                       placeholder="Email" value="<#if agent??>${(agent.defaultContactEmail)!""}</#if>"/></th>
+                       placeholder="Email" value="${(order.primaryContactEmail)!""}"/></th>
             <th><input type="text" id="j_primary_contact_phone" class="form-control"
-                       placeholder="联系电话" value="<#if agent??>${(agent.defaultContactPhone)!""}</#if>"/></th>
+                       placeholder="联系电话" value="${(order.primaryContactPhone)!""}"/></th>
             <th><input type="text" id="j_primary_contact_wechat" class="form-control"
                        placeholder="微信"/></th>
         </tr>
@@ -38,10 +42,10 @@
 
 </div>
 <div class="form-group"><input type="text" id="j_agent_order_id" class="form-control"
-                               placeholder="代理商订单号">
+                               placeholder="代理商订单号" value="${(order.agentOrderId)!""}">
 </div>
 <div class="form-group"><input type="text" id="j_remark" class="form-control"
-                               placeholder="备注">
+                               placeholder="备注" value="${(order.remark)!""}">
 </div>
 
 <div class="form-group"><label>票种信息</label></div>
@@ -66,7 +70,7 @@
 </div>
 
 <div class="form-group">
-    <label>描述:  </label><span id="j_ticket_desc"></span>
+    <label>描述: </label><span id="j_ticket_desc"></span>
 </div>
 
 <div class="form-group">
@@ -106,12 +110,70 @@
         <input type="text" class="form-control j_place" value="">
     </div>
 </#if>
-    <div class="form-group"><label>游客信息</label><a id="add_ticket"><span
-            class="glyphicon glyphicon-plus-sign" aria-hidden="true"/></a></div>
+    <div class="form-group"><label>游客信息</label><a id="add_ticket">
+        <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span></a></div>
 
 
 </div>
 
+<#list order.orderTickets as ticket>
+<div class="form-group j_ticket_container" value="${ticket.id?c}" ticketId="${ticket.skuTicketId?c}"
+     priceId="${ticket.ticketPriceId?c}">
+    <a id="j_ticket_delete"><span class="glyphicon glyphicon-remove pull-right"
+                                  aria-hidden="true"></span></a>
+    <div class="form-group"><label>票种:</label><span
+            id="j_ticket_name_span">${ticket.skuTicket!''}</span></div>
+    <div class="form-group"><label>日期:</label><span
+            id="j_ticket_date_span">${ticket.ticketDate!''}</span></div>
+    <div class="form-group"><label>时间:</label><span
+            id="j_ticket_time_span">${ticket.ticketTime!''}</span></div>
+    <div class="form-group"><label>核算价格:</label><span
+            id="j_ticket_price_span">${ticket.price?string('0.00')}</span>
+    </div>
+    <div class="form-group"><label>官网价格:</label><span
+            id="j_ticket_sale_price_span">${ticket.salePrice?string('0.00')}</span>
+    </div>
+    <div class="form-group">
+        <label for="j_gathering_time_span">集合时间:</label>
+        <input id="j_gathering_time_span" class="form-control"
+               value="${ticket.gatheringTime!''}">
+    </div>
+    <div class="form-group">
+        <label for="j_gathering_place_span">集合地点:</label>
+        <input id="j_gathering_place_span" class="form-control"
+               value="${ticket.gatheringPlace!''}"/>
+    </div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>姓名</th>
+            <th>年龄</th>
+            <th>体重</th>
+        </tr>
+        </thead>
+        <tbody id="j_ticket_container">
+            <#list ticket.orderTicketUsers as user>
+            <tr value="${user.id?c}">
+                <td><input class="form-control" id="j_user_name"
+                           value="${user.name}"/></td>
+                <td>
+                    <#if (user.age >= 0) >
+                        <input class="form-control" id="j_user_age"
+                               value="${user.age}"/>
+                    </#if>
+                </td>
+                <td>
+                    <#if (user.weight >= 0) >
+                        <input class="form-control" id="j_user_weight"
+                               value="${user.weight}"/>
+                    </#if>
+                </td>
+            </tr>
+            </#list>
+        </tbody>
+    </table>
+</div>
+</#list>
 <div class="form-group">
     <button id="j_submit" class="btn btn-primary">提交</button>
 </div>

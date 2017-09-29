@@ -262,9 +262,16 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("module", MODULE_CREATE_ORDER);
         model.put("role", getToken().getRole().toString());
         model.put("userName", getUserName(getToken()));
+        OrderVo orderVo = new OrderVo();
         if (getToken().getRole() == Role.Agent) {
-            model.put("agent", parse(agentMapper.findById(getToken().getId())));
+            AgentVo agent = parse(agentMapper.findById(getToken().getId()));
+            model.put("agent", agent);
+            orderVo.setPrimaryContactEmail(agent.getDefaultContactEmail());
+            orderVo.setPrimaryContactPhone(agent.getDefaultContactPhone());
+            orderVo.setPrimaryContact(agent.getDefaultContact());
         }
+        orderVo.setOrderTickets(Lists.newArrayList());
+        model.put("order", orderVo);
         return "create_order";
     }
 
@@ -1009,6 +1016,6 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("sku", skuVo);
         model.put("availableDateMap", availableDateMap);
         model.put("vendor", vendor);
-        return "create_scan_order";
+        return "create_order";
     }
 }

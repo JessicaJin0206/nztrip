@@ -4,12 +4,12 @@ var create_alert = function (message) {
         alert.remove();
     }
     return $('<div class="alert ">' +
-             '<button type="button" class="close" data-dismiss="alert"' +
-             'aria-hidden="true">' +
-             '&times;' +
-             '</button>' +
-             '<span id="j_alert">' + message + '</span>' +
-             '</div>');
+        '<button type="button" class="close" data-dismiss="alert"' +
+        'aria-hidden="true">' +
+        '&times;' +
+        '</button>' +
+        '<span id="j_alert">' + message + '</span>' +
+        '</div>');
 };
 
 var warn = function (message) {
@@ -65,20 +65,20 @@ $('#j_ticket_type_selector li a').on('click', function (e) {
     timeSpan.attr('value', "0");
     ticketDescSpan.html(selected.attr('desc'));
     selector.datetimepicker({
-                                enabledDates: availableDate,
-                                format: "YYYY-MM-DD"
-                            }).on('dp.change', function (e) {
+        enabledDates: availableDate,
+        format: "YYYY-MM-DD"
+    }).on('dp.change', function (e) {
         var url = '/v1/api/skus/' + $('.main').attr('skuId') + '/tickets/'
-                  + ticket.attr('value') + '/prices?date=' + e.date.format('YYYY-MM-DD');
+            + ticket.attr('value') + '/prices?date=' + e.date.format('YYYY-MM-DD');
         timeSpan.html("Select time");
         timeSpan.attr('value', 0);
         timeSpan.attr('price', 0);
         timeSelector.empty();
         $.ajax({
-                   type: 'GET',
-                   contentType: "application/json; charset=utf-8",
-                   url: url
-               }).success(function (data) {
+            type: 'GET',
+            contentType: "application/json; charset=utf-8",
+            url: url
+        }).success(function (data) {
             if (data && data.length > 0) {
                 timeSelector.empty();
                 $.each(data, function (index, price) {
@@ -167,7 +167,7 @@ $('#add_ticket').on('click', function (e) {
 var submitBtn = $('#j_submit');
 submitBtn.on('click', function () {
     submitBtn.prop('disabled', true);
-    var skuId = parseInt(getQueryString("skuId"));
+    var skuId = parseInt($('.main').attr("skuId"));
     var skuUuid = getQueryString("uuid");
     var primaryContact = $('#j_primary_contact').val();
     var primaryContactEmail = $('#j_primary_contact_email').val();
@@ -179,6 +179,7 @@ submitBtn.on('click', function () {
     var secondaryContactWechat = $('#j_secondary_contact_wechat').val();
     var remark = $('#j_remark').val();
     var agentOrderId = $('#j_agent_order_id').val();
+    var agentId = parseInt($('.main').attr("agentId"));
     var orderTickets = [];
 
     if (primaryContact.length === 0) {
@@ -187,7 +188,7 @@ submitBtn.on('click', function () {
         return;
     }
     var reg = /^[a-zA-Z ]+$/;
-    if(!reg.test(primaryContact)){
+    if (!reg.test(primaryContact)) {
         warn("主要联系人必须为英文");
         submitBtn.prop('disabled', false);
         return;
@@ -240,10 +241,10 @@ submitBtn.on('click', function () {
                 weight = -1;
             }
             orderTicket.orderTicketUsers.push({
-                                                  name: name,
-                                                  age: age,
-                                                  weight: weight
-                                              })
+                name: name,
+                age: age,
+                weight: weight
+            })
         });
     });
     if (!isDataValid) {
@@ -263,14 +264,15 @@ submitBtn.on('click', function () {
         secondaryContactWechat: secondaryContactWechat,
         remark: remark,
         agentOrderId: agentOrderId,
+        agentId: agentId,
         orderTickets: orderTickets
     };
     $.ajax({
-               type: 'POST',
-               contentType: "application/json; charset=utf-8",
-               url: '/v1/api/orders/',
-               data: JSON.stringify(data)
-           }).success(function (data) {
+        type: 'POST',
+        contentType: "application/json; charset=utf-8",
+        url: '/v1/api/orders/',
+        data: JSON.stringify(data)
+    }).success(function (data) {
         success("添加成功");
         window.location.href = "/orders/" + data.id;
     }).complete(function (e) {

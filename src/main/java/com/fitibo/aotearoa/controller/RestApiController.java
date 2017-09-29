@@ -305,7 +305,7 @@ public class RestApiController extends AuthenticationRequiredController {
 
         final Vendor vendor = vendorService.findById(sku.getVendorId());
         Preconditions.checkNotNull(vendor, "invalid vendor id:" + sku.getVendorId());
-        final int discount = getDiscount(getToken(), sku.getId());
+        final int discount = orderVo.getAgentId() == 0 ? getDiscount(getToken(), sku.getId()) : discountRateService.getDiscountByAgent(orderVo.getAgentId(), skuId);
         Map<Integer, SkuTicketPrice> priceMap = getSkuTicketPriceMap(
                 Lists.transform(orderVo.getOrderTickets(), OrderTicketVo::getTicketPriceId));
         Map<Integer, SkuTicket> skuTicketMap = getSkuTicketMap(
@@ -339,6 +339,8 @@ public class RestApiController extends AuthenticationRequiredController {
                 throw new AuthenticationFailureException("sku:" + sku.getId() + " does not belong to vendor:" + getToken().getId());
             }
             order.setStatus(OrderStatus.CONFIRMED.getValue());
+        } else {
+            order.setAgentId(orderVo.getAgentId());
         }
 
         checkSkuInventory(sku.getId(), orderVo.getOrderTickets());
@@ -1106,106 +1108,6 @@ public class RestApiController extends AuthenticationRequiredController {
         result.setDefaultContactEmail(agentVo.getDefaultContactEmail());
         result.setDefaultContactPhone(agentVo.getDefaultContactPhone());
         return result;
-    }
-
-    @RequestMapping(value = "/v1/api/scan_orders", method = RequestMethod.POST)
-    @Transactional(rollbackFor = Exception.class)
-    @Authentication({Role.Vendor, Role.Admin, Role.Agent})
-    public OrderVo createScanOrder(@RequestBody OrderVo orderVo) {
-        Preconditions.checkNotNull(getToken());
-        int skuId = orderVo.getSkuId();
-        String skuUuid = orderVo.getSkuUuid();
-        Sku sku;
-        if (skuId > 0) {
-            sku = skuService.findById(skuId);
-            Preconditions.checkNotNull(sku, "invalid sku id:" + skuId);
-        } else if (skuUuid != null) {
-            sku = skuService.findByUuid(skuUuid);
-            Preconditions.checkNotNull(sku, "invalid sku uuid:" + skuUuid);
-            orderVo.setSkuId(sku.getId());
-        } else {
-            throw new IllegalArgumentException("cannot find sku by sku id or uuid");
-        }
-
-        Preconditions.checkArgument(StringUtils.isAsciiPrintable(orderVo.getPrimaryContact()), "primary contact must use english");
-
-        Order order = parse(orderVo);
-
-        final Vendor vendor = vendorService.findById(sku.getVendorId());
-        Preconditions.checkNotNull(vendor, "invalid vendor id:" + sku.getVendorId());
-        final int discount = discountRateService.getDiscountByAgent(orderVo.getAgentId(), skuId);
-        Map<Integer, SkuTicketPrice> priceMap = getSkuTicketPriceMap(
-                Lists.transform(orderVo.getOrderTickets(), OrderTicketVo::getTicketPriceId));
-        Map<Integer, SkuTicket> skuTicketMap = getSkuTicketMap(
-                Lists.transform(orderVo.getOrderTickets(), OrderTicketVo::getSkuTicketId));
-        BigDecimal total = orderVo.getOrderTickets().stream().
-                map((orderTicket) -> calculateTicketPrice(priceMap.get(orderTicket.getTicketPriceId()),
-                        discount)).
-                reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
-        order.setPrice(total);
-        order.setVendorPhone(vendor.getPhone());
-        String orderUuid = GuidGenerator.generate(14);
-        order.setUuid(orderUuid);
-        order.setStatus(OrderStatus.NEW.getValue());
-        String agentOrderId = order.getAgentOrderId();
-        if (StringUtils.isNotEmpty(agentOrderId)) {
-            List<Order> orders = orderMapper.findByAgentOrderId(agentOrderId);
-            for (Order order1 : orders) {
-                if (order1.getSkuId() == sku.getId()) {
-                    throw new InvalidParamException("duplicated agent order:" + agentOrderId);
-                }
-            }
-        }
-        if (sku.isAutoGenerateReferenceNumber()) {
-            order.setReferenceNumber(order.getUuid());
-        }
-        if (getToken().getRole() == Role.Agent) {
-            checkViewSkuPriviledge(sku, getToken().getId());
-            order.setAgentId(getToken().getId());
-        } else if (getToken().getRole() == Role.Vendor) {
-            if (sku.getVendorId() != getToken().getId()) {
-                throw new AuthenticationFailureException("sku:" + sku.getId() + " does not belong to vendor:" + getToken().getId());
-            }
-            order.setStatus(OrderStatus.CONFIRMED.getValue());
-        } else {
-            order.setAgentId(orderVo.getAgentId());
-        }
-
-        checkSkuInventory(sku.getId(), orderVo.getOrderTickets());
-
-        orderMapper.create(order);
-        //订单日志
-        orderRecordService.createOrder(getToken(), order);
-
-        orderVo.setId(order.getId());
-        if (CollectionUtils.isEmpty(orderVo.getOrderTickets())) {
-            throw new InvalidParamException("order tickets cannot be empty");
-        }
-
-        for (OrderTicketVo orderTicketVo : orderVo.getOrderTickets()) {
-            if (CollectionUtils.isEmpty(orderTicketVo.getOrderTicketUsers())) {
-                throw new InvalidParamException("order ticket user cannot be empty");
-            }
-            OrderTicket orderTicket = parse(orderTicketVo, orderVo, priceMap, skuTicketMap, discount);
-            validateTicketUser(orderTicket, orderTicketVo.getOrderTicketUsers());
-            orderTicketMapper.create(orderTicket);
-            orderTicketVo.setId(orderTicket.getId());
-            for (OrderTicketUserVo orderTicketUserVo : orderTicketVo.getOrderTicketUsers()) {
-                OrderTicketUser orderTicketUser = new OrderTicketUser();
-                orderTicketUser.setOrderTicketId(orderTicketVo.getId());
-                orderTicketUser.setName(orderTicketUserVo.getName());
-                orderTicketUser.setAge(orderTicketUserVo.getAge());
-                orderTicketUser.setWeight(orderTicketUserVo.getWeight());
-                orderTicketUserMapper.create(orderTicketUser);
-                orderTicketUserVo.setId(orderTicketUser.getId());
-            }
-        }
-
-        orderVo.setStatus(order.getStatus());
-        orderVo.setVendorPhone(vendor.getPhone());
-        orderVo.setUuid(orderUuid);
-        orderVo.setPrice(order.getPrice());
-        return orderVo;
     }
 
 }
