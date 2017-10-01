@@ -149,8 +149,8 @@
     <div class="row">
         <label class="col-md-2">Remark:</label>
         <div class="col-md-offset-2">
-            <input type="text" id="j_remark" class="form-control" <#if editing=false>disabled</#if>
-                   value="${order.remark!''}">
+            <textarea id="j_remark" rows="3" class="form-control" <#if editing=false>disabled</#if>
+                      value="">${order.remark!''}</textarea>
         </div>
     </div>
 </div>
