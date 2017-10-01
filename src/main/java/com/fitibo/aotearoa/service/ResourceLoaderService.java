@@ -8,6 +8,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,13 @@ public class ResourceLoaderService {
 
     Multimap<Integer, Pair<String, Resource>> confirmationAttachments;
 
-    Multimap<Integer, Pair<String, Resource>> voucherTemplates;
+    Multimap<Integer, Pair<String, Resource>> agentVoucherTemplates;
+
+    Multimap<Integer, Pair<String, Resource>> vendorVoucherTemplates;
+
+
+    @Value(value = "classpath:voucher_template.xlsx")
+    private Resource defaultVoucherTemplate;
 
     @Autowired
     ResourcePatternResolver resourcePatternResolver;
@@ -31,9 +38,10 @@ public class ResourceLoaderService {
     @PostConstruct
     public void init() {
         confirmationAttachments = loadFiles("classpath:confirmation_attachments/*");
-        voucherTemplates = loadFiles("classpath:voucher/*");
+        agentVoucherTemplates = loadFiles("classpath:agent_voucher/*");
+        vendorVoucherTemplates = loadFiles("classpath:vendor_voucher/*");
         logger.info("confirmation_attachments: " + confirmationAttachments);
-        logger.info("voucher templates: " + voucherTemplates);
+        logger.info("agent_voucher templates: " + agentVoucherTemplates);
     }
 
     private Multimap<Integer, Pair<String, Resource>> loadFiles(String path) {
@@ -59,11 +67,11 @@ public class ResourceLoaderService {
         return Lists.newArrayList(confirmationAttachments.get(vendorId));
     }
 
-    public Pair<String, Resource> getVoucher(int agentId) {
-        if (voucherTemplates.containsKey(agentId)) {
-            return voucherTemplates.get(agentId).stream().findFirst().orElseThrow(() -> new RuntimeException("this should not happen"));
-        } else {
-            return voucherTemplates.get(0).stream().findFirst().orElseThrow(() -> new RuntimeException("this should not happen"));
-        }
+    public Pair<String, Resource> getVoucherByVendorIdOrDefault(int vendorId) {
+        return vendorVoucherTemplates.get(vendorId).stream().findFirst().orElse(Pair.of("voucher_template.xlsx", defaultVoucherTemplate));
+    }
+
+    public Pair<String, Resource> getVoucherByAgentIdOrDefault(int agentId) {
+        return agentVoucherTemplates.get(agentId).stream().findFirst().orElse(Pair.of("voucher_template.xlsx", defaultVoucherTemplate));
     }
 }

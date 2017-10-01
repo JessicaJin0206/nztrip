@@ -63,7 +63,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
@@ -147,7 +146,7 @@ public class ArchiveServiceImpl implements ArchiveService {
         SkuTicket skuTicket = skuTicketMapper.findById(firstOrderTicket.getSkuTicketId());
         Preconditions.checkNotNull(skuTicket, "invalid sku ticket id:" + firstOrderTicket.getSkuTicketId());
 
-        try (InputStream is = getVoucherTemplate(order).getInputStream()) {
+        try (InputStream is = getVoucherTemplate(sku, order).getInputStream()) {
             Workbook workbook = WorkbookFactory.create(is);
             Sheet sheet = workbook.getSheetAt(0);
             fillRowWithVoucher(sheet, order, firstOrderTicket, orderTickets, vendor, sku);
@@ -161,9 +160,12 @@ public class ArchiveServiceImpl implements ArchiveService {
         }
     }
 
-    private Resource getVoucherTemplate(Order order) {
-        int agentId = order.getAgentId();
-        return resourceLoaderService.getVoucher(agentId).getRight();
+    private Resource getVoucherTemplate(Sku sku, Order order) {
+        if (order.isFromVendor()) {
+            return resourceLoaderService.getVoucherByVendorIdOrDefault(sku.getVendorId()).getRight();
+        } else {
+            return resourceLoaderService.getVoucherByAgentIdOrDefault(order.getAgentId()).getRight();
+        }
     }
 
     private void fillRowWithVoucher(Sheet sheet, Order order, OrderTicket firstOrderTicket, List<OrderTicket> orderTickets, Vendor vendor, Sku sku) {

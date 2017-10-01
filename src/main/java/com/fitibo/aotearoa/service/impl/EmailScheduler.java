@@ -117,7 +117,7 @@ public class EmailScheduler {
             List<Email> subList = allFailedEmails.subList(0, Math.min(allFailedEmails.size(), 4));
             //at most 4 emails per minute
             for (Email email : subList) {
-                logger.info("resend email id:" + email.getId());
+                logger.info("send email id:" + email.getId() + " for the " + (email.getRetry() + 1) + " times");
                 List<Attachment> attachments = attachmentMapper.findByEmailId(email.getId());
                 new SendEmailTask(email, attachments).run();
             }
