@@ -321,11 +321,9 @@ public class RestApiController extends AuthenticationRequiredController {
         order.setStatus(OrderStatus.NEW.getValue());
         String agentOrderId = order.getAgentOrderId();
         if (StringUtils.isNotEmpty(agentOrderId)) {
-            List<Order> orders = orderMapper.findByAgentOrderId(agentOrderId);
-            for (Order order1 : orders) {
-                if (order1.getSkuId() == sku.getId()) {
-                    throw new InvalidParamException("duplicated agent order:" + agentOrderId);
-                }
+            List<Integer> ids = orderMapper.selectUnclosedIdsByAgentOrderIdAndSkuId(agentOrderId, sku.getId());
+            if (!ids.isEmpty()) {
+                throw new InvalidParamException("duplicated agent order:" + agentOrderId);
             }
         }
         if (sku.isAutoGenerateReferenceNumber()) {
@@ -521,6 +519,15 @@ public class RestApiController extends AuthenticationRequiredController {
             }
         }
         Order o = parse4Update(orderVo);
+        String agentOrderId = o.getAgentOrderId();
+        if (StringUtils.isNotEmpty(agentOrderId)) {
+            List<Integer> ids = orderMapper.selectUnclosedIdsByAgentOrderIdAndSkuId(agentOrderId, order.getSkuId());
+            if (ids.size() == 1 && ids.get(0) != order.getId()) {
+                throw new InvalidParamException("duplicated agent order:" + agentOrderId);
+            } else if (ids.size() > 1) {
+                throw new InvalidParamException("duplicated agent order:" + agentOrderId);
+            }
+        }
         BigDecimal total = orderVo.getOrderTickets().stream().
                 map((orderTicket) -> calculateTicketPrice(priceMap.get(orderTicket.getTicketPriceId()), discount)).
                 reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
@@ -533,15 +540,6 @@ public class RestApiController extends AuthenticationRequiredController {
         }
         if (token.getRole() == Role.Admin && o.getRefund().compareTo(order.getRefund()) != 0) {
             orderRecordService.modifyRefund(token, order, order.getRefund(), o.getRefund());
-        }
-        String agentOrderId = o.getAgentOrderId();
-        if (StringUtils.isNotEmpty(agentOrderId)) {
-            List<Order> orders = orderMapper.findByAgentOrderId(agentOrderId);
-            for (Order order1 : orders) {
-                if (order1.getSkuId() == order.getSkuId() && order1.getId() != order.getId()) {
-                    throw new InvalidParamException("duplicated agent order:" + agentOrderId);
-                }
-            }
         }
         //订单日志
         orderRecordService.updateOrder(getToken(), order, o);

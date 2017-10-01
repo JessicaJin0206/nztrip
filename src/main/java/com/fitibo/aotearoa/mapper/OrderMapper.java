@@ -1,7 +1,14 @@
 package com.fitibo.aotearoa.mapper;
 
 import com.fitibo.aotearoa.model.Order;
-import org.apache.ibatis.annotations.*;
+
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Options;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.apache.ibatis.session.RowBounds;
 
 import java.util.Date;
@@ -528,34 +535,9 @@ public interface OrderMapper {
     @Select("select count(*) from `order` where status = #{status} and agent_id = #{agentId}")
     int countByStatusAndAgentId(@Param("status") int status, @Param("agentId") int agentId);
 
-    @Select("select * from `order` where agent_order_id = #{agentOrderId}")
-    @Results({
-            @Result(column = "id", property = "id"),
-            @Result(column = "sku_id", property = "skuId"),
-            @Result(column = "uuid", property = "uuid"),
-            @Result(column = "agent_id", property = "agentId"),
-            @Result(column = "remark", property = "remark"),
-            @Result(column = "status", property = "status"),
-            @Result(column = "create_time", property = "createTime"),
-            @Result(column = "update_time", property = "updateTime"),
-            @Result(column = "price", property = "price"),
-            @Result(column = "gathering_info", property = "gatheringInfo"),
-            @Result(column = "primary_contact", property = "primaryContact"),
-            @Result(column = "primary_contact_email", property = "primaryContactEmail"),
-            @Result(column = "primary_contact_phone", property = "primaryContactPhone"),
-            @Result(column = "primary_contact_wechat", property = "primaryContactWechat"),
-            @Result(column = "secondary_contact", property = "secondaryContact"),
-            @Result(column = "secondary_contact_email", property = "secondaryContactEmail"),
-            @Result(column = "secondary_contact_phone", property = "secondaryContactPhone"),
-            @Result(column = "secondary_contact_wechat", property = "secondaryContactWechat"),
-            @Result(column = "reference_number", property = "referenceNumber"),
-            @Result(column = "vendor_phone", property = "vendorPhone"),
-            @Result(column = "agent_order_id", property = "agentOrderId"),
-            @Result(column = "modified_price", property = "modifiedPrice"),
-            @Result(column = "refund", property = "refund"),
-            @Result(column = "from_vendor", property = "fromVendor"),
-    })
-    List<Order> findByAgentOrderId(@Param("agentOrderId") String agentOrderId);
+    @Select("select id from `order` where agent_order_id = #{agentOrderId} and sku_id = #{skuId}")
+    List<Integer> selectUnclosedIdsByAgentOrderIdAndSkuId(@Param("agentOrderId") String agentOrderId,
+                                            @Param("skuId") int skuId);
 
     @Select({"select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time,",
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone,",
