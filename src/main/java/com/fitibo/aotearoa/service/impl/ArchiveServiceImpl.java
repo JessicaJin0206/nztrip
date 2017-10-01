@@ -229,6 +229,10 @@ public class ArchiveServiceImpl implements ArchiveService {
         Cell remark = sheet.getRow(14).getCell(4);
         remark.setCellType(Cell.CELL_TYPE_STRING);
         remark.setCellValue(order.getRemark());
+
+        Cell ticketInfo = sheet.getRow(15).getCell(4);
+        ticketInfo.setCellType(Cell.CELL_TYPE_STRING);
+        ticketInfo.setCellValue(sku.getTicketInfo());
     }
 
     private static BigDecimal calculateTicketPrice(SkuTicketPriceForExportKey ticketPrice, int discount) {
