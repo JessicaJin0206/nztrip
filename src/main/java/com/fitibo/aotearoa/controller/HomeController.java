@@ -382,14 +382,14 @@ public class HomeController extends AuthenticationRequiredController {
         for (OrderTicket orderTicket : ticketDates) {
             ticketDateMap.put(orderTicket.getOrderId(), orderTicket.getTicketDate());
         }
-        List<OrderVo> orderVos = Lists.transform(orders, input -> {
+        List<OrderVo> orderVos = orders.stream().map(input -> {
             OrderVo orderVo = ObjectParser.parse(input);
             Date date = ticketDateMap.get(input.getId());
             if (date != null) {
                 orderVo.setTicketDate(DateUtils.formatDate(date));
             }
             return orderVo;
-        });
+        }).sorted(Comparator.comparing(OrderVo::getTicketDate)).collect(Collectors.toList());
         model.put("orders", orderVos);
         return "urgent_orders";
     }
