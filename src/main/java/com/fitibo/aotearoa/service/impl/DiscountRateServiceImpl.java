@@ -73,11 +73,11 @@ public class DiscountRateServiceImpl implements DiscountRateService {
     }
 
     @Override
-    public int getDiscountByVendor(int id, int skuId) {
+    public int getDiscountByVendor(int vendorId, int skuId) {
         Sku sku = skuMapper.findById(skuId);
         Preconditions.checkNotNull(sku, "invalid skuId:" + skuId);
-        if (sku.getVendorId() != id) {
-            throw new IllegalArgumentException("sku id:" + skuId + " does not belong to vendor id:" + id);
+        if (sku.getVendorId() != vendorId) {
+            throw new IllegalArgumentException("sku id:" + skuId + " does not belong to vendor id:" + vendorId);
         }
         return 0;
     }

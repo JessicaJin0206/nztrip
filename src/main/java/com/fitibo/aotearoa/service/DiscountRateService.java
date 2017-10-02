@@ -11,5 +11,5 @@ public interface DiscountRateService {
 
     int getDiscountByOrder(int orderId);
 
-    int getDiscountByVendor(int id, int skuId);
+    int getDiscountByVendor(int vendorId, int skuId);
 }

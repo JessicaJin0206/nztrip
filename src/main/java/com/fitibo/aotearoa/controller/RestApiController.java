@@ -301,11 +301,11 @@ public class RestApiController extends AuthenticationRequiredController {
 
         Preconditions.checkArgument(StringUtils.isAsciiPrintable(orderVo.getPrimaryContact()), "primary contact must use english");
 
-        Order order = parse(orderVo);
 
-        final Vendor vendor = vendorService.findById(sku.getVendorId());
-        Preconditions.checkNotNull(vendor, "invalid vendor id:" + sku.getVendorId());
-        final int discount = orderVo.getAgentId() == 0 ? getDiscount(getToken(), sku.getId()) : discountRateService.getDiscountByAgent(orderVo.getAgentId(), skuId);
+
+        boolean isFromVendor = getToken().getRole() == Role.Vendor;
+        int orderAgentId = orderVo.getAgentId();
+        final int discount = orderAgentId == 0 ? getDiscount(getToken(), sku.getId()) : discountRateService.getDiscountByAgent(orderAgentId, skuId);
         Map<Integer, SkuTicketPrice> priceMap = getSkuTicketPriceMap(
                 Lists.transform(orderVo.getOrderTickets(), OrderTicketVo::getTicketPriceId));
         Map<Integer, SkuTicket> skuTicketMap = getSkuTicketMap(
@@ -314,12 +314,15 @@ public class RestApiController extends AuthenticationRequiredController {
                 map((orderTicket) -> calculateTicketPrice(priceMap.get(orderTicket.getTicketPriceId()),
                         discount)).
                 reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
+        Order order = parse(orderVo);
         order.setPrice(total);
-        order.setVendorPhone(vendor.getPhone());
         String orderUuid = GuidGenerator.generate(14);
         order.setUuid(orderUuid);
         order.setStatus(OrderStatus.NEW.getValue());
         String agentOrderId = order.getAgentOrderId();
+        final Vendor vendor = vendorService.findById(sku.getVendorId());
+        Preconditions.checkNotNull(vendor, "invalid vendor id:" + sku.getVendorId());
+        order.setVendorPhone(vendor.getPhone());
         if (StringUtils.isNotEmpty(agentOrderId)) {
             List<Integer> ids = orderMapper.findUnclosedIdsByAgentOrderIdAndSkuId(agentOrderId, sku.getId());
             if (!ids.isEmpty()) {
@@ -329,6 +332,7 @@ public class RestApiController extends AuthenticationRequiredController {
         if (sku.isAutoGenerateReferenceNumber()) {
             order.setReferenceNumber(order.getUuid());
         }
+
         if (getToken().getRole() == Role.Agent) {
             checkViewSkuPriviledge(sku, getToken().getId());
             order.setAgentId(getToken().getId());
@@ -337,10 +341,11 @@ public class RestApiController extends AuthenticationRequiredController {
                 throw new AuthenticationFailureException("sku:" + sku.getId() + " does not belong to vendor:" + getToken().getId());
             }
             order.setStatus(OrderStatus.CONFIRMED.getValue());
-            order.setFromVendor(true);
+        } else if (getToken().getRole() == Role.Agent) {
         } else {
-            order.setAgentId(orderVo.getAgentId());
+            throw new AuthenticationFailureException("invalid role:" + getToken().getRole());
         }
+        order.setFromVendor(isFromVendor);
 
         checkSkuInventory(sku.getId(), orderVo.getOrderTickets());
 
@@ -960,6 +965,7 @@ public class RestApiController extends AuthenticationRequiredController {
         result.setReferenceNumber(order.getReferenceNumber());
         result.setGatheringInfo(order.getGatheringInfo());
         result.setAgentOrderId(order.getAgentOrderId());
+        result.setAgentId(order.getAgentId());
         return result;
     }
 
