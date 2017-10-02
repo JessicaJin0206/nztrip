@@ -321,7 +321,7 @@ public class RestApiController extends AuthenticationRequiredController {
         order.setStatus(OrderStatus.NEW.getValue());
         String agentOrderId = order.getAgentOrderId();
         if (StringUtils.isNotEmpty(agentOrderId)) {
-            List<Integer> ids = orderMapper.selectUnclosedIdsByAgentOrderIdAndSkuId(agentOrderId, sku.getId());
+            List<Integer> ids = orderMapper.findUnclosedIdsByAgentOrderIdAndSkuId(agentOrderId, sku.getId());
             if (!ids.isEmpty()) {
                 throw new InvalidParamException("duplicated agent order:" + agentOrderId);
             }
@@ -521,7 +521,7 @@ public class RestApiController extends AuthenticationRequiredController {
         Order o = parse4Update(orderVo);
         String agentOrderId = o.getAgentOrderId();
         if (StringUtils.isNotEmpty(agentOrderId)) {
-            List<Integer> ids = orderMapper.selectUnclosedIdsByAgentOrderIdAndSkuId(agentOrderId, order.getSkuId());
+            List<Integer> ids = orderMapper.findUnclosedIdsByAgentOrderIdAndSkuId(agentOrderId, order.getSkuId());
             if (ids.size() == 1 && ids.get(0) != order.getId()) {
                 throw new InvalidParamException("duplicated agent order:" + agentOrderId);
             } else if (ids.size() > 1) {

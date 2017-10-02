@@ -138,7 +138,7 @@ public interface OrderMapper {
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
             "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund, o.from_vendor  " +
             "from `order` o left join `sku` s on o.sku_id = s.id " +
-            "where agent_id = #{agentId} " +
+            "where agent_id = #{agentId} and from_vendor = 0 " +
             "<if test =\"keyword != null and keyword != ''\"> and (s.name like CONCAT('%',#{keyword},'%') or o.primary_contact like CONCAT(#{keyword}, '%') ) </if> " +
             "<if test =\"uuid != null and uuid != ''\">and (o.uuid like CONCAT('%',#{uuid},'%') or o.agent_order_id like CONCAT('%',#{uuid},'%')) </if> " +
             "<if test =\"referenceNumber != null and referenceNumber != ''\">and o.reference_number like  CONCAT('%',#{referenceNumber},'%') </if> " +
@@ -185,7 +185,7 @@ public interface OrderMapper {
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
             "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund, o.from_vendor " +
             "from `order` o left join `sku` s on o.sku_id = s.id " +
-            "where agent_id = #{agentId} and o.id in (SELECT order_id FROM `order_ticket` GROUP BY order_id,ticket_date HAVING datediff(ticket_date,#{ticketDate}) = 0) " +
+            "where agent_id = #{agentId} and o.id in (SELECT order_id FROM `order_ticket` GROUP BY order_id,ticket_date HAVING datediff(ticket_date,#{ticketDate}) = 0) and from_vendor = 0 " +
             " order by o.id desc" +
             "</script>")
     @Results({
@@ -224,7 +224,7 @@ public interface OrderMapper {
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
             "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund, o.from_vendor " +
             "from `order` o left join `sku` s on o.sku_id = s.id " +
-            "where agent_id = #{agentId} and datediff(o.create_time,#{createTime}) = 0 " +
+            "where agent_id = #{agentId} and datediff(o.create_time,#{createTime}) = 0 and from_vendor = 0" +
             " order by o.id desc" +
             "</script>")
     @Results({
@@ -339,7 +339,7 @@ public interface OrderMapper {
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
             "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, agent.name as agent_name, o.agent_order_id, o.modified_price, o.refund, o.from_vendor " +
             "from `order` o left join `sku` s on o.sku_id = s.id left join agent on o.agent_id = agent.id " +
-            "where 1 = 1 " +
+            "where 1 = 1 and from_vendor = 0 " +
             "<if test =\"keyword != null and keyword != ''\"> and (s.name like CONCAT('%',#{keyword},'%') or o.primary_contact like CONCAT(#{keyword}, '%') or agent.name like CONCAT(#{keyword}, '%')) </if> " +
             "<if test =\"uuid != null and uuid != ''\">and (o.uuid like CONCAT('%',#{uuid},'%') or o.agent_order_id like CONCAT('%',#{uuid},'%')) </if> " +
             "<if test =\"referenceNumber != null and referenceNumber != ''\">and o.reference_number like  CONCAT('%',#{referenceNumber},'%') </if> " +
@@ -386,7 +386,7 @@ public interface OrderMapper {
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
             "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, agent.name as agent_name, o.agent_order_id, o.modified_price, o.refund, o.from_vendor " +
             "from `order` o left join `sku` s on o.sku_id = s.id left join agent on o.agent_id = agent.id " +
-            "where o.id in (SELECT order_id FROM `order_ticket` GROUP BY order_id,ticket_date HAVING datediff(ticket_date,#{ticketDate}) = 0) " +
+            "where o.id in (SELECT order_id FROM `order_ticket` GROUP BY order_id,ticket_date HAVING datediff(ticket_date,#{ticketDate}) = 0) and from_vendor = 0 " +
             " order by o.id desc" +
             "</script>")
     @Results({
@@ -426,7 +426,7 @@ public interface OrderMapper {
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
             "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, agent.name as agent_name, o.agent_order_id, o.modified_price, o.refund, o.from_vendor " +
             "from `order` o left join `sku` s on o.sku_id = s.id left join agent on o.agent_id = agent.id " +
-            "where datediff(o.create_time,#{createTime}) = 0 " +
+            "where datediff(o.create_time,#{createTime}) = 0 and from_vendor = 0 " +
             " order by o.id desc" +
             "</script>")
     @Results({
@@ -536,8 +536,8 @@ public interface OrderMapper {
     int countByStatusAndAgentId(@Param("status") int status, @Param("agentId") int agentId);
 
     @Select("select id from `order` where agent_order_id = #{agentOrderId} and sku_id = #{skuId}")
-    List<Integer> selectUnclosedIdsByAgentOrderIdAndSkuId(@Param("agentOrderId") String agentOrderId,
-                                            @Param("skuId") int skuId);
+    List<Integer> findUnclosedIdsByAgentOrderIdAndSkuId(@Param("agentOrderId") String agentOrderId,
+                                                        @Param("skuId") int skuId);
 
     @Select({"select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time,",
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone,",

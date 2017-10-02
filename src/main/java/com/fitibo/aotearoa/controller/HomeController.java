@@ -411,16 +411,6 @@ public class HomeController extends AuthenticationRequiredController {
         });
     }
 
-    private List<OrderVo> getOrders(int agentId, Date createTime, RowBounds rowBounds) {
-        List<Order> orders;
-        if (agentId > 0) {
-            orders = orderMapper.findByAgentIdAndCreateTime(agentId, createTime, rowBounds);
-        } else {
-            orders = orderMapper.findAllByCreateTime(createTime, rowBounds);
-        }
-        return parse(orders);
-    }
-
     private List<OrderVo> getOrders(int agentId, String uuid, String keyword, String referenceNumber,
                                     int status, Date createTime, Date ticketDate, RowBounds rowBounds) {
         List<Order> orders;
