@@ -346,6 +346,8 @@ public class RestApiController extends AuthenticationRequiredController {
             case Admin:
                 if (order.getAgentId() > 0) {//帮agent下单
                     break;
+                } else {
+                    throw new IllegalArgumentException("agent not specified");
                 }
             default:
                 throw new AuthenticationFailureException("invalid role:" + getToken().getRole());
