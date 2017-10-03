@@ -302,7 +302,6 @@ public class RestApiController extends AuthenticationRequiredController {
         Preconditions.checkArgument(StringUtils.isAsciiPrintable(orderVo.getPrimaryContact()), "primary contact must use english");
 
 
-
         boolean isFromVendor = getToken().getRole() == Role.Vendor;
         int orderAgentId = orderVo.getAgentId();
         final int discount = orderAgentId == 0 ? getDiscount(getToken(), sku.getId()) : discountRateService.getDiscountByAgent(orderAgentId, skuId);
@@ -333,17 +332,23 @@ public class RestApiController extends AuthenticationRequiredController {
             order.setReferenceNumber(order.getUuid());
         }
 
-        if (getToken().getRole() == Role.Agent) {
-            checkViewSkuPriviledge(sku, getToken().getId());
-            order.setAgentId(getToken().getId());
-        } else if (getToken().getRole() == Role.Vendor) {
-            if (sku.getVendorId() != getToken().getId()) {
-                throw new AuthenticationFailureException("sku:" + sku.getId() + " does not belong to vendor:" + getToken().getId());
-            }
-            order.setStatus(OrderStatus.CONFIRMED.getValue());
-        } else if (getToken().getRole() == Role.Agent) {
-        } else {
-            throw new AuthenticationFailureException("invalid role:" + getToken().getRole());
+        switch (getToken().getRole()) {
+            case Vendor:
+                if (sku.getVendorId() != getToken().getId()) {
+                    throw new AuthenticationFailureException("sku:" + sku.getId() + " does not belong to vendor:" + getToken().getId());
+                }
+                order.setStatus(OrderStatus.CONFIRMED.getValue());
+                break;
+            case Agent:
+                checkViewSkuPriviledge(sku, getToken().getId());
+                order.setAgentId(getToken().getId());
+                break;
+            case Admin:
+                if (order.getAgentId() > 0) {//帮agent下单
+                    break;
+                }
+            default:
+                throw new AuthenticationFailureException("invalid role:" + getToken().getRole());
         }
         order.setFromVendor(isFromVendor);
 
