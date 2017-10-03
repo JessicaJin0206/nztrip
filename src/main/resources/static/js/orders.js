@@ -30,11 +30,11 @@ ticketDateSelector.datetimepicker({
 }).on('dp.hide', doSearch);
 
 function doSearch() {
-    var keyword = $('#j_keyword').val();
-    var uuid = $('#j_uuid').val();
-    var referenceNumber = $('#j_reference_number').val();
-    var createTime = createTimeSelector.find('input').val();
-    var ticketDate = ticketDateSelector.find('input').val();
+    var keyword = $('#j_keyword').val().trim();
+    var uuid = $('#j_uuid').val().trim();
+    var referenceNumber = $('#j_reference_number').val().trim();
+    var createTime = createTimeSelector.find('input').val().trim();
+    var ticketDate = ticketDateSelector.find('input').val().trim();
     var status = parseInt(statusDropDown.attr("value"));
     var searchString = "";
     if (keyword.length > 0) {
