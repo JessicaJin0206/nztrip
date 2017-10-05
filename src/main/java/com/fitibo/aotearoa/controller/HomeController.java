@@ -462,6 +462,8 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("transitions", orderService.getAvailableTransitions(order.getStatus()));
         model.put("role", getToken().getRole().toString());
         model.put("userName", getUserName(getToken()));
+        Agent agent = agentMapper.findById(order.getAgentId());
+        model.put("agentName", Optional.ofNullable(agent).map(Agent::getName).orElse(""));
         model.put("lang", lang);
         return "order_detail";
     }
@@ -529,6 +531,8 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("role", getToken().getRole().toString());
         model.put("userName", getUserName(getToken()));
         model.put("role", role.toString());
+        Agent agent = agentMapper.findById(order.getAgentId());
+        model.put("agentName", Optional.ofNullable(agent).map(Agent::getName).orElse(""));
         return "order_detail";
     }
 

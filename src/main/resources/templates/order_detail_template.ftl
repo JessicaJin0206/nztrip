@@ -132,6 +132,16 @@
         </div>
     </div>
 </div>
+<#if role?? && role == "Admin">
+<div class="form-group">
+    <div class="row">
+        <label class="col-md-2">代理商:</label>
+        <div class="col-md-offset-2">
+            <span>${agentName}</span>
+        </div>
+    </div>
+</div>
+</#if>
 <div class="form-group">
     <div class="row">
         <label class="col-md-2">代理商订单号:</label>
