@@ -217,7 +217,8 @@ public interface OrderMapper {
     })
     List<Order> findByAgentIdAndTicketDate(@Param("agentId") int agentId,
                                            @Param("ticketDate") Date ticketDate,
-                                            RowBounds rowBounds);
+                                           RowBounds rowBounds);
+
     @Select("<script>" +
             "select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
@@ -255,8 +256,8 @@ public interface OrderMapper {
             @Result(column = "from_vendor", property = "fromVendor"),
     })
     List<Order> findByAgentIdAndCreateTime(@Param("agentId") int agentId,
-                                            @Param("createTime") Date createTime,
-                                            RowBounds rowBounds);
+                                           @Param("createTime") Date createTime,
+                                           RowBounds rowBounds);
 
     @Select("<script>" +
             "select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
@@ -418,7 +419,7 @@ public interface OrderMapper {
             @Result(column = "from_vendor", property = "fromVendor"),
     })
     List<Order> findAllByTicketDate(@Param("ticketDate") Date ticketDate,
-                                     RowBounds rowBounds);
+                                    RowBounds rowBounds);
 
     @Select("<script>" +
             "select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
@@ -579,4 +580,47 @@ public interface OrderMapper {
             @Result(column = "from_vendor", property = "fromVendor"),
     })
     List<Order> findAllUrgentOrders();
+
+    @Select({"select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
+            "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
+            "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, agent.name as agent_name, " +
+            "o.agent_order_id, o.modified_price, o.refund, o.from_vendor " +
+            "from `order` o left join `sku` s on o.sku_id = s.id left join agent on o.agent_id = agent.id " +
+            "WHERE( o.id in (SELECT `order_id` FROM `order_record` GROUP BY `order_id` " +
+            "HAVING TIMESTAMPDIFF(HOUR,MAX(operate_time),NOW())>=48) " +
+            "or o.id in(SELECT order_id FROM `order_ticket` " +
+            "GROUP BY order_id,ticket_date " +
+            "HAVING datediff(ticket_date,NOW())BETWEEN 0 AND 2) ) " +
+            "AND o.status in (10, 20, 30, 11, 21, 50) " +
+            "AND o.agent_id = #{agentId}"})
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "sku_id", property = "skuId"),
+            @Result(column = "uuid", property = "uuid"),
+            @Result(column = "agent_id", property = "agentId"),
+            @Result(column = "remark", property = "remark"),
+            @Result(column = "status", property = "status"),
+            @Result(column = "create_time", property = "createTime"),
+            @Result(column = "update_time", property = "updateTime"),
+            @Result(column = "price", property = "price"),
+            @Result(column = "gathering_info", property = "gatheringInfo"),
+            @Result(column = "primary_contact", property = "primaryContact"),
+            @Result(column = "primary_contact_email", property = "primaryContactEmail"),
+            @Result(column = "primary_contact_phone", property = "primaryContactPhone"),
+            @Result(column = "primary_contact_wechat", property = "primaryContactWechat"),
+            @Result(column = "secondary_contact", property = "secondaryContact"),
+            @Result(column = "secondary_contact_email", property = "secondaryContactEmail"),
+            @Result(column = "secondary_contact_phone", property = "secondaryContactPhone"),
+            @Result(column = "secondary_contact_wechat", property = "secondaryContactWechat"),
+            @Result(column = "reference_number", property = "referenceNumber"),
+            @Result(column = "name", property = "sku"),
+            @Result(column = "vendor_phone", property = "vendorPhone"),
+            @Result(column = "agent_name", property = "agentName"),
+            @Result(column = "agent_order_id", property = "agentOrderId"),
+            @Result(column = "modified_price", property = "modifiedPrice"),
+            @Result(column = "refund", property = "refund"),
+            @Result(column = "from_vendor", property = "fromVendor"),
+    })
+    List<Order> findAgentUrgentOrders(@Param("agentId") int agentId);
 }

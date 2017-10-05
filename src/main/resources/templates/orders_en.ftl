@@ -65,7 +65,7 @@
                 <div class="col-md-1">
                     <button id="j_export" class="btn btn-primary">Export</button>
                 </div>
-            <#if role?? && role == "Admin">
+            <#if role?? && (role == "Admin" || role == "Agent")>
                 <div class="col-md-1">
                     <button id="j_urgent_orders" class="btn btn-primary">Urgent Orders</button>
                 </div>

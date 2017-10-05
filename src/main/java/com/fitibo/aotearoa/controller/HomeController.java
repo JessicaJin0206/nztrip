@@ -66,6 +66,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Controller
 public class HomeController extends AuthenticationRequiredController {
@@ -207,7 +208,8 @@ public class HomeController extends AuthenticationRequiredController {
         Preconditions.checkNotNull(vendor, "invalid token:" + getToken().toString());
         List<Order> orders = orderMapper.findBySkuIds(vendorId, new RowBounds(pageNumber * pageSize, pageSize));
         model.put("statusList", OrderStatus.values());
-        model.put("orders", parse(orders));
+        List<OrderVo> result = parse(orders).collect(Collectors.toList());
+        model.put("orders", result);
         model.put("pageSize", pageSize);
         model.put("pageNumber", pageNumber);
         model.put("module", MODULE_VENDOR_ORDERS);
@@ -366,7 +368,7 @@ public class HomeController extends AuthenticationRequiredController {
      * 查看急单的功能
      */
     @RequestMapping("urgent_orders")
-    @Authentication(Role.Admin)
+    @Authentication({Role.Admin, Role.Agent})
     public String queryUrgentOrder(@CookieValue(value = "language", defaultValue = "en") String lang,
                                    Map<String, Object> model) {
         Preconditions.checkNotNull(getToken());
@@ -375,33 +377,34 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("role", getToken().getRole().toString());
         model.put("userName", getUserName(getToken()));
         model.put("lang", lang);
-        List<Order> orders = orderMapper.findAllUrgentOrders();
-        List<OrderTicket> ticketDates = orderTicketMapper
-                .findOrderTicketDate(Lists.transform(orders, Order::getId));
-        Map<Integer, Date> ticketDateMap = Maps.newHashMap();
-        for (OrderTicket orderTicket : ticketDates) {
-            ticketDateMap.put(orderTicket.getOrderId(), orderTicket.getTicketDate());
+        if (getToken().getRole() == Role.Admin) {
+            model.put("orders", findAdminUrgentOrders());
+        } else if (getToken().getRole() == Role.Agent) {
+            model.put("orders", findAgentUrgentOrders(getToken().getId()));
+        } else {
+            throw new RuntimeException("could not happen");
         }
-        List<OrderVo> orderVos = orders.stream().map(input -> {
-            OrderVo orderVo = ObjectParser.parse(input);
-            Date date = ticketDateMap.get(input.getId());
-            if (date != null) {
-                orderVo.setTicketDate(DateUtils.formatDate(date));
-            }
-            return orderVo;
-        }).sorted(Comparator.comparing(OrderVo::getTicketDate)).collect(Collectors.toList());
-        model.put("orders", orderVos);
         return "urgent_orders";
     }
 
-    private List<OrderVo> parse(List<Order> orders) {
+    private List<OrderVo> findAdminUrgentOrders() {
+        List<Order> orders = orderMapper.findAllUrgentOrders();
+        return parse(orders).sorted(Comparator.comparing(OrderVo::getTicketDate)).collect(Collectors.toList());
+    }
+
+    private List<OrderVo> findAgentUrgentOrders(int agentId) {
+        List<Order> orders = orderMapper.findAgentUrgentOrders(agentId);
+        return parse(orders).sorted(Comparator.comparing(OrderVo::getTicketDate)).collect(Collectors.toList());
+    }
+
+    private Stream<OrderVo> parse(List<Order> orders) {
         List<OrderTicket> ticketDates = orderTicketMapper
                 .findOrderTicketDate(Lists.transform(orders, Order::getId));
         Map<Integer, Date> ticketDateMap = Maps.newHashMap();
         for (OrderTicket orderTicket : ticketDates) {
             ticketDateMap.put(orderTicket.getOrderId(), orderTicket.getTicketDate());
         }
-        return Lists.transform(orders, input -> {
+        return orders.stream().map(input -> {
             OrderVo orderVo = ObjectParser.parse(input);
             Date date = ticketDateMap.get(input.getId());
             if (date != null) {
@@ -431,7 +434,7 @@ public class HomeController extends AuthenticationRequiredController {
                 orders = orderMapper.findAllByMultiFields(uuid, keyword, referenceNumber, status, rowBounds);
             }
         }
-        return parse(orders);
+        return parse(orders).collect(Collectors.toList());
     }
 
     @RequestMapping("orders/{id}")
