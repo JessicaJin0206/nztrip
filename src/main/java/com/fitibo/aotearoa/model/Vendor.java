@@ -37,8 +37,17 @@ public class Vendor extends ModelObject {
         this.password = password;
     }
 
+    public String getOrderContactPrefix() {
+        return orderContactPrefix;
+    }
+
+    public void setOrderContactPrefix(String orderContactPrefix) {
+        this.orderContactPrefix = orderContactPrefix;
+    }
+
     private String name;
     private String email;
     private String phone;
     private String password;
+    private String orderContactPrefix;
 }

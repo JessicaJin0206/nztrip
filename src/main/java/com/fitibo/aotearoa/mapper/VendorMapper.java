@@ -18,6 +18,7 @@ public interface VendorMapper {
             @Result(column = "email", property = "email"),
             @Result(column = "phone", property = "phone"),
             @Result(column = "password", property = "password"),
+            @Result(column = "order_contact_prefix", property = "orderContactPrefix"),
     })
     Vendor findById(int id);
 
@@ -27,7 +28,8 @@ public interface VendorMapper {
             @Result(column = "name", property = "name"),
             @Result(column = "email", property = "email"),
             @Result(column = "phone", property = "phone"),
-            @Result(column = "password", property = "password")
+            @Result(column = "password", property = "password"),
+            @Result(column = "order_contact_prefix", property = "orderContactPrefix"),
     })
     Vendor findByEmail(String email);
 
@@ -38,6 +40,7 @@ public interface VendorMapper {
             @Result(column = "email", property = "email"),
             @Result(column = "phone", property = "phone"),
             @Result(column = "password", property = "password"),
+            @Result(column = "order_contact_prefix", property = "orderContactPrefix"),
     })
     List<Vendor> findAll();
 
@@ -51,6 +54,7 @@ public interface VendorMapper {
             @Result(column = "email", property = "email"),
             @Result(column = "phone", property = "phone"),
             @Result(column = "password", property = "password"),
+            @Result(column = "order_contact_prefix", property = "orderContactPrefix"),
     })
     List<Vendor> findByKeyword(@Param(value = "keyword")String keyword);
 
@@ -72,6 +76,7 @@ public interface VendorMapper {
             @Result(column = "email", property = "email"),
             @Result(column = "phone", property = "phone"),
             @Result(column = "password", property = "password"),
+            @Result(column = "order_contact_prefix", property = "orderContactPrefix"),
     })
     List<Vendor> findByIds(List<Integer> ids);
 

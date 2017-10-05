@@ -270,7 +270,7 @@ public class HomeController extends AuthenticationRequiredController {
             orderVo.setPrimaryContactPhone(agent.getDefaultContactPhone());
             orderVo.setPrimaryContact(agent.getDefaultContact());
         }
-        orderVo.setOrderTickets(Lists.newArrayList());
+        orderVo.setOrderTickets(Collections.emptyList());
         model.put("order", orderVo);
         return "create_order";
     }
@@ -301,7 +301,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("userName", getUserName(getToken()));
 
         OrderVo orderVo = new OrderVo();
-        orderVo.setOrderTickets(Lists.newArrayList());
+        orderVo.setOrderTickets(Collections.emptyList());
         model.put("order", orderVo);
 
         return "create_vendor_order";
