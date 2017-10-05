@@ -359,6 +359,11 @@ public class ArchiveServiceImpl implements ArchiveService {
                 cell.setCellType(Cell.CELL_TYPE_STRING);
                 cell.setCellValue(skuTicket.getName());
             }
+            row = sheet.createRow(rowIndex + 3 + skuTickets.size());
+            cell = row.createCell(1);
+            cell.setCellType(Cell.CELL_TYPE_STRING);
+            cell.setCellValue("REMARK:");
+
 
             int idx = 0;
             for (Integer orderId : orderTicketsMap.keySet()) {
@@ -390,10 +395,14 @@ public class ArchiveServiceImpl implements ArchiveService {
                     cell.setCellValue(orderTicketsMap.get(orderId).stream().filter(orderTicket -> orderTicket.getSkuTicket().equalsIgnoreCase(skuTicket.getName())).count());
 
                 }
+                row = sheet.getRow(rowIndex + 3 + skuTickets.size());
+                cell = row.createCell(2 + idx);
+                cell.setCellType(Cell.CELL_TYPE_STRING);
+                cell.setCellValue(Optional.ofNullable(order.getRemark()).orElse(""));
                 idx++;
             }
 
-            rowIndex += skuTickets.size() + 4;
+            rowIndex += skuTickets.size() + 5;
 
 
         }
