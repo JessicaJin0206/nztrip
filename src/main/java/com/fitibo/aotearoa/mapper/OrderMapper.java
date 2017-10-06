@@ -550,7 +550,7 @@ public interface OrderMapper {
             "or o.id in(SELECT order_id FROM `order_ticket` ",
             "GROUP BY order_id,ticket_date ",
             "HAVING datediff(ticket_date,NOW())BETWEEN 0 AND 2) )",
-            "AND o.status in (10,20,30,50)"})
+            "AND o.status in (10, 20, 11, 21, 30, 50, 70)"})
     @Results({
             @Result(column = "id", property = "id"),
             @Result(column = "sku_id", property = "skuId"),
