@@ -505,7 +505,7 @@ public class HomeController extends AuthenticationRequiredController {
     }
 
     @RequestMapping("orders/{id}/_edit")
-    @Authentication
+    @Authentication({Role.Admin, Role.Vendor, Role.Agent})
     public String editOrder(@PathVariable("id") int id, Map<String, Object> model) {
         Token token = getToken();
         Role role = token.getRole();
@@ -513,12 +513,12 @@ public class HomeController extends AuthenticationRequiredController {
         if (order == null) {
             throw new ResourceNotFoundException();
         }
-        AuthenticationHelper.checkAgentAuthentication(order, token);
+        Sku sku = skuService.findById(order.getSkuId());
+        AuthenticationHelper.checkOrderAuthentication(order, sku, token);
         model.put("order", order);
         List<OrderTicketVo> orderTickets = Lists.transform(orderTicketMapper.findByOrderId(order.getId()), ObjectParser::parse);
         model.put("tickets", orderTickets);
         model.put("touristCount", calculateTouristCount(orderTickets));
-        Sku sku = skuService.findById(order.getSkuId());
         if (sku == null) {
             throw new ResourceNotFoundException("invalid sku id:" + order.getSkuId());
         }

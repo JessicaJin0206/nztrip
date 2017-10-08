@@ -477,14 +477,15 @@ public class RestApiController extends AuthenticationRequiredController {
 
     @RequestMapping(value = "/v1/api/orders/{id}", method = RequestMethod.PUT)
     @Transactional(rollbackFor = Exception.class)
-    @Authentication
+    @Authentication({Role.Admin, Role.Agent, Role.Vendor})
     public OrderVo updateOrder(@RequestBody OrderVo orderVo) {
         Token token = getToken();
         Order order = orderMapper.findById(orderVo.getId());
         if (order == null) {
             throw new ResourceNotFoundException("invalid order id:" + orderVo.getId());
         }
-        AuthenticationHelper.checkAgentAuthentication(order, token);
+        Sku sku = skuService.findById(order.getSkuId());
+        AuthenticationHelper.checkOrderAuthentication(order, sku, token);
         //update ticket
         if (CollectionUtils.isEmpty(orderVo.getOrderTickets())) {
             throw new InvalidParamException();
@@ -639,7 +640,7 @@ public class RestApiController extends AuthenticationRequiredController {
 
     @RequestMapping(value = "/v1/api/orders/tickets/{id}", method = RequestMethod.DELETE)
     @Transactional(rollbackFor = Exception.class)
-    @Authentication
+    @Authentication({Role.Vendor, Role.Admin, Role.Agent})
     public boolean deleteTicket(@PathVariable("id") int id, @RequestBody OrderTicketVo ticketVo) {
         Token token = getToken();
         int orderId = orderTicketMapper.findOrderId(id);
@@ -647,7 +648,8 @@ public class RestApiController extends AuthenticationRequiredController {
         if (order == null) {
             throw new ResourceNotFoundException("invalid order id:" + orderId);
         }
-        AuthenticationHelper.checkAgentAuthentication(order, token);
+        Sku sku = skuService.findById(order.getSkuId());
+        AuthenticationHelper.checkOrderAuthentication(order, sku, token);
         //订单日志
         orderRecordService.deleteTicket(order, token, id);
         //后续是否添加验证
@@ -666,8 +668,9 @@ public class RestApiController extends AuthenticationRequiredController {
         BigDecimal total = orderTickets.stream().
                 map((orderTicket) -> calculateTicketPrice(priceMap.get(orderTicket.getTicketPriceId()),
                         discount)).
-                reduce((a, b) -> a.add(b)).orElse(BigDecimal.ZERO);
+                reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
         order.setPrice(total);
+        order.setModifiedPrice(total);
         orderMapper.updateOrderInfo(order);
         return true;
     }

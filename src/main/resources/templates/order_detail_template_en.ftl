@@ -36,14 +36,19 @@
         </#if>
     </div>
 </div>
-<#elseif role?? && role == "Vendor" && (order.status == 40) && (order.fromVendor == true)>
+<#elseif role?? && role == "Vendor" && (order.fromVendor == true)>
 <div class="form-group">
     <div class="row">
         <label class="col-md-2">Action:</label>
-        <button class="btn btn-primary form-group j_operation"
-                operation="${60}"
-                email="false">Cancel
-        </button>
+        <#if editing = false>
+            <button id="j_edit" class="btn btn-default form-group">Modify</button>
+            <button class="btn btn-primary form-group j_operation"
+                    operation="${60}"
+                    email="false">Cancel
+            </button>
+        <#else>
+            <button id="j_update" class="btn btn-default form-group">Submit</button>
+        </#if>
     </div>
 </div>
 </#if>

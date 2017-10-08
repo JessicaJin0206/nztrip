@@ -36,14 +36,19 @@
         </#if>
     </div>
 </div>
-<#elseif role?? && role == "Vendor" && (order.status == 40) && (order.fromVendor == true)>
+<#elseif role?? && role == "Vendor" && (order.fromVendor == true)>
 <div class="form-group">
     <div class="row">
-        <label class="col-md-2">修改订单:</label>
-        <button class="btn btn-primary form-group j_operation"
-                operation="${60}"
-                email="false">取消订单
-        </button>
+        <label class="col-md-2">操作:</label>
+        <#if editing = false>
+            <button id="j_edit" class="btn btn-default form-group">修改订单信息</button>
+            <button class="btn btn-primary form-group j_operation"
+                    operation="${60}"
+                    email="false">取消订单
+            </button>
+        <#else>
+            <button id="j_update" class="btn btn-default form-group">提交</button>
+        </#if>
     </div>
 </div>
 </#if>
