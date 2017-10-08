@@ -1,11 +1,13 @@
 package com.fitibo.aotearoa.model;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * Created by qianhao.zhou on 22/02/2017.
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class SpecialRate extends ModelObject {
 
   private int id;

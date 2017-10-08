@@ -68,7 +68,7 @@ function doSearch() {
     }
 }
 
-function searchWith(pagenumber,pagesize) {
+function searchWith(pagenumber, pagesize) {
     var keyword = $('#j_keyword').val();
     var uuid = $('#j_uuid').val();
     var referenceNumber = $('#j_reference_number').val();

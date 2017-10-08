@@ -199,14 +199,16 @@ public class HomeController extends AuthenticationRequiredController {
 
     @RequestMapping("vendor_orders")
     @Authentication(Role.Vendor)
-    public String vendorOrders(@RequestParam(value = "pagesize", defaultValue = "10") int pageSize,
+    public String vendorOrders(@RequestParam(value = "primaryContact", defaultValue = "") String primaryContact,
+                               @RequestParam(value = "pagesize", defaultValue = "10") int pageSize,
                                @RequestParam(value = "pagenumber", defaultValue = "0") int pageNumber,
                                Map<String, Object> model) {
+        primaryContact = primaryContact.trim();
         int vendorId = getToken().getId();
         model.put("role", getToken().getRole().toString());
         Vendor vendor = vendorService.findById(vendorId);
         Preconditions.checkNotNull(vendor, "invalid token:" + getToken().toString());
-        List<Order> orders = orderMapper.findBySkuIds(vendorId, new RowBounds(pageNumber * pageSize, pageSize));
+        List<Order> orders = orderMapper.findByVendorIdAndPrimaryContact(vendorId, primaryContact, new RowBounds(pageNumber * pageSize, pageSize));
         model.put("statusList", OrderStatus.values());
         List<OrderVo> result = parse(orders).collect(Collectors.toList());
         model.put("orders", result);
@@ -214,6 +216,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("pageNumber", pageNumber);
         model.put("module", MODULE_VENDOR_ORDERS);
         model.put("userName", vendor.getName());
+        model.put("primaryContact", primaryContact);
         return "vendor_orders";
     }
 

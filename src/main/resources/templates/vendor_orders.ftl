@@ -12,6 +12,15 @@
     <div class="row">
     <#include "menu.ftl"/>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <div class="row">
+                <div class="col-md-2"><input id="j_primary_contact" class="form-control"
+                                             placeholder="Primary Contact"
+                                             value="${primaryContact!''}">
+                </div>
+                <div class="col-md-1">
+                    <button id="j_search" class="btn btn-primary">Search</button>
+                </div>
+            </div>
             <div>
                 <table class="table table-hover">
                     <thead>
@@ -60,12 +69,10 @@
                 <nav aria-label="...">
                     <ul class="pager">
                         <li class="<#if (pageNumber <= 0)>disabled</#if>">
-                            <a href="/vendor_orders?<#if (pageNumber > 0)>pagenumber=${pageNumber-1}&pagesize=${pageSize}</#if>">Prev
-                                Page</a>
+                            <a onclick="doSearch('${pageNumber-1}','${pageSize}', false)">Prev Page</a>
                         </li>
                         <li>
-                            <a href="/vendor_orders?pagenumber=${pageNumber+1}&pagesize=${pageSize}">Next
-                                Page</a>
+                            <a onclick="doSearch('${pageNumber+1}','${pageSize}', false)">Next Page</a>
                         </li>
                     </ul>
                 </nav>
@@ -75,6 +82,6 @@
 </div>
 
 <#include "third_party_file.ftl"/>
-<script src="/js/orders.js"></script>
+<script src="/js/vendor_orders.js"></script>
 </body>
 </html>

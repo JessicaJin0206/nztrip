@@ -266,7 +266,8 @@ public interface OrderMapper {
             "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund, o.from_vendor " +
             "from `order` o left join `sku` s on o.sku_id = s.id " +
             "where s.vendor_id = #{vendorId} " +
-            " order by o.id desc" +
+            "<if test =\"primaryContact != null and primaryContact != ''\">and o.primary_contact like CONCAT('%',#{primaryContact},'%') </if>" +
+            "order by o.id desc" +
             "</script>")
     @Results({
             @Result(column = "id", property = "id"),
@@ -295,8 +296,9 @@ public interface OrderMapper {
             @Result(column = "refund", property = "refund"),
             @Result(column = "from_vendor", property = "fromVendor"),
     })
-    List<Order> findBySkuIds(@Param("vendorId") int vendorId,
-                             RowBounds rowBounds);
+    List<Order> findByVendorIdAndPrimaryContact(@Param("vendorId") int vendorId,
+                                                @Param("primaryContact") String primaryContact,
+                                                RowBounds rowBounds);
 
 
     @Select("select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +

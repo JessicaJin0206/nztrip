@@ -1088,9 +1088,8 @@ public class RestApiController extends AuthenticationRequiredController {
         final OrderTicket result = new OrderTicket();
         final SkuTicketPrice skuTicketPrice = priceMap.get(ticketVo.getTicketPriceId());
         final SkuTicket skuTicket = skuTicketMap.get(ticketVo.getSkuTicketId());
-        Preconditions
-                .checkNotNull(skuTicketPrice, "invalid sku ticket price id:" + result.getTicketPriceId());
-        Preconditions.checkNotNull(skuTicketPrice, "invalid sku ticket id:" + result.getSkuTicketId());
+        Preconditions.checkNotNull(skuTicketPrice, "invalid sku ticket price id:" + ticketVo.getTicketPriceId());
+        Preconditions.checkNotNull(skuTicket, "invalid sku ticket id:" + ticketVo.getSkuTicketId());
         result.setSkuId(orderVo.getSkuId());
         result.setOrderId(orderVo.getId());
         result.setSkuTicketId(ticketVo.getSkuTicketId());
