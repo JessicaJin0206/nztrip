@@ -40,7 +40,6 @@ template:
       <br>
       TOUR: #TOUR#<br>
       NAME: #NAME#<br>
-      EMAIL: #EMAIL#<br>
       PHONE: #PHONE#<br>
       ORDER ID: #ORDER_ID#<br>
       REMARK: #REMARK#<br>

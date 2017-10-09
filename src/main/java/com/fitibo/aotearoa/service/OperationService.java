@@ -272,7 +272,7 @@ public class OperationService {
         content = content.replace("#TOUR_NAME#", sku.getName());
         content = content.replace("#GUEST_NAME#", order.getPrimaryContact());
         content = content.replace("#REFERENCE_NUMBER#", order.getReferenceNumber());
-        content = content.replace("#PRICE#", order.getPrice().toString());
+        content = content.replace("#PRICE#", order.getModifiedPrice().toString());
         content = content.replace("#REMARK#", order.getRemark());
         content = content.replace("#GUESTS_INFO#",
                 formatGuestsInfo(confirmationEmailGuestsInfoTemplate,
@@ -368,8 +368,6 @@ public class OperationService {
         content = content.replace("#VENDORNAME#", vendor.getName());
         content = content.replace("#TOUR#", order.getSku());
         content = content.replace("#NAME#", order.getPrimaryContact());
-        content = content.replace("#EMAIL#", Optional.ofNullable(order.getPrimaryContactEmail()).orElse(
-                StringUtils.EMPTY));
         content = content.replace("#PHONE#", Optional.ofNullable(order.getPrimaryContactPhone()).orElse(
                 StringUtils.EMPTY));
         content = content.replace("#REMARK#", Optional.ofNullable(order.getRemark()).orElse(
