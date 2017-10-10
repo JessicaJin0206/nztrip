@@ -317,6 +317,7 @@ public class RestApiController extends AuthenticationRequiredController {
         final Vendor vendor = vendorService.findById(vendorId);
         Order order = parse(orderVo);
         order.setPrice(total);
+        order.setModifiedPrice(total);
         String orderUuid = GuidGenerator.generate(14);
         order.setUuid(orderUuid);
         order.setStatus(OrderStatus.NEW.getValue());
