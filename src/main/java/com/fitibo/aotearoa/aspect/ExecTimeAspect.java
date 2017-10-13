@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Created by zhouqianhao on 11/03/2017.
@@ -46,16 +47,28 @@ public class ExecTimeAspect {
     }
 
     private Object logCostTime(ProceedingJoinPoint joinPoint) throws Throwable {
-        Object output = null;
+        Object output;
         try {
             long start = System.currentTimeMillis();
             output = joinPoint.proceed();
             long elapsedTime = System.currentTimeMillis() - start;
             String className = joinPoint.getTarget().getClass().getSimpleName();
-            String args = Joiner.on(",").join(joinPoint.getArgs());
+            String args = Arrays.stream(joinPoint.getArgs())
+                    .map(input -> {
+                        if (input != null) {
+                            return input.toString();
+                        } else {
+                            return "null";
+                        }
+                    })
+                    .collect(Collectors.joining(","));
             Optional<Class<?>> realClass = Arrays.stream(joinPoint.getTarget().getClass().getInterfaces()).findFirst();
             if (elapsedTime > 500) {
-                logger.warn(String.format("method [%s.%s(%s)] execution time:%sms", realClass.isPresent() ? realClass.get().getSimpleName() : className, joinPoint.getSignature().getName(), args, elapsedTime));
+                logger.warn(String.format("method [%s.%s(%s)] execution time:%sms",
+                        realClass.map(Class::getSimpleName).orElse(className),
+                        joinPoint.getSignature().getName(),
+                        args,
+                        elapsedTime));
             }
         } catch (Throwable throwable) {
             logger.error("aop record method exec time error", throwable);
