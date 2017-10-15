@@ -23,11 +23,11 @@ var createTimeSelector = $('#j_create_time');
 var ticketDateSelector = $('#j_ticket_date');
 createTimeSelector.datetimepicker({
     format: "YYYY-MM-DD"
-}).on('dp.hide', doSearch);
+});
 
 ticketDateSelector.datetimepicker({
     format: "YYYY-MM-DD"
-}).on('dp.hide', doSearch);
+});
 
 function doSearch() {
     var keyword = $('#j_keyword').val().trim();

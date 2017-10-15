@@ -143,6 +143,8 @@ public interface OrderMapper {
             "<if test =\"uuid != null and uuid != ''\">and (o.uuid like CONCAT('%',#{uuid},'%') or o.agent_order_id like CONCAT('%',#{uuid},'%')) </if> " +
             "<if test =\"referenceNumber != null and referenceNumber != ''\">and o.reference_number like  CONCAT('%',#{referenceNumber},'%') </if> " +
             "<if test =\"status != null and status > 0\">and o.status = #{status} </if> " +
+            "<if test =\"ticketDate != null\">and o.id in (SELECT order_id FROM `order_ticket` GROUP BY order_id,ticket_date HAVING datediff(ticket_date,#{ticketDate}) = 0) </if> " +
+            "<if test =\"createTime != null\">and datediff(o.create_time,#{createTime}) = 0 </if> " +
             " order by o.id desc" +
             "</script>")
     @Results({
@@ -177,6 +179,8 @@ public interface OrderMapper {
                                             @Param("keyword") String keyword,
                                             @Param("referenceNumber") String referenceNumber,
                                             @Param("status") int status,
+                                            @Param("createTime") Date createTime,
+                                            @Param("ticketDate") Date ticketDate,
                                             RowBounds rowBounds);
 
     @Select("<script>" +
@@ -347,6 +351,8 @@ public interface OrderMapper {
             "<if test =\"uuid != null and uuid != ''\">and (o.uuid like CONCAT('%',#{uuid},'%') or o.agent_order_id like CONCAT('%',#{uuid},'%')) </if> " +
             "<if test =\"referenceNumber != null and referenceNumber != ''\">and o.reference_number like  CONCAT('%',#{referenceNumber},'%') </if> " +
             "<if test =\"status != null and status > 0\">and o.status = #{status} </if> " +
+            "<if test =\"ticketDate != null\">and o.id in (SELECT order_id FROM `order_ticket` GROUP BY order_id,ticket_date HAVING datediff(ticket_date,#{ticketDate}) = 0) </if> " +
+            "<if test =\"createTime != null\">and datediff(o.create_time,#{createTime}) = 0 </if> " +
             " order by o.id desc" +
             "</script>")
     @Results({
@@ -381,6 +387,8 @@ public interface OrderMapper {
                                      @Param("keyword") String keyword,
                                      @Param("referenceNumber") String referenceNumber,
                                      @Param("status") int status,
+                                     @Param("createTime") Date createTime,
+                                     @Param("ticketDate") Date ticketDate,
                                      RowBounds rowBounds);
 
     @Select("<script>" +
@@ -521,14 +529,21 @@ public interface OrderMapper {
             "remark = #{remark}," +
             "agent_order_id = #{agentOrderId}, " +
             "modified_price = #{modifiedPrice}, " +
-            "refund = #{refund} " +
+            "refund = #{refund}, " +
+            "update_time = now() " +
             "where id = #{id}")
     int updateOrderInfo(Order order);
 
-    @Update("update `order` set status = #{newStatus} where id = #{id} and status = #{oldStatus}")
+    @Update("update `order` set " +
+            "status = #{newStatus}," +
+            "update_time = now() " +
+            "where id = #{id} and status = #{oldStatus}")
     int updateOrderStatus(@Param("id") int id, @Param("oldStatus") int oldStatus, @Param("newStatus") int newStatus);
 
-    @Update("update `order` set reference_number = #{referenceNumber} where id = #{id}")
+    @Update("update `order` set " +
+            "reference_number = #{referenceNumber} " +
+            "update_time = now() " +
+            "where id = #{id}")
     int updateReferenceNumber(@Param("id") int id, @Param("referenceNumber") String referenceNumber);
 
 

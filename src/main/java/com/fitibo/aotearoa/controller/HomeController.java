@@ -19,6 +19,7 @@ package com.fitibo.aotearoa.controller;
 import com.fitibo.aotearoa.service.*;
 import com.fitibo.aotearoa.service.impl.ArchiveServiceImpl;
 import com.fitibo.aotearoa.vo.*;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -421,21 +422,9 @@ public class HomeController extends AuthenticationRequiredController {
                                     int status, Date createTime, Date ticketDate, RowBounds rowBounds) {
         List<Order> orders;
         if (agentId > 0) {
-            if (createTime != null) {
-                orders = orderMapper.findByAgentIdAndCreateTime(agentId, createTime, rowBounds);
-            } else if (ticketDate != null) {
-                orders = orderMapper.findByAgentIdAndTicketDate(agentId, ticketDate, rowBounds);
-            } else {
-                orders = orderMapper.findByAgentIdAndMultiFields(agentId, uuid, keyword, referenceNumber, status, rowBounds);
-            }
+            orders = orderMapper.findByAgentIdAndMultiFields(agentId, uuid, keyword, referenceNumber, status, createTime, ticketDate, rowBounds);
         } else {
-            if (createTime != null) {
-                orders = orderMapper.findAllByCreateTime(createTime, rowBounds);
-            } else if (ticketDate != null) {
-                orders = orderMapper.findAllByTicketDate(ticketDate, rowBounds);
-            } else {
-                orders = orderMapper.findAllByMultiFields(uuid, keyword, referenceNumber, status, rowBounds);
-            }
+            orders = orderMapper.findAllByMultiFields(uuid, keyword, referenceNumber, status, createTime, ticketDate, rowBounds);
         }
         return parse(orders).collect(Collectors.toList());
     }
