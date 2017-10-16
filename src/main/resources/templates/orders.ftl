@@ -64,10 +64,17 @@
                 <div class="col-md-1">
                     <button id="j_search" class="btn btn-primary">搜索</button>
                 </div>
+            <#if role?? && (role == "Agent")>
+                <div class="col-md-1">
+                    <button id="j_full_orders" class="btn btn-primary">满员订单</button>
+                </div>
+                <div class="col-md-1">
+                    <button id="j_urgent_orders" class="btn btn-primary">急单</button>
+                </div>
+            <#elseif role?? && (role == "Admin")>
                 <div class="col-md-1">
                     <button id="j_export" class="btn btn-primary">导出</button>
                 </div>
-            <#if role?? && (role == "Admin" || role == "Agent")>
                 <div class="col-md-1">
                     <button id="j_urgent_orders" class="btn btn-primary">急单</button>
                 </div>

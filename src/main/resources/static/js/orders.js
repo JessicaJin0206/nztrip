@@ -107,3 +107,6 @@ $('#j_export').on('click', function () {
 $('#j_urgent_orders').on('click', function () {
     window.open("/urgent_orders");
 });
+$('#j_full_orders').on('click', function () {
+    window.open("/orders?status=30");
+});
