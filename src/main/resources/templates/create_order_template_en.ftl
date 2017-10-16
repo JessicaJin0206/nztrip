@@ -2,7 +2,13 @@
 <div class="form-group"><label>You are ordering for</label><span> ${order.agentName!''} </span></div>
 </#if>
 <div class="form-group"><label>Order Detail</label></div>
-<div class="form-group"><label>Item:</label><span>   ${sku.name!''}</span></div>
+<div class="form-group">
+    <label>Item:</label>
+    <span>${sku.name!''}</span>
+    <button id="j_check_available" class="btn btn-primary form-group" style="margin-left: 20px"
+            value="${sku.checkAvailabilityWebsite!!}">Check Availability
+    </button>
+</div>
 <div class="form-group"><label>Vendor Phone:</label><span>   ${vendor.phone!''}</span></div>
 
 <div class="form-group"><label>Primary Contact</label></div>
@@ -70,7 +76,7 @@
 </div>
 
 <div class="form-group">
-    <label>Description:  </label><span id="j_ticket_desc"></span>
+    <label>Description: </label><span id="j_ticket_desc"></span>
 </div>
 
 <div class="form-group">
@@ -120,7 +126,7 @@
 <div class="form-group j_ticket_container" value="${ticket.id?c}" ticketId="${ticket.skuTicketId?c}"
      priceId="${ticket.ticketPriceId?c}">
     <a id="j_ticket_delete"><span class="glyphicon glyphicon-remove pull-right"
-                                                       aria-hidden="true"></span></a>
+                                  aria-hidden="true"></span></a>
     <div class="form-group"><label>Ticket:</label><span
             id="j_ticket_name_span">${ticket.skuTicket!''}</span></div>
     <div class="form-group"><label>Date:</label><span

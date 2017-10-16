@@ -2,7 +2,13 @@
 <div class="form-group"><label>正在帮</label><span> ${order.agentName!''} </span><label>下单</label></div>
 </#if>
 <div class="form-group"><label>订单详情</label></div>
-<div class="form-group"><label>名称:</label><span>   ${sku.name!''}</span></div>
+<div class="form-group">
+    <label>名称:</label>
+    <span>${sku.name!''}</span>
+    <button id="j_check_available" class="btn btn-primary form-group" style="margin-left: 20px"
+            value="${sku.checkAvailabilityWebsite!!}">查位
+    </button>
+</div>
 <div class="form-group"><label>行程商电话:</label><span>   ${vendor.phone!''}</span></div>
 
 <div class="form-group"><label>主要联系人</label></div>

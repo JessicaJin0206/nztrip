@@ -1037,6 +1037,7 @@ public class RestApiController extends AuthenticationRequiredController {
         result.setRescheduleCancelNotice(sku.getRescheduleCancelNotice());
         result.setAutoGenerateReferenceNumber(sku.isAutoGenerateReferenceNumber());
         result.setAvailable(sku.isAvailable());
+        result.setCheckAvailabilityWebsite(sku.getCheckAvailabilityWebsite());
         return result;
     }
 
@@ -1070,6 +1071,7 @@ public class RestApiController extends AuthenticationRequiredController {
         result.setPriceConstraint(sku.getPriceConstraint());
         result.setOtherInfo(sku.getOtherInfo());
         result.setRescheduleCancelNotice(sku.getRescheduleCancelNotice());
+        result.setCheckAvailabilityWebsite(sku.getCheckAvailabilityWebsite());
         return result;
     }
 

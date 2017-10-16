@@ -42,4 +42,5 @@ public class SkuVo {
     private String otherInfo;
     private boolean autoGenerateReferenceNumber;
     private boolean available;
+    private String checkAvailabilityWebsite;
 }

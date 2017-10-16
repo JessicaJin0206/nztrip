@@ -202,7 +202,8 @@ var validate = function() {
         attention: $('#j_attention').val(),
         priceConstraint: $('#j_price_constraint').val(),
         otherInfo: $('#j_other_info').val(),
-        available: !!available
+        available: !!available,
+        checkAvailabilityWebsite: $('#j_check_availability_website').val()
     };
 };
 

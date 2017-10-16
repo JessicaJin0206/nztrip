@@ -915,6 +915,7 @@ public class HomeController extends AuthenticationRequiredController {
         result.setRescheduleCancelNotice(sku.getRescheduleCancelNotice());
         result.setAutoGenerateReferenceNumber(sku.isAutoGenerateReferenceNumber());
         result.setAvailable(sku.isAvailable());
+        result.setCheckAvailabilityWebsite(sku.getCheckAvailabilityWebsite());
         return result;
     }
 

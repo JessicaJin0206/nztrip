@@ -105,6 +105,12 @@
                        value="${sku.officialWebsite!!}">
             </div>
             <div class="form-group">
+                <label>Check Availability Website</label>
+                <input id="j_check_availability_website" class="form-control"
+                       <#if editing = false>disabled</#if>
+                       value="${sku.checkAvailabilityWebsite!!}">
+            </div>
+            <div class="form-group">
                 <label>Estimated Confirmation Time</label>
                 <input id="j_confirmation_time" class="form-control"
                        <#if editing = false>disabled</#if>

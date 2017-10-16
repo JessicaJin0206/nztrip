@@ -70,8 +70,12 @@
             </div>
 
             <div class="form-group">
-                <label>官网查位链接</label>
+                <label>官网链接</label>
                 <input type="text" id="j_official_website" class="form-control" placeholder="">
+            </div>
+            <div class="form-group">
+                <label>官网查位链接</label>
+                <input type="text" id="j_check_availability_website" class="form-control" placeholder="">
             </div>
             <div class="form-group">
                 <label>预估确认时长</label>
