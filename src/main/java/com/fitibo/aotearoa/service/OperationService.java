@@ -120,7 +120,9 @@ public class OperationService {
                     break;
                 case CLOSED:
                 case CANCELLED:
-                    sendCancellationEmail(order);
+                    if (fromStatus != OrderStatus.NEW.getValue()) {
+                        sendCancellationEmail(order);
+                    }
                     break;
                 case FULL:
                     sendFullEmail(order);
@@ -151,7 +153,8 @@ public class OperationService {
         Agent agent = agentMapper.findById(agentId);
         List<OrderTicket> ticketList = orderTicketMapper.findByOrderId(order.getId());
         if (ticketList.isEmpty()) {
-            throw new ResourceNotFoundException();
+            logger.warn("order tickets cannot be empty, send cancellation letter failed");
+            return;
         }
         String agentOrderId = order.getAgentOrderId();
         String subject = StringUtils.isNotEmpty(agentOrderId) ? cancellationEmailSubject + "(" + agentOrderId + ")" : cancellationEmailSubject;
