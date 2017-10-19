@@ -10,7 +10,6 @@ import com.fitibo.aotearoa.model.Order;
 import com.fitibo.aotearoa.model.Sku;
 import com.fitibo.aotearoa.service.ArchiveService;
 import com.fitibo.aotearoa.util.DateUtils;
-
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.joda.time.DateTime;
@@ -21,19 +20,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
-
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * Created by qianhao.zhou on 08/12/2016.
@@ -74,9 +67,12 @@ public class ExportController extends AuthenticationRequiredController {
             }
         }
         Workbook voucher = archiveService.createVoucher(order);
+        String fileName = order.getPrimaryContact() + " " +
+                order.getAgentOrderId() + " " +
+                order.getSku();
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             voucher.write(baos);
-            response.setHeader("Content-Disposition", "attachment; filename=\"voucher.xlsx\"");
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + getExportFileName(fileName) + ".xlsx\"");
             return new ResponseEntity<>(baos.toByteArray(), HttpStatus.CREATED);
         }
     }
@@ -110,7 +106,7 @@ public class ExportController extends AuthenticationRequiredController {
         String fileName = entry.getKey();
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             skuTickets.write(baos);
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + new String(fileName.getBytes("GB2312"), "ISO_8859_1") + ".xlsx\"");
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + getExportFileName(fileName) + ".xlsx\"");
             return new ResponseEntity<>(baos.toByteArray(), HttpStatus.CREATED);
 
         }
@@ -154,7 +150,7 @@ public class ExportController extends AuthenticationRequiredController {
         Workbook skusDetail = archiveService.createSkusDetail(keyword, cityId, categoryId, vendorId, agentId, language);
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             skusDetail.write(baos);
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + new String("新西兰产品信息表".getBytes("GB2312"), "ISO_8859_1") + ".xlsx\"");
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + getExportFileName("新西兰产品信息表") + ".xlsx\"");
             return new ResponseEntity<>(baos.toByteArray(), HttpStatus.CREATED);
 
         }
@@ -193,6 +189,10 @@ public class ExportController extends AuthenticationRequiredController {
             response.setHeader("Content-Disposition", "attachment; filename=\"overview.xlsx\"");
             return new ResponseEntity<>(baos.toByteArray(), HttpStatus.CREATED);
         }
+    }
+
+    private String getExportFileName(String fileName) throws IOException {
+        return new String(fileName.getBytes("GB2312"), "ISO_8859_1");
     }
 
 }
