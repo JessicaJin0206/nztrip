@@ -325,6 +325,7 @@
 
             <#if editing = false>
                 <button id="j_edit" class="btn btn-primary form-group">Modify</button>
+                <button id="j_copy" class="btn btn-primary form-group">Copy</button>
             <#else>
                 <button id="j_update" class="btn btn-primary form-group">Submit</button>
             </#if>

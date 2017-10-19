@@ -536,6 +536,22 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("durations", durationService.findAll());
         model.put("role", getToken().getRole().toString());
         model.put("userName", getUserName(getToken()));
+        model.put("sku", new SkuVo());
+        return "create_sku";
+    }
+
+    @RequestMapping("copy_sku/{id}")
+    @Authentication(Role.Admin)
+    public String createSku(@PathVariable("id") int skuId, Map<String, Object> model) {
+        model.put("module", MODULE_CREATE_SKU);
+        model.put("cities", cityService.findAll());
+        model.put("categories", categoryService.findAll());
+        List<Vendor> vendors = vendorService.findAll().stream().sorted((a, b) -> a.getName().compareToIgnoreCase(b.getName())).collect(Collectors.toList());
+        model.put("vendors", vendors);
+        model.put("durations", durationService.findAll());
+        model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
+        model.put("sku", parse(skuService.findById(skuId)));
         return "create_sku";
     }
 

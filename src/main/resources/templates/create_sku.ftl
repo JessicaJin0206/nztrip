@@ -12,15 +12,17 @@
     <#include "menu.ftl"/>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
             <div class="form-group"><label>创建项目</label></div>
-            <div class="form-group"><input type="text" id="j_uuid" class="form-control" placeholder="请输入项目编号...">
+            <div class="form-group"><input type="text" id="j_uuid" class="form-control" placeholder="请输入项目编号..."
+                                           value="${sku.uuid!!}">
             </div>
-            <div class="form-group"><input type="text" id="j_name" class="form-control" placeholder="请输入项目名称...">
+            <div class="form-group"><input type="text" id="j_name" class="form-control" placeholder="请输入项目名称..."
+                                           value="${sku.name!!}">
             </div>
             <div class="form-group dropdown">
                 <button class="btn btn-default dropdown-toggle" type="button" id="selected_city_button"
                         data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="true">
-                    <span id="j_selected_city" value="0">选择城市</span>
+                    <span id="j_selected_city" value="${sku.cityId?c}">${sku.city!"选择城市"}</span>
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" id="j_city_drop_down" aria-labelledby="selected_city_button">
@@ -33,7 +35,7 @@
                 <button class="btn btn-default dropdown-toggle" type="button" id="selected_category_button"
                         data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="true">
-                    <span id="j_selected_category" value="0">选择类别</span>
+                    <span id="j_selected_category" value="${sku.categoryId?c}">${sku.category!"选择类别"}</span>
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" id="j_category_drop_down" aria-labelledby="selected_category_button">
@@ -46,7 +48,7 @@
                 <button class="btn btn-default dropdown-toggle" type="button" id="selected_vendor_button"
                         data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="true">
-                    <span id="j_selected_vendor" value="0">选择供应商</span>
+                    <span id="j_selected_vendor" value="${sku.vendorId?c}">${sku.vendor!"选择供应商"}</span>
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" id="j_vendor_drop_down" aria-labelledby="selected_vendor_button">
@@ -59,7 +61,7 @@
                 <button class="btn btn-default dropdown-toggle" type="button" id="selected_duration_button"
                         data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="true">
-                    <span id="j_selected_duration" value="0">选择时长</span>
+                    <span id="j_selected_duration" value="${sku.durationId?c}">${sku.duration!"选择时长"}</span>
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" id="j_duration_drop_down" aria-labelledby="selected_duration_button">
@@ -71,59 +73,73 @@
 
             <div class="form-group">
                 <label>官网链接</label>
-                <input type="text" id="j_official_website" class="form-control" placeholder="">
+                <input id="j_official_website" class="form-control"
+                       value="${sku.officialWebsite!!}">
             </div>
             <div class="form-group">
                 <label>官网查位链接</label>
-                <input type="text" id="j_check_availability_website" class="form-control" placeholder="">
+                <input id="j_check_availability_website" class="form-control"
+                       value="${sku.checkAvailabilityWebsite!!}">
             </div>
             <div class="form-group">
                 <label>预估确认时长</label>
-                <input type="text" id="j_confirmation_time" class="form-control " placeholder="">
+                <input id="j_confirmation_time" class="form-control"
+                       value="${sku.confirmationTime!!}">
             </div>
             <div class="form-group">
                 <label>退改签规定</label>
-                <textarea id="j_reschedule_cancel_notice" rows="2" class="form-control" placeholder=""></textarea>
+                <textarea id="j_reschedule_cancel_notice" rows="2" class="form-control"
+                          value="">${sku.rescheduleCancelNotice!!}</textarea>
             </div>
             <div class="form-group">
                 <label>行程概述</label>
-                <textarea id="j_agenda_info" rows="2" class="form-control" placeholder=""></textarea>
+                <textarea id="j_agenda_info" rows="2" class="form-control"
+                          value="">${sku.agendaInfo!!}</textarea>
             </div>
             <div class="form-group">
                 <label>活动时间</label>
-                <textarea id="j_activity_time" rows="2" class="form-control" placeholder=""></textarea>
+                <textarea id="j_activity_time" rows="2" class="form-control"
+                          value="">${sku.activityTime!!}</textarea>
             </div>
             <div class="form-group">
                 <label>营业时间</label>
-                <textarea id="j_opening_time" rows="2" class="form-control" placeholder=""></textarea>
+                <textarea id="j_opening_time" class="form-control"
+                          value="">${sku.openingTime!!}</textarea>
             </div>
             <div class="form-group">
                 <label>门票形式</label>
-                <input type="text" id="j_ticket_info" class="form-control" placeholder="">
+                <input id="j_ticket_info" class="form-control"
+                       value="${sku.ticketInfo!!}">
             </div>
             <div class="form-group">
                 <label>服务包含</label>
-                <input type="text" id="j_service_include" class="form-control" placeholder="">
+                <input id="j_service_include" class="form-control"
+                       value="${sku.serviceInclude!!}">
             </div>
             <div class="form-group">
                 <label>服务未含</label>
-                <input type="text" id="j_service_exclude" class="form-control" placeholder="">
+                <input id="j_service_exclude" class="form-control"
+                       value="${sku.serviceExclude!!}">
             </div>
             <div class="form-group">
                 <label>附加收费项</label>
-                <input type="text" id="j_extra_item" class="form-control" placeholder="">
+                <input id="j_extra_item" class="form-control"
+                       value="${sku.extraItem!!}">
             </div>
             <div class="form-group">
                 <label>限价信息</label>
-                <input type="text" id="j_price_constraint" class="form-control" placeholder="">
+                <input id="j_price_constraint" class="form-control"
+                       value="${sku.priceConstraint!!}">
             </div>
             <div class="form-group">
                 <label>预订所需其他信息</label>
-                <input type="text" id="j_other_info" class="form-control" placeholder="">
+                <input id="j_other_info" class="form-control"
+                       value="${sku.otherInfo!!}">
             </div>
             <div class="form-group">
                 <label>注意事项</label>
-                <textarea id="j_attention" class="form-control" rows="3" placeholder=""></textarea>
+                <textarea id="j_attention" rows="3" class="form-control"
+                          value="">${sku.attention!!}</textarea>
             </div>
 
             <div class="form-group" id="j_gathering_place">
@@ -133,18 +149,26 @@
                 </a>
             </div>
             <div class="form-group">
+            <#if sku.gatheringPlace??>
+                <#list sku.gatheringPlace as place>
+                    <input class="form-control j_gathering_place_input"
+                           placeholder="请输入集合地点..."
+                           value="${place}">
+                </#list>
+            <#else>
                 <input type="text" class="form-control j_gathering_place_input" placeholder="请输入集合地点...">
+            </#if>
             </div>
             <div class="form-group"><input type="text" id="j_description" class="form-control"
-                                           placeholder="请输入项目详情...">
+                                           placeholder="请输入项目详情..." value="${sku.description!!}">
             </div>
             <div id="j_pickup_service" class="form-group">
                 <span>是否有接送服务?</span>
                 <div class="btn-group" data-toggle="buttons">
-                    <label class="btn btn-default">
+                    <label class="btn btn-default <#if sku.pickupService = true>active</#if>">
                         <input type="radio" class="toggle" value="1">是
                     </label>
-                    <label class="btn btn-default active">
+                    <label class="btn btn-default <#if sku.pickupService = false>active</#if>">
                         <input type="radio" class="toggle" value="0">否
                     </label>
                 </div>
@@ -170,16 +194,44 @@
                     </tr>
                     </thead>
                     <tbody id="j_ticket_container">
-                    <#--<tr>-->
-                        <#--<td><input id="j_ticket_name" type="text" class="form-control form-group" /></td>-->
-                        <#--<td><input id="j_ticket_count" type="number" class="form-control form-group" /></td>-->
-                        <#--<td><input id="j_ticket_min_age" type="number" class="form-control form-group" /></td>-->
-                        <#--<td><input id="j_ticket_max_age" type="number" class="form-control form-group" /></td>-->
-                        <#--<td><input id="j_ticket_min_weight" type="number" class="form-control form-group" /></td>-->
-                        <#--<td><input id="j_ticket_max_weight" type="number" class="form-control form-group" /></td>-->
-                        <#--<td><input id="j_ticket_description" type="text" class="form-control form-group" /></td>-->
-                        <#--<td><a id="j_ticket_delete"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td>-->
-                    <#--</tr>-->
+                    <#if sku.tickets?? >
+                        <#list sku.tickets as ticket>
+                        <tr id="j_ticket" value="${ticket.id?c}">
+                            <td><input id="j_ticket_name" class="form-control form-group"
+                                       value="${ticket.name}"
+                            /></td>
+                            <td><input id="j_ticket_count" type="number" class="form-control form-group"
+                                       value="${ticket.count}"/>
+                            </td>
+                            <td><input id="j_ticket_min_age" type="number"
+                                       class="form-control form-group"
+                                       value="${ticket.minAge}"/>
+                            </td>
+                            <td><input id="j_ticket_max_age" type="number"
+                                       class="form-control form-group"
+                                       value="${ticket.maxAge}"/>
+                            </td>
+                            <td><input id="j_ticket_min_weight" type="number"
+                                       class="form-control form-group"
+                                       value="${ticket.minWeight}"/>
+                            </td>
+                            <td><input id="j_ticket_max_weight" type="number"
+                                       class="form-control form-group"
+                                       value="${ticket.maxWeight}"/>
+                            </td>
+                            <td><input id="j_ticket_description" type="text"
+                                       class="form-control form-group"
+                                       value="${ticket.description}"
+                            /></td>
+                            <td>
+
+                                <a id="j_ticket_delete"><span class="glyphicon glyphicon-remove"
+                                                              aria-hidden="true"></span></a>
+
+                            </td>
+                        </tr>
+                        </#list>
+                    </#if>
                     </tbody>
                 </table>
             </div>
@@ -191,6 +243,6 @@
 </div>
 
 <#include "third_party_file.ftl"/>
-<script src="js/create_sku.js"></script>
+<script src="/js/create_sku.js"></script>
 </body>
 </html>

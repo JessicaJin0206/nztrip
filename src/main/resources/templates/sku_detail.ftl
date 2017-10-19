@@ -322,9 +322,9 @@
                 </table>
             </div>
         <#if role?? && role == "Admin">
-
             <#if editing = false>
                 <button id="j_edit" class="btn btn-primary form-group">修改</button>
+                <button id="j_copy" class="btn btn-primary form-group">复制</button>
             <#else>
                 <button id="j_update" class="btn btn-primary form-group">提交</button>
             </#if>

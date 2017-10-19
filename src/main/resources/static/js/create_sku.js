@@ -53,42 +53,42 @@ var warn = function (message) {
     alert.addClass('alert-warning');
     $('.main').prepend(alert);
 };
-var success = function(message) {
+var success = function (message) {
     var alert = create_alert(message);
     alert.addClass('alert-success');
     $('.main').prepend(alert);
 };
-var error = function(message) {
+var error = function (message) {
     var alert = create_alert(message);
     alert.addClass('alert-danger');
     $('.main').prepend(alert);
 };
 
 var gatheringPlace = $('#j_gathering_place');
-gatheringPlace.find('a').on('click', function() {
+gatheringPlace.find('a').on('click', function () {
     $('.j_gathering_place_input').parent().last().after($('<div class="form-group"><input type="text" class="form-control j_gathering_place_input" placeholder="请输入集合地点..."></div>'));
 });
 
-$('#j_add_ticket').on('click', function(e){
+$('#j_add_ticket').on('click', function (e) {
     if ($(e.target).attr('disabled')) {
         return;
     }
     var element = $('<tr><td><input id="j_ticket_name" type="text" class="form-control form-group" /></td><td><input id="j_ticket_count" type="number" class="form-control form-group" /></td><td><input id="j_ticket_min_age" type="number" class="form-control form-group" /></td><td><input id="j_ticket_max_age" type="number" class="form-control form-group" /></td><td><input id="j_ticket_min_weight" type="number" class="form-control form-group" /></td><td><input id="j_ticket_max_weight" type="number" class="form-control form-group" /></td><td><input id="j_ticket_description" type="text" class="form-control form-group" /></td><td><a id="j_ticket_delete"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a></td></tr>');
     var container = $('#j_ticket_container');
     container.append(element);
-    element.find('#j_ticket_delete').on('click', function() {
+    element.find('#j_ticket_delete').on('click', function () {
         element.remove();
     })
 });
 
-$('#j_ticket_container tr').each(function(index, e){
+$('#j_ticket_container tr').each(function (index, e) {
     var row = $(e);
-    row.find('td a#j_ticket_delete').on('click', function(){
+    row.find('td a#j_ticket_delete').on('click', function () {
         row.remove();
     });
 });
 
-var validate = function() {
+var validate = function () {
     var uuid = $('#j_uuid').val();
     if (uuid.length == 0) {
         warn("请填写编号");
@@ -115,7 +115,7 @@ var validate = function() {
         return;
     }
     var gatheringPlace = [];
-    $('.j_gathering_place_input').each(function() {
+    $('.j_gathering_place_input').each(function () {
         var item = $(this).val();
         if (item.length > 0) {
             gatheringPlace.push(item);
@@ -127,7 +127,7 @@ var validate = function() {
     var available = parseInt($('#j_available label.active input').val());
     var durationId = parseInt(durationDropDown.attr('value'));
     var tickets = [];
-    $('#j_ticket_container tr').each(function(idx, element){
+    $('#j_ticket_container tr').each(function (idx, element) {
         var container = $(element);
         var id = parseInt(container.attr("value"));
         var name = container.find("#j_ticket_name").val();
@@ -212,40 +212,46 @@ $('#j_submit').on('click', function () {
     if (data) {
         $.ajax({
             type: 'POST',
-            contentType:"application/json; charset=utf-8",
+            contentType: "application/json; charset=utf-8",
             url: '/v1/api/skus',
             data: JSON.stringify(data)
         }).success(function (sku) {
             window.location.href = "/skus/" + sku.id;
-        }).error(function (){
+        }).error(function () {
             error("添加失败");
         });
     }
 });
 
-$('#j_update').on('click', function() {
+$('#j_update').on('click', function () {
     var data = validate();
     var path = window.location.pathname.split('/');
     var id = parseInt(path[path.length - 2]);
     if (data) {
         $.ajax({
             type: 'PUT',
-            contentType:"application/json; charset=utf-8",
+            contentType: "application/json; charset=utf-8",
             url: '/v1/api/skus/' + id,
             data: JSON.stringify(data)
         }).success(function () {
             window.location.href = "/skus/" + id;
-        }).error(function (){
+        }).error(function () {
             error("修改失败");
         });
     }
 });
 
-$('#j_edit').on('click', function(){
+$('#j_edit').on('click', function () {
     window.location.href = window.location.pathname + "/_edit";
 });
 
-$('#j_edit_inventory').on('click', function() {
+$('#j_copy').on('click', function () {
+    var path = window.location.pathname.split('/');
+    var id = parseInt(path[path.length - 1]);
+    window.location.href = "/copy_sku/" + id;
+});
+
+$('#j_edit_inventory').on('click', function () {
     if (window.location.pathname.endsWith("/")) {
         window.location.href = window.location.pathname + "inventory"
     } else {
