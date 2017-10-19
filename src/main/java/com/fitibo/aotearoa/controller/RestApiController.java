@@ -103,6 +103,9 @@ public class RestApiController extends AuthenticationRequiredController {
     @Autowired
     private OrderRecordService orderRecordService;
 
+    @Autowired
+    private MessageBoardMapper messageBoardMapper;
+
     @Value("${secret}")
     private String secret;
 
@@ -920,6 +923,15 @@ public class RestApiController extends AuthenticationRequiredController {
             throw new ResourceNotFoundException(request.getDate() + " " + requestedTime + " does not exist");
         }
         return ResultVo.SUCCESS;
+    }
+
+    @RequestMapping(value = "/v1/api/publish_message", method = RequestMethod.POST)
+    @Authentication(Role.Admin)
+    public boolean publishMessage(@RequestBody MessageBoard messageBoard) {
+        messageBoard.setAdminId(getToken().getId());
+        messageBoard.setCreateTime(new Date());
+        int result = messageBoardMapper.create(messageBoard);
+        return result == 1;
     }
 
     private Map<Integer, SkuTicketPrice> getSkuTicketPriceMap(List<Integer> ids) {

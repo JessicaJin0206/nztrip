@@ -16,6 +16,8 @@
 
 package com.fitibo.aotearoa.controller;
 
+import com.fitibo.aotearoa.mapper.*;
+import com.fitibo.aotearoa.model.*;
 import com.fitibo.aotearoa.service.*;
 import com.fitibo.aotearoa.service.impl.ArchiveServiceImpl;
 import com.fitibo.aotearoa.vo.*;
@@ -33,34 +35,12 @@ import com.fitibo.aotearoa.dto.Token;
 import com.fitibo.aotearoa.exception.AuthenticationFailureException;
 import com.fitibo.aotearoa.exception.InvalidParamException;
 import com.fitibo.aotearoa.exception.ResourceNotFoundException;
-import com.fitibo.aotearoa.mapper.AdminMapper;
-import com.fitibo.aotearoa.mapper.AgentMapper;
-import com.fitibo.aotearoa.mapper.HotItemMapper;
-import com.fitibo.aotearoa.mapper.OrderMapper;
-import com.fitibo.aotearoa.mapper.OrderRecordMapper;
-import com.fitibo.aotearoa.mapper.OrderTicketMapper;
-import com.fitibo.aotearoa.mapper.PriceRecordMapper;
-import com.fitibo.aotearoa.mapper.SkuMapper;
-import com.fitibo.aotearoa.mapper.SkuTicketMapper;
-import com.fitibo.aotearoa.mapper.SkuTicketPriceMapper;
-import com.fitibo.aotearoa.model.Admin;
-import com.fitibo.aotearoa.model.Agent;
-import com.fitibo.aotearoa.model.Category;
-import com.fitibo.aotearoa.model.City;
-import com.fitibo.aotearoa.model.Duration;
-import com.fitibo.aotearoa.model.Order;
-import com.fitibo.aotearoa.model.OrderRecord;
-import com.fitibo.aotearoa.model.OrderTicket;
-import com.fitibo.aotearoa.model.PriceRecord;
-import com.fitibo.aotearoa.model.Sku;
-import com.fitibo.aotearoa.model.SkuTicket;
-import com.fitibo.aotearoa.model.SkuTicketPrice;
-import com.fitibo.aotearoa.model.Vendor;
 import com.fitibo.aotearoa.service.impl.CategoryServiceImpl;
 import com.fitibo.aotearoa.util.DateUtils;
 import com.fitibo.aotearoa.util.ObjectParser;
 
 import org.apache.ibatis.session.RowBounds;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -146,6 +126,9 @@ public class HomeController extends AuthenticationRequiredController {
     @Autowired
     private ScanService scanService;
 
+    @Autowired
+    private MessageBoardMapper messageBoardMapper;
+
     @ExceptionHandler
     public String handleException(ResourceNotFoundException ex) {
         return "404";
@@ -160,18 +143,24 @@ public class HomeController extends AuthenticationRequiredController {
     @Authentication({Role.Vendor, Role.Agent, Role.Admin})
     public String home(Map<String, Object> model) {
         Role role = getToken().getRole();
-        if (role == Role.Agent || role == Role.Admin) {
-            model.put("module", MODULE_DASHBOARD);
-            model.put("role", getToken().getRole().toString());
-            model.put("userName", getUserName(getToken()));
-            model.put("role", role.toString());
-            model.put("hotItems", Lists.transform(hotItemMapper.query(new RowBounds()), ObjectParser::parse));
-            return "dashboard";
-        } else if (role == Role.Vendor) {
-            return vendorSku(model);
-        } else {
-            throw new IllegalArgumentException("could not happen");
+        model.put("module", MODULE_DASHBOARD);
+        model.put("userName", getUserName(getToken()));
+        model.put("role", role.toString());
+        switch (role) {
+            case Admin:
+                model.put("pageSize", 10);
+                model.put("pageNumber", 0);
+                model.put("messageBoards", Lists.transform(messageBoardMapper.findByPage(new RowBounds(0, 10)), this::parse));
+                break;
+            case Agent:
+                model.put("hotItems", Lists.transform(hotItemMapper.query(new RowBounds()), ObjectParser::parse));
+                break;
+            case Vendor:
+                return vendorSku(model);
+            default:
+                throw new IllegalArgumentException("could not happen");
         }
+        return "dashboard";
     }
 
     @RequestMapping("vendor_skus")
@@ -224,11 +213,16 @@ public class HomeController extends AuthenticationRequiredController {
 
     @RequestMapping("dashboard")
     @Authentication
-    public String dashboard(Map<String, Object> model) {
+    public String dashboard(@RequestParam(value = "pagesize", defaultValue = "10") int pageSize,
+                            @RequestParam(value = "pagenumber", defaultValue = "0") int pageNumber,
+                            Map<String, Object> model) {
         model.put("module", MODULE_DASHBOARD);
         model.put("role", getToken().getRole().toString());
         model.put("userName", getUserName(getToken()));
+        model.put("pageSize", pageSize);
+        model.put("pageNumber", pageNumber);
         model.put("hotItems", Lists.transform(hotItemMapper.query(new RowBounds()), ObjectParser::parse));
+        model.put("messageBoards", Lists.transform(messageBoardMapper.findByPage(new RowBounds(pageSize * pageNumber, pageSize)), this::parse));
         return "dashboard";
     }
 
@@ -960,6 +954,15 @@ public class HomeController extends AuthenticationRequiredController {
                 break;
         }
         return orderRecordVo;
+    }
+
+    private MessageBoardVo parse(MessageBoard messageBoard) {
+        MessageBoardVo result = new MessageBoardVo();
+        result.setAdminId(messageBoard.getAdminId());
+        result.setContent(messageBoard.getContent());
+        result.setCreateTime(DateUtils.formatDateTime(messageBoard.getCreateTime()));
+        result.setAdminName(adminMapper.findById(messageBoard.getAdminId()).getUser());
+        return result;
     }
 
     /**
