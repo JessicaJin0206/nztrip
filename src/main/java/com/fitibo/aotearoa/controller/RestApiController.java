@@ -1,5 +1,14 @@
 package com.fitibo.aotearoa.controller;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multiset;
+
 import com.fitibo.aotearoa.annotation.Authentication;
 import com.fitibo.aotearoa.constants.CommonConstants;
 import com.fitibo.aotearoa.constants.OrderStatus;
@@ -11,20 +20,56 @@ import com.fitibo.aotearoa.dto.Transition;
 import com.fitibo.aotearoa.exception.AuthenticationFailureException;
 import com.fitibo.aotearoa.exception.InvalidParamException;
 import com.fitibo.aotearoa.exception.ResourceNotFoundException;
-import com.fitibo.aotearoa.mapper.*;
-import com.fitibo.aotearoa.model.*;
-import com.fitibo.aotearoa.service.*;
-import com.fitibo.aotearoa.util.*;
-import com.fitibo.aotearoa.vo.*;
-
-import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Splitter;
-import com.google.common.base.Strings;
-import com.google.common.collect.HashMultiset;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multiset;
+import com.fitibo.aotearoa.mapper.AdminMapper;
+import com.fitibo.aotearoa.mapper.AgentMapper;
+import com.fitibo.aotearoa.mapper.MessageBoardMapper;
+import com.fitibo.aotearoa.mapper.OrderMapper;
+import com.fitibo.aotearoa.mapper.OrderTicketMapper;
+import com.fitibo.aotearoa.mapper.OrderTicketUserMapper;
+import com.fitibo.aotearoa.mapper.PriceRecordMapper;
+import com.fitibo.aotearoa.mapper.SkuMapper;
+import com.fitibo.aotearoa.mapper.SkuTicketMapper;
+import com.fitibo.aotearoa.mapper.SkuTicketPriceMapper;
+import com.fitibo.aotearoa.model.Admin;
+import com.fitibo.aotearoa.model.Agent;
+import com.fitibo.aotearoa.model.MessageBoard;
+import com.fitibo.aotearoa.model.Order;
+import com.fitibo.aotearoa.model.OrderTicket;
+import com.fitibo.aotearoa.model.OrderTicketUser;
+import com.fitibo.aotearoa.model.PriceRecord;
+import com.fitibo.aotearoa.model.Sku;
+import com.fitibo.aotearoa.model.SkuTicket;
+import com.fitibo.aotearoa.model.SkuTicketPrice;
+import com.fitibo.aotearoa.model.Vendor;
+import com.fitibo.aotearoa.service.DiscountRateService;
+import com.fitibo.aotearoa.service.OperationService;
+import com.fitibo.aotearoa.service.OrderRecordService;
+import com.fitibo.aotearoa.service.OrderService;
+import com.fitibo.aotearoa.service.PricingService;
+import com.fitibo.aotearoa.service.SkuInventoryService;
+import com.fitibo.aotearoa.service.SkuService;
+import com.fitibo.aotearoa.service.TokenService;
+import com.fitibo.aotearoa.service.VendorService;
+import com.fitibo.aotearoa.util.DateUtils;
+import com.fitibo.aotearoa.util.GuidGenerator;
+import com.fitibo.aotearoa.util.Md5Utils;
+import com.fitibo.aotearoa.util.ObjectParser;
+import com.fitibo.aotearoa.vo.AddPriceRecordRequest;
+import com.fitibo.aotearoa.vo.AddPriceRequest;
+import com.fitibo.aotearoa.vo.AddSkuInventoryRequest;
+import com.fitibo.aotearoa.vo.AgentVo;
+import com.fitibo.aotearoa.vo.AuthenticationReq;
+import com.fitibo.aotearoa.vo.AuthenticationResp;
+import com.fitibo.aotearoa.vo.DeleteSkuInventoryRequest;
+import com.fitibo.aotearoa.vo.OrderTicketUserVo;
+import com.fitibo.aotearoa.vo.OrderTicketVo;
+import com.fitibo.aotearoa.vo.OrderVo;
+import com.fitibo.aotearoa.vo.ReplaceTicketsRequest;
+import com.fitibo.aotearoa.vo.ResultVo;
+import com.fitibo.aotearoa.vo.SkuTicketPriceVo;
+import com.fitibo.aotearoa.vo.SkuTicketVo;
+import com.fitibo.aotearoa.vo.SkuVo;
+import com.fitibo.aotearoa.vo.VendorVo;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -38,10 +83,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -102,6 +157,9 @@ public class RestApiController extends AuthenticationRequiredController {
 
     @Autowired
     private OrderRecordService orderRecordService;
+
+    @Autowired
+    private PricingService pricingService;
 
     @Autowired
     private MessageBoardMapper messageBoardMapper;
@@ -313,7 +371,7 @@ public class RestApiController extends AuthenticationRequiredController {
         Map<Integer, SkuTicket> skuTicketMap = getSkuTicketMap(
                 Lists.transform(orderVo.getOrderTickets(), OrderTicketVo::getSkuTicketId));
         BigDecimal total = orderVo.getOrderTickets().stream().
-                map((orderTicket) -> calculateTicketPrice(priceMap.get(orderTicket.getTicketPriceId()),
+                map((orderTicket) -> pricingService.calculate(priceMap.get(orderTicket.getTicketPriceId()),
                         discount)).
                 reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
 
@@ -455,27 +513,19 @@ public class RestApiController extends AuthenticationRequiredController {
 
 
     private void validateTicketUser(OrderTicket orderTicket, List<OrderTicketUserVo> users) {
-        String[] ages = orderTicket.getAgeConstraint().split("-");
-        int minAge = (Integer.parseInt(ages[0]));
-        int maxAge = (Integer.parseInt(ages[1]));
-        String[] weights = orderTicket.getWeightConstraint().split("-");
-        int minWeight = (Integer.parseInt(weights[0]));
-        int maxWeight = (Integer.parseInt(weights[1]));
-        boolean needCheckAge = !(minAge == maxAge && maxAge == 0);
-        boolean needCheckWeight = !(minWeight == maxWeight && maxWeight == 0);
-        for (OrderTicketUserVo orderTicketUserVo : users) {
-            int age = orderTicketUserVo.getAge();
-            if (needCheckAge) {
-                if (!(age >= minAge && age <= maxAge)) {
-                    throw new InvalidParamException("invalid age:" + age + " rule:" + orderTicket.getAgeConstraint());
-                }
-            }
-            int weight = orderTicketUserVo.getWeight();
-            if (needCheckWeight) {
-                if (!(weight >= minWeight && weight <= maxWeight)) {
-                    throw new InvalidParamException("invalid weight:" + weight + " rule:" + orderTicket.getWeightConstraint());
-                }
-            }
+        Pair<Boolean, String> validationResult = orderService.validateTicketUser(orderTicket.getAgeConstraint(),
+                orderTicket.getWeightConstraint(),
+                users.stream().map(input -> {
+                    OrderTicketUser result = new OrderTicketUser();
+                    result.setAge(input.getAge());
+                    result.setWeight(input.getWeight());
+                    result.setOrderTicketId(input.getOrderTicketId());
+                    result.setName(input.getName());
+                    result.setId(input.getId());
+                    return result;
+                }).collect(Collectors.toList()));
+        if (!validationResult.getLeft()) {
+            throw new InvalidParamException(validationResult.getRight());
         }
     }
 
@@ -520,7 +570,7 @@ public class RestApiController extends AuthenticationRequiredController {
                 validateTicketUser(orderTicket, orderTicketVo.getOrderTicketUsers());
                 orderTicketMapper.create(orderTicket);
                 //订单日志
-                orderRecordService.addTicket(orderTicket, token, order);
+                orderRecordService.addTicket(token, orderTicket, order);
                 orderTicketVo.setId(orderTicket.getId());
             }
             for (OrderTicketUserVo orderTicketUserVo : orderTicketVo.getOrderTicketUsers()) {
@@ -549,7 +599,7 @@ public class RestApiController extends AuthenticationRequiredController {
             }
         }
         BigDecimal total = orderVo.getOrderTickets().stream().
-                map((orderTicket) -> calculateTicketPrice(priceMap.get(orderTicket.getTicketPriceId()), discount)).
+                map((orderTicket) -> pricingService.calculate(priceMap.get(orderTicket.getTicketPriceId()), discount)).
                 reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
         o.setPrice(total);
         if (token.getRole() != Role.Admin || !order.getPrice().equals(o.getPrice())) {
@@ -645,9 +695,10 @@ public class RestApiController extends AuthenticationRequiredController {
     @RequestMapping(value = "/v1/api/orders/tickets/{id}", method = RequestMethod.DELETE)
     @Transactional(rollbackFor = Exception.class)
     @Authentication({Role.Vendor, Role.Admin, Role.Agent})
-    public boolean deleteTicket(@PathVariable("id") int id, @RequestBody OrderTicketVo ticketVo) {
+    public boolean deleteTicket(@PathVariable("id") int orderTicketId, @RequestBody OrderTicketVo ticketVo) {
         Token token = getToken();
-        int orderId = orderTicketMapper.findOrderId(id);
+        OrderTicket orderTicket = orderTicketMapper.findById(orderTicketId);
+        int orderId = orderTicket.getOrderId();
         Order order = orderMapper.findById(orderId);
         if (order == null) {
             throw new ResourceNotFoundException("invalid order id:" + orderId);
@@ -655,24 +706,23 @@ public class RestApiController extends AuthenticationRequiredController {
         Sku sku = skuService.findById(order.getSkuId());
         AuthenticationHelper.checkOrderAuthentication(order, sku, token);
         //订单日志
-        orderRecordService.deleteTicket(order, token, id);
-        //后续是否添加验证
-        int rowTicket = orderTicketMapper.deleteTicket(id, orderId);
+        int rowTicket = orderTicketMapper.deleteTicket(orderTicketId, orderId);
         if (rowTicket == 0) {
             return false;
         }
-        int rowUser = orderTicketUserMapper.deleteByOrderTicketId(id);
+        int rowUser = orderTicketUserMapper.deleteByOrderTicketId(orderTicketId);
         if (rowUser == 0) {
             return false;
         }
+        orderRecordService.deleteTicket(order, orderTicket, token);
+        //后续是否添加验证
         List<OrderTicket> orderTickets = orderTicketMapper.findByOrderId(orderId);
         Map<Integer, SkuTicketPrice> priceMap = getSkuTicketPriceMap(
                 Lists.transform(orderTickets, OrderTicket::getTicketPriceId));
         int discount = getDiscount(token, order.getSkuId());
-        BigDecimal total = orderTickets.stream().
-                map((orderTicket) -> calculateTicketPrice(priceMap.get(orderTicket.getTicketPriceId()),
-                        discount)).
-                reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
+        BigDecimal total = orderTickets.stream()
+                .map(input -> pricingService.calculate(priceMap.get(input.getTicketPriceId()), discount))
+                .reduce(BigDecimal::add).orElse(BigDecimal.ZERO);
         order.setPrice(total);
         order.setModifiedPrice(total);
         orderMapper.updateOrderInfo(order);
@@ -759,7 +809,7 @@ public class RestApiController extends AuthenticationRequiredController {
         int discount = orderId > 0 ? discountRateService.getDiscountByOrder(orderId) : getDiscount(getToken(), skuId);
         return Lists.transform(ticketPrices, (input) -> {
             SkuTicketPriceVo result = new SkuTicketPriceVo();
-            result.setPrice(calculateTicketPrice(input, discount));
+            result.setPrice(pricingService.calculate(input, discount));
             result.setSalePrice(input.getSalePrice());
             result.setId(input.getId());
             result.setSkuId(input.getSkuId());
@@ -771,11 +821,12 @@ public class RestApiController extends AuthenticationRequiredController {
         });
     }
 
-    public static BigDecimal calculateTicketPrice(SkuTicketPrice ticketPrice, int discount) {
-        BigDecimal cost = ticketPrice.getCostPrice();
-        BigDecimal sale = ticketPrice.getSalePrice();
-        return cost.add(sale.subtract(cost).multiply(BigDecimal.valueOf(discount))
-                .divide(BigDecimal.valueOf(100), BigDecimal.ROUND_CEILING));
+    @RequestMapping(value = "/v1/api/orders/{orderId}/tickets", method = RequestMethod.PUT)
+    @Authentication(Role.Admin)
+    public boolean replaceAllTickets(@PathVariable("orderId") int orderId,
+                                     @RequestBody ReplaceTicketsRequest request) {
+        Preconditions.checkArgument(orderId == request.getOrderId());
+        return orderService.replaceAllTickets(getToken(), orderId, request.getSkuTicketId(), request.getSkuTicketPriceId(), request.getGatheringPlace());
     }
 
     @RequestMapping(value = "/v1/api/skus/{skuId}/tickets/{ticketId}/prices", method = RequestMethod.POST)
@@ -1101,8 +1152,8 @@ public class RestApiController extends AuthenticationRequiredController {
         return result;
     }
 
-    private static OrderTicket parse(OrderTicketVo ticketVo, OrderVo orderVo,
-                                     Map<Integer, SkuTicketPrice> priceMap, Map<Integer, SkuTicket> skuTicketMap, int discount) {
+    private OrderTicket parse(OrderTicketVo ticketVo, OrderVo orderVo,
+                              Map<Integer, SkuTicketPrice> priceMap, Map<Integer, SkuTicket> skuTicketMap, int discount) {
         final OrderTicket result = new OrderTicket();
         final SkuTicketPrice skuTicketPrice = priceMap.get(ticketVo.getTicketPriceId());
         final SkuTicket skuTicket = skuTicketMap.get(ticketVo.getSkuTicketId());
@@ -1116,7 +1167,6 @@ public class RestApiController extends AuthenticationRequiredController {
         result.setTicketDate(DateUtils.parseDate(ticketVo.getTicketDate()));
         result.setTicketTime(ticketVo.getTicketTime());
         result.setPriceDescription(ticketVo.getPriceDescription());
-        result.setPrice(ticketVo.getPrice());
         result.setGatheringPlace(ticketVo.getGatheringPlace());
         result.setGatheringTime(ticketVo.getGatheringTime());
         result.setWeightConstraint(skuTicket.getWeightConstraint());
@@ -1126,7 +1176,7 @@ public class RestApiController extends AuthenticationRequiredController {
         result.setSalePrice(skuTicketPrice.getSalePrice());
         result.setCostPrice(skuTicketPrice.getCostPrice());
         result.setTicketDescription(skuTicketPrice.getDescription());
-        result.setPrice(calculateTicketPrice(skuTicketPrice, discount));
+        result.setPrice(pricingService.calculate(skuTicketPrice, discount));
         return result;
     }
 

@@ -123,8 +123,7 @@ public class OrderRecordService {
         orderRecordMapper.insert(orderRecord);
     }
 
-    public void deleteTicket(Order order, Token token, int id) {
-        OrderTicket orderTicket = orderTicketMapper.findById(id);
+    public void deleteTicket(Order order, OrderTicket orderTicket, Token token) {
         OrderRecord orderRecord = new OrderRecord();
         orderRecord.setOperateTime(new Date());
         orderRecord.setOperateType("票");
@@ -169,7 +168,7 @@ public class OrderRecordService {
         }
     }
 
-    public void addTicket(OrderTicket orderTicket, Token token, Order order) {
+    public void addTicket(Token token, OrderTicket orderTicket, Order order) {
         OrderRecord orderRecord = new OrderRecord();
         orderRecord.setOperateTime(new Date());
         orderRecord.setOperateType("票");

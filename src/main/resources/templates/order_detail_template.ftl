@@ -211,7 +211,6 @@
     </ul>
 </div>
 
-
 <div class="form-group" id="j_gathering_place_container">
     <label>选择集合地点</label>
     <#list sku.gatheringPlace as place>
@@ -228,6 +227,11 @@
             <input type="radio" name="gathering_place_radio">
         </span>
             <input type="text" class="form-control j_place" value="">
+        </div>
+    </#if>
+    <#if role?? && role == "Admin">
+        <div class="form-group">
+            <button id="j_replace_tickets" class="btn btn-primary">替换所有场次</button>
         </div>
     </#if>
     <div class="form-group"><label>游客信息</label><a id="add_ticket"><span

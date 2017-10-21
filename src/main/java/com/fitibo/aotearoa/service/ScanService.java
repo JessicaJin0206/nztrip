@@ -1,5 +1,8 @@
 package com.fitibo.aotearoa.service;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
 import com.fitibo.aotearoa.constants.CommonConstants;
 import com.fitibo.aotearoa.mapper.AgentMapper;
 import com.fitibo.aotearoa.mapper.SkuMapper;
@@ -14,8 +17,7 @@ import com.fitibo.aotearoa.vo.OrderTicketUserVo;
 import com.fitibo.aotearoa.vo.OrderTicketVo;
 import com.fitibo.aotearoa.vo.OrderVo;
 import com.fitibo.aotearoa.vo.Scan;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+
 import org.apache.ibatis.session.RowBounds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,8 +34,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.fitibo.aotearoa.controller.RestApiController.calculateTicketPrice;
-
 @Service("scanService")
 public class ScanService {
     private static final Logger logger = LoggerFactory.getLogger(ScanService.class);
@@ -47,6 +47,8 @@ public class ScanService {
     private AgentMapper agentMapper;
     @Autowired
     private DiscountRateService discountRateService;
+    @Autowired
+    private PricingService pricingService;
 
     public OrderVo scanOrder(Scan scan) {
         Map<String, String> map = Maps.newHashMap();
@@ -342,7 +344,7 @@ public class ScanService {
             if (skuTicketPrice.getTime().equals(scan.getTime())) {
                 orderTicketVo.setTicketPriceId(skuTicketPrice.getId());
                 orderTicketVo.setTicketTime(scan.getTime());
-                orderTicketVo.setPrice(calculateTicketPrice(skuTicketPrice, discount));
+                orderTicketVo.setPrice(pricingService.calculate(skuTicketPrice, discount));
                 orderTicketVo.setSalePrice(skuTicketPrice.getSalePrice());
                 break;
             }

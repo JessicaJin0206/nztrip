@@ -72,8 +72,7 @@ $('#j_ticket_type_selector li a').on('click', function (e) {
     timeSpan.html('选择时间');
     timeSpan.attr('value', "0");
     ticketDescSpan.html(selected.attr('desc'));
-    var path = window.location.pathname.split('/');
-    var orderId = parseInt(path[path.length - 2]);
+    var orderId = getOrderId();
     selector.datetimepicker({
                                 enabledDates: availableDate,
                                 // minDate: minDate,
@@ -182,8 +181,7 @@ $('.j_ticket_container').each(function (index, e) {
             if (result) {
                 var id = row.attr("value");
                 var skuTicketId = row.attr("ticketId");
-                var path = window.location.pathname.split('/');
-                var orderId = parseInt(path[path.length - 2]);
+                var orderId = getOrderId();
                 var data = {
                     id: id,
                     skuTicketId: skuTicketId,
@@ -219,14 +217,14 @@ $('#j_edit').on('click', function () {
 
 $('#j_record').on('click', function () {
     var path = window.location.pathname.split('/');
-    var id = parseInt(path[path.length - 1]);
+    var id = getOrderId();
     //window.location.href = '/order_record/' + id;
     if (window.location.pathname.endsWith('/_edit')) {
         id = parseInt(path[path.length - 2]);
-        window.open("/order_record/"+id);
+        window.open("/order_record/" + id);
     } else {
         id = parseInt(path[path.length - 1]);
-        window.open("/order_record/"+id);
+        window.open("/order_record/" + id);
     }
 });
 
@@ -270,7 +268,7 @@ $('#j_update').on('click', function () {
         return;
     }
     var reg = /^[a-zA-Z ]+$/;
-    if(!reg.test(primaryContact)){
+    if (!reg.test(primaryContact)) {
         warn("主要联系人必须为英文");
         isDataValid = false;
         return;
@@ -337,8 +335,7 @@ $('#j_update').on('click', function () {
     if (!isDataValid) {
         return;
     }
-    var path = window.location.pathname.split('/');
-    var id = parseInt(path[path.length - 2]);
+    var id = getOrderId();
     var data = {
         id: id,
         skuId: skuId,
@@ -379,14 +376,12 @@ $('#j_update').on('click', function () {
 });
 
 $('#j_download_voucher').on('click', function () {
-    var path = window.location.pathname.split('/');
-    var id = parseInt(path[path.length - 1]);
+    var id = getOrderId();
     window.open("/orders/" + id + "/voucher");
 });
 
 $('#j_resend_reservation').on('click', function () {
-    var path = window.location.pathname.split('/');
-    var id = parseInt(path[path.length - 1]);
+    var id = getOrderId();
     $.ajax({
                type: 'POST',
                contentType: 'application/json; charset=utf-8',
@@ -403,8 +398,7 @@ $('#j_resend_reservation').on('click', function () {
 });
 
 $('#j_resend_confirmation').on('click', function () {
-    var path = window.location.pathname.split('/');
-    var id = parseInt(path[path.length - 1]);
+    var id = getOrderId();
     $.ajax({
                type: 'POST',
                contentType: 'application/json; charset=utf-8',
@@ -421,13 +415,12 @@ $('#j_resend_confirmation').on('click', function () {
 });
 
 $('#j_resend_full').on('click', function () {
-    var path = window.location.pathname.split('/');
-    var id = parseInt(path[path.length - 1]);
+    var id = getOrderId();
     $.ajax({
-        type: 'POST',
-        contentType: 'application/json; charset=utf-8',
-        url: '/v1/api/orders/' + id + "/full"
-    }).success(function (resp) {
+               type: 'POST',
+               contentType: 'application/json; charset=utf-8',
+               url: '/v1/api/orders/' + id + "/full"
+           }).success(function (resp) {
         if (resp.code === 0) {
             success("full letter has been sent");
         } else {
@@ -439,8 +432,7 @@ $('#j_resend_full').on('click', function () {
 });
 
 $('.j_operation').on('click', function () {
-    var path = window.location.pathname.split('/');
-    var id = parseInt(path[path.length - 1]);
+    var id = getOrderId();
     var action = parseInt($(this).attr("operation"));
     var sendEmail = $(this).attr("email");
     var data = {};
@@ -471,6 +463,66 @@ $('.j_operation').on('click', function () {
                     }
     );
 
+});
+
+function getOrderId() {
+    var path = window.location.pathname.split('/');
+    for (var i = 0; i < path.length - 1; i++) {
+        if (path[i] === 'orders') {
+            return parseInt(path[i + 1]);
+        }
+    }
+    return NaN;
+}
+
+$("#j_replace_tickets").on('click', function () {
+    var ticket = $('#j_ticket');
+    var ticketId = parseInt(ticket.attr('value'));
+    if (ticketId <= 0) {
+        warn("请输入票种");
+        return;
+    }
+    var priceId = parseInt(timeSpan.attr('value'));
+    if (priceId <= 0) {
+        warn("请输入时间");
+        return;
+    }
+    var placeRadios = $('#j_gathering_place_container .input-group');
+    var place = '';
+    placeRadios.each(function (index, item) {
+        if ($(this).find('span input')[0].checked) {
+            place = $(this).find('input.j_place').val();
+        }
+    });
+    if (place.length === 0) {
+        warn("请输入集合地点");
+        return;
+    }
+    bootbox.confirm("确认替换所有票种?", function (yes) {
+        if (!yes) {
+            return;
+        }
+        var orderId = getOrderId();
+        $.ajax({
+                   type: 'PUT',
+                   contentType: "application/json; charset=utf-8",
+                   url: '/v1/api/orders/' + orderId + "/tickets",
+                   data: JSON.stringify({
+                                            orderId: orderId,
+                                            skuTicketId: ticketId,
+                                            skuTicketPriceId: priceId,
+                                            gatheringPlace: place
+                                        })
+               }).success(function (resp) {
+            window.location.href = "/orders/" + orderId;
+        }).error(function (resp) {
+            if (resp.status === 400) {
+                error(resp.responseText);
+            } else {
+                error("操作失败");
+            }
+        })
+    })
 });
 
 function updateOrderStatus(id, toStatus, sendEmail, data) {

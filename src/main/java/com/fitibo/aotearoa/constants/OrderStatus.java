@@ -42,7 +42,7 @@ public enum OrderStatus {
                 return orderStatus;
             }
         }
-        return NEW;
+        throw new IllegalArgumentException("invalid status value:" + value);
     }
 
     private final int value;

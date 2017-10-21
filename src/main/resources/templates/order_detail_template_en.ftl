@@ -216,7 +216,6 @@
     </ul>
 </div>
 
-
 <div class="form-group" id="j_gathering_place_container">
     <label>Select Gathering Place</label>
     <#list sku.gatheringPlace as place>
@@ -233,6 +232,11 @@
             <input type="radio" name="gathering_place_radio">
         </span>
             <input type="text" class="form-control j_place" value="">
+        </div>
+    </#if>
+    <#if role?? && role == "Admin">
+        <div class="form-group">
+            <button id="j_replace_tickets" class="btn btn-primary">Replace all Tickets</button>
         </div>
     </#if>
     <div class="form-group"><label>Tourists Info</label><a id="add_ticket"><span
