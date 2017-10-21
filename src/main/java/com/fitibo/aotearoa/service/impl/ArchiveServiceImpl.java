@@ -720,11 +720,10 @@ public class ArchiveServiceImpl implements ArchiveService {
                 return Integer.parseInt(s1[0]) - Integer.parseInt(s2[0]);
             }
         } catch (NumberFormatException e) {
-            logger.warn("invalid format", e);
-            return -1;
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //logger.warn("invalid format", e);
-            return -1;
+            logger.warn("invalid format");
+            return time1.compareTo(time2);
+        } catch (Exception e) {
+            return time1.compareTo(time2);
         }
     }
 
