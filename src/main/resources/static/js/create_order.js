@@ -1,22 +1,21 @@
 var create_alert = function (message) {
     var alert = $('.main .alert');
-    if (alert != null) {
+    if (alert !== null) {
         alert.remove();
     }
     return $('<div class="alert ">' +
-        '<button type="button" class="close" data-dismiss="alert"' +
-        'aria-hidden="true">' +
-        '&times;' +
-        '</button>' +
-        '<span id="j_alert">' + message + '</span>' +
-        '</div>');
+             '<button type="button" class="close" data-dismiss="alert"' +
+             'aria-hidden="true">' +
+             '&times;' +
+             '</button>' +
+             '<span id="j_alert">' + message + '</span>' +
+             '</div>');
 };
 
 var warn = function (message) {
     var alert = create_alert(message);
     alert.addClass('alert-warning');
     $('.main').prepend(alert);
-    console.log(message);
 };
 var success = function (message) {
     var alert = create_alert(message);
@@ -32,7 +31,7 @@ var error = function (message) {
 function getQueryString(name) {
     var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
     var r = window.location.search.substr(1).match(reg);
-    if (r != null) {
+    if (r !== null) {
         return unescape(r[2]);
     }
     return null;
@@ -41,10 +40,20 @@ function getQueryString(name) {
 var timeSelector = $('#j_ticket_time_selector');
 var timeSpan = $('#j_ticket_time_span');
 var ticketDescSpan = $('#j_ticket_desc');
+var dateSelector = $('#j_ticket_date');
+dateSelector.datetimepicker({
+                                disable: true,
+                                format: "YYYY-MM-DD"
+                            });
+var datetimepicker = dateSelector.data('DateTimePicker');
 $('#j_ticket_type_selector li a').on('click', function (e) {
     var selected = $(e.target);
     var ticket = $('#j_ticket');
-    ticket.attr('value', selected.attr("value"));
+    var ticketId = selected.attr("value");
+    if (ticket.attr('value') === ticketId) {
+        return;
+    }
+    ticket.attr('value', ticketId);
     ticket.attr('count', selected.attr("count"));
     ticket.attr('minAge', selected.attr('minAge'));
     ticket.attr('maxAge', selected.attr('maxAge'));
@@ -55,30 +64,54 @@ $('#j_ticket_type_selector li a').on('click', function (e) {
         function (value) {
             return value.length > 0;
         }).sort();
-    // availableDate.push(moment().format('YYYY-MM-DD'));
-    var selector = $('#j_ticket_date');
-    if (selector.data('DateTimePicker')) {
-        selector.data('DateTimePicker').destroy();
+
+    var selectedDate = dateSelector.find('input').val();
+    var selectedTime = "";
+    if (parseInt(timeSpan.attr('value')) > 0) {
+        selectedTime = timeSpan.html();
     }
-    selector.find('input').val("");
-    timeSpan.html('选择时间');
+    dateSelector.find('input').val("");
+    timeSpan.html('Select time');
     timeSpan.attr('value', "0");
     ticketDescSpan.html(selected.attr('desc'));
-    selector.datetimepicker({
-        enabledDates: availableDate,
-        format: "YYYY-MM-DD"
-    }).on('dp.change', function (e) {
-        var url = '/v1/api/skus/' + $('.main').attr('skuId') + '/tickets/'
-            + ticket.attr('value') + '/prices?date=' + e.date.format('YYYY-MM-DD');
+    console.log('selected date:' + selectedDate);
+    console.log('selected time:' + selectedTime);
+    if (availableDate.length === 0) {
+        datetimepicker.disable();
+        return;
+    }
+    datetimepicker.enable(true);
+    datetimepicker.enabledDates(availableDate);
+    dateSelector.on('dp.change', function (e) {
+        if (e.date === null) {
+            return;
+        }
+        if (e.oldDate !== null && (e.oldDate.format('YYYY-MM-DD') === e.date.format(
+                'YYYY-MM-DD'))) {
+            return;
+        }
+        var queryDate = e.date.format('YYYY-MM-DD');
+        queryTicket(ticketId, queryDate);
+    });
+    function queryTicket(ticketId, queryDate, orderId) {
+        var url = '/v1/api/skus/' + $('.main').attr('skuId')
+                  + '/tickets/'
+                  + ticketId
+                  + '/prices?date='
+                  + queryDate;
+        if (!isNaN(orderId)) {
+            url = url + "&orderId=" + orderId;
+        }
+        console.log('query url:' + url);
         timeSpan.html("Select time");
         timeSpan.attr('value', 0);
         timeSpan.attr('price', 0);
         timeSelector.empty();
         $.ajax({
-            type: 'GET',
-            contentType: "application/json; charset=utf-8",
-            url: url
-        }).success(function (data) {
+                   type: 'GET',
+                   contentType: "application/json; charset=utf-8",
+                   url: url
+               }).success(function (data) {
             if (data && data.length > 0) {
                 timeSelector.empty();
                 $.each(data, function (index, price) {
@@ -91,6 +124,12 @@ $('#j_ticket_type_selector li a').on('click', function (e) {
                         timeSpan.attr('salePrice', price.salePrice);
                     });
                     timeSelector.append(item);
+                    if (price.time === selectedTime) {
+                        timeSpan.html(price.time);
+                        timeSpan.attr('value', price.id);
+                        timeSpan.attr('price', price.price);
+                        timeSpan.attr('salePrice', price.salePrice);
+                    }
                 });
             } else {
 
@@ -98,7 +137,11 @@ $('#j_ticket_type_selector li a').on('click', function (e) {
         }).error(function () {
             timeSelector.empty();
         });
-    });
+    }
+    if ($.inArray(selectedDate, availableDate) >= 0) {
+        datetimepicker.date(selectedDate);
+        queryTicket(ticketId, selectedDate);
+    }
 });
 
 $('#add_ticket').on('click', function (e) {
@@ -109,7 +152,7 @@ $('#add_ticket').on('click', function (e) {
             place = $(this).find('input.j_place').val();
         }
     });
-    if (place.length == 0) {
+    if (place.length === 0) {
         warn('请输入接送地点');
         return;
     }
@@ -141,9 +184,6 @@ $('#add_ticket').on('click', function (e) {
     ticketContainer.attr('priceId', priceId);
     var totalTicketCount = $(".form-group.j_ticket_container").length;
     $('#add_ticket').parent().after(ticketContainer);
-    ticketContainer.find('#j_ticket_delete').on('click', function () {
-        ticketContainer.remove();
-    });
     ticketContainer.find('#j_ticket_name_span').html(ticketName);
     ticketContainer.find('#j_ticket_date_span').html(date);
     ticketContainer.find('#j_ticket_time_span').html(time);
@@ -162,6 +202,9 @@ $('#add_ticket').on('click', function (e) {
         ticketDetail.find('#j_user_name').val(ticketName + (totalTicketCount + 1));
         ticketContainer.find('tbody').append(ticketDetail);
     }
+    ticketContainer.find("a#j_ticket_delete").on('click', function () {
+        ticketContainer.remove();
+    })
 });
 
 var submitBtn = $('#j_submit');
@@ -179,6 +222,7 @@ submitBtn.on('click', function () {
     var secondaryContactWechat = $('#j_secondary_contact_wechat').val();
     var remark = $('#j_remark').val();
     var agentOrderId = $('#j_agent_order_id').val();
+    var vendorPhone = $('#j_vendor_phone').val();
     var agentId = parseInt($('.main').attr("agentId"));
     var orderTickets = [];
 
@@ -241,10 +285,10 @@ submitBtn.on('click', function () {
                 weight = -1;
             }
             orderTicket.orderTicketUsers.push({
-                name: name,
-                age: age,
-                weight: weight
-            })
+                                                  name: name,
+                                                  age: age,
+                                                  weight: weight
+                                              })
         });
     });
     if (!isDataValid) {
@@ -268,11 +312,11 @@ submitBtn.on('click', function () {
         orderTickets: orderTickets
     };
     $.ajax({
-        type: 'POST',
-        contentType: "application/json; charset=utf-8",
-        url: '/v1/api/orders/',
-        data: JSON.stringify(data)
-    }).success(function (data) {
+               type: 'POST',
+               contentType: "application/json; charset=utf-8",
+               url: '/v1/api/orders/',
+               data: JSON.stringify(data)
+           }).success(function (data) {
         success("添加成功");
         window.location.href = "/orders/" + data.id;
     }).complete(function (e) {

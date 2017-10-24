@@ -28,31 +28,23 @@ var error = function (message) {
     $('.main').prepend(alert);
 };
 
-var statusDropDown = $('#j_selected_status');
-$.each($('#j_status_drop_down li a'), function (idx, item) {
-    var status = $(item);
-    status.on('click', function () {
-        statusDropDown.html(status.html());
-        statusDropDown.attr('value', status.attr('value'));
-    })
-});
-
-function getQueryString(name) {
-    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
-    var r = window.location.search.substr(1).match(reg);
-    if (r !== null) {
-        return unescape(r[2]);
-    }
-    return null;
-}
-
 var timeSelector = $('#j_ticket_time_selector');
 var timeSpan = $('#j_ticket_time_span');
 var ticketDescSpan = $('#j_ticket_desc');
+var dateSelector = $('#j_ticket_date');
+dateSelector.datetimepicker({
+                                disable: true,
+                                format: "YYYY-MM-DD"
+                            });
+var datetimepicker = dateSelector.data('DateTimePicker');
 $('#j_ticket_type_selector li a').on('click', function (e) {
     var selected = $(e.target);
     var ticket = $('#j_ticket');
-    ticket.attr('value', selected.attr("value"));
+    var ticketId = selected.attr("value");
+    if (ticket.attr('value') === ticketId) {
+        return;
+    }
+    ticket.attr('value', ticketId);
     ticket.attr('count', selected.attr("count"));
     ticket.attr('minAge', selected.attr('minAge'));
     ticket.attr('maxAge', selected.attr('maxAge'));
@@ -63,25 +55,46 @@ $('#j_ticket_type_selector li a').on('click', function (e) {
         function (value) {
             return value.length > 0;
         }).sort();
-    availableDate.push(moment().format('YYYY-MM-DD'));
-    var selector = $('#j_ticket_date');
-    if (selector.data('DateTimePicker')) {
-        selector.data('DateTimePicker').destroy();
+
+    var selectedDate = dateSelector.find('input').val();
+    var selectedTime = "";
+    if (parseInt(timeSpan.attr('value')) > 0) {
+        selectedTime = timeSpan.html();
     }
-    selector.find('input').val("");
-    timeSpan.html('选择时间');
+    dateSelector.find('input').val("");
+    timeSpan.html('Select time');
     timeSpan.attr('value', "0");
     ticketDescSpan.html(selected.attr('desc'));
     var orderId = getOrderId();
-    selector.datetimepicker({
-                                enabledDates: availableDate,
-                                // minDate: minDate,
-                                // maxDate: maxDate,
-                                format: "YYYY-MM-DD"
-                            }).on('dp.change', function (e) {
-        var url = '/v1/api/skus/' + $('.main').attr('skuId') + '/tickets/'
-                  + ticket.attr('value')
-                  + '/prices?date=' + e.date.format('YYYY-MM-DD') + "&orderId=" + orderId;
+    console.log('selected date:' + selectedDate);
+    console.log('selected time:' + selectedTime);
+    if (availableDate.length === 0) {
+        datetimepicker.disable();
+        return;
+    }
+    datetimepicker.enable(true);
+    datetimepicker.enabledDates(availableDate);
+    dateSelector.on('dp.change', function (e) {
+        if (e.date === null) {
+            return;
+        }
+        if (e.oldDate !== null && (e.oldDate.format('YYYY-MM-DD') === e.date.format(
+                'YYYY-MM-DD'))) {
+            return;
+        }
+        var queryDate = e.date.format('YYYY-MM-DD');
+        queryTicket(ticketId, queryDate, orderId);
+    });
+    function queryTicket(ticketId, queryDate, orderId) {
+        var url = '/v1/api/skus/' + $('.main').attr('skuId')
+                  + '/tickets/'
+                  + ticketId
+                  + '/prices?date='
+                  + queryDate;
+        if (!isNaN(orderId)) {
+            url = url + "&orderId=" + orderId;
+        }
+        console.log('query url:' + url);
         timeSpan.html("Select time");
         timeSpan.attr('value', 0);
         timeSpan.attr('price', 0);
@@ -103,12 +116,24 @@ $('#j_ticket_type_selector li a').on('click', function (e) {
                         timeSpan.attr('salePrice', price.salePrice);
                     });
                     timeSelector.append(item);
+                    if (price.time === selectedTime) {
+                        timeSpan.html(price.time);
+                        timeSpan.attr('value', price.id);
+                        timeSpan.attr('price', price.price);
+                        timeSpan.attr('salePrice', price.salePrice);
+                    }
                 });
+            } else {
+
             }
         }).error(function () {
             timeSelector.empty();
         });
-    });
+    }
+    if ($.inArray(selectedDate, availableDate) >= 0) {
+        datetimepicker.date(selectedDate);
+        queryTicket(ticketId, selectedDate, orderId);
+    }
 });
 
 $('#add_ticket').on('click', function (e) {
@@ -159,7 +184,7 @@ $('#add_ticket').on('click', function (e) {
     ticketContainer.find('#j_gathering_place_span').val(place);
     for (var i = 0; i < ticketCount; i++) {
         var ticketDetail = $(
-            '<tr><th><input type="text" id="j_user_name" class="form-control"/></th><th><input type="number" id="j_user_age" class="form-control"/></th><th><input type="number" id="j_user_weight" class="form-control"/></th></tr>')
+            '<tr><th><input id="j_user_name" class="form-control"/></th><th><input type="number" id="j_user_age" class="form-control"/></th><th><input type="number" id="j_user_weight" class="form-control"/></th></tr>');
         if (minWeight === maxWeight && minWeight === 0) {
             ticketDetail.find('#j_user_weight').remove();
         }
