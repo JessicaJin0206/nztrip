@@ -49,11 +49,7 @@ var datetimepicker = dateSelector.data('DateTimePicker');
 $('#j_ticket_type_selector li a').on('click', function (e) {
     var selected = $(e.target);
     var ticket = $('#j_ticket');
-    var ticketId = selected.attr("value");
-    if (ticket.attr('value') === ticketId) {
-        return;
-    }
-    ticket.attr('value', ticketId);
+    ticket.attr('value', selected.attr('value'));
     ticket.attr('count', selected.attr("count"));
     ticket.attr('minAge', selected.attr('minAge'));
     ticket.attr('maxAge', selected.attr('maxAge'));
@@ -74,8 +70,6 @@ $('#j_ticket_type_selector li a').on('click', function (e) {
     timeSpan.html('Select time');
     timeSpan.attr('value', "0");
     ticketDescSpan.html(selected.attr('desc'));
-    console.log('selected date:' + selectedDate);
-    console.log('selected time:' + selectedTime);
     if (availableDate.length === 0) {
         datetimepicker.disable();
         return;
@@ -91,9 +85,16 @@ $('#j_ticket_type_selector li a').on('click', function (e) {
             return;
         }
         var queryDate = e.date.format('YYYY-MM-DD');
-        queryTicket(ticketId, queryDate);
+        queryTicket(queryDate);
     });
-    function queryTicket(ticketId, queryDate, orderId) {
+
+    if ($.inArray(selectedDate, availableDate) >= 0) {
+        datetimepicker.date(selectedDate);
+        queryTicket(selectedDate);
+    }
+
+    function queryTicket(queryDate, orderId) {
+        var ticketId = ticket.attr('value');
         var url = '/v1/api/skus/' + $('.main').attr('skuId')
                   + '/tickets/'
                   + ticketId
@@ -102,7 +103,6 @@ $('#j_ticket_type_selector li a').on('click', function (e) {
         if (!isNaN(orderId)) {
             url = url + "&orderId=" + orderId;
         }
-        console.log('query url:' + url);
         timeSpan.html("Select time");
         timeSpan.attr('value', 0);
         timeSpan.attr('price', 0);
@@ -112,6 +112,9 @@ $('#j_ticket_type_selector li a').on('click', function (e) {
                    contentType: "application/json; charset=utf-8",
                    url: url
                }).success(function (data) {
+            if (parseInt(ticketId) !== parseInt(ticket.attr('value'))) {
+                return;
+            }
             if (data && data.length > 0) {
                 timeSelector.empty();
                 $.each(data, function (index, price) {
@@ -137,10 +140,6 @@ $('#j_ticket_type_selector li a').on('click', function (e) {
         }).error(function () {
             timeSelector.empty();
         });
-    }
-    if ($.inArray(selectedDate, availableDate) >= 0) {
-        datetimepicker.date(selectedDate);
-        queryTicket(ticketId, selectedDate);
     }
 });
 
