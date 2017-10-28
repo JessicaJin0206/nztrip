@@ -338,3 +338,7 @@ checkAvailableButton.on('click', function () {
     }
     window.open(checkAvailable);
 });
+
+function deleteContainer(e) {
+    e.parentNode.remove();
+}
