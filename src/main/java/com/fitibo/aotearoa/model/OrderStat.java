@@ -24,7 +24,6 @@ public class OrderStat extends ModelObject {
     private String ticket;
     private Date ticketDate;
     private String ticketTime;
-    private String ticketUserName;
     private BigDecimal modifiedPrice;
     private BigDecimal totalPrice;
     private BigDecimal price;

@@ -13,13 +13,12 @@ import java.util.List;
  */
 public interface OrderStatMapper {
 
-    @Select("select o.id, o.uuid as order_id, o.create_time, o.primary_contact, o.status, o.reference_number, sku.uuid as sku_id, sku.name as sku_name, vendor.name as vendor_name, ot.sku_ticket_name, ot.ticket_date, ot.ticket_time, otu.name as order_ticket_user_name, o.price as total_price, o.modified_price, o.refund, ot.cost_price, ot.sale_price, (ot.cost_price + (ot.sale_price - ot.cost_price) * (CASE WHEN sr.discount is not null THEN sr.discount ELSE agent.discount END) / 100) as price, o.agent_order_id, agent.id as agent_id, agent.name as agent_name,\n" +
+    @Select("select o.id, o.uuid as order_id, o.create_time, o.primary_contact, o.status, o.reference_number, sku.uuid as sku_id, sku.name as sku_name, vendor.name as vendor_name, ot.sku_ticket_name, ot.ticket_date, ot.ticket_time, o.price as total_price, o.modified_price, o.refund, ot.cost_price, ot.sale_price, (ot.cost_price + (ot.sale_price - ot.cost_price) * (CASE WHEN sr.discount is not null THEN sr.discount ELSE agent.discount END) / 100) as price, o.agent_order_id, agent.id as agent_id, agent.name as agent_name,\n" +
             "(CASE WHEN sr.discount is not null THEN sr.discount ELSE agent.discount END) as discount\n" +
             "from `order` o \n" +
             "inner join order_ticket ot on o.id = ot.order_id\n" +
             "inner join sku on o.sku_id = sku.id\n" +
             "inner join vendor on sku.vendor_id = vendor.id\n" +
-            "inner join order_ticket_user otu on ot.id = otu.order_ticket_id\n" +
             "inner join agent on o.agent_id = agent.id\n" +
             "left join special_rate sr on sku.uuid = sr.sku and agent.id = sr.agent_id\n")
     @Results({
@@ -34,7 +33,6 @@ public interface OrderStatMapper {
             @Result(column = "sku_ticket_name", property = "ticket"),
             @Result(column = "ticket_date", property = "ticketDate"),
             @Result(column = "ticket_time", property = "ticketTime"),
-            @Result(column = "order_ticket_user_name", property = "ticketUserName"),
             @Result(column = "total_price", property = "totalPrice"),
             @Result(column = "modified_price", property = "modifiedPrice"),
             @Result(column = "price", property = "price"),
