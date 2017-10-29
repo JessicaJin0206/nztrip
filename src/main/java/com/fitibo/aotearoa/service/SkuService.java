@@ -1,7 +1,5 @@
 package com.fitibo.aotearoa.service;
 
-import com.google.common.collect.Maps;
-
 import com.fitibo.aotearoa.mapper.SkuMapper;
 import com.fitibo.aotearoa.mapper.SkuTicketMapper;
 import com.fitibo.aotearoa.mapper.SkuTicketPriceMapper;
@@ -9,16 +7,13 @@ import com.fitibo.aotearoa.model.Sku;
 import com.fitibo.aotearoa.model.SkuTicket;
 import com.fitibo.aotearoa.model.SkuTicketPrice;
 import com.fitibo.aotearoa.util.DateUtils;
-
+import com.google.common.collect.Maps;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import javax.annotation.PostConstruct;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -26,6 +21,7 @@ import java.util.stream.Collectors;
  */
 @Service("skuService")
 public class SkuService {
+    private static Map<Integer, Integer> skuVendorMap;
 
     @Autowired
     private SkuMapper skuMapper;
@@ -35,6 +31,20 @@ public class SkuService {
 
     @Autowired
     private SkuTicketPriceMapper skuTicketPriceMapper;
+
+    public static boolean isSameVendor(int skuId1, int skuId2) {
+        return getVendorId(skuId1) == getVendorId(skuId2);
+    }
+
+    public static int getVendorId(int skuId) {
+        return skuVendorMap.get(skuId);
+    }
+
+    @PostConstruct
+    public void init() {
+        List<Sku> skus = skuMapper.findAll(new RowBounds());
+        skuVendorMap = skus.stream().collect(Collectors.toConcurrentMap(Sku::getId, Sku::getVendorId));
+    }
 
     public Sku findById(int skuId) {
         Sku sku = skuMapper.findById(skuId);

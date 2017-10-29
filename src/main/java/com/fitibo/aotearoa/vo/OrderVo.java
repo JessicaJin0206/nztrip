@@ -45,4 +45,5 @@ public class OrderVo {
     private BigDecimal refund;
     private PayStatus payStatus;
     private String currency;
+    private int groupType;
 }

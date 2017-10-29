@@ -95,9 +95,9 @@ function searchWith(pagenumber, pagesize) {
         searchString += "status=" + status + "&";
     }
     if (searchString.length > 0) {
-        window.location.href="/orders?pagenumber="+pagenumber+"&pagesize="+pagesize + searchString;
-    }else {
-        window.location.href="/orders?pagenumber="+pagenumber+"&pagesize="+pagesize;
+        window.location.href = "/orders?pagenumber=" + pagenumber + "&pagesize=" + pagesize + searchString;
+    } else {
+        window.location.href = "/orders?pagenumber=" + pagenumber + "&pagesize=" + pagesize;
     }
 }
 
@@ -109,4 +109,8 @@ $('#j_urgent_orders').on('click', function () {
 });
 $('#j_full_orders').on('click', function () {
     window.open("/orders?status=30");
+});
+
+$('#j_classify_orders').on('click', function () {
+    window.open("/orders/classify/2");
 });

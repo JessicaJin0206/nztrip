@@ -25,6 +25,11 @@ spring:
   jackson:
     default-property-inclusion: non_null
 
+mybatis:
+  mapperLocations: classpath:mybatis/mapper/*.xml
+  typeAliasesPackage: com.fitibo.aotearoa.model
+  configLocation: classpath:mybatis/mybatis-config.xml
+
 mock-receiver:
 email-from: eyounz01@gmail.com
 
@@ -53,6 +58,40 @@ template:
       Tel & Fax: +64 (0)3 357 4405<br>
       Address: 8a/41 Sir William Pickering Dr, Burnside, Christchurch 8053
       </div></body></html>
+
+
+  multisaverreservationemail:
+      from: eyounz@foxmail.com
+      subject: |
+        Multi Saver New Booking from EYOUNZ LTD #TOUR# #PRIMARY_CONTACT#
+      content: |
+        <html><body><div>
+        #VENDORNAME#,<br><br>
+        Please kindly help us to make the reservation as below:<br>
+        <b>Please add on MULTI SAVER promotion for this bookings</b>
+        <br>
+        NAME: #NAME# <br>
+        PHONE: #PHONE# <br>
+        #SKUS#
+        <br>
+        REMARK: #REMARK#<br>
+        <br>
+        A prompt replay would greatly oblige us.<br><br>
+        Many thanks for your support.<br><br>
+        Best Regards<br><br>
+        Reservation Team<br>
+        <span style="color: dodgerblue">the <span style="font-weight: bold">Easy Efficient Excellent</span> travel with <span style="font-weight: bold">EYOUNZ Limited</span></span><br>
+        Tel & Fax: +64 (0)3 357 4405<br>
+        Address: 8a/41 Sir William Pickering Dr, Burnside, Christchurch 8053
+        </div></body></html>
+      sku_detail: |
+            TOUR: #TOUR# <br>
+            ORDER ID: #ORDER_ID# <br>
+            #PEOPLE_INFO# <br>
+            DATE: #DATE# (yyyy-MM-dd)<br>
+            TIME: #TIME# <br>
+            Gather At：#GRATHING_INFO# <br>
+            <br>
 
   confirmation_email:
     from: eyounz@foxmail.com

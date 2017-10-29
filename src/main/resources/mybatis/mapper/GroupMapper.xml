@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fitibo.aotearoa.mapper.GroupMapper">
+    <resultMap id="BaseResultMap" type="com.fitibo.aotearoa.model.Group">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="uuid" property="uuid" jdbcType="VARCHAR"/>
+        <result column="type" property="type" jdbcType="TINYINT"/>
+        <result column="agent_id" property="agentId" jdbcType="INTEGER"/>
+        <result column="primary_contact" property="primaryContact" jdbcType="VARCHAR"/>
+        <result column="primary_contact_email" property="primaryContactEmail" jdbcType="VARCHAR"/>
+        <result column="primary_contact_phone" property="primaryContactPhone" jdbcType="VARCHAR"/>
+        <result column="primary_contact_wechat" property="primaryContactWechat" jdbcType="VARCHAR"/>
+        <result column="ticket_date_start" property="ticketDateStart" jdbcType="DATE"/>
+        <result column="ticket_date_end" property="ticketDateEnd" jdbcType="DATE"/>
+        <result column="total_cost_price" property="totalCostPrice" jdbcType="DECIMAL"/>
+        <result column="total_price" property="totalPrice" jdbcType="DECIMAL"/>
+        <result column="status" property="status" jdbcType="TINYINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <resultMap id="ResultMapWithBLOBs" type="com.fitibo.aotearoa.model.Group"
+               extends="BaseResultMap">
+        <result column="remark" property="remark" jdbcType="LONGVARCHAR"/>
+    </resultMap>
+    <resultMap id="ResultMapWithAgentName" type="com.fitibo.aotearoa.model.Group"
+               extends="ResultMapWithBLOBs">
+        <result column="agent_name" property="agentName" jdbcType="LONGVARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, uuid, type, agent_id, primary_contact, primary_contact_email, primary_contact_phone,
+        primary_contact_wechat, ticket_date_start, ticket_date_end, total_cost_price, total_price, status, create_time, update_time
+    </sql>
+    <sql id="Blob_Column_List">
+        remark
+    </sql>
+    <insert id="insertSelective" parameterType="com.fitibo.aotearoa.model.Group">
+        insert into `group`
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="uuid != null">
+                uuid,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="agentId != null">
+                agent_id,
+            </if>
+            <if test="primaryContact != null">
+                primary_contact,
+            </if>
+            <if test="primaryContactEmail != null">
+                primary_contact_email,
+            </if>
+            <if test="primaryContactPhone != null">
+                primary_contact_phone,
+            </if>
+            <if test="primaryContactWechat != null">
+                primary_contact_wechat,
+            </if>
+            <if test="ticketDateStart != null">
+                ticket_date_start,
+            </if>
+            <if test="ticketDateEnd != null">
+                ticket_date_end,
+            </if>
+            <if test="totalCostPrice != null">
+                total_cost_price,
+            </if>
+            <if test="totalPrice != null">
+                total_price,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="uuid != null">
+                #{uuid,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=TINYINT},
+            </if>
+            <if test="agentId != null">
+                #{agentId,jdbcType=INTEGER},
+            </if>
+            <if test="primaryContact != null">
+                #{primaryContact,jdbcType=VARCHAR},
+            </if>
+            <if test="primaryContactEmail != null">
+                #{primaryContactEmail,jdbcType=VARCHAR},
+            </if>
+            <if test="primaryContactPhone != null">
+                #{primaryContactPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="primaryContactWechat != null">
+                #{primaryContactWechat,jdbcType=VARCHAR},
+            </if>
+            <if test="ticketDateStart != null">
+                #{ticketDateStart},
+            </if>
+            <if test="ticketDateEnd != null">
+                #{ticketDateEnd},
+            </if>
+            <if test="totalCostPrice != null">
+                #{totalCostPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="totalPrice != null">
+                #{totalPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=TINYINT},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=LONGVARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.fitibo.aotearoa.model.Group">
+        update `group`
+        <set>
+            <if test="uuid != null">
+                uuid = #{uuid,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                type = #{type,jdbcType=TINYINT},
+            </if>
+            <if test="agentId != null">
+                agent_id = #{agentId,jdbcType=INTEGER},
+            </if>
+            <if test="primaryContact != null">
+                primary_contact = #{primaryContact,jdbcType=VARCHAR},
+            </if>
+            <if test="primaryContactEmail != null">
+                primary_contact_email = #{primaryContactEmail,jdbcType=VARCHAR},
+            </if>
+            <if test="primaryContactPhone != null">
+                primary_contact_phone = #{primaryContactPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="primaryContactWechat != null">
+                primary_contact_wechat = #{primaryContactWechat,jdbcType=VARCHAR},
+            </if>
+            <if test="ticketDateStart != null">
+                ticket_date_start = #{ticketDateStart},
+            </if>
+            <if test="ticketDateEnd != null">
+                ticket_date_end = #{ticketDateEnd},
+            </if>
+            <if test="totalCostPrice != null">
+                total_cost_price = #{totalCostPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="totalPrice != null">
+                total_price = #{totalPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=TINYINT},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=LONGVARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

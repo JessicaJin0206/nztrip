@@ -97,6 +97,11 @@
                         </span>
                     </div>
                 </div>
+            <#if role?? && (role == "Admin")>
+                <div class="col-md-1">
+                    <button id="j_classify_orders" class="btn btn-primary">Multi Saver</button>
+                </div>
+            </#if>
             </div>
             <div>
                 <table class="table table-hover">

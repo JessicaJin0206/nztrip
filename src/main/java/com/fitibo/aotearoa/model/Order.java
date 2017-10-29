@@ -40,4 +40,5 @@ public class Order extends ModelObject {
     private boolean fromVendor;
     private String currency;
     private int payStatus;
+    private int groupType;
 }

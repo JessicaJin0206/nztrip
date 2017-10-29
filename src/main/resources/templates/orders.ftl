@@ -99,6 +99,11 @@
                         </span>
                     </div>
                 </div>
+            <#if role?? && (role == "Admin")>
+                <div class="col-md-1">
+                    <button id="j_classify_orders" class="btn btn-primary">Multi Saver</button>
+                </div>
+            </#if>
             </div>
             <div>
                 <table class="table table-hover">
@@ -107,7 +112,7 @@
                         <th>编号/代理商订单号</th>
                         <th>项目/备注</th>
                         <th>主联系人/出行日期</th>
-                        <th>Email/代理商</th>
+                        <th><#if role?? && (role == "Admin")>组类别<#else>Email</#if>/代理商</th>
                         <th>状态/操作</th>
                     </tr>
                     </thead>
@@ -117,7 +122,13 @@
                         <th scope="row">${order.uuid}</th>
                         <th>${order.sku}</th>
                         <td>${order.primaryContact!''}</td>
-                        <td>${order.primaryContactEmail!''}</td>
+                        <td><#if role?? && (role == "Admin")>
+                            <#list types as type>
+                            <#if (type.getValue() == order.groupType)>
+                            ${type.getDesc()}
+                            </#if>
+                        </#list>
+                        <#else>${order.primaryContactEmail!''}</#if></td>
                         <td>
                             <#list statusList as s>
                             <#if (s.getValue() == order.status)>

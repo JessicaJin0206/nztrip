@@ -2,6 +2,7 @@ package com.fitibo.aotearoa.controller;
 
 import com.fitibo.aotearoa.annotation.Authentication;
 import com.fitibo.aotearoa.constants.CommonConstants;
+import com.fitibo.aotearoa.constants.GroupType;
 import com.fitibo.aotearoa.constants.OrderStatus;
 import com.fitibo.aotearoa.constants.SkuTicketStatus;
 import com.fitibo.aotearoa.dto.Role;
@@ -15,6 +16,7 @@ import com.fitibo.aotearoa.exception.VendorEmailEmptyException;
 import com.fitibo.aotearoa.mapper.*;
 import com.fitibo.aotearoa.model.*;
 import com.fitibo.aotearoa.service.*;
+import com.fitibo.aotearoa.service.impl.ArchiveServiceImpl;
 import com.fitibo.aotearoa.util.DateUtils;
 import com.fitibo.aotearoa.util.GuidGenerator;
 import com.fitibo.aotearoa.util.Md5Utils;
@@ -127,6 +129,12 @@ public class RestApiController extends AuthenticationRequiredController {
     @Value("${secret}")
     private String secret;
 
+    @Autowired
+    private GroupService groupService;
+
+    @Autowired
+    private GroupMapper groupMapper;
+
     @ExceptionHandler
     public ResponseEntity handleException(AuthenticationFailureException ex) {
         logger.error(ex.getMessage(), ex);
@@ -175,7 +183,6 @@ public class RestApiController extends AuthenticationRequiredController {
         List<Sku> skus = skuMapper.findAllByMultiFields(keyword, 0, 0, 0, vendorId, new RowBounds(pageNumber * pageSize, pageSize));
         return skus.stream().filter(Sku::isAvailable).map(RestApiController::parse).collect(Collectors.toList());
     }
-
 
     @RequestMapping(value = "/v1/api/skus/{id}", method = RequestMethod.GET)
     @Authentication(Role.Agent)
@@ -228,7 +235,6 @@ public class RestApiController extends AuthenticationRequiredController {
         result.setTickets(Lists.transform(skuTickets, ObjectParser::parse));
         return result;
     }
-
 
     @RequestMapping(value = "/v1/api/skus/{id}", method = RequestMethod.PUT)
     @Transactional(rollbackFor = Exception.class)
@@ -445,6 +451,18 @@ public class RestApiController extends AuthenticationRequiredController {
         return orderVo;
     }
 
+    @RequestMapping(value = "/v1/api/team_orders", method = RequestMethod.POST)
+    @Transactional(rollbackFor = Exception.class)
+    @Authentication({Role.Vendor, Role.Admin, Role.Agent})
+    public List<OrderVo> createTeamOrders(@RequestBody TeamOrdersRequest request) {
+        List<OrderVo> orderVos = Lists.newArrayList();
+        for (OrderVo orderVo : request.getOrders()) {
+            orderVo.setAgentId(35);
+            orderVos.add(createOrder(orderVo));
+        }
+        return orderVos;
+    }
+
     @RequestMapping(value = "/v1/api/skus/{id}/sessions", method = RequestMethod.GET)
     @Authentication({Role.Admin, Role.Vendor})
     public List<String> getSessions(@PathVariable("id") int id,
@@ -500,7 +518,6 @@ public class RestApiController extends AuthenticationRequiredController {
             return new ResultVo(-1, "failed to send full email");
         }
     }
-
 
     private void validateTicketUser(OrderTicket orderTicket, List<OrderTicketUserVo> users) {
         Pair<Boolean, String> validationResult = orderService.validateTicketUser(orderTicket.getAgeConstraint(),
@@ -1023,45 +1040,129 @@ public class RestApiController extends AuthenticationRequiredController {
         return true;
     }
 
-    private Map<Integer, SkuTicketPrice> getSkuTicketPriceMap(List<Integer> ids) {
-        if (ids.isEmpty()) {
-            return Collections.emptyMap();
+    @RequestMapping(value = "/v1/api/group/{id}/status/{toStatus}", method = RequestMethod.PUT)
+    @Authentication({Role.Admin, Role.Vendor})
+    @Transactional
+    public ResultVo updateGroupStatus(@PathVariable("id") int id,
+                                      @PathVariable("toStatus") int toStatus,
+                                      @RequestParam(value = "sendEmail", defaultValue = "true") boolean sendEmail,
+                                      @RequestBody GroupVo extra) {
+        GroupVo groupVo = groupService.getGroupById(id);
+        int fromStatus = groupVo.getStatus();
+        logger.info("update group status from " + OrderStatus.valueOf(fromStatus) + " to" + OrderStatus.valueOf(toStatus));
+        List<Transition> transitions = orderService.getAvailableTransitions(fromStatus);
+        boolean statusValid = false;
+        for (Transition transition : transitions) {
+            if (transition.getTo() == toStatus) {
+                statusValid = true;
+                break;
+            }
         }
-        List<SkuTicketPrice> prices = skuTicketPriceMapper.findByIds(ids);
-        Map<Integer, SkuTicketPrice> priceMap = Maps.newHashMap();
-        for (SkuTicketPrice skuTicketPrice : prices) {
-            priceMap.put(skuTicketPrice.getId(), skuTicketPrice);
+        if (!statusValid) {
+            throw new InvalidParamException("invalid transition from " + OrderStatus.valueOf(fromStatus) + " to " + OrderStatus.valueOf(toStatus));
         }
-        return priceMap;
+        boolean result = groupService.updateGroupStatus(id, toStatus);
+        for (OrderVo orderVo : groupVo.getOrderVos()) {
+            result &= updateOrderStatus(orderVo.getId(), toStatus, toStatus != OrderStatus.PENDING.getValue() && sendEmail, orderVo).equals(ResultVo.SUCCESS);
+        }
+        if (!result) {
+            return ResultVo.FAIL;
+        }
+        try {
+            operationService.doRelatedOperation(sendEmail, fromStatus, toStatus, groupMapper.findById(id));
+        } catch (VendorEmailEmptyException e) {
+            logger.warn("vendor does not have email please order in other system");
+            return new ResultVo(-2, "vendor does not have email please order in other system");
+        }
+        return ResultVo.SUCCESS;
     }
 
-    private Map<Integer, SkuTicket> getSkuTicketMap(List<Integer> ids) {
-        if (ids.isEmpty()) {
-            return Collections.emptyMap();
+    @RequestMapping(value = "/v1/api/group/{id}/confirmation", method = RequestMethod.POST)
+    @Authentication(Role.Admin)
+    public ResultVo sendGroupConfirmation(@PathVariable("id") int groupId) {
+        Group group = groupMapper.findById(groupId);
+        Preconditions.checkArgument(group.getStatus() == OrderStatus.CONFIRMED.getValue(),
+                "unable to send confirmation with group id: " + group + " with status:" + group.getStatus());
+        boolean result = operationService.sendConfirmationEmail(group);
+        if (result) {
+            return ResultVo.SUCCESS;
+        } else {
+            return new ResultVo(-1, "agent does not have email");
         }
-        logger.info("sku ticket ids from order:" + ids);
-        List<SkuTicket> skuTickets = skuTicketMapper.findByIds(ids);
-        HashMap<Integer, SkuTicket> skuTicketMap = Maps.newHashMap();
-        for (SkuTicket skuTicket : skuTickets) {
-            skuTicketMap.put(skuTicket.getId(), skuTicket);
-        }
-        return skuTicketMap;
     }
 
-    private int getDiscount(Token token, int skuId) {
-        if (token == null) {
-            throw new AuthenticationFailureException("token cannot be null");
+    @RequestMapping(value = "/v1/api/group/{id}/reservation", method = RequestMethod.POST)
+    @Authentication(Role.Admin)
+    public ResultVo sendGroupReservation(@PathVariable("id") int groupId) {
+        Group group = groupMapper.findById(groupId);
+        int status = group.getStatus();
+        Preconditions.checkArgument(status == OrderStatus.PENDING.getValue() || status == OrderStatus.RECONFIRMING.getValue(),
+                "unable to send reservation with group id: " + groupId + " with status:" + status);
+        try {
+            boolean result = operationService.sendReservationEmail(group);
+            if (result) {
+                return ResultVo.SUCCESS;
+            } else {
+                return new ResultVo(-1, "failed to send reservation email");
+            }
+        } catch (VendorEmailEmptyException e) {
+            return new ResultVo(-2, "vendor does not have email please order in other system");
         }
-        switch (token.getRole()) {
-            case Admin:
-                return discountRateService.getDiscountByAdmin(token.getId());
-            case Agent:
-                return discountRateService.getDiscountByAgent(token.getId(), skuId);
-            case Vendor:
-                return discountRateService.getDiscountByVendor(token.getId(), skuId);
-            default:
-                throw new AuthenticationFailureException("invalid role:" + token.getRole());
+    }
+
+    @RequestMapping(value = "/v1/api/group/{id}/full", method = RequestMethod.POST)
+    @Authentication(Role.Admin)
+    public ResultVo sendGroupFull(@PathVariable("id") int groupId) {
+        Group group = groupMapper.findById(groupId);
+        boolean result = operationService.sendFullEmail(group);
+        if (result) {
+            return ResultVo.SUCCESS;
+        } else {
+            return new ResultVo(-1, "failed to send full email");
         }
+    }
+
+    @RequestMapping(value = "/v1/api/group/{id}/orders/{orderId}", method = RequestMethod.DELETE)
+    @Transactional(rollbackFor = Exception.class)
+    @Authentication(Role.Admin)
+    public boolean deleteOrder(@PathVariable("id") int groupId, @PathVariable("orderId") int orderId) {
+        return groupService.deleteOrderFromGroup(new GroupOrder(groupId, orderId));
+    }
+
+    @RequestMapping(value = "/v1/api/group/{id}/orders/{uuid}", method = RequestMethod.POST)
+    @Transactional(rollbackFor = Exception.class)
+    @Authentication(Role.Admin)
+    public boolean addOrder(@PathVariable("id") int groupId, @PathVariable("uuid") String uuid) {
+        return groupService.addOrderToGroup(groupId, uuid);
+    }
+
+    @RequestMapping(value = "/v1/api/group", method = RequestMethod.POST)
+    @Transactional(rollbackFor = Exception.class)
+    @Authentication(Role.Admin)
+    public GroupVo createGroup(@RequestBody GroupVo groupVo) {
+        groupService.createGroup(groupVo);
+        return groupVo;
+    }
+
+    @RequestMapping(value = "/v1/api/group/{id}", method = RequestMethod.PUT)
+    @Transactional(rollbackFor = Exception.class)
+    @Authentication(Role.Admin)
+    public GroupVo updateGroup(@RequestBody GroupVo groupVo) {
+        Group group = groupMapper.findById(groupVo.getId());
+        if (group == null) {
+            throw new ResourceNotFoundException("invalid group id:" + groupVo.getId());
+        }
+        groupService.updateGroup(groupVo);
+        return groupVo;
+    }
+
+    @RequestMapping(value = "/v1/api/orders/group/{type}", method = RequestMethod.POST)
+    @Transactional(rollbackFor = Exception.class)
+    @Authentication(Role.Admin)
+    public GroupVo createGroupByOrders(@PathVariable("type") int type,
+                                       @RequestBody List<OrderVo> orderVos) {
+        GroupVo groupVo = groupService.createGroup(orderVos.stream().map(OrderVo::getId).collect(Collectors.toList()), GroupType.valueOf(type));
+        return groupVo;
     }
 
     private static Order parse(OrderVo order) {
@@ -1080,6 +1181,7 @@ public class RestApiController extends AuthenticationRequiredController {
         result.setGatheringInfo(Strings.nullToEmpty(order.getGatheringInfo()));
         result.setAgentOrderId(Strings.nullToEmpty(order.getAgentOrderId()));
         result.setAgentId(order.getAgentId());
+        result.setGroupType(order.getGroupType());
         return result;
     }
 
@@ -1106,6 +1208,7 @@ public class RestApiController extends AuthenticationRequiredController {
         result.setGatheringInfo(Strings.nullToEmpty(order.getGatheringInfo()));
         result.setAgentOrderId(Strings.nullToEmpty(order.getAgentOrderId()));
         result.setVendorPhone(order.getVendorPhone());
+        result.setGroupType(order.getGroupType());
         return result;
     }
 
@@ -1193,6 +1296,64 @@ public class RestApiController extends AuthenticationRequiredController {
         return result;
     }
 
+    private static Agent parse(AgentVo agentVo) {
+        Agent result = new Agent();
+        result.setUserName(agentVo.getUserName());
+        if (!Strings.isNullOrEmpty(agentVo.getPassword())) {
+            result.setPassword(Md5Utils.md5(agentVo.getPassword()));
+        }
+        result.setName(agentVo.getName());
+        result.setDescription(agentVo.getDescription());
+        result.setDiscount(agentVo.getDiscount());
+        result.setEmail(agentVo.getEmail());
+        result.setDefaultContact(agentVo.getDefaultContact());
+        result.setDefaultContactEmail(agentVo.getDefaultContactEmail());
+        result.setDefaultContactPhone(agentVo.getDefaultContactPhone());
+        result.setHasApi(agentVo.isHasApi());
+        return result;
+    }
+
+    private Map<Integer, SkuTicketPrice> getSkuTicketPriceMap(List<Integer> ids) {
+        if (ids.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        List<SkuTicketPrice> prices = skuTicketPriceMapper.findByIds(ids);
+        Map<Integer, SkuTicketPrice> priceMap = Maps.newHashMap();
+        for (SkuTicketPrice skuTicketPrice : prices) {
+            priceMap.put(skuTicketPrice.getId(), skuTicketPrice);
+        }
+        return priceMap;
+    }
+
+    private Map<Integer, SkuTicket> getSkuTicketMap(List<Integer> ids) {
+        if (ids.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        logger.info("sku ticket ids from order:" + ids);
+        List<SkuTicket> skuTickets = skuTicketMapper.findByIds(ids);
+        HashMap<Integer, SkuTicket> skuTicketMap = Maps.newHashMap();
+        for (SkuTicket skuTicket : skuTickets) {
+            skuTicketMap.put(skuTicket.getId(), skuTicket);
+        }
+        return skuTicketMap;
+    }
+
+    private int getDiscount(Token token, int skuId) {
+        if (token == null) {
+            throw new AuthenticationFailureException("token cannot be null");
+        }
+        switch (token.getRole()) {
+            case Admin:
+                return discountRateService.getDiscountByAdmin(token.getId());
+            case Agent:
+                return discountRateService.getDiscountByAgent(token.getId(), skuId);
+            case Vendor:
+                return discountRateService.getDiscountByVendor(token.getId(), skuId);
+            default:
+                throw new AuthenticationFailureException("invalid role:" + token.getRole());
+        }
+    }
+
     private OrderTicket parse(OrderTicketVo ticketVo, int orderId, int skuId,
                               Map<Integer, SkuTicketPrice> priceMap, Map<Integer, SkuTicket> skuTicketMap, int discount) {
         final OrderTicket result = new OrderTicket();
@@ -1218,23 +1379,6 @@ public class RestApiController extends AuthenticationRequiredController {
         result.setCostPrice(skuTicketPrice.getCostPrice());
         result.setTicketDescription(skuTicketPrice.getDescription());
         result.setPrice(pricingService.calculate(skuTicketPrice, discount));
-        return result;
-    }
-
-    private static Agent parse(AgentVo agentVo) {
-        Agent result = new Agent();
-        result.setUserName(agentVo.getUserName());
-        if (!Strings.isNullOrEmpty(agentVo.getPassword())) {
-            result.setPassword(Md5Utils.md5(agentVo.getPassword()));
-        }
-        result.setName(agentVo.getName());
-        result.setDescription(agentVo.getDescription());
-        result.setDiscount(agentVo.getDiscount());
-        result.setEmail(agentVo.getEmail());
-        result.setDefaultContact(agentVo.getDefaultContact());
-        result.setDefaultContactEmail(agentVo.getDefaultContactEmail());
-        result.setDefaultContactPhone(agentVo.getDefaultContactPhone());
-        result.setHasApi(agentVo.isHasApi());
         return result;
     }
 

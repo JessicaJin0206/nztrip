@@ -65,6 +65,20 @@
         <button id="j_resend_full" class="btn btn-default form-group">重新发送已满邮件</button>
     </div>
 </div>
+    <#if order.groupType != 0>
+    <div class="form-group">
+        <div class="row">
+            <label class="col-md-2">组类别:</label>
+            <button id="j_view_group" class="btn btn-default form-group">
+                <#list types as type>
+                <#if (type.getValue() == order.groupType)>
+                ${type.getDesc()}
+                </#if>
+            </#list>
+            </button>
+        </div>
+    </div>
+    </#if>
 </#if>
 
 <div class="form-group">

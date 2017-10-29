@@ -593,6 +593,17 @@ function updateOrderStatus(id, toStatus, sendEmail, data) {
     });
 }
 
+$('#j_view_group').on('click', function () {
+    var checkAvailable = $('#j_check_available').attr('value');
+    if (checkAvailable.length === 0) {
+        warn("暂无查位链接");
+        checkAvailableButton.prop('disabled', false);
+        return;
+    }
+    window.open(checkAvailable);
+});
+
+
 function getSuggestRemarkJson() {
     var suggestRemark = [];
     $('.j_suggest_remark_input').each(function () {

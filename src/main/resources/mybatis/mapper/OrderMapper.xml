@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fitibo.aotearoa.mapper.OrderMapper">
+    <resultMap id="BaseResultMap" type="com.fitibo.aotearoa.model.Order">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="sku_id" property="skuId" jdbcType="INTEGER"/>
+        <result column="uuid" property="uuid" jdbcType="VARCHAR"/>
+        <result column="agent_id" property="agentId" jdbcType="INTEGER"/>
+        <result column="status" property="status" jdbcType="TINYINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="price" property="price" jdbcType="DECIMAL"/>
+        <result column="primary_contact" property="primaryContact" jdbcType="VARCHAR"/>
+        <result column="primary_contact_email" property="primaryContactEmail" jdbcType="VARCHAR"/>
+        <result column="primary_contact_phone" property="primaryContactPhone" jdbcType="VARCHAR"/>
+        <result column="primary_contact_wechat" property="primaryContactWechat" jdbcType="VARCHAR"/>
+        <result column="secondary_contact" property="secondaryContact" jdbcType="VARCHAR"/>
+        <result column="secondary_contact_email" property="secondaryContactEmail"
+                jdbcType="VARCHAR"/>
+        <result column="secondary_contact_phone" property="secondaryContactPhone"
+                jdbcType="VARCHAR"/>
+        <result column="secondary_contact_wechat" property="secondaryContactWechat"
+                jdbcType="VARCHAR"/>
+        <result column="gathering_info" property="gatheringInfo" jdbcType="VARCHAR"/>
+        <result column="reference_number" property="referenceNumber" jdbcType="VARCHAR"/>
+        <result column="vendor_phone" property="vendorPhone" jdbcType="VARCHAR"/>
+        <result column="agent_order_id" property="agentOrderId" jdbcType="VARCHAR"/>
+        <result column="modified_price" property="modifiedPrice" jdbcType="DECIMAL"/>
+        <result column="refund" property="refund" jdbcType="DECIMAL"/>
+        <result column="from_vendor" property="fromVendor" jdbcType="BIT"/>
+        <result column="group_type" property="groupType" jdbcType="TINYINT"/>
+        <result column="currency" property="currency" jdbcType="VARCHAR"/>
+        <result column="pay_status" property="payStatus" jdbcType="INTEGER"/>
+    </resultMap>
+    <resultMap id="ResultMapWithBLOBs" type="com.fitibo.aotearoa.model.Order"
+               extends="BaseResultMap">
+        <result column="remark" property="remark" jdbcType="LONGVARCHAR"/>
+    </resultMap>
+    <resultMap id="ResultMapWithSkuName" type="com.fitibo.aotearoa.model.Order"
+               extends="ResultMapWithBLOBs">
+        <result column="sku" property="sku" jdbcType="VARCHAR"/>
+    </resultMap>
+    <resultMap id="ResultMapWithSkuAndAgentName" type="com.fitibo.aotearoa.model.Order"
+               extends="ResultMapWithSkuName">
+        <result column="agent_name" property="agentName" jdbcType="VARCHAR"/>
+    </resultMap>
+</mapper>

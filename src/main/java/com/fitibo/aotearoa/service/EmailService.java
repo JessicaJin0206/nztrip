@@ -11,4 +11,5 @@ public interface EmailService {
 
     boolean send(int orderId, String from, String to, String subject, String content, List<Attachment> attachments);
 
+    boolean sendGroupEmail(int groupId, String from, String to, String subject, String content, List<Attachment> attachments);
 }

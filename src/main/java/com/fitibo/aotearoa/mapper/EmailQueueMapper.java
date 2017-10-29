@@ -19,7 +19,7 @@ import java.util.List;
 @Mapper
 public interface EmailQueueMapper {
 
-    @Insert("insert into `email_queue` (`order_id`, `from`, `to`, `subject`, `content`) values(#{orderId}, #{from}, #{to}, #{subject}, #{content})")
+    @Insert("insert into `email_queue` (`order_id`, `from`, `to`, `subject`, `content`, group_id) values(#{orderId}, #{from}, #{to}, #{subject}, #{content}, #{groupId})")
     @Options(useGeneratedKeys = true, keyColumn = "id", keyProperty = "id", flushCache = Options.FlushCachePolicy.DEFAULT)
     int create(Email email);
 
@@ -33,6 +33,7 @@ public interface EmailQueueMapper {
             @Result(property = "content", column = "content"),
             @Result(property = "retry", column = "retry"),
             @Result(property = "succeed", column = "succeed"),
+            @Result(property = "group_id", column = "groupId"),
     })
     List<Email> findAllFailedEmails();
 

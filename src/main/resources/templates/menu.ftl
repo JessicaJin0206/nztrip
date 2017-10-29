@@ -49,4 +49,11 @@
         <li <#if module == "price_record">class="active"</#if>><a href="/prices">价格监控</a></li>
     </ul>
 </#if>
+<#if role?? && role == "Admin">
+    <ul class="nav nav-sidebar">
+        <li <#if module == "query_group">class="active"</#if>><a href="/groups">查询组</a></li>
+        <li <#if module == "create_group">class="active"</#if>><a href="/create_group">创建组</a>
+        </li>
+    </ul>
+</#if>
 </div>

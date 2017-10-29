@@ -5,7 +5,7 @@
            value="${order.agentName!''}"/>
 </div>
 </#if>
-<div class="form-group"><label>订单详情</label></div>
+<div class="form-group" id="main" skuId="${sku.id?c}" agentId="${(order.agentId)?c}"><label>订单详情</label></div>
 <div class="form-group">
     <label>名称:</label>
     <span>${sku.name!''}</span>

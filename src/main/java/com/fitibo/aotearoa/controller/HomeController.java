@@ -18,6 +18,7 @@ package com.fitibo.aotearoa.controller;
 
 import com.fitibo.aotearoa.annotation.Authentication;
 import com.fitibo.aotearoa.constants.CommonConstants;
+import com.fitibo.aotearoa.constants.GroupType;
 import com.fitibo.aotearoa.constants.OrderStatus;
 import com.fitibo.aotearoa.dto.Role;
 import com.fitibo.aotearoa.dto.Token;
@@ -77,6 +78,8 @@ public class HomeController extends AuthenticationRequiredController {
     private static final String MODULE_QUERY_INVENTORY = "query_inventory";
     private static final String MODULE_SKU_RECORD = "sku_record";
     private static final String MODULE_DELETE_SKU_TICKET_PRICES = "delete_sku_ticket_prices";
+    private static final String MODULE_CREATE_GROUP = "create_group";
+    private static final String MODULE_QUERY_GROUP = "query_group";
 
     private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 
@@ -136,6 +139,80 @@ public class HomeController extends AuthenticationRequiredController {
 
     @Autowired
     private SkuRecordMapper skuRecordMapper;
+
+    @Autowired
+    private GroupService groupService;
+
+    private static PriceRecordVo parse(PriceRecord input) {
+        PriceRecordVo result = new PriceRecordVo();
+        result.setCategory(input.getCategory());
+        result.setCompany(input.getCompany());
+        result.setUrl(input.getUrl());
+        result.setCreateTime(DateUtils.formatDate(input.getCreateTime()));
+        result.setPrice(input.getPrice().setScale(2, BigDecimal.ROUND_FLOOR).toString());
+        result.setSku(input.getSku());
+        return result;
+    }
+
+    private static SkuVo parse(Sku sku, City city,
+                               Category category,
+                               Vendor vendor,
+                               Duration duration) {
+        SkuVo result = new SkuVo();
+        result.setId(sku.getId());
+        result.setName(sku.getName());
+        result.setUuid(sku.getUuid());
+        result.setVendorId(sku.getVendorId());
+        result.setVendor(vendor.getName());
+        result.setDescription(sku.getDescription());
+        result.setCategoryId(sku.getCategoryId());
+        result.setCategory(category.getName());
+        result.setCityId(sku.getCityId());
+        result.setCity(city.getName());
+        result.setCityEn(city.getNameEn());
+        result.setGatheringPlace(
+                Lists.newArrayList(sku.getGatheringPlace().split(CommonConstants.SEPARATOR)));
+        result.setPickupService(sku.isPickupService());
+
+        result.setDurationId(sku.getDurationId());
+        result.setDuration(duration != null ? duration.getName() : "");
+        result.setTickets(Lists.transform(sku.getTickets(), ObjectParser::parse));
+        result.setActivityTime(sku.getActivityTime());
+        result.setAgendaInfo(sku.getAgendaInfo());
+        result.setAttention(sku.getAttention());
+        result.setExtraItem(sku.getExtraItem());
+        result.setOfficialWebsite(sku.getOfficialWebsite());
+        result.setOpeningTime(sku.getOpeningTime());
+        result.setServiceExclude(sku.getServiceExclude());
+        result.setServiceInclude(sku.getServiceInclude());
+        result.setConfirmationTime(sku.getConfirmationTime());
+        result.setTicketInfo(sku.getTicketInfo());
+        result.setPriceConstraint(sku.getPriceConstraint());
+        result.setOtherInfo(sku.getOtherInfo());
+        result.setRescheduleCancelNotice(sku.getRescheduleCancelNotice());
+        result.setAutoGenerateReferenceNumber(sku.isAutoGenerateReferenceNumber());
+        result.setAvailable(sku.isAvailable());
+        result.setCheckAvailabilityWebsite(sku.getCheckAvailabilityWebsite());
+        result.setApi(sku.isApi());
+        result.setSuggestRemark(Lists.newArrayList(sku.getSuggestRemark().split(CommonConstants.SEPARATOR)));
+        return result;
+    }
+
+    public static AgentVo parse(Agent agent) {
+        AgentVo vo = new AgentVo();
+        vo.setId(agent.getId());
+        vo.setUserName(agent.getUserName());
+        vo.setPassword(agent.getPassword());
+        vo.setName(agent.getName());
+        vo.setDescription(agent.getDescription());
+        vo.setDiscount(agent.getDiscount());
+        vo.setEmail(agent.getEmail());
+        vo.setDefaultContact(agent.getDefaultContact());
+        vo.setDefaultContactEmail(agent.getDefaultContactEmail());
+        vo.setDefaultContactPhone(agent.getDefaultContactPhone());
+        vo.setHasApi(agent.isHasApi());
+        return vo;
+    }
 
     @ExceptionHandler
     public String handleException(ResourceNotFoundException ex) {
@@ -215,6 +292,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("module", MODULE_VENDOR_ORDERS);
         model.put("userName", vendor.getName());
         model.put("primaryContact", primaryContact);
+        model.put("types", GroupType.values());
         return "vendor_orders";
     }
 
@@ -326,6 +404,7 @@ public class HomeController extends AuthenticationRequiredController {
         Preconditions.checkNotNull(getToken());
         model.put("module", MODULE_QUERY_ORDER);
         model.put("statusList", OrderStatus.values());
+        model.put("types", GroupType.values());
         model.put("status", status);
         model.put("pageSize", pageSize);
         model.put("pageNumber", pageNumber);
@@ -364,6 +443,21 @@ public class HomeController extends AuthenticationRequiredController {
         orderCountByStatus.put(OrderStatus.AFTER_SALE.getValue() + "", agentId == 0 ? orderMapper.countByStatus(OrderStatus.AFTER_SALE.getValue()) : orderMapper.countByStatusAndAgentId(OrderStatus.AFTER_SALE.getValue(), agentId));
         model.put("orderCountByStatus", orderCountByStatus);
         return "orders";
+    }
+
+    @RequestMapping("orders/classify/{type}")
+    @Authentication
+    public String classifyNewOrders(@PathVariable("type") int type,
+                                    Map<String, Object> model) {
+        Preconditions.checkNotNull(getToken());
+        model.put("module", MODULE_QUERY_ORDER);
+        model.put("statusList", OrderStatus.values());
+        model.put("types", GroupType.values());
+        model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
+        List<GroupVo> groupVos = groupService.classifyNewOrders(GroupType.valueOf(type));
+        model.put("groups", groupVos);
+        return "classify_orders";
     }
 
     /**
@@ -459,6 +553,8 @@ public class HomeController extends AuthenticationRequiredController {
         Agent agent = agentMapper.findById(order.getAgentId());
         model.put("agentName", Optional.ofNullable(agent).map(Agent::getName).orElse(""));
         model.put("lang", lang);
+        model.put("groupId", groupService.getGroupIdByOrderId(id));
+        model.put("types", GroupType.values());
         return "order_detail";
     }
 
@@ -971,6 +1067,74 @@ public class HomeController extends AuthenticationRequiredController {
         return "delete_sku_ticket_prices";
     }
 
+    @RequestMapping("/create_group")
+    @Authentication(Role.Admin)
+    public String createGroup(Map<String, Object> model) {
+        model.put("module", MODULE_CREATE_GROUP);
+        model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
+        model.put("types", Lists.newArrayList(GroupType.values()).subList(1, 4));
+        model.put("agents", agentMapper.findAll().stream().map(HomeController::parse).collect(Collectors.toList()));
+        return "create_group";
+    }
+
+    @RequestMapping("/groups")
+    @Authentication(Role.Admin)
+    public String queryGroup(@RequestParam(value = "pagesize", defaultValue = "10") int pageSize,
+                             @RequestParam(value = "pagenumber", defaultValue = "0") int pageNumber,
+                             Map<String, Object> model) {
+        List<GroupVo> groupVos = groupService.getGroupsByPage(pageSize, pageNumber);
+        model.put("groups", groupVos);
+        model.put("statusList", OrderStatus.values());
+        model.put("types", GroupType.values());
+        model.put("pageSize", pageSize);
+        model.put("pageNumber", pageNumber);
+        model.put("module", MODULE_QUERY_GROUP);
+        model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
+        return "groups";
+    }
+
+    @RequestMapping("/group/{id}")
+    @Authentication(Role.Admin)
+    public String groupDetail(@PathVariable("id") int id, Map<String, Object> model) {
+        GroupVo groupVo = groupService.getGroupById(id);
+        model.put("group", groupVo);
+        model.put("statusList", OrderStatus.values());
+        if (groupVo.getType() == GroupType.MULTI_SAVER.getValue()) {
+            if (groupVo.getStatus() == OrderStatus.NEW.getValue()) {
+                model.put("transitions", orderService.getAvailableTransitions(groupVo.getStatus()).subList(0, 1));
+            } else {
+                model.put("transitions", Lists.newArrayList());
+            }
+        } else {
+            model.put("transitions", orderService.getAvailableTransitions(groupVo.getStatus()));
+        }
+        model.put("editing", false);
+        model.put("module", MODULE_QUERY_INVENTORY);
+        model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
+        model.put("types", GroupType.values());
+        return "group_detail";
+    }
+
+    @RequestMapping("/group/{id}/_edit")
+    @Authentication({Role.Admin, Role.Agent})
+    public String editGroup(@PathVariable("id") int id, Map<String, Object> model) {
+        GroupVo groupVo = groupService.getGroupById(id);
+        List<Order> orders = orderMapper.findByGroupId(groupVo.getId());
+        groupVo.setOrderVos(parse(orders).collect(Collectors.toList()));
+        model.put("group", groupVo);
+        model.put("statusList", OrderStatus.values());
+        model.put("transitions", orderService.getAvailableTransitions(groupVo.getStatus()));
+        model.put("editing", true);
+        model.put("module", MODULE_QUERY_INVENTORY);
+        model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
+        model.put("types", GroupType.values());
+        return "group_detail";
+    }
+
     private String calculateTouristCount(List<OrderTicketVo> tickets) {
         Map<String, Long> result = tickets.stream().collect(Collectors.groupingBy(OrderTicketVo::getSkuTicket, Collectors.counting()));
         return result.entrySet().stream().map(input -> input.getKey() + ":" + input.getValue()).collect(Collectors.joining("  "));
@@ -986,77 +1150,6 @@ public class HomeController extends AuthenticationRequiredController {
                 categoryService.findById(sku.getCategoryId()),
                 vendorService.findById(sku.getVendorId()),
                 durationService.findById(sku.getDurationId()));
-    }
-
-    private static PriceRecordVo parse(PriceRecord input) {
-        PriceRecordVo result = new PriceRecordVo();
-        result.setCategory(input.getCategory());
-        result.setCompany(input.getCompany());
-        result.setUrl(input.getUrl());
-        result.setCreateTime(DateUtils.formatDate(input.getCreateTime()));
-        result.setPrice(input.getPrice().setScale(2, BigDecimal.ROUND_FLOOR).toString());
-        result.setSku(input.getSku());
-        return result;
-    }
-
-    private static SkuVo parse(Sku sku, City city,
-                               Category category,
-                               Vendor vendor,
-                               Duration duration) {
-        SkuVo result = new SkuVo();
-        result.setId(sku.getId());
-        result.setName(sku.getName());
-        result.setUuid(sku.getUuid());
-        result.setVendorId(sku.getVendorId());
-        result.setVendor(vendor.getName());
-        result.setDescription(sku.getDescription());
-        result.setCategoryId(sku.getCategoryId());
-        result.setCategory(category.getName());
-        result.setCityId(sku.getCityId());
-        result.setCity(city.getName());
-        result.setCityEn(city.getNameEn());
-        result.setGatheringPlace(
-                Lists.newArrayList(sku.getGatheringPlace().split(CommonConstants.SEPARATOR)));
-        result.setPickupService(sku.isPickupService());
-
-        result.setDurationId(sku.getDurationId());
-        result.setDuration(duration != null ? duration.getName() : "");
-        result.setTickets(Lists.transform(sku.getTickets(), ObjectParser::parse));
-        result.setActivityTime(sku.getActivityTime());
-        result.setAgendaInfo(sku.getAgendaInfo());
-        result.setAttention(sku.getAttention());
-        result.setExtraItem(sku.getExtraItem());
-        result.setOfficialWebsite(sku.getOfficialWebsite());
-        result.setOpeningTime(sku.getOpeningTime());
-        result.setServiceExclude(sku.getServiceExclude());
-        result.setServiceInclude(sku.getServiceInclude());
-        result.setConfirmationTime(sku.getConfirmationTime());
-        result.setTicketInfo(sku.getTicketInfo());
-        result.setPriceConstraint(sku.getPriceConstraint());
-        result.setOtherInfo(sku.getOtherInfo());
-        result.setRescheduleCancelNotice(sku.getRescheduleCancelNotice());
-        result.setAutoGenerateReferenceNumber(sku.isAutoGenerateReferenceNumber());
-        result.setAvailable(sku.isAvailable());
-        result.setCheckAvailabilityWebsite(sku.getCheckAvailabilityWebsite());
-        result.setApi(sku.isApi());
-        result.setSuggestRemark(Lists.newArrayList(sku.getSuggestRemark().split(CommonConstants.SEPARATOR)));
-        return result;
-    }
-
-    public static AgentVo parse(Agent agent) {
-        AgentVo vo = new AgentVo();
-        vo.setId(agent.getId());
-        vo.setUserName(agent.getUserName());
-        vo.setPassword(agent.getPassword());
-        vo.setName(agent.getName());
-        vo.setDescription(agent.getDescription());
-        vo.setDiscount(agent.getDiscount());
-        vo.setEmail(agent.getEmail());
-        vo.setDefaultContact(agent.getDefaultContact());
-        vo.setDefaultContactEmail(agent.getDefaultContactEmail());
-        vo.setDefaultContactPhone(agent.getDefaultContactPhone());
-        vo.setHasApi(agent.isHasApi());
-        return vo;
     }
 
     private OrderRecordVo parse(OrderRecord orderRecord, Map<Integer, Admin> adminMap, Map<Integer, Agent> agentMap) {
@@ -1134,5 +1227,4 @@ public class HomeController extends AuthenticationRequiredController {
                 return "";
         }
     }
-
 }

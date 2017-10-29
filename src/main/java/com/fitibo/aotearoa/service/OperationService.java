@@ -1,26 +1,18 @@
 package com.fitibo.aotearoa.service;
 
+import com.fitibo.aotearoa.constants.GroupType;
+import com.fitibo.aotearoa.constants.OrderStatus;
+import com.fitibo.aotearoa.exception.InvalidParamException;
+import com.fitibo.aotearoa.exception.ResourceNotFoundException;
 import com.fitibo.aotearoa.exception.VendorEmailEmptyException;
+import com.fitibo.aotearoa.mapper.*;
+import com.fitibo.aotearoa.model.*;
+import com.fitibo.aotearoa.util.DateUtils;
+import com.fitibo.aotearoa.util.ObjectParser;
+import com.fitibo.aotearoa.vo.OrderTicketVo;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-
-import com.fitibo.aotearoa.constants.OrderStatus;
-import com.fitibo.aotearoa.exception.ResourceNotFoundException;
-import com.fitibo.aotearoa.mapper.AgentMapper;
-import com.fitibo.aotearoa.mapper.OrderMapper;
-import com.fitibo.aotearoa.mapper.OrderTicketMapper;
-import com.fitibo.aotearoa.mapper.OrderTicketUserMapper;
-import com.fitibo.aotearoa.mapper.SkuMapper;
-import com.fitibo.aotearoa.model.Agent;
-import com.fitibo.aotearoa.model.Attachment;
-import com.fitibo.aotearoa.model.Order;
-import com.fitibo.aotearoa.model.OrderTicket;
-import com.fitibo.aotearoa.model.OrderTicketUser;
-import com.fitibo.aotearoa.model.Sku;
-import com.fitibo.aotearoa.model.Vendor;
-import com.fitibo.aotearoa.util.DateUtils;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -29,81 +21,66 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import rx.Observable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import rx.Observable;
-
 @Service("operationService")
 public class OperationService {
 
+    private final static Logger logger = LoggerFactory.getLogger(OperationService.class);
+    private static final String SPACE = "&nbsp;&nbsp;&nbsp;";
     @Autowired
     private OrderTicketMapper orderTicketMapper;
-
     @Autowired
     private OrderTicketUserMapper orderTicketUserMapper;
-
     @Autowired
     private SkuMapper skuMapper;
-
     @Autowired
     private AgentMapper agentMapper;
-
     @Autowired
     private VendorService vendorService;
-
     @Autowired
     private EmailService emailService;
-
     @Autowired
     private SkuService skuService;
-
     @Autowired
     private OrderMapper orderMapper;
-
     @Autowired
     private ArchiveService archiveService;
-
     @Autowired
     private ResourceLoaderService resourceLoaderService;
-
     @Value("${email-from}")
     private String emailFrom;
-
     @Value("${template.reservationemail.subject}")
     private String reservationEmailSubject;
-
     @Value("${template.reservationemail.content}")
     private String reservationEmailTemplate;
-
     @Value("${template.confirmation_email.subject}")
     private String confirmationEmailSubject;
-
     @Value("${template.confirmation_email.content}")
     private String confirmationEmailTemplate;
-
     @Value("${template.confirmation_email.guests_info}")
     private String confirmationEmailGuestsInfoTemplate;
-
     @Value("${template.cancel_email.subject}")
     private String cancellationEmailSubject;
-
     @Value("${template.cancel_email.content}")
     private String cancellationEmailTemplate;
-
     @Value("${template.full_email.subject}")
     private String fullEmailSubject;
-
     @Value("${template.full_email.content}")
     private String fullEmailTemplate;
-
     @Value("${template.full_email.guests_info}")
     private String fullEmailGuestsInfoTemplate;
-
-    private final static Logger logger = LoggerFactory.getLogger(OperationService.class);
+    @Value("${template.multisaverreservationemail.subject}")
+    private String multiSaverReservationEmailSubject;
+    @Value("${template.multisaverreservationemail.content}")
+    private String multiSaverReservationEmail;
+    @Value("${template.multisaverreservationemail.sku_detail}")
+    private String multiSaverReservationEmailSkuDetail;
 
     public void doRelatedOperation(boolean sendEmail, int fromStatus, int toStatus, Order order) {
         if (sendEmail) {
@@ -130,6 +107,31 @@ public class OperationService {
         }
     }
 
+    public void doRelatedOperation(boolean sendEmail, int fromStatus, int toStatus, Group group) {
+        if (sendEmail) {
+            switch (OrderStatus.valueOf(toStatus)) {
+                case PENDING:
+                case RECONFIRMING:
+                    sendReservationEmail(group);
+                    break;
+                case CONFIRMED:
+                    sendConfirmationEmail(group);
+                    break;
+                case CLOSED:
+                case CANCELLED:
+                    if (fromStatus != OrderStatus.NEW.getValue()) {
+                        sendCancellationEmail(group);
+                    }
+                    break;
+                case FULL:
+                    sendFullEmail(group);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
     private boolean sendCancellationEmail(Order order) {
         int agentId = order.getAgentId();
         if (agentId <= 0) {
@@ -148,6 +150,33 @@ public class OperationService {
         String content = formatCancellationEmailContent(order, agent, skuMapper.findById(order.getSkuId()), ticketList);
         boolean result = emailService.send(order.getId(), emailFrom, agent.getEmail(), subject, content, Collections.emptyList());
         logger.info("send cancel email, order id: " + order.getId() + " result:" + result);
+        return result;
+    }
+
+    public boolean sendConfirmationEmail(Group group) {
+        List<Order> orders = orderMapper.findByGroupId(group.getId());
+        boolean result = true;
+        for (Order order : orders) {
+            result &= sendConfirmationEmail(order);
+        }
+        return result;
+    }
+
+    public boolean sendCancellationEmail(Group group) {
+        List<Order> orders = orderMapper.findByGroupId(group.getId());
+        boolean result = true;
+        for (Order order : orders) {
+            result &= sendCancellationEmail(order);
+        }
+        return result;
+    }
+
+    public boolean sendFullEmail(Group group) {
+        List<Order> orders = orderMapper.findByGroupId(group.getId());
+        boolean result = true;
+        for (Order order : orders) {
+            result &= sendFullEmail(order);
+        }
         return result;
     }
 
@@ -264,6 +293,180 @@ public class OperationService {
         return result;
     }
 
+    public boolean sendReservationEmail(Group group) {
+        switch (GroupType.valueOf(group.getType())) {
+            case TOGETHER:
+                return sendTogetherReservationEmail(group);
+            case MULTI_SAVER:
+                return sendMultiSaverReservationEmail(group);
+            case TEAM:
+                List<Order> orders = orderMapper.findByGroupId(group.getId());
+                boolean result = true;
+                boolean hasEmptyVendorEmail = false;
+                try {
+                    //小包团可能也需要multisaver，这里只适合RJ
+                    sendMultiSaverReservationEmail(group, orders.stream()
+                            .filter(order -> SkuService.getVendorId(order.getSkuId()) == 2)
+                            .collect(Collectors.toList()));
+                    //抛出异常后这里不会执行
+                    orders = orders.stream()
+                            .filter(order -> SkuService.getVendorId(order.getSkuId()) != 2)
+                            .collect(Collectors.toList());
+                } catch (InvalidParamException e) {
+                    logger.info("不符合multi saver条件");
+                }
+                //发剩余的邮件（单封）
+                for (Order order : orders) {
+                    try {
+                        result &= sendReservationEmail(order);
+                    } catch (VendorEmailEmptyException e) {
+                        hasEmptyVendorEmail = true;
+                    }
+                }
+                if (hasEmptyVendorEmail) {
+                    throw new VendorEmailEmptyException();
+                }
+                return result;
+            default:
+                throw new InvalidParamException("Group Type is invalid");
+        }
+
+    }
+
+    /**
+     * 发同行group的邮件
+     *
+     * @param group
+     * @return
+     */
+    public boolean sendTogetherReservationEmail(Group group) {
+        List<Order> orders = orderMapper.findByGroupId(group.getId());
+        if (orders.size() == 0) {
+            throw new ResourceNotFoundException("orders is empty");
+        }
+        List<OrderTicket> ticketList = Lists.newArrayList();
+        for (Order order : orders) {
+            ticketList.addAll(orderTicketMapper.findByOrderId(order.getId()));
+        }
+        if (ticketList.isEmpty()) {
+            throw new ResourceNotFoundException();
+        }
+        Sku sku = skuService.findById(orders.get(0).getSkuId());
+        if (sku == null) {
+            throw new ResourceNotFoundException("invalid sku id:" + orders.get(0).getSkuId());
+        }
+        Vendor vendor = vendorService.findById(sku.getVendorId());
+        if (vendor.getEmail() == null || vendor.getEmail().length() == 0) {
+            String message = "vendor id:" + vendor.getId() + " email is empty, won't send email";
+            logger.warn(message);
+            throw new VendorEmailEmptyException(message);
+        }
+        String content = formatTogetherReservationEmailContent(reservationEmailTemplate, vendor, group, orders.get(0),
+                ticketList);
+        String subject = formatReservationEmailSubject(reservationEmailSubject, orders.get(0));
+        boolean result = emailService.sendGroupEmail(group.getId(), emailFrom, vendor.getEmail(), subject, content, Collections.emptyList());
+        logger.info("send reservation email, group id: " + group.getId() + " result:" + result);
+        return result;
+    }
+
+    private String formatTogetherReservationEmailContent(String contentTemplate, Vendor vendor, Group group, Order primaryOrder,
+                                                         List<OrderTicket> tickets) {
+
+        String content = contentTemplate;
+        content = content.replace("#VENDORNAME#", vendor.getName());
+        content = content.replace("#TOUR#", primaryOrder.getSku());
+        content = content.replace("#NAME#", group.getPrimaryContact());
+        content = content.replace("#PHONE#", Optional.ofNullable(group.getPrimaryContactPhone()).orElse(
+                StringUtils.EMPTY));
+        content = content.replace("#REMARK#", Optional.ofNullable(group.getRemark()).orElse(
+                StringUtils.EMPTY));
+        content = content.replace("#ORDER_ID#", primaryOrder.getUuid());
+
+        content = content.replace("#TOURINFO#", formatTourInfo(tickets));
+        return content;
+    }
+
+    /**
+     * multi saver邮件
+     *
+     * @param group
+     * @return
+     */
+    public boolean sendMultiSaverReservationEmail(Group group) {
+        List<Order> orders = orderMapper.findByGroupId(group.getId());
+        if (orders.size() == 0) {
+            throw new ResourceNotFoundException("orders is empty");
+        }
+        return sendMultiSaverReservationEmail(group, orders);
+    }
+
+    /**
+     * 附带orders的multi saver邮件（因为小包团）
+     *
+     * @param group
+     * @param orders
+     * @return
+     */
+    public boolean sendMultiSaverReservationEmail(Group group, List<Order> orders) {
+        if (orders == null || orders.size() < 2) {
+            throw new InvalidParamException("Multi Saver must have more than 1 orders");
+        }
+        Vendor vendor = vendorService.findById(SkuService.getVendorId(orders.get(0).getSkuId()));
+        List<Sku> skus = skuMapper.findByIds(orders.stream().map(Order::getSkuId).collect(Collectors.toList()));
+        if (vendor.getEmail() == null || vendor.getEmail().length() == 0) {
+            String message = "vendor id:" + vendor.getId() + " email is empty, won't send email";
+            logger.warn(message);
+            throw new VendorEmailEmptyException(message);
+        }
+        String content = formatMultiSaverReservationEmailContent(multiSaverReservationEmail, group, vendor, orders);
+        String subject = formatMultiSaverReservationEmailSubject(multiSaverReservationEmailSubject, group, skus);
+        boolean result = emailService.sendGroupEmail(group.getId(), emailFrom, vendor.getEmail(), subject, content, Collections.emptyList());
+        logger.info("send multi saver reservation email, group id: " + group.getId() + " result:" + result);
+        return result;
+    }
+
+    public String formatMultiSaverReservationEmailSubject(String template, Group group, List<Sku> skus) {
+        String result = template;
+        result = result.replace("#PRIMARY_CONTACT#", group.getPrimaryContact());
+        result = result.replace("#TOUR#", StringUtils.join(skus.stream().map(Sku::getUuid).collect(Collectors.toList()), ","));
+        return result;
+    }
+
+    public String formatMultiSaverReservationEmailContent(String template, Group group, Vendor vendor, List<Order> orders) {
+        String result = template;
+        result = result.replace("#VENDORNAME#", vendor.getName());
+        result = result.replace("#REMARK#", group.getRemark());
+        result = result.replace("#NAME#", group.getPrimaryContact());
+        result = result.replace("#PHONE#", group.getPrimaryContactPhone());
+        result = result.replace("#SKUS#", getSkuDetail(multiSaverReservationEmailSkuDetail, orders));
+        return result;
+    }
+
+    public String getSkuDetail(String template, List<Order> orders) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Order order : orders) {
+            stringBuilder.append(getSkuDetail(template, order));
+        }
+        return stringBuilder.toString();
+    }
+
+    public String getSkuDetail(String template, Order order) {
+        String result = template;
+        result = result.replace("#TOUR#", order.getSku());
+        result = result.replace("#ORDER_ID#", order.getUuid());
+        List<OrderTicketVo> orderTicketVos = orderTicketMapper.findByOrderId(order.getId()).stream().map(ObjectParser::parse).collect(Collectors.toList());
+        result = result.replace("#PEOPLE_INFO#", calculateTouristCount(orderTicketVos));
+        result = result.replace("#DATE#", orderTicketVos.get(0).getTicketDate());
+        result = result.replace("#TIME#", orderTicketVos.get(0).getTicketTime());
+        result = result.replace("#GRATHING_INFO#", orderTicketVos.get(0).getGatheringPlace());
+        return result;
+    }
+
+    private String calculateTouristCount(List<OrderTicketVo> tickets) {
+        Map<String, Long> result = tickets.stream().collect(Collectors.groupingBy(OrderTicketVo::getSkuTicket, Collectors.counting()));
+        return result.entrySet().stream().map(input -> input.getKey() + ":" + input.getValue()).collect(Collectors.joining("  "));
+    }
+
     private String addUrgentStart(String start, String ordinal, Order order) {
         Date date = orderTicketMapper.findByOrderId(order.getId()).get(0).getTicketDate();
         int diff = DateUtils.differentDays(date, new Date());
@@ -338,8 +541,6 @@ public class OperationService {
         });
         return Joiner.on("<br><br>").join(list);
     }
-
-    private static final String SPACE = "&nbsp;&nbsp;&nbsp;";
 
     private String formatTourInfo(List<OrderTicket> tickets) {
         StringBuilder tourInfo = new StringBuilder();

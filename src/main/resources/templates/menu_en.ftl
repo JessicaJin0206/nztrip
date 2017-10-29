@@ -53,4 +53,12 @@
             Monitoring</a></li>
     </ul>
 </#if>
+    <#if role?? && role == "Admin">
+    <ul class="nav nav-sidebar">
+        <li <#if module == "query_group">class="active"</#if>><a href="/groups">Query Group Order</a></li>
+        <li <#if module == "create_group">class="active"</#if>><a href="/create_group">Create Group Order</a>
+        </li>
+    </ul>
+    </#if>
+
 </div>
