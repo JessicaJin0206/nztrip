@@ -1106,6 +1106,7 @@ public class RestApiController extends AuthenticationRequiredController {
 
     private static SkuVo parse(Sku sku) {
         SkuVo result = new SkuVo();
+        result.setId(sku.getId());
         result.setUuid(sku.getUuid());
         result.setName(sku.getName());
         if (sku.getGatheringPlace() == null) {
