@@ -79,6 +79,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -183,6 +184,12 @@ public class RestApiController extends AuthenticationRequiredController {
     public ResponseEntity handleException(InvalidParamException ex) {
         logger.error(ex.getMessage(), ex);
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity handleException(DataAccessException ex) {
+        logger.error(ex.getMessage(), ex);
+        return new ResponseEntity<>("invalid parameter", HttpStatus.BAD_REQUEST);
     }
 
     @RequestMapping(value = "/v1/api/skus", method = RequestMethod.POST)
