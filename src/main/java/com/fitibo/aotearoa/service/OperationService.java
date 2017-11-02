@@ -31,11 +31,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import rx.Observable;
@@ -158,6 +154,7 @@ public class OperationService {
         }
         String agentOrderId = order.getAgentOrderId();
         String subject = StringUtils.isNotEmpty(agentOrderId) ? cancellationEmailSubject + "(" + agentOrderId + ")" : cancellationEmailSubject;
+        subject = addUrgentStart("#急单 ", subject, order);
         String content = formatCancellationEmailContent(order, agent, skuMapper.findById(order.getSkuId()), ticketList);
         emailService.send(order.getId(), emailFrom, agent.getEmail(), subject, content, Collections.emptyList());
     }
@@ -199,6 +196,7 @@ public class OperationService {
         Workbook voucher = archiveService.createVoucher(order);
         String agentOrderId = order.getAgentOrderId();
         String subject = StringUtils.isNotEmpty(agentOrderId) ? confirmationEmailSubject + "(" + agentOrderId + ")" : confirmationEmailSubject;
+        subject = addUrgentStart("#急单 ", subject, order);
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             voucher.write(baos);
             byte[] data = baos.toByteArray();
@@ -237,6 +235,7 @@ public class OperationService {
         String content = formatFullEmailContent(fullEmailTemplate, order, sku, agent);
         String agentOrderId = order.getAgentOrderId();
         String subject = StringUtils.isNotEmpty(agentOrderId) ? fullEmailSubject + "(" + agentOrderId + ")" : fullEmailSubject;
+        subject = addUrgentStart("#急单 ", subject, order);
         return emailService.send(order.getId(), emailFrom, to, subject, content, Collections.emptyList());
     }
 
@@ -260,11 +259,21 @@ public class OperationService {
         return emailService.send(order.getId(), emailFrom, vendor.getEmail(), subject, content, Collections.emptyList());
     }
 
+    private String addUrgentStart(String start, String ordinal, Order order) {
+        Date date = orderTicketMapper.findByOrderId(order.getId()).get(0).getTicketDate();
+        int diff = DateUtils.differentDays(date, new Date());
+        if (diff < 2 && diff >= 0) {
+            return start + ordinal;
+        } else {
+            return ordinal;
+        }
+    }
+
     private String formatReservationEmailSubject(String template, Order order) {
         String result = template;
         result = result.replace("#TOUR#", order.getSku());
         result = result.replace("#PRIMARY_CONTACT#", order.getPrimaryContact());
-        return result;
+        return addUrgentStart("Urgent！", result, order);
     }
 
     private String formatConfirmationEmailContent(String template, Order order, Sku sku,

@@ -2,13 +2,16 @@ package com.fitibo.aotearoa.util;
 
 import com.fitibo.aotearoa.constants.DateFormatConstants;
 import com.fitibo.aotearoa.exception.InvalidDateFormatException;
-
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 /**
@@ -62,4 +65,12 @@ public final class DateUtils {
         return DateTime.parse(dateString, DATE_FORMATTER);
     }
 
+    public static int differentDays(Date date1, Date date2) {
+        ZoneId zone = ZoneId.systemDefault();
+        Instant instant1 = date1.toInstant();
+        LocalDate localDate1 = LocalDateTime.ofInstant(instant1, zone).toLocalDate();
+        Instant instant2 = date2.toInstant();
+        LocalDate localDate2 = LocalDateTime.ofInstant(instant2, zone).toLocalDate();
+        return (int) (localDate1.toEpochDay() - localDate2.toEpochDay());
+    }
 }
