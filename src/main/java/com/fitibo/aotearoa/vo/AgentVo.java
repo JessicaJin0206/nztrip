@@ -18,5 +18,6 @@ public class AgentVo {
     private String defaultContact;
     private String defaultContactEmail;
     private String defaultContactPhone;
+    private boolean hasApi;
 
 }

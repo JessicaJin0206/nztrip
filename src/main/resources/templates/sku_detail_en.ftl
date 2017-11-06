@@ -251,9 +251,23 @@
                     <#if sku.available = false><span>No</span></#if>
                 </#if>
                 </div>
-                <div class="form-group">
-
+            </div>
+            <div id="j_api" class="form-group">
+                <span>Is API?</span>
+                <div class="btn-group" data-toggle="buttons">
+                <#if editing = true>
+                    <label class="btn btn-default <#if sku.api = true>active</#if>">
+                        <input type="radio" class="toggle" value="1">Yes
+                    </label>
+                    <label class="btn btn-default <#if sku.api = false>active</#if>">
+                        <input type="radio" class="toggle" value="0">No
+                    </label>
+                <#else>
+                    <#if sku.api = true><span>Yes</span></#if>
+                    <#if sku.api = false><span>No</span></#if>
+                </#if>
                 </div>
+            </div>
             <div class="form-group">
                 <span>Ticket</span>
             <#if editing = true>

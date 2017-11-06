@@ -40,5 +40,6 @@ public class Sku extends ModelObject {
     private boolean autoGenerateReferenceNumber;
     private boolean available;
     private String checkAvailabilityWebsite;
+    private boolean api;
 
 }

@@ -16,10 +16,19 @@ $.each($('#j_category_drop_down li a'), function (idx, item) {
     })
 });
 
+var apiDropDown = $('#j_selected_api');
+$.each($('#j_api_drop_down li a'), function (idx, item) {
+    var api = $(item);
+    api.on('click', function () {
+        apiDropDown.html(api.html());
+        apiDropDown.attr('value', api.attr('value'));
+    })
+});
+
 $('#j_search').on('click', doSearch);
 
 $('#j_export').on('click', function () {
-    window.open("/skus/export?"+ getSearchString());
+    window.open("/skus/export?" + getSearchString());
 });
 
 
@@ -34,6 +43,7 @@ function enterKey(event) {
 function getSearchString() {
     var cityId = parseInt(cityDropDown.attr('value'));
     var categoryId = parseInt(categoryDropDown.attr('value'));
+    var api = parseInt(apiDropDown.attr('value'));
     var keyword = $('#j_keyword').val();
     var searchString = "";
     if (cityId > 0) {
@@ -41,6 +51,9 @@ function getSearchString() {
     }
     if (categoryId > 0) {
         searchString += "categoryid=" + categoryId + "&";
+    }
+    if (api > 0) {
+        searchString += "api=" + api + "&";
     }
     if (keyword.length > 0) {
         searchString += "keyword=" + encodeURI(keyword) + "&";
@@ -51,6 +64,7 @@ function getSearchString() {
 function doSearch() {
     var cityId = parseInt(cityDropDown.attr('value'));
     var categoryId = parseInt(categoryDropDown.attr('value'));
+    var api = parseInt(apiDropDown.attr('value'));
     var keyword = $('#j_keyword').val();
     var searchString = "";
     if (cityId > 0) {
@@ -58,6 +72,9 @@ function doSearch() {
     }
     if (categoryId > 0) {
         searchString += "categoryid=" + categoryId + "&";
+    }
+    if (api > 0) {
+        searchString += "api=" + api + "&";
     }
     if (keyword.length > 0) {
         searchString += "keyword=" + encodeURI(keyword) + "&";

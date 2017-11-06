@@ -251,9 +251,23 @@
                     <#if sku.available = false><span>否</span></#if>
                 </#if>
                 </div>
-                <div class="form-group">
-
+            </div>
+            <div id="j_api" class="form-group">
+                <span>是否是API?</span>
+                <div class="btn-group" data-toggle="buttons">
+                <#if editing = true>
+                    <label class="btn btn-default <#if sku.api = true>active</#if>">
+                        <input type="radio" class="toggle" value="1">是
+                    </label>
+                    <label class="btn btn-default <#if sku.api = false>active</#if>">
+                        <input type="radio" class="toggle" value="0">否
+                    </label>
+                <#else>
+                    <#if sku.api = true><span>是</span></#if>
+                    <#if sku.api = false><span>否</span></#if>
+                </#if>
                 </div>
+            </div>
             <div class="form-group">
                 <span>票种</span>
             <#if editing = true>

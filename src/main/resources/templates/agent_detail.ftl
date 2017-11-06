@@ -45,6 +45,22 @@
                                            <#if action != "edit">disabled</#if> placeholder="请输入默认联系人手机"
                                            value="${(agent.defaultContactPhone)!""}">
             </div>
+            <div id="j_api" class="form-group">
+                <span>是否接入API?</span>
+                <div class="btn-group" data-toggle="buttons">
+                <#if action == "edit">
+                    <label class="btn btn-default <#if agent.hasApi = true>active</#if>">
+                        <input type="radio" class="toggle" value="1">是
+                    </label>
+                    <label class="btn btn-default <#if agent.hasApi = false>active</#if>">
+                        <input type="radio" class="toggle" value="0">否
+                    </label>
+                <#else>
+                    <#if agent.hasApi = true><span>是</span></#if>
+                    <#if agent.hasApi = false><span>否</span></#if>
+                </#if>
+                </div>
+            </div>
             <#if action = "reset"><div class="form-group"><input id="j_password" class="form-control"
                                            placeholder="请输入代理商用户密码"></div>
             </#if>

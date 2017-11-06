@@ -97,6 +97,7 @@ var validateUpdate = function() {
     var defaultContact = $('#j_default_contact').val();
     var defaultContactEmail = $('#j_default_contact_email').val();
     var defaultContactPhone = $('#j_default_contact_phone').val();
+    var hasApi = parseInt($('#j_api label.active input').val());
     return {
         userName: userName,
         name: name,
@@ -105,7 +106,8 @@ var validateUpdate = function() {
         email: email,
         defaultContact: defaultContact,
         defaultContactEmail: defaultContactEmail,
-        defaultContactPhone: defaultContactPhone
+        defaultContactPhone: defaultContactPhone,
+        hasApi: !!hasApi
     };
 };
 

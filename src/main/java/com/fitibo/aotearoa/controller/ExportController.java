@@ -139,6 +139,7 @@ public class ExportController extends AuthenticationRequiredController {
                                                @RequestParam(value = "keyword", defaultValue = "") String keyword,
                                                @RequestParam(value = "cityid", defaultValue = "0") int cityId,
                                                @RequestParam(value = "categoryid", defaultValue = "0") int categoryId,
+                                               @RequestParam(value = "api", defaultValue = "2") int api,
                                                @CookieValue(value = "language", defaultValue = "en") String language)
             throws IOException, InvalidFormatException {
         int vendorId = 0;
@@ -147,7 +148,7 @@ public class ExportController extends AuthenticationRequiredController {
             vendorId = agentMapper.findById(getToken().getId()).getVendorId();
             agentId = getToken().getId();
         }
-        Workbook skusDetail = archiveService.createSkusDetail(keyword, cityId, categoryId, vendorId, agentId, language);
+        Workbook skusDetail = archiveService.createSkusDetail(keyword, cityId, categoryId, api, vendorId, agentId, language);
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             skusDetail.write(baos);
             response.setHeader("Content-Disposition", "attachment; filename=\"" + getExportFileName("新西兰产品信息表") + ".xlsx\"");

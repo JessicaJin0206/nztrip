@@ -212,7 +212,7 @@ public class RestApiController extends AuthenticationRequiredController {
         int agentId = getToken().getId();
         Agent agent = agentMapper.findById(agentId);
         int vendorId = agent.getVendorId();
-        List<Sku> skus = skuMapper.findAllByMultiFields(keyword, 0, 0, vendorId, new RowBounds(pageNumber * pageSize, pageSize));
+        List<Sku> skus = skuMapper.findAllByMultiFields(keyword, 0, 0, 0, vendorId, new RowBounds(pageNumber * pageSize, pageSize));
         return skus.stream().filter(Sku::isAvailable).map(RestApiController::parse).collect(Collectors.toList());
     }
 
@@ -1108,6 +1108,7 @@ public class RestApiController extends AuthenticationRequiredController {
         result.setAutoGenerateReferenceNumber(sku.isAutoGenerateReferenceNumber());
         result.setAvailable(sku.isAvailable());
         result.setCheckAvailabilityWebsite(sku.getCheckAvailabilityWebsite());
+        result.setApi(sku.isApi());
         return result;
     }
 
@@ -1143,6 +1144,7 @@ public class RestApiController extends AuthenticationRequiredController {
         result.setOtherInfo(sku.getOtherInfo());
         result.setRescheduleCancelNotice(sku.getRescheduleCancelNotice());
         result.setCheckAvailabilityWebsite(sku.getCheckAvailabilityWebsite());
+        result.setApi(sku.isApi());
         return result;
     }
 
@@ -1201,6 +1203,7 @@ public class RestApiController extends AuthenticationRequiredController {
         result.setDefaultContact(agentVo.getDefaultContact());
         result.setDefaultContactEmail(agentVo.getDefaultContactEmail());
         result.setDefaultContactPhone(agentVo.getDefaultContactPhone());
+        result.setHasApi(agentVo.isHasApi());
         return result;
     }
 

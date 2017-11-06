@@ -667,6 +667,7 @@ public class HomeController extends AuthenticationRequiredController {
     public String querySku(@RequestParam(value = "keyword", defaultValue = "") String keyword,
                            @RequestParam(value = "cityid", defaultValue = "0") int cityId,
                            @RequestParam(value = "categoryid", defaultValue = "0") int categoryId,
+                           @RequestParam(value = "api", defaultValue = "2") int api,
                            @RequestParam(value = "pagesize", defaultValue = "10") int pageSize,
                            @RequestParam(value = "pagenumber", defaultValue = "0") int pageNumber,
                            @CookieValue(value = "language", defaultValue = "en") String lang,
@@ -675,6 +676,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("module", MODULE_QUERY_SKU);
         model.put("cityId", cityId);
         model.put("categoryId", categoryId);
+        model.put("api", api);
         model.put("keyword", keyword);
         model.put("cities", cityService.findAll());
         model.put("categories", categoryService.findAll());
@@ -684,10 +686,16 @@ public class HomeController extends AuthenticationRequiredController {
         if (getToken().getRole() == Role.Agent) {
             vendorId = agentMapper.findById(getToken().getId()).getVendorId();
         }
-        List<Sku> skus = searchSku(keyword, cityId, categoryId, vendorId, rowBounds);
+        List<Sku> skus = searchSku(keyword, cityId, categoryId, api, vendorId, rowBounds);
+        boolean selectApi = getToken().getRole() == Role.Admin;
         if (getToken().getRole() == Role.Agent) {
             skus = skus.stream().filter(Sku::isAvailable).collect(Collectors.toList());
+            Agent agent = agentMapper.findById(getToken().getId());
+            if (agent.isHasApi()) {
+                selectApi = true;
+            }
         }
+        model.put("selectApi", selectApi);
         Map<Integer, City> cityMap = cityService.findByIds(Lists.transform(skus, Sku::getCityId));
         Map<Integer, Category> categoryMap = categoryService
                 .findByIds(Lists.transform(skus, Sku::getCategoryId));
@@ -864,8 +872,8 @@ public class HomeController extends AuthenticationRequiredController {
         return "edit_sku_inventory";
     }
 
-    private List<Sku> searchSku(String keyword, int cityId, int categoryId, int vendorId, RowBounds rowBounds) {
-        return skuMapper.findAllByMultiFields(keyword, cityId, categoryId, vendorId, rowBounds);
+    private List<Sku> searchSku(String keyword, int cityId, int categoryId, int api, int vendorId, RowBounds rowBounds) {
+        return skuMapper.findAllByMultiFields(keyword, cityId, categoryId, api, vendorId, rowBounds);
     }
 
     private SkuVo parse(Sku sku) {
@@ -926,6 +934,7 @@ public class HomeController extends AuthenticationRequiredController {
         result.setAutoGenerateReferenceNumber(sku.isAutoGenerateReferenceNumber());
         result.setAvailable(sku.isAvailable());
         result.setCheckAvailabilityWebsite(sku.getCheckAvailabilityWebsite());
+        result.setApi(sku.isApi());
         return result;
     }
 
@@ -941,6 +950,7 @@ public class HomeController extends AuthenticationRequiredController {
         vo.setDefaultContact(agent.getDefaultContact());
         vo.setDefaultContactEmail(agent.getDefaultContactEmail());
         vo.setDefaultContactPhone(agent.getDefaultContactPhone());
+        vo.setHasApi(agent.isHasApi());
         return vo;
     }
 

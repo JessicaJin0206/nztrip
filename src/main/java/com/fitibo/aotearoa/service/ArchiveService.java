@@ -24,7 +24,7 @@ public interface ArchiveService {
 
     Workbook createSkuDetail(int skuId, String language);
 
-    Workbook createSkusDetail(String keyword, int cityId, int categoryId, int vendorId, int agentId, String language);
+    Workbook createSkusDetail(String keyword, int cityId, int categoryId, int api, int vendorId, int agentId, String language);
 
     Pair<String, Workbook> createSkuTickets(int skuId, int agentId, String language);
 

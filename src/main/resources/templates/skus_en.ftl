@@ -12,7 +12,7 @@
     <#include "menu.ftl"/>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
             <div class="row">
-                <div class="dropdown col-md-3">
+                <div class="dropdown col-md-2">
                     <button class="btn btn-default dropdown-toggle" type="button" id="selected_city_button"
                             data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="true">
@@ -37,7 +37,7 @@
                     </#list>
                     </ul>
                 </div>
-                <div class="dropdown col-md-3">
+                <div class="dropdown col-md-2">
                     <button class="btn btn-default dropdown-toggle" type="button" id="selected_category_button"
                             data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="true">
@@ -62,7 +62,38 @@
                     </#list>
                     </ul>
                 </div>
-                <div class="col-md-4"><input type="text" id="j_keyword" class="form-control" placeholder="Please Input Sku id or Keyword" value="${keyword}">
+            <#if selectApi = true>
+                <div class="dropdown col-md-2">
+                    <button class="btn btn-default dropdown-toggle" type="button" id="selected_api_button"
+                            data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="true">
+                        <#switch api>
+                            <#case 1>
+                                <span id="j_selected_api" value="1">All</span>
+                                <#break>
+                            <#case 2>
+                                <span id="j_selected_api" value="2">Normal</span>
+                                <#break>
+                            <#case 3>
+                                <span id="j_selected_api" value="3">API</span>
+                                <#break>
+                            <#default>
+                                <span id="j_selected_api" value="2">Normal</span>
+                        </#switch>
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" id="j_api_drop_down" aria-labelledby="selected_api_button">
+                        <li><a value="0">Select If Api</a></li>
+                        <li><a value="1">All</a></li>
+                        <li><a value="2">Normal</a></li>
+                        <li><a value="3">API</a></li>
+                    </ul>
+                </div>
+            <#else >
+                <div class="dropdown col-md-2"></div>
+            </#if>
+                <div class="col-md-4"><input type="text" id="j_keyword" class="form-control"
+                                             placeholder="Please Input Sku id or Keyword" value="${keyword}">
                 </div>
                 <div class="col-md-1">
                     <button id="j_search" class="btn btn-primary">Search</button>
@@ -122,10 +153,12 @@
                 <nav aria-label="...">
                     <ul class="pager">
                         <li class="<#if (pageNumber <= 0)>disabled</#if>">
-                            <a href="skus?<#if (cityId > 0)>cityid=${cityId?c}&</#if><#if (categoryId > 0)>categoryid=${categoryId?c}&</#if><#if (keyword != "")>keyword=${keyword}&</#if><#if (pageNumber > 0)>pagenumber=${pageNumber-1}&pagesize=${pageSize}</#if>">Prev Page</a>
+                            <a href="skus?<#if (cityId > 0)>cityid=${cityId?c}&</#if><#if (categoryId > 0)>categoryid=${categoryId?c}&</#if><#if (keyword != "")>keyword=${keyword}&</#if><#if (pageNumber > 0)>pagenumber=${pageNumber-1}&pagesize=${pageSize}</#if>">Prev
+                                Page</a>
                         </li>
                         <li>
-                            <a href="skus?<#if (cityId > 0)>cityid=${cityId?c}&</#if><#if (categoryId > 0)>categoryid=${categoryId?c}&</#if><#if (keyword != "")>keyword=${keyword}&</#if>pagenumber=${pageNumber+1}&pagesize=${pageSize}">Next Page</a>
+                            <a href="skus?<#if (cityId > 0)>cityid=${cityId?c}&</#if><#if (categoryId > 0)>categoryid=${categoryId?c}&</#if><#if (keyword != "")>keyword=${keyword}&</#if>pagenumber=${pageNumber+1}&pagesize=${pageSize}">Next
+                                Page</a>
                         </li>
                     </ul>
                 </nav>

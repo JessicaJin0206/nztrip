@@ -737,9 +737,9 @@ public class ArchiveServiceImpl implements ArchiveService {
     }
 
     @Override
-    public Workbook createSkusDetail(String keyword, int cityId, int categoryId, int vendorId, int agentId, String language) {
+    public Workbook createSkusDetail(String keyword, int cityId, int categoryId, int api, int vendorId, int agentId, String language) {
 
-        List<Sku> skus = skuMapper.findAllByMultiFields(keyword, cityId, categoryId, vendorId, new RowBounds());
+        List<Sku> skus = skuMapper.findAllByMultiFields(keyword, cityId, categoryId, api, vendorId, new RowBounds());
         if (agentId > 0) {
             skus = skus.stream().filter(Sku::isAvailable).collect(Collectors.toList());
         }

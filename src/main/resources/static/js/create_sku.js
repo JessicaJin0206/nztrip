@@ -125,6 +125,7 @@ var validate = function () {
     var pickupService = parseInt($('#j_pickup_service label.active input').val());
     var autoGenerateReferenceNumber = parseInt($('#j_auto_generate_reference_number label.active input').val());
     var available = parseInt($('#j_available label.active input').val());
+    var api = parseInt($('#j_api label.active input').val());
     var durationId = parseInt(durationDropDown.attr('value'));
     var tickets = [];
     $('#j_ticket_container tr').each(function (idx, element) {
@@ -203,7 +204,8 @@ var validate = function () {
         priceConstraint: $('#j_price_constraint').val(),
         otherInfo: $('#j_other_info').val(),
         available: !!available,
-        checkAvailabilityWebsite: $('#j_check_availability_website').val()
+        checkAvailabilityWebsite: $('#j_check_availability_website').val(),
+        api: !!api
     };
 };
 

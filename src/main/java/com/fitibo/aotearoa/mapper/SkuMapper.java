@@ -21,10 +21,10 @@ public interface SkuMapper {
 
     @Insert("insert into sku(uuid, name, city_id, category_id, description, vendor_id, pickup_service, gathering_place, duration_id," +
             "official_website, confirmation_time, reschedule_cancel_notice, agenda_info, activity_time, opening_time, ticket_info," +
-            "service_include, service_exclude, extra_item, attention, price_constraint, other_info, check_availability_website) " +
+            "service_include, service_exclude, extra_item, attention, price_constraint, other_info, check_availability_website, api) " +
             "values(#{uuid}, #{name}, #{cityId}, #{categoryId}, #{description}, #{vendorId}, #{pickupService}, #{gatheringPlace}, #{durationId}," +
             "#{officialWebsite}, #{confirmationTime}, #{rescheduleCancelNotice}, #{agendaInfo}, #{activityTime}, #{openingTime}, #{ticketInfo}," +
-            "#{serviceInclude}, #{serviceExclude}, #{extraItem}, #{attention}, #{priceConstraint}, #{otherInfo}, #{checkAvailabilityWebsite} )")
+            "#{serviceInclude}, #{serviceExclude}, #{extraItem}, #{attention}, #{priceConstraint}, #{otherInfo}, #{checkAvailabilityWebsite}, #{api} )")
     @Options(useGeneratedKeys = true, keyColumn = "id", keyProperty = "id", flushCache = Options.FlushCachePolicy.DEFAULT)
     int create(Sku sku);
 
@@ -52,8 +52,9 @@ public interface SkuMapper {
             "price_constraint = #{priceConstraint}, " +
             "other_info = #{otherInfo}," +
             "auto_generate_reference_number = #{autoGenerateReferenceNumber}, " +
-            "available = #{available}, "+
-            "check_availability_website = #{checkAvailabilityWebsite} "+
+            "available = #{available}, " +
+            "check_availability_website = #{checkAvailabilityWebsite}, " +
+            "api = #{api} " +
             "where id = #{id}"})
     int update(Sku sku);
 
@@ -84,7 +85,8 @@ public interface SkuMapper {
             @Result(column = "other_info", property = "otherInfo"),
             @Result(column = "auto_generate_reference_number", property = "autoGenerateReferenceNumber"),
             @Result(column = "available", property = "available"),
-            @Result(column = "check_availability_website", property = "checkAvailabilityWebsite")
+            @Result(column = "check_availability_website", property = "checkAvailabilityWebsite"),
+            @Result(column = "api", property = "api")
 
     })
     Sku findByUuid(String uuid);
@@ -116,7 +118,8 @@ public interface SkuMapper {
             @Result(column = "other_info", property = "otherInfo"),
             @Result(column = "auto_generate_reference_number", property = "autoGenerateReferenceNumber"),
             @Result(column = "available", property = "available"),
-            @Result(column = "check_availability_website", property = "checkAvailabilityWebsite")
+            @Result(column = "check_availability_website", property = "checkAvailabilityWebsite"),
+            @Result(column = "api", property = "api")
     })
     Sku findById(int id);
 
@@ -147,7 +150,8 @@ public interface SkuMapper {
             @Result(column = "other_info", property = "otherInfo"),
             @Result(column = "auto_generate_reference_number", property = "autoGenerateReferenceNumber"),
             @Result(column = "available", property = "available"),
-            @Result(column = "check_availability_website", property = "checkAvailabilityWebsite")
+            @Result(column = "check_availability_website", property = "checkAvailabilityWebsite"),
+            @Result(column = "api", property = "api")
     })
     List<Sku> findAll(RowBounds rowBounds);
 
@@ -181,7 +185,8 @@ public interface SkuMapper {
             @Result(column = "other_info", property = "otherInfo"),
             @Result(column = "auto_generate_reference_number", property = "autoGenerateReferenceNumber"),
             @Result(column = "available", property = "available"),
-            @Result(column = "check_availability_website", property = "checkAvailabilityWebsite")
+            @Result(column = "check_availability_website", property = "checkAvailabilityWebsite"),
+            @Result(column = "api", property = "api")
     })
     List<Sku> findAllByName(String name, RowBounds rowBounds);
 
@@ -192,6 +197,7 @@ public interface SkuMapper {
             "<if test =\"categoryId > 0\">and category_id = #{categoryId} </if> " +
             "<if test =\"cityId > 0\">and city_id = #{cityId} </if> " +
             "<if test =\"vendorId > 0\">and vendor_id = #{vendorId} </if> " +
+            "<if test =\"api > 1\">and api = #{api} - 2 </if> " +
             "</script>")
     @Results({
             @Result(column = "id", property = "id"),
@@ -219,11 +225,13 @@ public interface SkuMapper {
             @Result(column = "other_info", property = "otherInfo"),
             @Result(column = "auto_generate_reference_number", property = "autoGenerateReferenceNumber"),
             @Result(column = "available", property = "available"),
-            @Result(column = "check_availability_website", property = "checkAvailabilityWebsite")
+            @Result(column = "check_availability_website", property = "checkAvailabilityWebsite"),
+            @Result(column = "api", property = "api")
     })
     List<Sku> findAllByMultiFields(@Param("keyword") String keyword,
                                    @Param("cityId") int cityId,
                                    @Param("categoryId") int categoryId,
+                                   @Param("api") int api,
                                    @Param("vendorId") int vendorId,
                                    RowBounds rowBounds);
 
@@ -254,7 +262,8 @@ public interface SkuMapper {
             @Result(column = "other_info", property = "otherInfo"),
             @Result(column = "auto_generate_reference_number", property = "autoGenerateReferenceNumber"),
             @Result(column = "available", property = "available"),
-            @Result(column = "check_availability_website", property = "checkAvailabilityWebsite")
+            @Result(column = "check_availability_website", property = "checkAvailabilityWebsite"),
+            @Result(column = "api", property = "api")
     })
     List<Sku> findByVendorId(int vendorId);
 }

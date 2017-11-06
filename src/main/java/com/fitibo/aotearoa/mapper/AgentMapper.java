@@ -12,8 +12,8 @@ import java.util.List;
 public interface AgentMapper {
 
     @Select("<script>" +
-            "select * from agent "+
-            "<if test = \"keyword != null and keyword != ''\">where name like CONCAT('%',#{keyword},'%')</if>"+
+            "select * from agent " +
+            "<if test = \"keyword != null and keyword != ''\">where name like CONCAT('%',#{keyword},'%')</if>" +
             "</script>")
     @Results({
             @Result(column = "id", property = "id"),
@@ -26,8 +26,9 @@ public interface AgentMapper {
             @Result(column = "default_contact_email", property = "defaultContactEmail"),
             @Result(column = "default_contact_phone", property = "defaultContactPhone"),
             @Result(column = "vendor_id", property = "vendorId"),
+            @Result(column = "has_api", property = "hasApi"),
     })
-    List<Agent> findByKeyword(@Param(value = "keyword")String keyword);
+    List<Agent> findByKeyword(@Param(value = "keyword") String keyword);
 
     @Select("select * from agent where id = #{id}")
     @Results({
@@ -41,6 +42,7 @@ public interface AgentMapper {
             @Result(column = "default_contact_email", property = "defaultContactEmail"),
             @Result(column = "default_contact_phone", property = "defaultContactPhone"),
             @Result(column = "vendor_id", property = "vendorId"),
+            @Result(column = "has_api", property = "hasApi"),
     })
     Agent findById(int id);
 
@@ -56,6 +58,7 @@ public interface AgentMapper {
             @Result(column = "default_contact_email", property = "defaultContactEmail"),
             @Result(column = "default_contact_phone", property = "defaultContactPhone"),
             @Result(column = "vendor_id", property = "vendorId"),
+            @Result(column = "has_api", property = "hasApi"),
     })
     Agent findByUserName(String user);
 
@@ -82,6 +85,7 @@ public interface AgentMapper {
             "<if test = \"defaultContact != null and defaultContact != ''\">default_contact = #{defaultContact},</if>" +
             "<if test = \"defaultContactEmail != null and defaultContactEmail != ''\">default_contact_email = #{defaultContactEmail},</if>" +
             "<if test = \"defaultContactPhone != null and defaultContactPhone != ''\">default_contact_phone = #{defaultContactPhone},</if>" +
+            "has_api = #{hasApi},"+
             "</set>" +
             "where id = #{id}" +
             "</script>")

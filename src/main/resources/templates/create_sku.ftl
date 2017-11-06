@@ -173,6 +173,17 @@
                     </label>
                 </div>
             </div>
+            <div id="j_api" class="form-group">
+                <span>是否是API?</span>
+                <div class="btn-group" data-toggle="buttons">
+                    <label class="btn btn-default <#if sku.api = true>active</#if>">
+                        <input type="radio" class="toggle" value="1">是
+                    </label>
+                    <label class="btn btn-default <#if sku.api = false>active</#if>">
+                        <input type="radio" class="toggle" value="0">否
+                    </label>
+                </div>
+            </div>
             <div class="form-group">
                 <span>票种</span>
                 <a id="j_add_ticket">
@@ -235,7 +246,6 @@
                     </tbody>
                 </table>
             </div>
-
             <button id="j_submit" class="btn btn-default form-group">提交</button>
         </div>
 
