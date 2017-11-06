@@ -260,3 +260,11 @@ $('#j_edit_inventory').on('click', function () {
         window.location.href = window.location.pathname + "/inventory"
     }
 });
+
+$('#j_query_inventory').on('click', function () {
+    if (window.location.pathname.endsWith("/")) {
+        window.location.href = window.location.pathname + "query_inventory"
+    } else {
+        window.location.href = window.location.pathname + "/query_inventory"
+    }
+});

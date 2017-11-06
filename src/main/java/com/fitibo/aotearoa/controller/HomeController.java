@@ -45,6 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -74,6 +75,7 @@ public class HomeController extends AuthenticationRequiredController {
     private static final String MODULE_ORDER_RECORD = "order_record";
     private static final String MODULE_URGENT_ORDER = "urgent_orders";
     private static final String MODULE_SCAN_ORDER = "scan_order";
+    private static final String MODULE_QUERY_INVENTORY = "query_inventory";
 
     @Autowired
     private CityService cityService;
@@ -460,7 +462,7 @@ public class HomeController extends AuthenticationRequiredController {
     /**
      * 查看订单日志
      */
-    @RequestMapping("order_record/{id}")
+    @RequestMapping("/orders/{id}/record")
     @Authentication
     public String orderRecord(@PathVariable("id") int id, Map<String, Object> model,
                               @CookieValue(value = "language", defaultValue = "en") String lang) {
@@ -480,11 +482,6 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("userName", getUserName(getToken()));
         model.put("lang", lang);
         return "order_record";
-    }
-
-    private String calculateTouristCount(List<OrderTicketVo> tickets) {
-        Map<String, Long> result = tickets.stream().collect(Collectors.groupingBy(OrderTicketVo::getSkuTicket, Collectors.counting()));
-        return result.entrySet().stream().map(input -> input.getKey() + ":" + input.getValue()).collect(Collectors.joining("  "));
     }
 
     @RequestMapping("orders/{id}/_edit")
@@ -872,6 +869,68 @@ public class HomeController extends AuthenticationRequiredController {
         return "edit_sku_inventory";
     }
 
+    @RequestMapping("scan_order/{id}")
+    @Authentication(Role.Admin)
+    public String scanOrder(@PathVariable("id") int id, Map<String, Object> model) {
+        model.put("module", MODULE_SCAN_ORDER);
+        model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
+        model.put("skuId", id);
+        model.put("dates", skuTicketPriceMapper.getSessionsBySkuId(id).stream().sorted(ArchiveServiceImpl::compareTime).collect(Collectors.toList()));
+        return "scan_order";
+    }
+
+    @RequestMapping("scan_order/sub")
+    @Authentication(Role.Admin)
+    public String sub(@ModelAttribute Scan scan, Map<String, Object> model) {
+        model.put("module", MODULE_SCAN_ORDER);
+        model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
+        model.put("order", scanService.scanOrder(scan));
+        Sku sku = skuService.findById(scan.getSkuId());
+        Vendor vendor = vendorService.findById(sku.getVendorId());
+        Category category = categoryService.findById(sku.getCategoryId());
+        Duration duration = durationService.findById(sku.getDurationId());
+        City city = cityService.findById(sku.getCityId());
+        SkuVo skuVo = parse(sku, city, category, vendor, duration);
+        Map<String, Collection<String>> availableDateMap = Maps.newHashMap();
+        for (SkuTicketVo skuTicketVo : skuVo.getTickets()) {
+            Set<String> availableDates = Sets.newLinkedHashSet(
+                    Lists.transform(skuTicketVo.getTicketPrices(), SkuTicketPriceVo::getDate));
+            availableDateMap.put(skuTicketVo.getId() + "", availableDates);
+        }
+        model.put("sku", skuVo);
+        model.put("availableDateMap", availableDateMap);
+        model.put("vendor", vendor);
+        return "create_order";
+    }
+
+    @RequestMapping("/skus/{id}/query_inventory")
+    @Authentication({Role.Admin, Role.Agent})
+    public String queryInventory(@PathVariable("id") int id, Map<String, Object> model) {
+        Sku sku = skuService.findById(id);
+        if (sku == null || !sku.isAvailable()) {
+            throw new ResourceNotFoundException("sku:" + id + " not existed or is offline");
+        }
+        if (getToken().getRole() == Role.Admin) {
+
+        } else if (getToken().getRole() == Role.Agent) {
+
+        } else {
+            throw new AuthenticationFailureException("invalid role " + getToken().getRole());
+        }
+        model.put("module", MODULE_QUERY_INVENTORY);
+        model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
+        model.put("sku", sku);
+        return "query_inventory";
+    }
+
+    private String calculateTouristCount(List<OrderTicketVo> tickets) {
+        Map<String, Long> result = tickets.stream().collect(Collectors.groupingBy(OrderTicketVo::getSkuTicket, Collectors.counting()));
+        return result.entrySet().stream().map(input -> input.getKey() + ":" + input.getValue()).collect(Collectors.joining("  "));
+    }
+
     private List<Sku> searchSku(String keyword, int cityId, int categoryId, int api, int vendorId, RowBounds rowBounds) {
         return skuMapper.findAllByMultiFields(keyword, cityId, categoryId, api, vendorId, rowBounds);
     }
@@ -890,7 +949,7 @@ public class HomeController extends AuthenticationRequiredController {
         result.setCompany(input.getCompany());
         result.setUrl(input.getUrl());
         result.setCreateTime(DateUtils.formatDate(input.getCreateTime()));
-        result.setPrice(input.getPrice().setScale(2).toString());
+        result.setPrice(input.getPrice().setScale(2, BigDecimal.ROUND_FLOOR).toString());
         result.setSku(input.getSku());
         return result;
     }
@@ -1007,39 +1066,4 @@ public class HomeController extends AuthenticationRequiredController {
         }
     }
 
-    @RequestMapping("scan_order/{id}")
-    @Authentication(Role.Admin)
-    public String scanOrder(@PathVariable("id") int id, Map<String, Object> model) {
-        model.put("module", MODULE_SCAN_ORDER);
-        model.put("role", getToken().getRole().toString());
-        model.put("userName", getUserName(getToken()));
-        model.put("skuId", id);
-        model.put("dates", skuTicketPriceMapper.getSessionsBySkuId(id).stream().sorted(ArchiveServiceImpl::compareTime).collect(Collectors.toList()));
-        return "scan_order";
-    }
-
-    @RequestMapping("scan_order/sub")
-    @Authentication(Role.Admin)
-    public String sub(@ModelAttribute Scan scan, Map<String, Object> model) {
-        model.put("module", MODULE_SCAN_ORDER);
-        model.put("role", getToken().getRole().toString());
-        model.put("userName", getUserName(getToken()));
-        model.put("order", scanService.scanOrder(scan));
-        Sku sku = skuService.findById(scan.getSkuId());
-        Vendor vendor = vendorService.findById(sku.getVendorId());
-        Category category = categoryService.findById(sku.getCategoryId());
-        Duration duration = durationService.findById(sku.getDurationId());
-        City city = cityService.findById(sku.getCityId());
-        SkuVo skuVo = parse(sku, city, category, vendor, duration);
-        Map<String, Collection<String>> availableDateMap = Maps.newHashMap();
-        for (SkuTicketVo skuTicketVo : skuVo.getTickets()) {
-            Set<String> availableDates = Sets.newLinkedHashSet(
-                    Lists.transform(skuTicketVo.getTicketPrices(), SkuTicketPriceVo::getDate));
-            availableDateMap.put(skuTicketVo.getId() + "", availableDates);
-        }
-        model.put("sku", skuVo);
-        model.put("availableDateMap", availableDateMap);
-        model.put("vendor", vendor);
-        return "create_order";
-    }
 }

@@ -344,6 +344,7 @@
                 <button id="j_update" class="btn btn-primary form-group">Submit</button>
             </#if>
             <button id="j_edit_inventory" class="btn btn-primary form-group">Edit Inventory</button>
+            <button id="j_query_inventory" class="btn btn-primary form-group">Query Inventory</button>
         </#if>
         <#if role?? && role == "Vendor">
             <button id="j_edit_inventory" class="btn btn-primary form-group">Edit Inventory</button>

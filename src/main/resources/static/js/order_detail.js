@@ -245,10 +245,10 @@ $('#j_record').on('click', function () {
     //window.location.href = '/order_record/' + id;
     if (window.location.pathname.endsWith('/_edit')) {
         id = parseInt(path[path.length - 2]);
-        window.open("/order_record/" + id);
+        window.open("/orders/" + id + "/record");
     } else {
         id = parseInt(path[path.length - 1]);
-        window.open("/order_record/" + id);
+        window.open("/orders/" + id + "/record");
     }
 });
 

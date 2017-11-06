@@ -919,9 +919,9 @@ public class RestApiController extends AuthenticationRequiredController {
 
     @RequestMapping(value = "/v1/api/skus/{skuId}/inventories", method = RequestMethod.GET)
     @Authentication({Role.Admin, Role.Agent, Role.Vendor})
-    public SkuInventoryDto getSkuInventory(@PathVariable("skuId") int skuId,
+    public List<SkuInventoryDto> getSkuInventory(@PathVariable("skuId") int skuId,
                                            @RequestParam("date") String dateString,
-                                           @RequestParam("time") String time) {
+                                           @RequestParam(value = "time", required = false) String time) {
         if (getToken().getRole() == Role.Agent) {
             int agentId = getToken().getId();
             checkViewSkuPriviledge(skuMapper.findById(skuId), agentId);
@@ -931,7 +931,11 @@ public class RestApiController extends AuthenticationRequiredController {
                 throw new AuthenticationFailureException();
             }
         }
-        return skuInventoryService.getSkuInventory(skuId, DateUtils.parseDate(dateString), time);
+        if (time == null) {
+            return skuInventoryService.getSkuInventory(skuId, DateUtils.parseDate(dateString));
+        } else {
+            return Lists.newArrayList(skuInventoryService.getSkuInventory(skuId, DateUtils.parseDate(dateString), time));
+        }
     }
 
     @RequestMapping(value = "/v1/api/skus/{skuId}/inventories", method = RequestMethod.POST)

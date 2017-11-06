@@ -343,6 +343,7 @@
                 <button id="j_update" class="btn btn-primary form-group">提交</button>
             </#if>
             <button id="j_edit_inventory" class="btn btn-primary form-group">编辑库存</button>
+            <button id="j_query_inventory" class="btn btn-primary form-group">查询库存</button>
         </#if>
         <#if role?? && role == "Vendor">
             <button id="j_edit_inventory" class="btn btn-primary form-group">编辑库存</button>

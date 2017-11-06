@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service("skuInventoryService")
 public class SkuInventoryServiceImpl implements SkuInventoryService {
@@ -62,6 +63,12 @@ public class SkuInventoryServiceImpl implements SkuInventoryService {
         result.setDate(DateUtils.formatDate(date));
         result.setTime(time);
         return result;
+    }
+
+    @Override
+    public List<SkuInventoryDto> getSkuInventory(int skuId, Date date) {
+        List<String> sessions = skuTicketPriceMapper.getSessionsBySkuIdAndDate(skuId, date, date);
+        return sessions.stream().map(input -> getSkuInventory(skuId, date, input)).collect(Collectors.toList());
     }
 
     @Override
