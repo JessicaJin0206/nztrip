@@ -2,6 +2,9 @@
 <div class="form-group" id="j_order_sku" skuid="${order.skuId?c}">
     <label>Sku:</label>
     <span>  ${order.sku}</span>
+    <button id="j_check_available" class="btn btn-primary form-group" style="margin-left: 20px"
+            value="${sku.checkAvailabilityWebsite!!}">Check Availability
+    </button>
 </div>
 <#if role?? && role == "Admin">
 <div class="form-group">

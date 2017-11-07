@@ -549,6 +549,18 @@ $("#j_replace_tickets").on('click', function () {
     })
 });
 
+var checkAvailableButton = $('#j_check_available');
+checkAvailableButton.on('click', function () {
+    var checkAvailable = $('#j_check_available').attr('value');
+    if (checkAvailable.length === 0) {
+        warn("暂无查位链接");
+        checkAvailableButton.prop('disabled', false);
+        return;
+    }
+    window.open(checkAvailable);
+});
+
+
 function updateOrderStatus(id, toStatus, sendEmail, data) {
     $.ajax({
                type: 'PUT',

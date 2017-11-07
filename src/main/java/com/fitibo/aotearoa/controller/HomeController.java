@@ -430,12 +430,12 @@ public class HomeController extends AuthenticationRequiredController {
     public String orderDetail(@PathVariable("id") int id, Map<String, Object> model,
                               @CookieValue(value = "language", defaultValue = "en") String lang) {
         Order order = orderMapper.findById(id);
+        Sku sku = skuMapper.findById(order.getSkuId());
         if (getToken().getRole() == Role.Agent) {
             if (order.getAgentId() != getToken().getId()) {
                 throw new AuthenticationFailureException("order id:" + id + " does not belong to agent id:" + getToken().getId());
             }
         } else if (getToken().getRole() == Role.Vendor) {
-            Sku sku = skuMapper.findById(order.getSkuId());
             if (sku.getVendorId() != getToken().getId()) {
                 throw new AuthenticationFailureException("order id:" + id + " does not belong to vendor id:" + getToken().getId());
             }
@@ -444,6 +444,7 @@ public class HomeController extends AuthenticationRequiredController {
             throw new ResourceNotFoundException();
         }
         model.put("order", order);
+        model.put("sku", sku);
         List<OrderTicketVo> orderTickets = Lists.transform(orderTicketMapper.findByOrderId(order.getId()), ObjectParser::parse);
         model.put("tickets", orderTickets);
         model.put("touristCount", calculateTouristCount(orderTickets));
