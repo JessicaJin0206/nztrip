@@ -153,12 +153,14 @@
                 <nav aria-label="...">
                     <ul class="pager">
                         <li class="<#if (pageNumber <= 0)>disabled</#if>">
-                            <a href="skus?<#if (cityId > 0)>cityid=${cityId?c}&</#if><#if (categoryId > 0)>categoryid=${categoryId?c}&</#if><#if (keyword != "")>keyword=${keyword}&</#if><#if (pageNumber > 0)>pagenumber=${pageNumber-1}&pagesize=${pageSize}</#if>">Prev
-                                Page</a>
+                            <a href="javascript:void(0)" onclick="searchWith('${pageNumber-1}','${pageSize}')">Prev Page</a>
+                            <#--<a href="skus?<#if (cityId > 0)>cityid=${cityId?c}&</#if><#if (categoryId > 0)>categoryid=${categoryId?c}&</#if><#if (keyword != "")>keyword=${keyword}&</#if><#if (pageNumber > 0)>pagenumber=${pageNumber-1}&pagesize=${pageSize}</#if>">Prev
+                                Page</a>-->
                         </li>
                         <li>
-                            <a href="skus?<#if (cityId > 0)>cityid=${cityId?c}&</#if><#if (categoryId > 0)>categoryid=${categoryId?c}&</#if><#if (keyword != "")>keyword=${keyword}&</#if>pagenumber=${pageNumber+1}&pagesize=${pageSize}">Next
-                                Page</a>
+                            <a href="javascript:void(0)" onclick="searchWith('${pageNumber+1}','${pageSize}')">Next Page</a>
+                            <#--<a href="skus?<#if (cityId > 0)>cityid=${cityId?c}&</#if><#if (categoryId > 0)>categoryid=${categoryId?c}&</#if><#if (keyword != "")>keyword=${keyword}&</#if>pagenumber=${pageNumber+1}&pagesize=${pageSize}">Next
+                                Page</a>-->
                         </li>
                     </ul>
                 </nav>

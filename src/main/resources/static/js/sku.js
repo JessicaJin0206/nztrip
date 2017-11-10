@@ -61,24 +61,17 @@ function getSearchString() {
     return searchString;
 }
 
+function searchWith(pagenumber, pagesize) {
+    var searchString = getSearchString();
+    if (searchString.length > 0) {
+        window.location.href = "/skus?pagenumber=" + pagenumber + "&pagesize=" + pagesize + "&" + searchString;
+    } else {
+        window.location.href = "/skus?pagenumber=" + pagenumber + "&pagesize=" + pagesize;
+    }
+}
+
 function doSearch() {
-    var cityId = parseInt(cityDropDown.attr('value'));
-    var categoryId = parseInt(categoryDropDown.attr('value'));
-    var api = parseInt(apiDropDown.attr('value'));
-    var keyword = $('#j_keyword').val();
-    var searchString = "";
-    if (cityId > 0) {
-        searchString += "cityid=" + cityId + "&";
-    }
-    if (categoryId > 0) {
-        searchString += "categoryid=" + categoryId + "&";
-    }
-    if (api > 0) {
-        searchString += "api=" + api + "&";
-    }
-    if (keyword.length > 0) {
-        searchString += "keyword=" + encodeURI(keyword) + "&";
-    }
+    var searchString = getSearchString();
     if (searchString.length > 0) {
         window.location.href = "/skus?" + searchString;
     }

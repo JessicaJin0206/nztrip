@@ -153,10 +153,12 @@
                 <nav aria-label="...">
                     <ul class="pager">
                         <li class="<#if (pageNumber <= 0)>disabled</#if>">
-                            <a href="skus?<#if (cityId > 0)>cityid=${cityId?c}&</#if><#if (categoryId > 0)>categoryid=${categoryId?c}&</#if><#if (keyword != "")>keyword=${keyword}&</#if><#if (pageNumber > 0)>pagenumber=${pageNumber-1}&pagesize=${pageSize}</#if>">上一页</a>
+                            <a href="javascript:void(0)" onclick="searchWith('${pageNumber-1}','${pageSize}')">上一页</a>
+                        <#--<a href="skus?<#if (cityId > 0)>cityid=${cityId?c}&</#if><#if (categoryId > 0)>categoryid=${categoryId?c}&</#if><#if (keyword != "")>keyword=${keyword}&</#if><#if (pageNumber > 0)>pagenumber=${pageNumber-1}&pagesize=${pageSize}</#if>">上一页</a>-->
                         </li>
                         <li>
-                            <a href="skus?<#if (cityId > 0)>cityid=${cityId?c}&</#if><#if (categoryId > 0)>categoryid=${categoryId?c}&</#if><#if (keyword != "")>keyword=${keyword}&</#if>pagenumber=${pageNumber+1}&pagesize=${pageSize}">下一页</a>
+                            <a href="javascript:void(0)" onclick="searchWith('${pageNumber+1}','${pageSize}')">下一页</a>
+                        <#--<a href="skus?<#if (cityId > 0)>cityid=${cityId?c}&</#if><#if (categoryId > 0)>categoryid=${categoryId?c}&</#if><#if (keyword != "")>keyword=${keyword}&</#if>pagenumber=${pageNumber+1}&pagesize=${pageSize}">下一页</a>-->
                         </li>
                     </ul>
                 </nav>
