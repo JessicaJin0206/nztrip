@@ -245,7 +245,7 @@ public class HomeController extends AuthenticationRequiredController {
                 throw new ResourceNotFoundException();
             }
         } else {
-            throw new InvalidParamException();
+            throw new InvalidParamException("sku id:" + skuId + " uuid:" + uuid);
         }
         Vendor vendor = vendorService.findById(sku.getVendorId());
         Category category = categoryService.findById(sku.getCategoryId());

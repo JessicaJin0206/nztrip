@@ -23,7 +23,7 @@ public interface EmailQueueMapper {
     @Options(useGeneratedKeys = true, keyColumn = "id", keyProperty = "id", flushCache = Options.FlushCachePolicy.DEFAULT)
     int create(Email email);
 
-    @Select("select * from email_queue where succeed = 0")
+    @Select("select * from email_queue where succeed = 0 order by retry")
     @Results({
             @Result(property = "id", column = "id"),
             @Result(property = "from", column = "from"),
