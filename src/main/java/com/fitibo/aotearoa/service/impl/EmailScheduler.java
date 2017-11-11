@@ -38,6 +38,9 @@ public class EmailScheduler {
     @Value("${mock-receiver}")
     private String mockReceiver;
 
+    @Value("${email-from}")
+    private String emailFrom;
+
     @Autowired
     private JavaMailSender mailSender;
 
@@ -88,7 +91,7 @@ public class EmailScheduler {
             String[] receivers = to.split(";");
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper messageHelper = new MimeMessageHelper(message, true, "utf-8");
-            messageHelper.setFrom(email.getFrom());
+            messageHelper.setFrom(emailFrom);
             messageHelper.setSubject(email.getSubject());
             messageHelper.setText(email.getContent(), true);
             messageHelper.setTo(receivers);
@@ -114,7 +117,7 @@ public class EmailScheduler {
         logger.info("start auto-resend email task");
         try {
             List<Email> allFailedEmails = emailQueueMapper.findAllFailedEmails();
-            List<Email> subList = allFailedEmails.subList(0, Math.min(allFailedEmails.size(), 4));
+            List<Email> subList = allFailedEmails.subList(0, Math.min(allFailedEmails.size(), 1));
             //at most 4 emails per minute
             for (Email email : subList) {
                 logger.info("send email id:" + email.getId() + " for the " + (email.getRetry() + 1) + " times");
