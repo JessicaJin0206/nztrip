@@ -1,0 +1,9 @@
+insert into special_rate(`sku`, `sku_id`, `agent_id`, `discount`) values('RJ500', 0, 59, 10);
+insert into special_rate(`sku`, `sku_id`, `agent_id`, `discount`) values('RJ501', 0, 59, 10);
+insert into special_rate(`sku`, `sku_id`, `agent_id`, `discount`) values('RJ504', 0, 59, 10);
+insert into special_rate(`sku`, `sku_id`, `agent_id`, `discount`) values('RJ502', 0, 59, 10);
+insert into special_rate(`sku`, `sku_id`, `agent_id`, `discount`) values('RJ512', 0, 59, 10);
+insert into special_rate(`sku`, `sku_id`, `agent_id`, `discount`) values('RJ530', 0, 59, 10);
+insert into special_rate(`sku`, `sku_id`, `agent_id`, `discount`) values('RJ505', 0, 59, 10);
+insert into special_rate(`sku`, `sku_id`, `agent_id`, `discount`) values('RJ503', 0, 59, 10);
+insert into special_rate(`sku`, `sku_id`, `agent_id`, `discount`) values('RJ5304', 0, 59, 10);
