@@ -1,8 +1,5 @@
 package com.fitibo.aotearoa.service;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
 import com.fitibo.aotearoa.constants.CommonConstants;
 import com.fitibo.aotearoa.mapper.AgentMapper;
 import com.fitibo.aotearoa.mapper.SkuMapper;
@@ -17,7 +14,10 @@ import com.fitibo.aotearoa.vo.OrderTicketUserVo;
 import com.fitibo.aotearoa.vo.OrderTicketVo;
 import com.fitibo.aotearoa.vo.OrderVo;
 import com.fitibo.aotearoa.vo.Scan;
-
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import org.apache.ibatis.session.RowBounds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +28,7 @@ import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -85,6 +86,8 @@ public class ScanService {
         List<String> nameList = Lists.newArrayList();
         List<Integer> weightList = Lists.newArrayList();
 
+        Multimap<String, OrderTicketUserVo> users = ArrayListMultimap.create();
+
         OrderVo orderVo = new OrderVo();
         orderVo.setAgentId(agent.getId());
         orderVo.setSkuId(sku.getId());
@@ -93,6 +96,8 @@ public class ScanService {
         orderVo.setPrimaryContact(agent.getDefaultContact());
         orderVo.setPrimaryContactEmail(agent.getDefaultContactEmail());
         orderVo.setRemark("");
+
+        String skuName = null;
         try {
             Map<String, PropertyDescriptor> propertyDescriptorMap = Stream.of(Introspector.getBeanInfo(OrderVo.class).getPropertyDescriptors()).collect(Collectors.toMap(PropertyDescriptor::getName, Function.identity()));
             BeanInfo beanInfo = Introspector.getBeanInfo(OrderTicketUserVo.class);
@@ -111,18 +116,8 @@ public class ScanService {
                 if (hasTravelInfo) {
                     if (line.contains("、")) {
                         String temp = line.split("、")[1];
-                        OrderTicketVo orderTicketVo = null;
-                        SkuTicket skuTicket = null;
                         if (temp.contains("：")) {
-                            for (SkuTicket ticket : skuTickets) {
-                                String s = temp.substring(0, 2);
-                                if (ticket.getName().contains(userMap.get(s))) {
-                                    skuTicket = ticket;
-                                    orderTicketVo = parse(ticket, orderVo, scan, gatheringPlace);
-                                    ticketVos.add(orderTicketVo);
-                                    break;
-                                }
-                            }
+                            String type = temp.substring(0, 2);
                             temp = temp.substring(2);
                             String[] strings1 = temp.split("\\s+");
                             OrderTicketUserVo orderTicketUserVo = new OrderTicketUserVo();
@@ -158,22 +153,8 @@ public class ScanService {
 
                                 }
                             }
-                            if (skuTicket != null && orderTicketVo != null) {
-                                orderTicketUserVo.setAge(Integer.parseInt(skuTicket.getAgeConstraint().split("-")[0]));
-                                if (orderTicketUserVo.getWeight() == 0) {
-                                    orderTicketUserVo.setWeight(Integer.parseInt(skuTicket.getWeightConstraint().split("-")[0]));
-                                }
-                                orderTicketVo.setOrderTicketUsers(Lists.newArrayList(orderTicketUserVo));
-                            }
+                            users.put(userMap.get(type), orderTicketUserVo);
                         } else {
-                            for (SkuTicket ticket : skuTickets) {
-                                if (ticket.getName().contains(userMap.get(temp))) {
-                                    skuTicket = ticket;
-                                    orderTicketVo = parse(ticket, orderVo, scan, gatheringPlace);
-                                    ticketVos.add(orderTicketVo);
-                                    break;
-                                }
-                            }
                             OrderTicketUserVo orderTicketUserVo = new OrderTicketUserVo();
                             do {
                                 i++;
@@ -191,11 +172,7 @@ public class ScanService {
                                     }
                                 }
                             } while (!line.contains("、"));
-                            if (skuTicket != null && orderTicketVo != null) {
-                                orderTicketUserVo.setAge(Integer.parseInt(skuTicket.getAgeConstraint().split("-")[0]));
-                                orderTicketUserVo.setWeight(Integer.parseInt(skuTicket.getWeightConstraint().split("-")[0]));
-                                orderTicketVo.setOrderTicketUsers(Lists.newArrayList(orderTicketUserVo));
-                            }
+                            users.put(userMap.get(temp), orderTicketUserVo);
                         }
                     }
                 }
@@ -210,7 +187,7 @@ public class ScanService {
                     }
                 }
                 if (line.contains("：")) {
-                    if (line.startsWith("Preferred")&&line.contains("Time")) {
+                    if (line.startsWith("Preferred") && line.contains("Time")) {
                         orderVo.setRemark(orderVo.getRemark() + line + "  ");
                         continue;
                     }
@@ -243,28 +220,30 @@ public class ScanService {
                                 method.invoke(orderVo, s.substring(index + 1).trim());
                             }
                         }
+                    } else if (temp.get(0).equals("SKU名称") || temp.get(0).equals("Package booked") || temp.get(0).equals("Activity booked")) {
+                        if (temp.size() > 1) {
+                            skuName = temp.get(1);
+                        }
                     }
                     if (temp.size() > 2) {
                         List<String> temp1 = Stream.of(line.split("：|\\s+")).map(String::trim).filter(s -> !s.isEmpty()).collect(Collectors.toList());
-                        if (temp1.size() % 2 == 0) {
-                            for (int j = 0; j < temp1.size(); j += 2) {
-                                try {
-                                    switch (temp1.get(j)) {
-                                        case "成人":
-                                            peopleMap.put("Adult", Integer.parseInt(temp1.get(j + 1)));
-                                            break;
-                                        case "儿童":
-                                            peopleMap.put("Child", Integer.parseInt(temp1.get(j + 1)));
-                                            break;
-                                        case "婴儿":
-                                            peopleMap.put("Infant", Integer.parseInt(temp1.get(j + 1)));
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                } catch (NumberFormatException e) {
-
+                        for (int j = 0; j < temp1.size(); j += 2) {
+                            try {
+                                switch (temp1.get(j)) {
+                                    case "成人":
+                                        peopleMap.put("Adult", Integer.parseInt(temp1.get(j + 1)));
+                                        break;
+                                    case "儿童":
+                                        peopleMap.put("Child", Integer.parseInt(temp1.get(j + 1)));
+                                        break;
+                                    case "婴儿":
+                                        peopleMap.put("Infant", Integer.parseInt(temp1.get(j + 1)));
+                                        break;
+                                    default:
+                                        break;
                                 }
+                            } catch (NumberFormatException | IndexOutOfBoundsException e) {
+                                logger.info("ignore exception int auto import", e);
                             }
                         }
                     }
@@ -275,48 +254,76 @@ public class ScanService {
                     int k = 0, w = 0;
                     for (Map.Entry<String, Integer> entry : peopleMap.entrySet()) {
                         for (int i = 0; i < entry.getValue(); i++) {
-                            for (SkuTicket skuTicket : skuTickets) {
-                                String s = entry.getKey();
-                                if (skuTicket.getName().contains(s)) {
-                                    OrderTicketVo orderTicketVo = parse(skuTicket, orderVo, scan, gatheringPlace);
-                                    OrderTicketUserVo orderTicketUserVo = new OrderTicketUserVo();
-                                    if (k < nameList.size()) {
-                                        orderTicketUserVo.setName(nameList.get(k));
-                                        k++;
-                                    } else {
-                                        orderTicketUserVo.setName(s + (i + 1));
-                                    }
-                                    orderTicketUserVo.setAge(Integer.parseInt(skuTicket.getAgeConstraint().split("-")[0]));
-                                    if (w < weightList.size()) {
-                                        orderTicketUserVo.setWeight(weightList.get(w));
-                                        w++;
-                                    } else {
-                                        orderTicketUserVo.setWeight(Integer.parseInt(skuTicket.getWeightConstraint().split("-")[0]));
-                                    }
-                                    orderTicketVo.setOrderTicketUsers(Lists.newArrayList(orderTicketUserVo));
-                                    ticketVos.add(orderTicketVo);
-                                    break;
-                                }
+                            String s = entry.getKey();
+                            OrderTicketUserVo orderTicketUserVo = new OrderTicketUserVo();
+                            if (k < nameList.size()) {
+                                orderTicketUserVo.setName(nameList.get(k));
+                                k++;
+                            } else {
+                                orderTicketUserVo.setName(s + (i + 1));
                             }
+                            if (w < weightList.size()) {
+                                orderTicketUserVo.setWeight(weightList.get(w));
+                                w++;
+                            }
+                            users.put(s, orderTicketUserVo);
                         }
                     }
                 } else {
                     for (Map.Entry<String, Integer> entry : peopleMap.entrySet()) {
                         for (int i = 0; i < entry.getValue(); i++) {
-                            for (SkuTicket skuTicket : skuTickets) {
-                                String s = entry.getKey();
-                                if (skuTicket.getName().contains(s)) {
-                                    OrderTicketVo orderTicketVo = parse(skuTicket, orderVo, scan, gatheringPlace);
-                                    OrderTicketUserVo orderTicketUserVo = new OrderTicketUserVo();
-                                    orderTicketUserVo.setName(s + (i + 1));
-                                    orderTicketUserVo.setAge(Integer.parseInt(skuTicket.getAgeConstraint().split("-")[0]));
-                                    orderTicketUserVo.setWeight(Integer.parseInt(skuTicket.getWeightConstraint().split("-")[0]));
-                                    orderTicketVo.setOrderTicketUsers(Lists.newArrayList(orderTicketUserVo));
-                                    ticketVos.add(orderTicketVo);
-                                    break;
-                                }
-                            }
+                            String s = entry.getKey();
+                            OrderTicketUserVo orderTicketUserVo = new OrderTicketUserVo();
+                            orderTicketUserVo.setName(s + (i + 1));
+                            users.put(s, orderTicketUserVo);
                         }
+                    }
+                }
+            }
+            for (Map.Entry<String, Collection<OrderTicketUserVo>> entry : users.asMap().entrySet()) {
+                String type = entry.getKey();
+                for (OrderTicketUserVo orderTicketUserVo : entry.getValue()) {
+                    List<OrderTicketVo> orderTicketVos = parse(skuTickets, orderVo, scan, gatheringPlace);
+                    OrderTicketVo vo = null;
+                    int max = -1;
+                    if (orderTicketVos.size() == 0) {
+                        break;
+                    } else if (skuName == null || orderTicketVos.size() == 1) {
+                        vo = orderTicketVos.get(0);
+                    } else {
+                        List<OrderTicketVo> orderTicketVoList = orderTicketVos.stream()
+                                .filter(orderTicketVo -> orderTicketVo.getSkuTicket().contains(type)).collect(Collectors.toList());
+                        switch (orderTicketVoList.size()) {
+                            case 1:
+                                vo = orderTicketVos.get(0);
+                                break;
+                            case 0:
+                                orderTicketVoList = orderTicketVos;
+                            default:
+                                for (OrderTicketVo orderTicketVo : orderTicketVoList) {
+                                    String ticketName = orderTicketVo.getSkuTicket().replace(type, "").trim().toLowerCase();
+                                    int count = 0;
+                                    for (String temp : ticketName.split("\\s+|\\+")) {
+                                        if (skuName.toLowerCase().contains(temp)) {
+                                            count++;
+                                        }
+                                    }
+                                    if (count > max) {
+                                        max = count;
+                                        vo = orderTicketVo;
+                                    }
+                                }
+                        }
+                    }
+                    if (vo != null) {
+                        if (orderTicketUserVo.getAge() == 0) {
+                            orderTicketUserVo.setAge(Integer.parseInt(vo.getAgeConstraint().split("-")[0]));
+                        }
+                        if (orderTicketUserVo.getWeight() == 0) {
+                            orderTicketUserVo.setWeight(Integer.parseInt(vo.getWeightConstraint().split("-")[0]));
+                        }
+                        vo.setOrderTicketUsers(Lists.newArrayList(orderTicketUserVo));
+                        ticketVos.add(vo);
                     }
                 }
             }
@@ -328,29 +335,31 @@ public class ScanService {
         return orderVo;
     }
 
-    private OrderTicketVo parse(SkuTicket skuTicket, OrderVo orderVo, Scan scan, String gatheringPlace) {
-        OrderTicketVo orderTicketVo = new OrderTicketVo();
-        orderTicketVo.setSkuTicketId(skuTicket.getId());
-        orderTicketVo.setSkuTicket(skuTicket.getName());
-        orderTicketVo.setAgeConstraint(skuTicket.getAgeConstraint());
-        orderTicketVo.setCountConstraint(skuTicket.getCountConstraint());
-        orderTicketVo.setWeightConstraint(skuTicket.getWeightConstraint());
-        orderTicketVo.setPriceDescription(skuTicket.getDescription());
-        orderTicketVo.setGatheringPlace(gatheringPlace);
-        orderTicketVo.setTicketDate(orderVo.getTicketDate());
-        int discount = discountRateService.getDiscountByAgent(scan.getAgentId(), scan.getSkuId());
-        List<SkuTicketPrice> skuTicketPrices = skuTicketPriceMapper.findAvailableBySkuTicketIdAndDate(skuTicket.getSkuId(), skuTicket.getId(), DateUtils.parseDate(orderVo.getTicketDate()), new RowBounds());
-        for (SkuTicketPrice skuTicketPrice : skuTicketPrices) {
-            if (skuTicketPrice.getTime().equals(scan.getTime())) {
-                orderTicketVo.setTicketPriceId(skuTicketPrice.getId());
-                orderTicketVo.setTicketTime(scan.getTime());
-                orderTicketVo.setPrice(pricingService.calculate(skuTicketPrice, discount));
-                orderTicketVo.setSalePrice(skuTicketPrice.getSalePrice());
-                break;
+    private List<OrderTicketVo> parse(List<SkuTicket> skuTickets, OrderVo orderVo, Scan scan, String gatheringPlace) {
+        List<OrderTicketVo> orderTicketVos = Lists.newArrayList();
+        for (SkuTicket skuTicket : skuTickets) {
+            int discount = discountRateService.getDiscountByAgent(scan.getAgentId(), scan.getSkuId());
+            List<SkuTicketPrice> skuTicketPrices = skuTicketPriceMapper.findAvailableBySkuTicketIdAndDate(skuTicket.getSkuId(), skuTicket.getId(), DateUtils.parseDate(orderVo.getTicketDate()), new RowBounds());
+            for (SkuTicketPrice skuTicketPrice : skuTicketPrices) {
+                if (skuTicketPrice.getTime().equals(scan.getTime())) {
+                    OrderTicketVo orderTicketVo = new OrderTicketVo();
+                    orderTicketVo.setSkuTicketId(skuTicket.getId());
+                    orderTicketVo.setSkuTicket(skuTicket.getName());
+                    orderTicketVo.setAgeConstraint(skuTicket.getAgeConstraint());
+                    orderTicketVo.setCountConstraint(skuTicket.getCountConstraint());
+                    orderTicketVo.setWeightConstraint(skuTicket.getWeightConstraint());
+                    orderTicketVo.setPriceDescription(skuTicket.getDescription());
+                    orderTicketVo.setGatheringPlace(gatheringPlace);
+                    orderTicketVo.setTicketDate(orderVo.getTicketDate());
+                    orderTicketVo.setTicketPriceId(skuTicketPrice.getId());
+                    orderTicketVo.setTicketTime(scan.getTime());
+                    orderTicketVo.setPrice(pricingService.calculate(skuTicketPrice, discount));
+                    orderTicketVo.setSalePrice(skuTicketPrice.getSalePrice());
+                    orderTicketVos.add(orderTicketVo);
+                }
             }
         }
-        return orderTicketVo;
-
+        return orderTicketVos;
     }
 
 }
