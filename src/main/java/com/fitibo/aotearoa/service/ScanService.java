@@ -222,7 +222,7 @@ public class ScanService {
                         }
                     } else if (temp.get(0).equals("SKU名称") || temp.get(0).equals("Package booked") || temp.get(0).equals("Activity booked")) {
                         if (temp.size() > 1) {
-                            skuName = temp.get(1);
+                            skuName = temp.get(1).replace(" ", "").replace(",", "").toLowerCase();
                         }
                     }
                     if (temp.size() > 2) {
@@ -295,7 +295,7 @@ public class ScanService {
                                 .filter(orderTicketVo -> orderTicketVo.getSkuTicket().contains(type)).collect(Collectors.toList());
                         switch (orderTicketVoList.size()) {
                             case 1:
-                                vo = orderTicketVos.get(0);
+                                vo = orderTicketVoList.get(0);
                                 break;
                             case 0:
                                 orderTicketVoList = orderTicketVos;
