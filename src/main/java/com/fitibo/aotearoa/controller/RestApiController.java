@@ -1,14 +1,5 @@
 package com.fitibo.aotearoa.controller;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Splitter;
-import com.google.common.base.Strings;
-import com.google.common.collect.HashMultiset;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multiset;
-
 import com.fitibo.aotearoa.annotation.Authentication;
 import com.fitibo.aotearoa.constants.CommonConstants;
 import com.fitibo.aotearoa.constants.OrderStatus;
@@ -20,57 +11,22 @@ import com.fitibo.aotearoa.dto.Transition;
 import com.fitibo.aotearoa.exception.AuthenticationFailureException;
 import com.fitibo.aotearoa.exception.InvalidParamException;
 import com.fitibo.aotearoa.exception.ResourceNotFoundException;
-import com.fitibo.aotearoa.mapper.AdminMapper;
-import com.fitibo.aotearoa.mapper.AgentMapper;
-import com.fitibo.aotearoa.mapper.MessageBoardMapper;
-import com.fitibo.aotearoa.mapper.OrderMapper;
-import com.fitibo.aotearoa.mapper.OrderTicketMapper;
-import com.fitibo.aotearoa.mapper.OrderTicketUserMapper;
-import com.fitibo.aotearoa.mapper.PriceRecordMapper;
-import com.fitibo.aotearoa.mapper.SkuMapper;
-import com.fitibo.aotearoa.mapper.SkuTicketMapper;
-import com.fitibo.aotearoa.mapper.SkuTicketPriceMapper;
-import com.fitibo.aotearoa.model.Admin;
-import com.fitibo.aotearoa.model.Agent;
-import com.fitibo.aotearoa.model.MessageBoard;
-import com.fitibo.aotearoa.model.Order;
-import com.fitibo.aotearoa.model.OrderTicket;
-import com.fitibo.aotearoa.model.OrderTicketUser;
-import com.fitibo.aotearoa.model.PriceRecord;
-import com.fitibo.aotearoa.model.Sku;
-import com.fitibo.aotearoa.model.SkuTicket;
-import com.fitibo.aotearoa.model.SkuTicketPrice;
-import com.fitibo.aotearoa.model.Vendor;
-import com.fitibo.aotearoa.service.DiscountRateService;
-import com.fitibo.aotearoa.service.OperationService;
-import com.fitibo.aotearoa.service.OrderRecordService;
-import com.fitibo.aotearoa.service.OrderService;
-import com.fitibo.aotearoa.service.PricingService;
-import com.fitibo.aotearoa.service.SkuInventoryService;
-import com.fitibo.aotearoa.service.SkuService;
-import com.fitibo.aotearoa.service.TokenService;
-import com.fitibo.aotearoa.service.VendorService;
+import com.fitibo.aotearoa.mapper.*;
+import com.fitibo.aotearoa.model.*;
+import com.fitibo.aotearoa.service.*;
 import com.fitibo.aotearoa.util.DateUtils;
 import com.fitibo.aotearoa.util.GuidGenerator;
 import com.fitibo.aotearoa.util.Md5Utils;
 import com.fitibo.aotearoa.util.ObjectParser;
-import com.fitibo.aotearoa.vo.AddPriceRecordRequest;
-import com.fitibo.aotearoa.vo.AddPriceRequest;
-import com.fitibo.aotearoa.vo.AddSkuInventoryRequest;
-import com.fitibo.aotearoa.vo.AgentVo;
-import com.fitibo.aotearoa.vo.AuthenticationReq;
-import com.fitibo.aotearoa.vo.AuthenticationResp;
-import com.fitibo.aotearoa.vo.DeleteSkuInventoryRequest;
-import com.fitibo.aotearoa.vo.OrderTicketUserVo;
-import com.fitibo.aotearoa.vo.OrderTicketVo;
-import com.fitibo.aotearoa.vo.OrderVo;
-import com.fitibo.aotearoa.vo.ReplaceTicketsRequest;
-import com.fitibo.aotearoa.vo.ResultVo;
-import com.fitibo.aotearoa.vo.SkuTicketPriceVo;
-import com.fitibo.aotearoa.vo.SkuTicketVo;
-import com.fitibo.aotearoa.vo.SkuVo;
-import com.fitibo.aotearoa.vo.VendorVo;
-
+import com.fitibo.aotearoa.vo.*;
+import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multiset;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.ibatis.session.RowBounds;
@@ -84,20 +40,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -988,7 +934,7 @@ public class RestApiController extends AuthenticationRequiredController {
         return ResultVo.SUCCESS;
     }
 
-    @RequestMapping(value = "/v1/api/publish_message", method = RequestMethod.POST)
+    @RequestMapping(value = "/v1/api/message", method = RequestMethod.POST)
     @Authentication(Role.Admin)
     public boolean publishMessage(@RequestBody MessageBoard messageBoard) {
         messageBoard.setAdminId(getToken().getId());
@@ -1041,19 +987,18 @@ public class RestApiController extends AuthenticationRequiredController {
     private static Order parse(OrderVo order) {
         Order result = new Order();
         result.setSkuId(order.getSkuId());
-        result.setRemark(order.getRemark());
-        result.setReferenceNumber(order.getReferenceNumber());
-        result.setPrimaryContact(order.getPrimaryContact());
-        result.setPrimaryContactEmail(order.getPrimaryContactEmail());
-        result.setPrimaryContactPhone(order.getPrimaryContactPhone());
-        result.setPrimaryContactWechat(order.getPrimaryContactWechat());
-        result.setSecondaryContact(order.getSecondaryContact());
-        result.setSecondaryContactEmail(order.getSecondaryContactEmail());
-        result.setSecondaryContactPhone(order.getSecondaryContactPhone());
-        result.setSecondaryContactWechat(order.getSecondaryContactWechat());
-        result.setReferenceNumber(order.getReferenceNumber());
-        result.setGatheringInfo(order.getGatheringInfo());
-        result.setAgentOrderId(order.getAgentOrderId());
+        result.setRemark(Strings.nullToEmpty(order.getRemark()));
+        result.setReferenceNumber(Strings.nullToEmpty(order.getReferenceNumber()));
+        result.setPrimaryContact(Strings.nullToEmpty(order.getPrimaryContact()));
+        result.setPrimaryContactEmail(Strings.nullToEmpty(order.getPrimaryContactEmail()));
+        result.setPrimaryContactPhone(Strings.nullToEmpty(order.getPrimaryContactPhone()));
+        result.setPrimaryContactWechat(Strings.nullToEmpty(order.getPrimaryContactWechat()));
+        result.setSecondaryContact(Strings.nullToEmpty(order.getSecondaryContact()));
+        result.setSecondaryContactEmail(Strings.nullToEmpty(order.getSecondaryContactEmail()));
+        result.setSecondaryContactPhone(Strings.nullToEmpty(order.getSecondaryContactPhone()));
+        result.setSecondaryContactWechat(Strings.nullToEmpty(order.getSecondaryContactWechat()));
+        result.setGatheringInfo(Strings.nullToEmpty(order.getGatheringInfo()));
+        result.setAgentOrderId(Strings.nullToEmpty(order.getAgentOrderId()));
         result.setAgentId(order.getAgentId());
         return result;
     }
@@ -1068,20 +1013,19 @@ public class RestApiController extends AuthenticationRequiredController {
         result.setRefund(order.getRefund());
 
         result.setStatus(order.getStatus());
-        result.setReferenceNumber(order.getReferenceNumber());
-        result.setGatheringInfo(order.getGatheringInfo());
-        result.setRemark(order.getRemark());
-        result.setReferenceNumber(order.getReferenceNumber());
-        result.setPrimaryContact(order.getPrimaryContact());
-        result.setPrimaryContactEmail(order.getPrimaryContactEmail());
-        result.setPrimaryContactPhone(order.getPrimaryContactPhone());
-        result.setPrimaryContactWechat(order.getPrimaryContactWechat());
-        result.setSecondaryContact(order.getSecondaryContact());
-        result.setSecondaryContactEmail(order.getSecondaryContactEmail());
-        result.setSecondaryContactPhone(order.getSecondaryContactPhone());
-        result.setSecondaryContactWechat(order.getSecondaryContactWechat());
+        result.setRemark(Strings.nullToEmpty(order.getRemark()));
+        result.setReferenceNumber(Strings.nullToEmpty(order.getReferenceNumber()));
+        result.setPrimaryContact(Strings.nullToEmpty(order.getPrimaryContact()));
+        result.setPrimaryContactEmail(Strings.nullToEmpty(order.getPrimaryContactEmail()));
+        result.setPrimaryContactPhone(Strings.nullToEmpty(order.getPrimaryContactPhone()));
+        result.setPrimaryContactWechat(Strings.nullToEmpty(order.getPrimaryContactWechat()));
+        result.setSecondaryContact(Strings.nullToEmpty(order.getSecondaryContact()));
+        result.setSecondaryContactEmail(Strings.nullToEmpty(order.getSecondaryContactEmail()));
+        result.setSecondaryContactPhone(Strings.nullToEmpty(order.getSecondaryContactPhone()));
+        result.setSecondaryContactWechat(Strings.nullToEmpty(order.getSecondaryContactWechat()));
+        result.setGatheringInfo(Strings.nullToEmpty(order.getGatheringInfo()));
+        result.setAgentOrderId(Strings.nullToEmpty(order.getAgentOrderId()));
         result.setVendorPhone(order.getVendorPhone());
-        result.setAgentOrderId(order.getAgentOrderId());
         return result;
     }
 

@@ -38,7 +38,7 @@ function pushMessage() {
     $.ajax({
         type: 'POST',
         contentType: "application/json; charset=utf-8",
-        url: '/v1/api/publish_message',
+        url: '/v1/api/message',
         data: JSON.stringify({content: message})
     }).success(function () {
         window.location.reload();
