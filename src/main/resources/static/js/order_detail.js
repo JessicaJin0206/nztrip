@@ -404,6 +404,12 @@ $('#j_download_voucher').on('click', function () {
     window.open("/orders/" + id + "/voucher");
 });
 
+
+$('#j_download_pdf_voucher').on('click', function () {
+    var id = getOrderId();
+    window.open("/orders/" + id + "/pdf_voucher");
+});
+
 $('#j_resend_reservation').on('click', function () {
     var id = getOrderId();
     $.ajax({

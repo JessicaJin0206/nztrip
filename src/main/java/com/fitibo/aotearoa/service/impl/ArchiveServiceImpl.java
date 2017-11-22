@@ -34,6 +34,10 @@ import com.fitibo.aotearoa.service.ResourceLoaderService;
 import com.fitibo.aotearoa.service.SkuService;
 import com.fitibo.aotearoa.util.DateUtils;
 
+import com.itextpdf.text.pdf.AcroFields;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.PdfStamper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.ibatis.session.RowBounds;
@@ -66,8 +70,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
@@ -158,6 +161,79 @@ public class ArchiveServiceImpl implements ArchiveService {
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
         }
+    }
+
+    @Override
+    public byte[] createPDFVoucher(Order order) {
+
+        int orderId = order.getId();
+
+        Sku sku = skuService.findById(order.getSkuId());
+        Preconditions.checkNotNull(sku, "invalid sku id:" + order.getSkuId());
+
+        Vendor vendor = vendorMapper.findById(sku.getVendorId());
+        Preconditions.checkNotNull(vendor, "invalid vendor id:" + sku.getVendorId());
+
+        List<OrderTicket> orderTickets = orderTicketMapper.findByOrderId(orderId);
+        Preconditions.checkArgument(orderTickets.size() > 0, "no available tickets, order id:" + orderId);
+        OrderTicket firstOrderTicket = orderTickets.get(0);
+
+        SkuTicket skuTicket = skuTicketMapper.findById(firstOrderTicket.getSkuTicketId());
+        Preconditions.checkNotNull(skuTicket, "invalid sku ticket id:" + firstOrderTicket.getSkuTicketId());
+
+        Map<String, String> map = Maps.newHashMap();
+        map.put("refNumber", Optional.ofNullable(order.getReferenceNumber()).orElse(""));
+        map.put("gatheringTime", firstOrderTicket.getGatheringTime());
+        map.put("gatheringPlace", firstOrderTicket.getGatheringPlace());
+
+        map.put("vendorName", vendor.getName());
+        map.put("vendorContact", vendor.getPhone());
+        map.put("skuName", sku.getName());
+        map.put("date", DateUtils.formatDateWithFormat(firstOrderTicket.getTicketDate()));
+        map.put("time", firstOrderTicket.getTicketTime());
+        map.put("name", order.getPrimaryContact());
+        Multimap<String, OrderTicket> multimap = ArrayListMultimap.create();
+        for (OrderTicket ticket : orderTickets) {
+            multimap.put(ticket.getSkuTicket(), ticket);
+        }
+        ArrayList<String> items = Lists.newArrayList();
+        multimap.keySet().forEach(key -> items.add(multimap.get(key).size() + " " + key));
+        map.put("users", Joiner.on(" & ").join(items));
+        map.put("remark", order.getRemark());
+        map.put("ticketInfo", sku.getTicketInfo());
+        Resource voucherTemplate;
+        if (order.isFromVendor()) {
+            voucherTemplate = resourceLoaderService.getPDFVoucherByVendorIdOrDefault(sku.getVendorId()).getRight();
+        } else {
+            voucherTemplate = resourceLoaderService.getPDFVoucherByAgentIdOrDefault(order.getAgentId()).getRight();
+        }
+        System.setProperty("javax.xml.parsers.DocumentBuilderFactory",
+                "com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl");
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        PdfReader reader = null;
+        PdfStamper pdfStamper = null;
+        try {
+            reader = new PdfReader(voucherTemplate.getInputStream());
+            pdfStamper = new PdfStamper(reader, os);
+            AcroFields form = pdfStamper.getAcroFields();
+            BaseFont baseFont = BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
+            form.addSubstitutionFont(baseFont);
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                form.setField(entry.getKey(), entry.getValue());
+            }
+            pdfStamper.setFormFlattening(true);
+        } catch (Exception e) {
+            logger.error("export pdf voucher error", e);
+        } finally {
+            try {
+                pdfStamper.close();
+                reader.close();
+                os.close();
+            } catch (Exception e) {
+                logger.error("export pdf voucher error", e);
+            }
+        }
+        return os.toByteArray();
     }
 
     private Resource getVoucherTemplate(Sku sku, Order order) {

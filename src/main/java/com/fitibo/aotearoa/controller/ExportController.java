@@ -9,12 +9,21 @@ import com.fitibo.aotearoa.mapper.SkuMapper;
 import com.fitibo.aotearoa.model.Order;
 import com.fitibo.aotearoa.model.Sku;
 import com.fitibo.aotearoa.service.ArchiveService;
+import com.fitibo.aotearoa.service.ResourceLoaderService;
 import com.fitibo.aotearoa.util.DateUtils;
+import com.itextpdf.text.pdf.AcroFields;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.PdfStamper;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatterBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +34,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Date;
 import java.util.Map;
 
@@ -33,6 +43,8 @@ import java.util.Map;
  */
 @Controller
 public class ExportController extends AuthenticationRequiredController {
+
+    private final static Logger logger = LoggerFactory.getLogger(ExportController.class);
 
     @Autowired
     private OrderMapper orderMapper;
@@ -46,6 +58,9 @@ public class ExportController extends AuthenticationRequiredController {
     @Autowired
     private AgentMapper agentMapper;
 
+    @Autowired
+    private ResourceLoaderService resourceLoaderService;
+
     @ExceptionHandler
     public ResponseEntity handleException(AuthenticationFailureException ex) {
         return new ResponseEntity(HttpStatus.UNAUTHORIZED);
@@ -58,12 +73,12 @@ public class ExportController extends AuthenticationRequiredController {
         Order order = orderMapper.findById(orderId);
         if (getToken().getRole() == Role.Agent) {
             if (order.getAgentId() != getToken().getId()) {
-                throw new AuthenticationFailureException("order:" + orderId + " does not belong to agent:" + getToken().getId());
+                throw new AuthenticationFailureException("order:" + order.getId() + " does not belong to agent:" + getToken().getId());
             }
         } else if (getToken().getRole() == Role.Vendor) {
             Sku sku = skuMapper.findById(order.getSkuId());
             if (sku.getVendorId() != getToken().getId()) {
-                throw new AuthenticationFailureException("order:" + orderId + " does not belong to vendor:" + getToken().getId());
+                throw new AuthenticationFailureException("order:" + order.getId() + " does not belong to vendor:" + getToken().getId());
             }
         }
         Workbook voucher = archiveService.createVoucher(order);
@@ -77,6 +92,28 @@ public class ExportController extends AuthenticationRequiredController {
         }
     }
 
+    @RequestMapping(value = "/orders/{id}/pdf_voucher", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @Authentication(value = {Role.Admin, Role.Agent, Role.Vendor})
+    public ResponseEntity<byte[]> downloadPDFVoucher(@PathVariable("id") int orderId,
+                                                     HttpServletResponse response) throws IOException, InvalidFormatException {
+        Order order = orderMapper.findById(orderId);
+        Sku sku = skuMapper.findById(order.getSkuId());
+        if (getToken().getRole() == Role.Agent) {
+            if (order.getAgentId() != getToken().getId()) {
+                throw new AuthenticationFailureException("order:" + order.getId() + " does not belong to agent:" + getToken().getId());
+            }
+        } else if (getToken().getRole() == Role.Vendor) {
+            if (sku.getVendorId() != getToken().getId()) {
+                throw new AuthenticationFailureException("order:" + order.getId() + " does not belong to vendor:" + getToken().getId());
+            }
+        }
+        String fileName = order.getPrimaryContact() + " " +
+                order.getAgentOrderId() + " " +
+                order.getSku();
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "attachment;fileName=" + getExportFileName(fileName) + ".pdf");
+        return new ResponseEntity<>(archiveService.createPDFVoucher(order), HttpStatus.CREATED);
+    }
 
     @RequestMapping(value = "/orders/export", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @Authentication(Role.Admin)
@@ -87,7 +124,6 @@ public class ExportController extends AuthenticationRequiredController {
             orderStats.write(baos);
             response.setHeader("Content-Disposition", "attachment; filename=\"orders.xlsx\"");
             return new ResponseEntity<>(baos.toByteArray(), HttpStatus.CREATED);
-
         }
     }
 
@@ -178,7 +214,8 @@ public class ExportController extends AuthenticationRequiredController {
 
     @RequestMapping(value = "/export/skus/{id}/overview", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @Authentication({Role.Admin, Role.Vendor})
-    public ResponseEntity<byte[]> downloadSkuOverview(HttpServletResponse response, @PathVariable("id") int skuId) throws IOException {
+    public ResponseEntity<byte[]> downloadSkuOverview(HttpServletResponse response, @PathVariable("id") int skuId) throws
+            IOException {
         DateTime from = DateTime.now().monthOfYear().roundFloorCopy();
         DateTime to = DateTime.parse("2018-06", new DateTimeFormatterBuilder().appendPattern("YYYY-MM").toFormatter());
         //FIXME don't hard code

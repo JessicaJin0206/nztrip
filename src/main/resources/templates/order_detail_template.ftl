@@ -70,7 +70,8 @@
 <div class="form-group">
     <div class="row">
         <label class="col-md-2">收据:</label>
-        <button id="j_download_voucher" class="btn btn-default form-group">导出</button>
+        <button id="j_download_voucher" class="btn btn-default form-group">导出 Excel</button>
+        <button id="j_download_pdf_voucher" class="btn btn-default form-group">导出PDF</button>
     </div>
 </div>
 

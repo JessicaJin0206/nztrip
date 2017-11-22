@@ -6,6 +6,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.joda.time.DateTime;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * Created by zhouqianhao on 11/03/2017.
@@ -13,6 +14,8 @@ import java.util.Date;
 public interface ArchiveService {
 
     Workbook createVoucher(Order order);
+
+    byte[] createPDFVoucher(Order order);
 
     Workbook createOrderStats();
 

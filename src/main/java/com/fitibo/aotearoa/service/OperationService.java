@@ -126,17 +126,6 @@ public class OperationService {
                 default:
                     break;
             }
-            /*if (toStatus == OrderStatus.PENDING.getValue()) {
-                sendReservationEmail(order);
-            } else if (toStatus == OrderStatus.CONFIRMED.getValue()) {
-                sendConfirmationEmail(order);
-            } else if (toStatus == OrderStatus.CANCELLED.getValue() || toStatus == OrderStatus.CLOSED.getValue()) {
-                sendCancellationEmail(order);
-            } else if(toStatus == ){
-
-            } else {
-                // do nothing now
-            }*/
         }
     }
 
@@ -203,8 +192,10 @@ public class OperationService {
             Attachment attachment = new Attachment();
             attachment.setName("voucher.xlsx");
             attachment.setData(data);
-
-            ArrayList<Attachment> attachments = Lists.newArrayList(attachment);
+            Attachment pdfAttachment = new Attachment();
+            pdfAttachment.setName("voucher.pdf");
+            pdfAttachment.setData(archiveService.createPDFVoucher(order));
+            ArrayList<Attachment> attachments = Lists.newArrayList(attachment, pdfAttachment);
             attachments.addAll(resourceLoaderService.getConfirmationLetterAttachments(sku.getVendorId()).stream().map(input -> {
                 Attachment result = new Attachment();
                 result.setName(input.getLeft());

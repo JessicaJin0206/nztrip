@@ -74,7 +74,8 @@
 <div class="form-group">
     <div class="row">
         <label class="col-md-2">Voucher:</label>
-        <button id="j_download_voucher" class="btn btn-default form-group">Export</button>
+        <button id="j_download_voucher" class="btn btn-default form-group">Export Excel</button>
+        <button id="j_download_pdf_voucher" class="btn btn-default form-group">Export PDF</button>
     </div>
 </div>
 <div class="form-group" id="j_order_status" value="${order.status?c}">

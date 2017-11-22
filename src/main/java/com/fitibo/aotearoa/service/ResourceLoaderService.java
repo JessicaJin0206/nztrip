@@ -26,9 +26,15 @@ public class ResourceLoaderService {
 
     Multimap<Integer, Pair<String, Resource>> vendorVoucherTemplates;
 
+    Multimap<Integer, Pair<String, Resource>> agentPDFVoucherTemplates;
+
+    Multimap<Integer, Pair<String, Resource>> vendorPDFVoucherTemplates;
 
     @Value(value = "classpath:voucher_template.xlsx")
     private Resource defaultVoucherTemplate;
+
+    @Value(value = "classpath:voucher_template.pdf")
+    private Resource defaultPDFVoucherTemplate;
 
     @Autowired
     ResourcePatternResolver resourcePatternResolver;
@@ -40,6 +46,8 @@ public class ResourceLoaderService {
         confirmationAttachments = loadFiles("classpath:confirmation_attachments/*");
         agentVoucherTemplates = loadFiles("classpath:agent_voucher/*");
         vendorVoucherTemplates = loadFiles("classpath:vendor_voucher/*");
+        agentPDFVoucherTemplates = loadFiles("classpath:agent_pdf_voucher/*");
+        vendorPDFVoucherTemplates = loadFiles("classpath:vendor_pdf_voucher/*");
         logger.info("confirmation_attachments: " + confirmationAttachments);
         logger.info("agent_voucher templates: " + agentVoucherTemplates);
     }
@@ -73,5 +81,13 @@ public class ResourceLoaderService {
 
     public Pair<String, Resource> getVoucherByAgentIdOrDefault(int agentId) {
         return agentVoucherTemplates.get(agentId).stream().findFirst().orElse(Pair.of("voucher_template.xlsx", defaultVoucherTemplate));
+    }
+
+    public Pair<String, Resource> getPDFVoucherByVendorIdOrDefault(int vendorId) {
+        return vendorPDFVoucherTemplates.get(vendorId).stream().findFirst().orElse(Pair.of("voucher_template.pdf", defaultPDFVoucherTemplate));
+    }
+
+    public Pair<String, Resource> getPDFVoucherByAgentIdOrDefault(int agentId) {
+        return agentPDFVoucherTemplates.get(agentId).stream().findFirst().orElse(Pair.of("voucher_template.pdf", defaultPDFVoucherTemplate));
     }
 }
