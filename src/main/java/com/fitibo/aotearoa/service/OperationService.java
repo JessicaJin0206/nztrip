@@ -189,11 +189,14 @@ public class OperationService {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             voucher.write(baos);
             byte[] data = baos.toByteArray();
+            String fileName = order.getPrimaryContact() + " " +
+                    order.getAgentOrderId() + " " +
+                    order.getSku();
             Attachment attachment = new Attachment();
-            attachment.setName("voucher.xlsx");
+            attachment.setName(fileName + ".xlsx");
             attachment.setData(data);
             Attachment pdfAttachment = new Attachment();
-            pdfAttachment.setName("voucher.pdf");
+            pdfAttachment.setName(fileName + ".pdf");
             pdfAttachment.setData(archiveService.createPDFVoucher(order));
             ArrayList<Attachment> attachments = Lists.newArrayList(attachment, pdfAttachment);
             attachments.addAll(resourceLoaderService.getConfirmationLetterAttachments(sku.getVendorId()).stream().map(input -> {

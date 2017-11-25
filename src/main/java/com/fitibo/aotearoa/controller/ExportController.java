@@ -229,7 +229,7 @@ public class ExportController extends AuthenticationRequiredController {
         }
     }
 
-    private String getExportFileName(String fileName) throws IOException {
+    public static String getExportFileName(String fileName) throws IOException {
         return new String(fileName.getBytes("GB2312"), "ISO_8859_1");
     }
 
