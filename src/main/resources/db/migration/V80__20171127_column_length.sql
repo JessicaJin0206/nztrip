@@ -1,0 +1,1 @@
+ALTER TABLE `attachment` CHANGE COLUMN `name` `name` varchar(200) NOT NULL;
