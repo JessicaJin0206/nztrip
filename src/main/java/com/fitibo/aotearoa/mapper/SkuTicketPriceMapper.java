@@ -209,6 +209,19 @@ public interface SkuTicketPriceMapper {
                     @Param("date") Date date,
                     @Param("times") List<String> times);
 
+    @Delete({
+            "<script>",
+            "update sku_ticket_price set valid = 0 where sku_id = #{skuId} ",
+            "and sku_ticket_id in ",
+            "<foreach  collection='skuTicketIds' open='(' close=')' item='item' separator=','>#{item}</foreach> ",
+            "and `date` &gt;= #{startDate} and `date` &lt;= #{endDate}",
+            "</script>"
+    })
+    int batchDeleteByDate(@Param("skuId") int skuId,
+                          @Param("skuTicketIds") List<Integer> skuTicketIds,
+                          @Param("startDate") Date startDate,
+                          @Param("endDate") Date endDate);
+
     @Select("select distinct `time` from sku_ticket_price where sku_id = #{skuId} and date >= #{startDate} and date <= #{endDate}")
     List<String> getSessionsBySkuIdAndDate(@Param("skuId") int skuId,
                                            @Param("startDate") Date startDate,

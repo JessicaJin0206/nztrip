@@ -970,6 +970,21 @@ public class RestApiController extends AuthenticationRequiredController {
         return categoryService.findAll();
     }
 
+    @RequestMapping(value = "/v1/api/skus/{skuId}/tickets", method = RequestMethod.DELETE)
+    @Authentication(Role.Admin)
+    public boolean removeAllTicketPrice(@PathVariable("skuId") int skuId,
+                                        @RequestBody() DeleteTicketPriceRequest request) {
+        Date startDate = DateUtils.parseDate(request.getStartDate());
+        Date endDate = DateUtils.parseDate(request.getEndDate());
+        List<Integer> skuTicketIds = request.getSkuTicketIds();
+        if (skuTicketIds.isEmpty()) {
+            throw new InvalidParamException("ticket not selected");
+        }
+        int resultCount = skuTicketPriceMapper.batchDeleteByDate(skuId, skuTicketIds, startDate, endDate);
+        logger.info("total " + resultCount + " ticket price deleted");
+        return true;
+    }
+
     private Map<Integer, SkuTicketPrice> getSkuTicketPriceMap(List<Integer> ids) {
         if (ids.isEmpty()) {
             return Collections.emptyMap();
