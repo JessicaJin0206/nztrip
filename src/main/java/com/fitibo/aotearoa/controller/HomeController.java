@@ -40,7 +40,6 @@ import com.fitibo.aotearoa.util.DateUtils;
 import com.fitibo.aotearoa.util.ObjectParser;
 
 import org.apache.ibatis.session.RowBounds;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -235,12 +234,12 @@ public class HomeController extends AuthenticationRequiredController {
                               Map<String, Object> model) {
         Sku sku;
         if (skuId > 0) {
-            sku = skuService.findById(skuId);
+            sku = skuService.findByIdWithoutTicketPrice(skuId);
             if (sku == null) {
                 throw new ResourceNotFoundException("invalid sku id:" + skuId);
             }
         } else if (uuid != null && uuid.length() > 0) {
-            sku = skuService.findByUuid(uuid);
+            sku = skuService.findByUuidWithoutTicketPrice(uuid);
             if (sku == null) {
                 throw new ResourceNotFoundException();
             }
@@ -252,14 +251,10 @@ public class HomeController extends AuthenticationRequiredController {
         Duration duration = durationService.findById(sku.getDurationId());
         City city = cityService.findById(sku.getCityId());
         SkuVo skuVo = parse(sku, city, category, vendor, duration);
-        Map<String, Collection<String>> availableDateMap = Maps.newHashMap();
-        for (SkuTicketVo skuTicketVo : skuVo.getTickets()) {
-            Set<String> availableDates = Sets.newLinkedHashSet(
-                    Lists.transform(skuTicketVo.getTicketPrices(), SkuTicketPriceVo::getDate));
-            availableDateMap.put(skuTicketVo.getId() + "", availableDates);
-        }
+
         model.put("sku", skuVo);
-        model.put("availableDateMap", availableDateMap);
+        Map<String, Collection<String>> dateMap = skuService.getAvailableDateMap(skuId, skuVo.getTickets().stream().map(SkuTicketVo::getId).collect(Collectors.toList()));
+        model.put("availableDateMap", dateMap);
         model.put("vendor", vendor);
         model.put("module", MODULE_CREATE_ORDER);
         model.put("role", getToken().getRole().toString());
@@ -494,7 +489,8 @@ public class HomeController extends AuthenticationRequiredController {
         if (order == null) {
             throw new ResourceNotFoundException();
         }
-        Sku sku = skuService.findById(order.getSkuId());
+        int skuId = order.getSkuId();
+        Sku sku = skuService.findByIdWithoutTicketPrice(order.getSkuId());
         AuthenticationHelper.checkOrderAuthentication(order, sku, token);
         model.put("order", order);
         List<OrderTicketVo> orderTickets = Lists.transform(orderTicketMapper.findByOrderId(order.getId()), ObjectParser::parse);
@@ -503,15 +499,15 @@ public class HomeController extends AuthenticationRequiredController {
         if (sku == null) {
             throw new ResourceNotFoundException("invalid sku id:" + order.getSkuId());
         }
-        Map<String, Collection<String>> availableDateMap = Maps.newHashMap();
-        SkuVo skuVo = parse(sku);
-        for (SkuTicketVo skuTicketVo : skuVo.getTickets()) {
-            Set<String> availableDates = Sets.newLinkedHashSet(
-                    Lists.transform(skuTicketVo.getTicketPrices(), SkuTicketPriceVo::getDate));
-            availableDateMap.put(skuTicketVo.getId() + "", availableDates);
+        Map<String, Collection<String>> dateMap;
+        if (getToken().getRole() == Role.Admin) {
+            dateMap = skuService.getAllDateMap(skuId, sku.getTickets().stream().map(SkuTicket::getId).collect(Collectors.toList()));
+        } else {
+            dateMap = skuService.getAvailableDateMap(skuId, sku.getTickets().stream().map(SkuTicket::getId).collect(Collectors.toList()));
         }
+        SkuVo skuVo = parse(sku);
         model.put("sku", skuVo);
-        model.put("availableDateMap", availableDateMap);
+        model.put("availableDateMap", dateMap);
         model.put("module", MODULE_ORDER_DETAIL);
         model.put("statusList", OrderStatus.values());
         model.put("editing", true);

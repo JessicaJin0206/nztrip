@@ -2,6 +2,7 @@ package com.fitibo.aotearoa.mapper;
 
 import com.fitibo.aotearoa.model.SkuTicketPrice;
 import com.fitibo.aotearoa.model.SkuTicketPriceForExport;
+
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.session.RowBounds;
 
@@ -175,6 +176,22 @@ public interface SkuTicketPriceMapper {
     })
     List<SkuTicketPrice> findAvailableBySkuTicketId(@Param("skuId") int skuId,
                                                     @Param("skuTicketId") int skuTicketId, RowBounds rowBounds);
+
+    @Select("select * from sku_ticket_price where sku_id = #{skuId} and sku_ticket_id = #{skuTicketId} and valid = 1 order by date desc")
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "sku_id", property = "skuId"),
+            @Result(column = "sku_ticket_id", property = "skuTicketId"),
+            @Result(column = "date", property = "date"),
+            @Result(column = "time", property = "time"),
+            @Result(column = "cost_price", property = "costPrice"),
+            @Result(column = "sale_price", property = "salePrice"),
+            @Result(column = "description", property = "description"),
+            @Result(column = "total_count", property = "totalCount"),
+            @Result(column = "current_count", property = "currentCount"),
+    })
+    List<SkuTicketPrice> findAllBySkuTicketId(@Param("skuId") int skuId,
+                                              @Param("skuTicketId") int skuTicketId, RowBounds rowBounds);
 
 
     @Delete({
