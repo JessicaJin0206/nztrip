@@ -444,7 +444,7 @@ public class HomeController extends AuthenticationRequiredController {
             throw new ResourceNotFoundException();
         }
         model.put("order", order);
-        model.put("sku", sku);
+        model.put("sku", parse(sku));
         List<OrderTicketVo> orderTickets = Lists.transform(orderTicketMapper.findByOrderId(order.getId()), ObjectParser::parse);
         model.put("tickets", orderTickets);
         model.put("touristCount", calculateTouristCount(orderTickets));
@@ -995,6 +995,7 @@ public class HomeController extends AuthenticationRequiredController {
         result.setAvailable(sku.isAvailable());
         result.setCheckAvailabilityWebsite(sku.getCheckAvailabilityWebsite());
         result.setApi(sku.isApi());
+        result.setSuggestRemark(Lists.newArrayList(sku.getSuggestRemark().split(CommonConstants.SEPARATOR)));
         return result;
     }
 

@@ -5,6 +5,9 @@
 <div class="form-group">
     <label>名称:</label>
     <span>${sku.name!''}</span>
+    <button id="j_sku" class="btn btn-primary form-group" style="margin-left: 20px"
+            value="">查看sku
+    </button>
     <button id="j_check_available" class="btn btn-primary form-group" style="margin-left: 20px"
             value="${sku.checkAvailabilityWebsite!!}">查位
     </button>

@@ -4,12 +4,12 @@ var create_alert = function (message) {
         alert.remove();
     }
     return $('<div class="alert ">' +
-             '<button type="button" class="close" data-dismiss="alert"' +
-             'aria-hidden="true">' +
-             '&times;' +
-             '</button>' +
-             '<span id="j_alert">' + message + '</span>' +
-             '</div>');
+        '<button type="button" class="close" data-dismiss="alert"' +
+        'aria-hidden="true">' +
+        '&times;' +
+        '</button>' +
+        '<span id="j_alert">' + message + '</span>' +
+        '</div>');
 };
 
 var warn = function (message) {
@@ -42,9 +42,9 @@ var timeSpan = $('#j_ticket_time_span');
 var ticketDescSpan = $('#j_ticket_desc');
 var dateSelector = $('#j_ticket_date');
 dateSelector.datetimepicker({
-                                disable: true,
-                                format: "YYYY-MM-DD"
-                            });
+    disable: true,
+    format: "YYYY-MM-DD"
+});
 var datetimepicker = dateSelector.data('DateTimePicker');
 $('#j_ticket_type_selector li a').on('click', function (e) {
     var selected = $(e.target);
@@ -96,10 +96,10 @@ $('#j_ticket_type_selector li a').on('click', function (e) {
     function queryTicket(queryDate, orderId) {
         var ticketId = ticket.attr('value');
         var url = '/v1/api/skus/' + $('.main').attr('skuId')
-                  + '/tickets/'
-                  + ticketId
-                  + '/prices?date='
-                  + queryDate;
+            + '/tickets/'
+            + ticketId
+            + '/prices?date='
+            + queryDate;
         if (!isNaN(orderId)) {
             url = url + "&orderId=" + orderId;
         }
@@ -108,10 +108,10 @@ $('#j_ticket_type_selector li a').on('click', function (e) {
         timeSpan.attr('price', 0);
         timeSelector.empty();
         $.ajax({
-                   type: 'GET',
-                   contentType: "application/json; charset=utf-8",
-                   url: url
-               }).success(function (data) {
+            type: 'GET',
+            contentType: "application/json; charset=utf-8",
+            url: url
+        }).success(function (data) {
             if (parseInt(ticketId) !== parseInt(ticket.attr('value'))) {
                 return;
             }
@@ -284,10 +284,10 @@ submitBtn.on('click', function () {
                 weight = -1;
             }
             orderTicket.orderTicketUsers.push({
-                                                  name: name,
-                                                  age: age,
-                                                  weight: weight
-                                              })
+                name: name,
+                age: age,
+                weight: weight
+            })
         });
     });
     if (!isDataValid) {
@@ -311,11 +311,11 @@ submitBtn.on('click', function () {
         orderTickets: orderTickets
     };
     $.ajax({
-               type: 'POST',
-               contentType: "application/json; charset=utf-8",
-               url: '/v1/api/orders/',
-               data: JSON.stringify(data)
-           }).success(function (data) {
+        type: 'POST',
+        contentType: "application/json; charset=utf-8",
+        url: '/v1/api/orders/',
+        data: JSON.stringify(data)
+    }).success(function (data) {
         success("添加成功");
         window.location.href = "/orders/" + data.id;
     }).complete(function (e) {
@@ -337,6 +337,27 @@ checkAvailableButton.on('click', function () {
         return;
     }
     window.open(checkAvailable);
+});
+
+$('#j_sku').on('click', function () {
+    var skuId = parseInt($('.main').attr("skuId"));
+    window.open("/skus/" + skuId);
+});
+
+function getSuggestRemarkJson() {
+    var suggestRemark = [];
+    $('.j_suggest_remark_input').each(function () {
+        var item = $(this).val();
+        if (item.length > 0) {
+            suggestRemark.push({id: 0, label: item, value: item});
+        }
+    });
+    return suggestRemark;
+}
+
+$('#j_remark').autosuggest({
+    url: '',
+    data: getSuggestRemarkJson()
 });
 
 function deleteContainer(e) {

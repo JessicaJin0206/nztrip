@@ -44,4 +44,5 @@ public class SkuVo {
     private boolean available;
     private String checkAvailabilityWebsite;
     private boolean api;
+    private List<String> suggestRemark;
 }

@@ -592,3 +592,19 @@ function updateOrderStatus(id, toStatus, sendEmail, data) {
         }
     });
 }
+
+function getSuggestRemarkJson() {
+    var suggestRemark = [];
+    $('.j_suggest_remark_input').each(function () {
+        var item = $(this).val();
+        if (item.length > 0) {
+            suggestRemark.push({id: 0, label: item, value: item});
+        }
+    });
+    return suggestRemark;
+}
+
+$('#j_remark').autosuggest({
+    url: '',
+    data: getSuggestRemarkJson()
+});

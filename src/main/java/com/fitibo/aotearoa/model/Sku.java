@@ -41,5 +41,6 @@ public class Sku extends ModelObject {
     private boolean available;
     private String checkAvailabilityWebsite;
     private boolean api;
+    private String suggestRemark;
 
 }

@@ -159,6 +159,22 @@
                 <input type="text" class="form-control j_gathering_place_input" placeholder="请输入集合地点...">
             </#if>
             </div>
+            <div class="form-group" id="j_suggest_remark">
+                <span>提示备注</span>
+                <a>
+                    <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+                </a>
+            </div>
+            <div class="form-group">
+            <#if sku.suggestRemark??>
+                <#list sku.suggestRemark as remark>
+                    <textarea class="form-control j_suggest_remark_input"
+                           placeholder="提示备注">${remark}</textarea>
+                </#list>
+            <#else>
+                <textarea type="text" class="form-control j_suggest_remark_input" placeholder="提示备注"></textarea>
+            </#if>
+            </div>
             <div class="form-group"><input type="text" id="j_description" class="form-control"
                                            placeholder="请输入项目详情..." value="${sku.description!!}">
             </div>

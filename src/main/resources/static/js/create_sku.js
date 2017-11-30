@@ -69,6 +69,11 @@ gatheringPlace.find('a').on('click', function () {
     $('.j_gathering_place_input').parent().last().after($('<div class="form-group"><input type="text" class="form-control j_gathering_place_input" placeholder="请输入集合地点..."></div>'));
 });
 
+var suggestRemark = $('#j_suggest_remark');
+suggestRemark.find('a').on('click', function () {
+    $('.j_suggest_remark_input').parent().last().after($('<div class="form-group"><input type="text" class="form-control j_suggest_remark_input" placeholder="请输入备注提示"></div>'));
+});
+
 $('#j_add_ticket').on('click', function (e) {
     if ($(e.target).attr('disabled')) {
         return;
@@ -119,6 +124,13 @@ var validate = function () {
         var item = $(this).val();
         if (item.length > 0) {
             gatheringPlace.push(item);
+        }
+    });
+    var suggestRemark = [];
+    $('.j_suggest_remark_input').each(function () {
+        var item = $(this).val();
+        if (item.length > 0) {
+            suggestRemark.push(item);
         }
     });
     var description = $('#j_description').val();
@@ -205,7 +217,8 @@ var validate = function () {
         otherInfo: $('#j_other_info').val(),
         available: !!available,
         checkAvailabilityWebsite: $('#j_check_availability_website').val(),
-        api: !!api
+        api: !!api,
+        suggestRemark: suggestRemark
     };
 };
 
