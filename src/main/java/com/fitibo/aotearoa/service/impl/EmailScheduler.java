@@ -4,25 +4,20 @@ import com.fitibo.aotearoa.mapper.AttachmentMapper;
 import com.fitibo.aotearoa.mapper.EmailQueueMapper;
 import com.fitibo.aotearoa.model.Attachment;
 import com.fitibo.aotearoa.model.Email;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import javax.mail.internet.MimeMessage;
 import java.util.Collections;
 import java.util.List;
-
-import javax.mail.internet.MimeMessage;
 
 /**
  * Created by zhouqianhao on 11/03/2017.
@@ -31,6 +26,10 @@ import javax.mail.internet.MimeMessage;
 public class EmailScheduler {
 
     private static final Logger logger = LoggerFactory.getLogger(EmailScheduler.class);
+
+    static {
+        System.setProperty("mail.mime.splitlongparameters","false");
+    }
 
     @Value("${spring.email-enabled}")
     private Boolean enabled;
