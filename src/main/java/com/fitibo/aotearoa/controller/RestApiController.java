@@ -111,6 +111,12 @@ public class RestApiController extends AuthenticationRequiredController {
     @Autowired
     private MessageBoardMapper messageBoardMapper;
 
+    @Autowired
+    private CityService cityService;
+
+    @Autowired
+    private CategoryService categoryService;
+
     @Value("${secret}")
     private String secret;
 
@@ -941,6 +947,18 @@ public class RestApiController extends AuthenticationRequiredController {
         messageBoard.setCreateTime(new Date());
         int result = messageBoardMapper.create(messageBoard);
         return result == 1;
+    }
+
+    @RequestMapping(value = "/v1/api/cities", method = RequestMethod.GET)
+    @Authentication
+    public List<City> queryCities() {
+        return cityService.findAll();
+    }
+
+    @RequestMapping(value = "/v1/api/categories", method = RequestMethod.GET)
+    @Authentication
+    public List<Category> queryCategories() {
+        return categoryService.findAll();
     }
 
     private Map<Integer, SkuTicketPrice> getSkuTicketPriceMap(List<Integer> ids) {
