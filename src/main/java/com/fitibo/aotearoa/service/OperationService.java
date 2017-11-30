@@ -1,5 +1,6 @@
 package com.fitibo.aotearoa.service;
 
+import com.fitibo.aotearoa.exception.VendorEmailEmptyException;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -244,8 +245,9 @@ public class OperationService {
         }
         Vendor vendor = vendorService.findById(sku.getVendorId());
         if (vendor.getEmail() == null || vendor.getEmail().length() == 0) {
-            logger.info("vendor id:" + vendor.getId() + " email is empty, won't send email");
-            return false;
+            String message = "vendor id:" + vendor.getId() + " email is empty, won't send email";
+            logger.info(message);
+            throw new VendorEmailEmptyException(message);
         }
         String content = formatReservationEmailContent(reservationEmailTemplate, vendor, order,
                 ticketList);

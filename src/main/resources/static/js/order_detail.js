@@ -4,12 +4,12 @@ var create_alert = function (message) {
         alert.remove();
     }
     return $('<div class="alert ">' +
-             '<button type="button" class="close" data-dismiss="alert"' +
-             'aria-hidden="true">' +
-             '&times;' +
-             '</button>' +
-             '<span id="j_alert">' + message + '</span>' +
-             '</div>');
+        '<button type="button" class="close" data-dismiss="alert"' +
+        'aria-hidden="true">' +
+        '&times;' +
+        '</button>' +
+        '<span id="j_alert">' + message + '</span>' +
+        '</div>');
 };
 
 var warn = function (message) {
@@ -33,9 +33,9 @@ var timeSpan = $('#j_ticket_time_span');
 var ticketDescSpan = $('#j_ticket_desc');
 var dateSelector = $('#j_ticket_date');
 dateSelector.datetimepicker({
-                                disable: true,
-                                format: "YYYY-MM-DD"
-                            });
+    disable: true,
+    format: "YYYY-MM-DD"
+});
 var datetimepicker = dateSelector.data('DateTimePicker');
 $('#j_ticket_type_selector li a').on('click', function (e) {
     var selected = $(e.target);
@@ -88,10 +88,10 @@ $('#j_ticket_type_selector li a').on('click', function (e) {
     function queryTicket(queryDate, orderId) {
         var ticketId = ticket.attr('value');
         var url = '/v1/api/skus/' + $('.main').attr('skuId')
-                  + '/tickets/'
-                  + ticketId
-                  + '/prices?date='
-                  + queryDate;
+            + '/tickets/'
+            + ticketId
+            + '/prices?date='
+            + queryDate;
         if (!isNaN(orderId)) {
             url = url + "&orderId=" + orderId;
         }
@@ -100,10 +100,10 @@ $('#j_ticket_type_selector li a').on('click', function (e) {
         timeSpan.attr('price', 0);
         timeSelector.empty();
         $.ajax({
-                   type: 'GET',
-                   contentType: "application/json; charset=utf-8",
-                   url: url
-               }).success(function (data) {
+            type: 'GET',
+            contentType: "application/json; charset=utf-8",
+            url: url
+        }).success(function (data) {
             if (parseInt(ticketId) !== parseInt(ticket.attr('value'))) {
                 return;
             }
@@ -212,11 +212,11 @@ $('.j_ticket_container').each(function (index, e) {
                     orderId: orderId
                 };
                 $.ajax({
-                           type: 'DELETE',
-                           contentType: "application/json; charset=utf-8",
-                           url: '/v1/api/orders/tickets/' + id,
-                           data: JSON.stringify(data)
-                       }).success(function (data) {
+                    type: 'DELETE',
+                    contentType: "application/json; charset=utf-8",
+                    url: '/v1/api/orders/tickets/' + id,
+                    data: JSON.stringify(data)
+                }).success(function (data) {
                     if (data) {
                         row.remove();
                         success("删除成功");
@@ -348,11 +348,11 @@ $('#j_update').on('click', function () {
                 weight = -1;
             }
             orderTicket.orderTicketUsers.push({
-                                                  id: id,
-                                                  name: name,
-                                                  age: age,
-                                                  weight: weight
-                                              })
+                id: id,
+                name: name,
+                age: age,
+                weight: weight
+            })
         });
     });
 
@@ -382,11 +382,11 @@ $('#j_update').on('click', function () {
         refund: refund
     };
     $.ajax({
-               type: 'PUT',
-               contentType: "application/json; charset=utf-8",
-               url: '/v1/api/orders/' + id,
-               data: JSON.stringify(data)
-           }).success(function () {
+        type: 'PUT',
+        contentType: "application/json; charset=utf-8",
+        url: '/v1/api/orders/' + id,
+        data: JSON.stringify(data)
+    }).success(function () {
         success("修改成功");
         $('#j_update').attr("disabled", true);
         window.location.href = '/orders/' + id;
@@ -413,10 +413,10 @@ $('#j_download_pdf_voucher').on('click', function () {
 $('#j_resend_reservation').on('click', function () {
     var id = getOrderId();
     $.ajax({
-               type: 'POST',
-               contentType: 'application/json; charset=utf-8',
-               url: '/v1/api/orders/' + id + "/reservation"
-           }).success(function (resp) {
+        type: 'POST',
+        contentType: 'application/json; charset=utf-8',
+        url: '/v1/api/orders/' + id + "/reservation"
+    }).success(function (resp) {
         if (resp.code === 0) {
             success("reservation letter has been sent");
         } else {
@@ -430,10 +430,10 @@ $('#j_resend_reservation').on('click', function () {
 $('#j_resend_confirmation').on('click', function () {
     var id = getOrderId();
     $.ajax({
-               type: 'POST',
-               contentType: 'application/json; charset=utf-8',
-               url: '/v1/api/orders/' + id + "/confirmation"
-           }).success(function (resp) {
+        type: 'POST',
+        contentType: 'application/json; charset=utf-8',
+        url: '/v1/api/orders/' + id + "/confirmation"
+    }).success(function (resp) {
         if (resp.code === 0) {
             success("confirmation letter has been sent");
         } else {
@@ -447,10 +447,10 @@ $('#j_resend_confirmation').on('click', function () {
 $('#j_resend_full').on('click', function () {
     var id = getOrderId();
     $.ajax({
-               type: 'POST',
-               contentType: 'application/json; charset=utf-8',
-               url: '/v1/api/orders/' + id + "/full"
-           }).success(function (resp) {
+        type: 'POST',
+        contentType: 'application/json; charset=utf-8',
+        url: '/v1/api/orders/' + id + "/full"
+    }).success(function (resp) {
         if (resp.code === 0) {
             success("full letter has been sent");
         } else {
@@ -467,30 +467,30 @@ $('.j_operation').on('click', function () {
     var sendEmail = $(this).attr("email");
     var data = {};
     bootbox.confirm("确认操作订单吗?", function (yes) {
-                        if (!yes) {
+            if (!yes) {
+                return;
+            }
+            if (action === 40) {//reservation confirmed
+                if ($('#j_referencenumber').val().length === 0) {
+                    bootbox.prompt("请先填写Reference Number", function (referenceNumber) {
+                        if (referenceNumber === null) {
                             return;
-                        }
-                        if (action === 40) {//reservation confirmed
-                            if ($('#j_referencenumber').val().length === 0) {
-                                bootbox.prompt("请先填写Reference Number", function (referenceNumber) {
-                                    if (referenceNumber === null) {
-                                        return;
-                                    } else if (referenceNumber.length === 0) {
-                                        warn("缺少Reference Number");
-                                        return;
-                                    } else {
-                                        data.referenceNumber = referenceNumber;
-                                        updateOrderStatus(id, action, sendEmail, data);
-                                    }
-                                });
-                            } else {
-                                updateOrderStatus(id, action, sendEmail, data);
-                            }
+                        } else if (referenceNumber.length === 0) {
+                            warn("缺少Reference Number");
+                            return;
                         } else {
+                            data.referenceNumber = referenceNumber;
                             updateOrderStatus(id, action, sendEmail, data);
                         }
+                    });
+                } else {
+                    updateOrderStatus(id, action, sendEmail, data);
+                }
+            } else {
+                updateOrderStatus(id, action, sendEmail, data);
+            }
 
-                    }
+        }
     );
 
 });
@@ -534,16 +534,16 @@ $("#j_replace_tickets").on('click', function () {
         }
         var orderId = getOrderId();
         $.ajax({
-                   type: 'PUT',
-                   contentType: "application/json; charset=utf-8",
-                   url: '/v1/api/orders/' + orderId + "/tickets",
-                   data: JSON.stringify({
-                                            orderId: orderId,
-                                            skuTicketId: ticketId,
-                                            skuTicketPriceId: priceId,
-                                            gatheringPlace: place
-                                        })
-               }).success(function (resp) {
+            type: 'PUT',
+            contentType: "application/json; charset=utf-8",
+            url: '/v1/api/orders/' + orderId + "/tickets",
+            data: JSON.stringify({
+                orderId: orderId,
+                skuTicketId: ticketId,
+                skuTicketPriceId: priceId,
+                gatheringPlace: place
+            })
+        }).success(function (resp) {
             window.location.href = "/orders/" + orderId;
         }).error(function (resp) {
             if (resp.status === 400) {
@@ -569,18 +569,20 @@ checkAvailableButton.on('click', function () {
 
 function updateOrderStatus(id, toStatus, sendEmail, data) {
     $.ajax({
-               type: 'PUT',
-               contentType: "application/json; charset=utf-8",
-               url: '/v1/api/orders/' + id + "/status/" + toStatus + "?sendEmail="
-                    + sendEmail,
-               data: JSON.stringify(data)
-           }).success(function (data) {
-        if (data) {
+        type: 'PUT',
+        contentType: "application/json; charset=utf-8",
+        url: '/v1/api/orders/' + id + "/status/" + toStatus + "?sendEmail="
+        + sendEmail,
+        data: JSON.stringify(data)
+    }).success(function (data) {
+        if (data.code === 0) {
             bootbox.alert("操作成功", function () {
                 window.location.reload();
             });
         } else {
-            error("操作失败");
+            bootbox.alert(data.msg, function () {
+                window.location.reload();
+            });
         }
     }).error(function (resp) {
         if (resp.status === 400) {

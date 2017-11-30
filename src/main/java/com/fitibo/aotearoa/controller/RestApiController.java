@@ -11,6 +11,7 @@ import com.fitibo.aotearoa.dto.Transition;
 import com.fitibo.aotearoa.exception.AuthenticationFailureException;
 import com.fitibo.aotearoa.exception.InvalidParamException;
 import com.fitibo.aotearoa.exception.ResourceNotFoundException;
+import com.fitibo.aotearoa.exception.VendorEmailEmptyException;
 import com.fitibo.aotearoa.mapper.*;
 import com.fitibo.aotearoa.model.*;
 import com.fitibo.aotearoa.service.*;
@@ -451,11 +452,15 @@ public class RestApiController extends AuthenticationRequiredController {
         int status = order.getStatus();
         Preconditions.checkArgument(status == OrderStatus.PENDING.getValue() || status == OrderStatus.RECONFIRMING.getValue(),
                 "unable to send reservation with order id: " + orderId + " with status:" + status);
-        boolean result = operationService.sendReservationEmail(order);
-        if (result) {
-            return ResultVo.SUCCESS;
-        } else {
-            return new ResultVo(-1, "failed to send reservation email");
+        try {
+            boolean result = operationService.sendReservationEmail(order);
+            if (result) {
+                return ResultVo.SUCCESS;
+            } else {
+                return new ResultVo(-1, "failed to send reservation email");
+            }
+        } catch (VendorEmailEmptyException e) {
+            return new ResultVo(-2, "vendor does not have email please order in other system");
         }
     }
 
@@ -587,10 +592,10 @@ public class RestApiController extends AuthenticationRequiredController {
     @RequestMapping(value = "/v1/api/orders/{id}/status/{toStatus}", method = RequestMethod.PUT)
     @Authentication({Role.Admin, Role.Vendor})
     @Transactional
-    public boolean updateOrderStatus(@PathVariable("id") int id,
-                                     @PathVariable("toStatus") int toStatus,
-                                     @RequestParam(value = "sendEmail", defaultValue = "true") boolean sendEmail,
-                                     @RequestBody OrderVo extra) {
+    public ResultVo updateOrderStatus(@PathVariable("id") int id,
+                                      @PathVariable("toStatus") int toStatus,
+                                      @RequestParam(value = "sendEmail", defaultValue = "true") boolean sendEmail,
+                                      @RequestBody OrderVo extra) {
         Order order = orderMapper.findById(id);
         if (order == null) {
             throw new ResourceNotFoundException();
@@ -629,12 +634,16 @@ public class RestApiController extends AuthenticationRequiredController {
 
         int row = orderMapper.updateOrderStatus(id, fromStatus, toStatus);
         if (row != 1) {
-            return false;
+            return ResultVo.FAIL;
         }
         //订单日志
         orderRecordService.updateOrderStatus(getToken(), id, fromStatus, toStatus);
-        operationService.doRelatedOperation(sendEmail, fromStatus, toStatus, order);
-        return true;
+        try {
+            operationService.doRelatedOperation(sendEmail, fromStatus, toStatus, order);
+        } catch (VendorEmailEmptyException e) {
+            return new ResultVo(-2, "vendor does not have email please order in other system");
+        }
+        return ResultVo.SUCCESS;
     }
 
     private void checkSkuInventory(int skuId, List<OrderTicketVo> orderTickets) {
