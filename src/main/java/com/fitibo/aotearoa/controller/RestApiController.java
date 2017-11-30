@@ -201,7 +201,7 @@ public class RestApiController extends AuthenticationRequiredController {
             throw new ResourceNotFoundException();
         }
         SkuVo result = parse(sku);
-        List<SkuTicket> skuTickets = skuTicketMapper.findBySkuId(sku.getId());
+        List<SkuTicket> skuTickets = skuTicketMapper.findOnlineBySkuId(sku.getId());
         result.setTickets(Lists.transform(skuTickets, ObjectParser::parse));
         return result;
     }
@@ -867,8 +867,8 @@ public class RestApiController extends AuthenticationRequiredController {
     @RequestMapping(value = "/v1/api/skus/{skuId}/inventories", method = RequestMethod.GET)
     @Authentication({Role.Admin, Role.Agent, Role.Vendor})
     public List<SkuInventoryDto> getSkuInventory(@PathVariable("skuId") int skuId,
-                                           @RequestParam("date") String dateString,
-                                           @RequestParam(value = "time", required = false) String time) {
+                                                 @RequestParam("date") String dateString,
+                                                 @RequestParam(value = "time", required = false) String time) {
         if (getToken().getRole() == Role.Agent) {
             int agentId = getToken().getId();
             checkViewSkuPriviledge(skuMapper.findById(skuId), agentId);
