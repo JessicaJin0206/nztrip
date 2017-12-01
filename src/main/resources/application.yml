@@ -16,7 +16,7 @@ spring:
     password: eyounz2017
     properties:
       mail:
-        smtp:
+        smtps:
           connecttimeout: 3000
           timeout: 5000
           writetimeout: 5000
