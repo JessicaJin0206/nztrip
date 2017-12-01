@@ -16,17 +16,6 @@
 
 package com.fitibo.aotearoa.controller;
 
-import com.fitibo.aotearoa.mapper.*;
-import com.fitibo.aotearoa.model.*;
-import com.fitibo.aotearoa.service.*;
-import com.fitibo.aotearoa.service.impl.ArchiveServiceImpl;
-import com.fitibo.aotearoa.vo.*;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
 import com.fitibo.aotearoa.annotation.Authentication;
 import com.fitibo.aotearoa.constants.CommonConstants;
 import com.fitibo.aotearoa.constants.OrderStatus;
@@ -35,10 +24,18 @@ import com.fitibo.aotearoa.dto.Token;
 import com.fitibo.aotearoa.exception.AuthenticationFailureException;
 import com.fitibo.aotearoa.exception.InvalidParamException;
 import com.fitibo.aotearoa.exception.ResourceNotFoundException;
+import com.fitibo.aotearoa.mapper.*;
+import com.fitibo.aotearoa.model.*;
+import com.fitibo.aotearoa.service.*;
+import com.fitibo.aotearoa.service.impl.ArchiveServiceImpl;
 import com.fitibo.aotearoa.service.impl.CategoryServiceImpl;
 import com.fitibo.aotearoa.util.DateUtils;
 import com.fitibo.aotearoa.util.ObjectParser;
-
+import com.fitibo.aotearoa.vo.*;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -257,6 +254,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("availableDateMap", dateMap);
         model.put("vendor", vendor);
         model.put("module", MODULE_CREATE_ORDER);
+        model.put("agents", agentMapper.findAll().stream().map(HomeController::parse).collect(Collectors.toList()));
         model.put("role", getToken().getRole().toString());
         model.put("userName", getUserName(getToken()));
         OrderVo orderVo = new OrderVo();
@@ -899,6 +897,7 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("sku", skuVo);
         model.put("availableDateMap", availableDateMap);
         model.put("vendor", vendor);
+        model.put("agents", agentMapper.findAll().stream().map(HomeController::parse).collect(Collectors.toList()));
         return "create_order";
     }
 

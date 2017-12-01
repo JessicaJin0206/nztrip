@@ -606,5 +606,6 @@ function getSuggestRemarkJson() {
 
 $('#j_remark').autosuggest({
     url: '',
-    data: getSuggestRemarkJson()
+    data: getSuggestRemarkJson(),
+    all: true
 });

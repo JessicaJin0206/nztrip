@@ -28,7 +28,8 @@
             firstSelected: false, //第一个被选中
             dataCallback: null, //接口数据转换方法
             dataType: 'json',
-            onSelect: null //选中项方法，返回选中项jQuery对象
+            onSelect: null, //选中项方法，返回选中项jQuery对象
+            all: false
         };
 
         var settings = $.extend({}, defaults, options);
@@ -121,7 +122,22 @@
                 }
 
                 if (settings.url === "") {
-                    onSuccess(settings.data);
+                    console.info(settings.data);
+                    if (settings.all) {
+                        onSuccess(settings.data);
+                    } else {
+                        console.info(query);
+                        var temp = [];
+                        for (var i = 0; i < settings.data.length; i++) {
+                            var s = settings.data[i];
+                            if (s.value !== undefined && (s.value).indexOf(query) > -1) {
+                                //console.info(s);
+                                temp.push(s);
+                            }
+                        }
+                        console.info(temp);
+                        onSuccess(temp);
+                    }
                 } else {
                     xhr = $.ajax({
                         type: settings.method,

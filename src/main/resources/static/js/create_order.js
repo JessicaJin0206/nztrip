@@ -355,9 +355,30 @@ function getSuggestRemarkJson() {
     return suggestRemark;
 }
 
+function getAgentsJson() {
+    var agents = [];
+    var data = $('#j_agents').val();
+    var temp = data.split("|");
+    for (var i = 0; i < temp.length; i++) {
+        var a = temp[i].split(",");
+        agents.push({id: a[0], label: a[1], value: a[1]});
+    }
+    return agents;
+}
+
 $('#j_remark').autosuggest({
     url: '',
-    data: getSuggestRemarkJson()
+    data: getSuggestRemarkJson(),
+    all: true
+});
+
+$('#j_agent').autosuggest({
+    url: '',
+    data: getAgentsJson(),
+    onSelect: function (e, e1) {
+        var agentId = e1.attr('data-id');
+        $('.main').attr("agentId", agentId);
+    }
 });
 
 function deleteContainer(e) {

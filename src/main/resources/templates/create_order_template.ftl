@@ -1,5 +1,9 @@
 <#if role == "Admin">
-<div class="form-group"><label>正在帮</label><span> ${order.agentName!''} </span><label>下单</label></div>
+<div class="form-group">
+    <label>正在帮以下agent下单</label>
+    <input type="text" id="j_agent" class="form-control" style="display: inline;width: auto" placeholder="姓名"
+           value="${order.agentName!''}"/>
+</div>
 </#if>
 <div class="form-group"><label>订单详情</label></div>
 <div class="form-group">
@@ -129,7 +133,7 @@
 <div class="form-group j_ticket_container" value="${ticket.id?c}" ticketId="${ticket.skuTicketId?c}"
      priceId="${ticket.ticketPriceId?c}">
     <a id="j_ticket_delete" onclick="deleteContainer(this)"><span class="glyphicon glyphicon-remove pull-right"
-                                  aria-hidden="true"></span></a>
+                                                                  aria-hidden="true"></span></a>
     <div class="form-group"><label>票种:</label><span
             id="j_ticket_name_span">${ticket.skuTicket!''}</span></div>
     <div class="form-group"><label>日期:</label><span

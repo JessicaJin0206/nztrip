@@ -1,5 +1,9 @@
 <#if role == "Admin">
-<div class="form-group"><label>You are ordering for</label><span> ${order.agentName!''} </span></div>
+<div class="form-group">
+    <label>You are ordering for</label>
+    <input type="text" id="j_agent" class="form-control" style="display: inline;width: auto" placeholder="姓名"
+           value="${order.agentName!''}"/>
+</div>
 </#if>
 <div class="form-group"><label>Order Detail</label></div>
 <div class="form-group">

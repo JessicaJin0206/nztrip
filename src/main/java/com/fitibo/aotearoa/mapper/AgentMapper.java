@@ -62,6 +62,23 @@ public interface AgentMapper {
     })
     Agent findByUserName(String user);
 
+
+    @Select("select * from agent ")
+    @Results({
+            @Result(column = "id", property = "id"),
+            @Result(column = "name", property = "name"),
+            @Result(column = "email", property = "email"),
+            @Result(column = "user_name", property = "userName"),
+            @Result(column = "password", property = "password"),
+            @Result(column = "description", property = "description"),
+            @Result(column = "default_contact", property = "defaultContact"),
+            @Result(column = "default_contact_email", property = "defaultContactEmail"),
+            @Result(column = "default_contact_phone", property = "defaultContactPhone"),
+            @Result(column = "vendor_id", property = "vendorId"),
+            @Result(column = "has_api", property = "hasApi"),
+    })
+    List<Agent> findAll();
+
     @Insert("insert into agent(user_name, password, name, description, discount, email) " +
             "values(#{userName}, #{password}, #{name}, #{description}, #{discount}, #{email})")
     @Options(useGeneratedKeys = true, keyColumn = "id", keyProperty = "id", flushCache = Options.FlushCachePolicy.DEFAULT)
@@ -85,7 +102,7 @@ public interface AgentMapper {
             "<if test = \"defaultContact != null and defaultContact != ''\">default_contact = #{defaultContact},</if>" +
             "<if test = \"defaultContactEmail != null and defaultContactEmail != ''\">default_contact_email = #{defaultContactEmail},</if>" +
             "<if test = \"defaultContactPhone != null and defaultContactPhone != ''\">default_contact_phone = #{defaultContactPhone},</if>" +
-            "has_api = #{hasApi},"+
+            "has_api = #{hasApi}," +
             "</set>" +
             "where id = #{id}" +
             "</script>")

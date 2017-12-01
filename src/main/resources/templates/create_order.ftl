@@ -23,6 +23,9 @@
                        value="${remark}">
             </#list>
         </div>
+        <div style="display: none">
+            <textarea id="j_agents"><#list agents as agent>${agent.id},${agent.name}|</#list></textarea>
+        </div>
     </#if>
     </div>
 </div>
