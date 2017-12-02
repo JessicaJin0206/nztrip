@@ -122,20 +122,16 @@
                 }
 
                 if (settings.url === "") {
-                    console.info(settings.data);
                     if (settings.all) {
                         onSuccess(settings.data);
                     } else {
-                        console.info(query);
                         var temp = [];
                         for (var i = 0; i < settings.data.length; i++) {
                             var s = settings.data[i];
                             if (s.value !== undefined && (s.value).indexOf(query) > -1) {
-                                //console.info(s);
                                 temp.push(s);
                             }
                         }
-                        console.info(temp);
                         onSuccess(temp);
                     }
                 } else {
@@ -152,7 +148,6 @@
 
 
                 function onSuccess(json) {
-                    //console.info(json);
                     if (settings.dataCallback) {
                         json = settings.data = settings.dataCallback(json);
                     }
