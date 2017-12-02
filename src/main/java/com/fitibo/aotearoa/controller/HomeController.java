@@ -250,7 +250,7 @@ public class HomeController extends AuthenticationRequiredController {
         SkuVo skuVo = parse(sku, city, category, vendor, duration);
 
         model.put("sku", skuVo);
-        Map<String, Collection<String>> dateMap = skuService.getAvailableDateMap(skuId, skuVo.getTickets().stream().map(SkuTicketVo::getId).collect(Collectors.toList()));
+        Map<String, Collection<String>> dateMap = skuService.getAvailableDateMap(sku.getId(), skuVo.getTickets().stream().map(SkuTicketVo::getId).collect(Collectors.toList()));
         model.put("availableDateMap", dateMap);
         model.put("vendor", vendor);
         model.put("module", MODULE_CREATE_ORDER);
