@@ -606,6 +606,7 @@ public class RestApiController extends AuthenticationRequiredController {
                     "order id:" + id + " does not belong to vendor id:" + vendorId);
         }
         int fromStatus = order.getStatus();
+        logger.info("update order status from " + OrderStatus.valueOf(fromStatus) + " to" + OrderStatus.valueOf(toStatus));
         List<Transition> transitions = orderService.getAvailableTransitions(fromStatus);
         boolean statusValid = false;
         for (Transition transition : transitions) {
@@ -629,7 +630,7 @@ public class RestApiController extends AuthenticationRequiredController {
 
         }
         if (!statusValid) {
-            throw new InvalidParamException("invalid transition from " + fromStatus + " to " + toStatus);
+            throw new InvalidParamException("invalid transition from " + OrderStatus.valueOf(fromStatus) + " to " + OrderStatus.valueOf(toStatus));
         }
 
         int row = orderMapper.updateOrderStatus(id, fromStatus, toStatus);
@@ -641,6 +642,7 @@ public class RestApiController extends AuthenticationRequiredController {
         try {
             operationService.doRelatedOperation(sendEmail, fromStatus, toStatus, order);
         } catch (VendorEmailEmptyException e) {
+            logger.warn("vendor does not have email please order in other system");
             return new ResultVo(-2, "vendor does not have email please order in other system");
         }
         return ResultVo.SUCCESS;

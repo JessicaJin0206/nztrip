@@ -130,23 +130,25 @@ public class OperationService {
         }
     }
 
-    private void sendCancellationEmail(Order order) {
+    private boolean sendCancellationEmail(Order order) {
         int agentId = order.getAgentId();
         if (agentId <= 0) {
             logger.info("agent id is 0, don't send cancellation email");
-            return;
+            return false;
         }
         Agent agent = agentMapper.findById(agentId);
         List<OrderTicket> ticketList = orderTicketMapper.findByOrderId(order.getId());
         if (ticketList.isEmpty()) {
             logger.warn("order tickets cannot be empty, send cancellation letter failed");
-            return;
+            return false;
         }
         String agentOrderId = order.getAgentOrderId();
         String subject = StringUtils.isNotEmpty(agentOrderId) ? cancellationEmailSubject + "(" + agentOrderId + ")" : cancellationEmailSubject;
         subject = addUrgentStart("#急单 ", subject, order);
         String content = formatCancellationEmailContent(order, agent, skuMapper.findById(order.getSkuId()), ticketList);
-        emailService.send(order.getId(), emailFrom, agent.getEmail(), subject, content, Collections.emptyList());
+        boolean result = emailService.send(order.getId(), emailFrom, agent.getEmail(), subject, content, Collections.emptyList());
+        logger.info("send cancel email, order id: " + order.getId() + " result:" + result);
+        return result;
     }
 
     private String formatCancellationEmailContent(Order order, Agent agent, Sku sku, List<OrderTicket> tickets) {
@@ -211,8 +213,11 @@ public class OperationService {
                 }
                 return result;
             }).filter(Objects::nonNull).collect(Collectors.toList()));
-            return emailService.send(order.getId(), emailFrom, to, subject, content, attachments);
+            boolean result = emailService.send(order.getId(), emailFrom, to, subject, content, attachments);
+            logger.info("send confirmation email, order id: " + order.getId() + " result:" + result);
+            return result;
         } catch (IOException e) {
+            logger.error("error send confirmation email, order id: " + order.getId(), e);
             throw new RuntimeException(e);
         }
     }
@@ -231,7 +236,9 @@ public class OperationService {
         String agentOrderId = order.getAgentOrderId();
         String subject = StringUtils.isNotEmpty(agentOrderId) ? fullEmailSubject + "(" + agentOrderId + ")" : fullEmailSubject;
         subject = addUrgentStart("#急单 ", subject, order);
-        return emailService.send(order.getId(), emailFrom, to, subject, content, Collections.emptyList());
+        boolean result = emailService.send(order.getId(), emailFrom, to, subject, content, Collections.emptyList());
+        logger.info("send full email, order id: " + order.getId() + " result:" + result);
+        return result;
     }
 
     public boolean sendReservationEmail(Order order) {
@@ -246,13 +253,15 @@ public class OperationService {
         Vendor vendor = vendorService.findById(sku.getVendorId());
         if (vendor.getEmail() == null || vendor.getEmail().length() == 0) {
             String message = "vendor id:" + vendor.getId() + " email is empty, won't send email";
-            logger.info(message);
+            logger.warn(message);
             throw new VendorEmailEmptyException(message);
         }
         String content = formatReservationEmailContent(reservationEmailTemplate, vendor, order,
                 ticketList);
         String subject = formatReservationEmailSubject(reservationEmailSubject, order);
-        return emailService.send(order.getId(), emailFrom, vendor.getEmail(), subject, content, Collections.emptyList());
+        boolean result = emailService.send(order.getId(), emailFrom, vendor.getEmail(), subject, content, Collections.emptyList());
+        logger.info("send reservation email, order id: " + order.getId() + " result:" + result);
+        return result;
     }
 
     private String addUrgentStart(String start, String ordinal, Order order) {
