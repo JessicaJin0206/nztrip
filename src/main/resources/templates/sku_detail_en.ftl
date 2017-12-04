@@ -198,6 +198,22 @@
                        value="${place}" <#if editing = false>disabled</#if>>
             </#list>
             </div>
+        <#if role?? && role == "Admin">
+            <div class="form-group" id="j_suggest_remark">
+                <label>Remark Suggestions</label>
+                <#if editing = true>
+                    <a>
+                        <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+                    </a>
+                </#if>
+            </div>
+            <div class="form-group">
+                <#list sku.suggestRemark as remark>
+                    <textarea class="form-control j_suggest_remark_input"
+                              placeholder="Remark Suggestions" <#if editing = false>disabled</#if>>${remark}</textarea>
+                </#list>
+            </div>
+        </#if>
             <div class="form-group">
                 <label>Description</label>
                 <input id="j_description" class="form-control"
