@@ -4,7 +4,11 @@ import com.google.common.collect.Lists;
 
 import com.fitibo.aotearoa.annotation.Authentication;
 import com.fitibo.aotearoa.controller.AuthenticationRequiredController;
+import com.fitibo.aotearoa.dto.Role;
 import com.fitibo.aotearoa.dto.Token;
+import com.fitibo.aotearoa.mapper.AdminMapper;
+import com.fitibo.aotearoa.mapper.AgentMapper;
+import com.fitibo.aotearoa.mapper.VendorMapper;
 import com.fitibo.aotearoa.service.TokenService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +31,15 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
 
     @Autowired
     private TokenService tokenService;
+
+    @Autowired
+    private AgentMapper agentMapper;
+
+    @Autowired
+    private AdminMapper adminMapper;
+
+    @Autowired
+    private VendorMapper vendorMapper;
 
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object handler) throws Exception {
@@ -99,7 +112,23 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
             return null;
         }
         try {
-            return tokenService.parseToken(tokenString);
+            Token token = tokenService.parseToken(tokenString);
+            if (token.getRole() == Role.Admin) {
+                if (adminMapper.findById(token.getId()) == null) {
+                    return null;
+                }
+            } else if (token.getRole() == Role.Agent) {
+                if (agentMapper.findById(token.getId()) == null) {
+                    return null;
+                }
+            } else if (token.getRole() == Role.Vendor) {
+                if (vendorMapper.findById(token.getId()) == null) {
+                    return null;
+                }
+            } else {
+                return null;
+            }
+            return token;
         } catch (RuntimeException e) {
             return null;
         }
