@@ -29,7 +29,20 @@ public class Admin extends ModelObject {
         this.discount = discount;
     }
 
+    public final boolean isActive() {
+        return status > 0;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
     private String user;
     private String pass;
     private int discount;
+    private int status;
 }

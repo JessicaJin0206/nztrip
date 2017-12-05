@@ -9,6 +9,7 @@ import com.fitibo.aotearoa.dto.Token;
 import com.fitibo.aotearoa.mapper.AdminMapper;
 import com.fitibo.aotearoa.mapper.AgentMapper;
 import com.fitibo.aotearoa.mapper.VendorMapper;
+import com.fitibo.aotearoa.model.Admin;
 import com.fitibo.aotearoa.service.TokenService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,7 +115,8 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
         try {
             Token token = tokenService.parseToken(tokenString);
             if (token.getRole() == Role.Admin) {
-                if (adminMapper.findById(token.getId()) == null) {
+                Admin admin = adminMapper.findById(token.getId());
+                if (admin == null || !admin.isActive()) {
                     return null;
                 }
             } else if (token.getRole() == Role.Agent) {

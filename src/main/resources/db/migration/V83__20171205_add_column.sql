@@ -1,0 +1,1 @@
+ALTER TABLE `admin` ADD COLUMN status TINYINT(2) default 10;
