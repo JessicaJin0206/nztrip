@@ -12,4 +12,15 @@ public class AddSkuInventoryRequest {
     private String endDate;
     private List<String> sessions;
     private int totalCount;
+
+    @Override
+    public String toString() {
+        return "AddSkuInventoryRequest{" +
+                "skuId=" + skuId +
+                ", startDate='" + startDate + '\'' +
+                ", endDate='" + endDate + '\'' +
+                ", sessions=" + sessions +
+                ", totalCount=" + totalCount +
+                '}';
+    }
 }

@@ -72,6 +72,7 @@ public class HomeController extends AuthenticationRequiredController {
     private static final String MODULE_URGENT_ORDER = "urgent_orders";
     private static final String MODULE_SCAN_ORDER = "scan_order";
     private static final String MODULE_QUERY_INVENTORY = "query_inventory";
+    private static final String MODULE_SKU_RECORD = "sku_record";
 
     @Autowired
     private CityService cityService;
@@ -126,6 +127,9 @@ public class HomeController extends AuthenticationRequiredController {
 
     @Autowired
     private MessageBoardMapper messageBoardMapper;
+
+    @Autowired
+    private SkuRecordMapper skuRecordMapper;
 
     @ExceptionHandler
     public String handleException(ResourceNotFoundException ex) {
@@ -207,7 +211,6 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("primaryContact", primaryContact);
         return "vendor_orders";
     }
-
 
     @RequestMapping("dashboard")
     @Authentication
@@ -470,12 +473,34 @@ public class HomeController extends AuthenticationRequiredController {
         Map<Integer, Agent> agentMap = Maps.newHashMap();
         List<OrderRecordVo> orderRecords = Lists.transform(orderRecordMapper.findByOrderId(order.getId()), orderRecord -> parse(orderRecord, adminMap, agentMap));
         model.put("orderRecords", orderRecords);
-        model.put("module", MODULE_ORDER_DETAIL);
         model.put("statusList", OrderStatus.values());
         model.put("role", getToken().getRole().toString());
         model.put("userName", getUserName(getToken()));
         model.put("lang", lang);
         return "order_record";
+    }
+
+    /**
+     * 查看sku日志
+     */
+    @RequestMapping("/skus/{id}/record")
+    @Authentication
+    public String skuRecord(@PathVariable("id") int id, Map<String, Object> model,
+                            @CookieValue(value = "language", defaultValue = "en") String lang) {
+        Sku sku = skuService.findById(id);
+        if (sku == null) {
+            throw new ResourceNotFoundException();
+        }
+        model.put("module", MODULE_SKU_RECORD);
+        model.put("sku", sku);
+        Map<Integer, Admin> adminMap = Maps.newHashMap();
+        Map<Integer, Vendor> vendorMap = Maps.newHashMap();
+        List<SkuRecordVo> skuRecordVos = Lists.transform(skuRecordMapper.findBySkuId(sku.getId()), skuRecord -> parse(skuRecord, adminMap, vendorMap));
+        model.put("skuRecords", skuRecordVos);
+        model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
+        model.put("lang", lang);
+        return "sku_record";
     }
 
     @RequestMapping("orders/{id}/_edit")
@@ -652,7 +677,6 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("userName", getUserName(getToken()));
         return "sku_ticket_detail";
     }
-
 
     @RequestMapping("skus")
     @Authentication
@@ -1036,6 +1060,29 @@ public class HomeController extends AuthenticationRequiredController {
                 break;
         }
         return orderRecordVo;
+    }
+
+    private SkuRecordVo parse(SkuRecord skuRecord, Map<Integer, Admin> adminMap, Map<Integer, Vendor> vendorMap) {
+        SkuRecordVo skuRecordVo = new SkuRecordVo();
+        skuRecordVo.setSkuId(skuRecord.getSkuId());
+        skuRecordVo.setOperateType(skuRecord.getOperateType());
+        skuRecordVo.setOperateTime(DateUtils.formatDateTime(skuRecord.getOperateTime()));
+        skuRecordVo.setContentChangeFrom(skuRecord.getContentChangeFrom());
+        skuRecordVo.setContentChangeTo(skuRecord.getContentChangeTo());
+        switch (skuRecord.getOperatorType()) {
+            case "Admin":
+                Admin admin = adminMap.computeIfAbsent(skuRecord.getOperatorId(), k -> adminMapper.findById(skuRecord.getOperatorId()));
+                skuRecordVo.setOperator(admin.getUser());
+                break;
+            case "Vendor":
+                Vendor vendor = vendorMap.computeIfAbsent(skuRecord.getOperatorId(), k -> vendorService.findById(skuRecord.getOperatorId()));
+                skuRecordVo.setOperator(vendor.getName());
+                break;
+            default:
+                skuRecordVo.setOperator("");
+                break;
+        }
+        return skuRecordVo;
     }
 
     private MessageBoardVo parse(MessageBoard messageBoard) {

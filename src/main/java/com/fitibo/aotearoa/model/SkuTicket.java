@@ -1,5 +1,6 @@
 package com.fitibo.aotearoa.model;
 
+import com.google.common.base.Objects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -20,4 +21,17 @@ public class SkuTicket extends ModelObject {
     private String description;
     private int status;
     private List<SkuTicketPrice> ticketPrices;
+
+    @Override
+    public String toString() {
+        return "SkuTicket{" +
+                "skuId=" + skuId +
+                ", name='" + name + '\'' +
+                ", countConstraint='" + countConstraint + '\'' +
+                ", ageConstraint='" + ageConstraint + '\'' +
+                ", weightConstraint='" + weightConstraint + '\'' +
+                ", description='" + description + '\'' +
+                ", status=" + status +
+                '}';
+    }
 }

@@ -281,3 +281,12 @@ $('#j_query_inventory').on('click', function () {
         window.location.href = window.location.pathname + "/query_inventory"
     }
 });
+
+$('#j_view_record').on('click', function () {
+    if (window.location.pathname.endsWith("/")) {
+        window.open(window.location.pathname + "record");
+    } else {
+        window.open(window.location.pathname + "/record");
+    }
+});
+

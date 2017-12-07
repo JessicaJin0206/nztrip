@@ -113,6 +113,12 @@ public class RestApiController extends AuthenticationRequiredController {
     private MessageBoardMapper messageBoardMapper;
 
     @Autowired
+    private SkuRecordService skuRecordService;
+
+    @Autowired
+    private SkuRecordMapper skuRecordMapper;
+
+    @Autowired
     private CityService cityService;
 
     @Autowired
@@ -154,6 +160,7 @@ public class RestApiController extends AuthenticationRequiredController {
         final int skuId = sku.getId();
         skuVo.setId(skuId);
         skuTicketMapper.batchCreate(Lists.transform(skuVo.getTickets(), (input) -> parse(skuId, input)));
+        skuRecordService.createSku(getToken(), sku);
         return skuVo;
     }
 
@@ -193,6 +200,15 @@ public class RestApiController extends AuthenticationRequiredController {
         }
     }
 
+    @RequestMapping(value = "/v1/api/skus/check_update", method = RequestMethod.GET)
+    public List<Integer> querySku(@RequestParam("startDate") String startDateString,
+                                  @RequestParam("endDate") String endDateString) {
+        Date startDate = DateUtils.parseDate(startDateString);
+        Date endDate = DateUtils.parseDate(endDateString);
+        List<Integer> skuIds = skuRecordMapper.checkUpdateSkuIds(startDate, endDate);
+        return skuIds;
+    }
+
     private void checkViewSkuPriviledge(Sku sku, int agentId) {
         Agent agent = agentMapper.findById(agentId);
         if (agent.getVendorId() != 0 && agent.getVendorId() != sku.getVendorId()) {
@@ -220,6 +236,7 @@ public class RestApiController extends AuthenticationRequiredController {
     public SkuVo updateSku(@PathVariable("id") int id, @RequestBody SkuVo skuVo) {
         Sku sku = parse(skuVo);
         sku.setId(id);
+        skuRecordService.updateSku(getToken(), skuService.findById(id), sku);
         skuMapper.update(sku);
         List<SkuTicket> ticketList = skuService.findOnlineSkuTicketsBySkuId(id);
         Map<Integer, SkuTicket> ticketMap = Maps.newHashMap();
@@ -248,12 +265,17 @@ public class RestApiController extends AuthenticationRequiredController {
 
         if (!createList.isEmpty()) {
             skuTicketMapper.batchCreate(createList);
+            for (SkuTicket skuTicket : createList) {
+                skuRecordService.addTicket(skuTicket, getToken());
+            }
         }
         for (SkuTicket skuTicket : updateList) {
+            skuRecordService.updateTicket(skuTicket, getToken());
             skuTicketMapper.update(skuTicket);
         }
         for (SkuTicket skuTicket : deleteList) {
             skuTicketMapper.update(skuTicket);
+            skuRecordService.deleteTicket(skuTicket, getToken());
         }
         return skuVo;
     }
@@ -843,6 +865,7 @@ public class RestApiController extends AuthenticationRequiredController {
                 }
             }
         }
+        skuRecordService.deleteTicketPrice(skuId, request, getToken());
         if (prices.isEmpty()) {
             return 0;
         } else {
@@ -850,6 +873,7 @@ public class RestApiController extends AuthenticationRequiredController {
             for (List<SkuTicketPrice> skuTicketPrices : Lists.partition(prices, 50)) {
                 total += skuTicketPriceMapper.batchCreate(skuTicketPrices);
             }
+            skuRecordService.addTicketPrice(skuId, request, getToken());
             return total;
         }
     }
@@ -878,6 +902,7 @@ public class RestApiController extends AuthenticationRequiredController {
                 skuTicketPriceMapper.batchDelete(skuId, ticketId, date.toDate(), times);
             }
         }
+        skuRecordService.deleteTicketPrice(skuId, request, getToken());
         return count;
     }
 
@@ -917,7 +942,12 @@ public class RestApiController extends AuthenticationRequiredController {
         }
         Date startDate = DateUtils.parseDate(request.getStartDate());
         Date endDate = DateUtils.parseDate(request.getEndDate());
-        return skuInventoryService.addSkuInventory(skuId, startDate, endDate, request.getSessions(), request.getTotalCount());
+        if (skuInventoryService.addSkuInventory(skuId, startDate, endDate, request.getSessions(), request.getTotalCount())) {
+            skuRecordService.addInventory(request, getToken());
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @RequestMapping(value = "/v1/api/skus/{skuId}/inventories", method = RequestMethod.DELETE)
@@ -947,6 +977,8 @@ public class RestApiController extends AuthenticationRequiredController {
         if (!result) {
             logger.warn(request.getDate() + " " + requestedTime + " does not exist");
             throw new ResourceNotFoundException(request.getDate() + " " + requestedTime + " does not exist");
+        } else {
+            skuRecordService.deleteInventory(request, getToken());
         }
         return ResultVo.SUCCESS;
     }

@@ -352,7 +352,6 @@
                 </table>
             </div>
         <#if role?? && role == "Admin">
-
             <#if editing = false>
                 <button id="j_edit" class="btn btn-primary form-group">Modify</button>
                 <button id="j_copy" class="btn btn-primary form-group">Copy</button>
@@ -361,6 +360,7 @@
             </#if>
             <button id="j_edit_inventory" class="btn btn-primary form-group">Edit Inventory</button>
             <button id="j_query_inventory" class="btn btn-primary form-group">Query Inventory</button>
+            <button id="j_view_record" class="btn btn-primary form-group">View Log</button>
         </#if>
         <#if role?? && role == "Vendor">
             <button id="j_edit_inventory" class="btn btn-primary form-group">Edit Inventory</button>
