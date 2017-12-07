@@ -10,7 +10,7 @@
 <div class="container-fluid">
     <div class="row">
     <#include "menu.ftl"/>
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <div class="col-sm-9 col-sm-offset-3 col-md-11 col-md-offset-1 main">
             <div class="row">
                 <div class="col-md-2"><input type="text" id="j_keyword" class="form-control"
                                              placeholder="请输入关键词..." value="${keyword}">

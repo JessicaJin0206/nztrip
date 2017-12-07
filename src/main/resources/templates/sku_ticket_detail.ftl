@@ -10,7 +10,7 @@
 <div class="container-fluid">
     <div class="row">
     <#include "menu.ftl"/>
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" skuId="${skuId?c}" ticketId="${ticketId?c}">
+        <div class="col-sm-9 col-sm-offset-3 col-md-11 col-md-offset-1 main" skuId="${skuId?c}" ticketId="${ticketId?c}">
             <div class="form-group">
                 <div class="row">
                     <label>项目名称:</label>

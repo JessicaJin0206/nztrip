@@ -10,7 +10,7 @@
 <div class="container-fluid">
     <div class="row">
     <#include "menu.ftl"/>
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <div class="col-sm-9 col-sm-offset-3 col-md-11 col-md-offset-1 main">
             <div class="form-group"><label>Edit Sku Inventory</label></div>
             <div class="form-group row">
                 <div class="input-group date col-md-4 col-sm-4 col-xs-4" id="j_date">

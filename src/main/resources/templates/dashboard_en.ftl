@@ -11,7 +11,7 @@
     <div class="row">
     <#include "menu.ftl"/>
     <#if role?? && role == "Admin">
-        <div class="col-sm-9 col-sm-offset-3 col-md-8 col-md-offset-2 main">
+        <div class="col-sm-9 col-sm-offset-3 col-md-11 col-md-offset-1 main">
             <div class="row">
                 <div class="form-group">
                     <button class="btn btn-info text-center center-block" data-toggle="modal"
@@ -66,7 +66,7 @@
             </div>
         </div>
     <#else>
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <div class="col-sm-9 col-sm-offset-3 col-md-11 col-md-offset-1 main">
             <div>
                 <table class="table table-hover">
                     <thead>

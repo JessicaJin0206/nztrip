@@ -10,7 +10,7 @@
 <div class="container-fluid">
     <div class="row">
     <#include "menu.ftl"/>
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <div class="col-sm-9 col-sm-offset-3 col-md-11 col-md-offset-1 main">
             <div class="row">
                 <div class="dropdown col-md-2">
                     <button class="btn btn-default dropdown-toggle" type="button" id="selected_city_button"

@@ -10,7 +10,7 @@
 <div class="container-fluid">
     <div class="row">
     <#include "menu.ftl"/>
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <div class="col-sm-9 col-sm-offset-3 col-md-11 col-md-offset-1 main">
             <div class="form-group"><label>创建代理商</label></div>
             <div class="form-group"><input type="text" id="j_username" class="form-control" placeholder="请创建代理商用户名...">
             </div>

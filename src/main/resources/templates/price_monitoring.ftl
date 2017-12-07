@@ -11,7 +11,7 @@
 <div class="container-fluid">
     <div class="row">
     <#include "menu.ftl"/>
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <div class="col-sm-9 col-sm-offset-3 col-md-11 col-md-offset-1 main">
             <div class="row">
                 <div class="col-md-4"><input type="text" id="j_agent" class="form-control"
                                              placeholder="请输入公司名称" value="${company!}">

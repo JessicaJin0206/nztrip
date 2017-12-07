@@ -1,4 +1,4 @@
-<div class="col-sm-3 col-md-2 sidebar" style="width: 7.5%">
+<div class="col-sm-3 col-md-1 sidebar">
 <#if role?? && (role == "Admin" || role == "Agent")>
     <ul class="nav nav-sidebar">
         <li <#if module == "dashboard">class="active"</#if>><a href="/dashboard">总览</a></li>

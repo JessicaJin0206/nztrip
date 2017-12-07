@@ -10,10 +10,10 @@
 <div class="container-fluid">
     <div class="row">
     <#include "menu.ftl"/>
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" skuId="${sku.id?c}">
+        <div class="col-sm-9 col-sm-offset-3 col-md-11 col-md-offset-1 main" skuId="${sku.id?c}">
             <div class="row form-group">
                 <label class="col-md-1">项目名称: </label>
-                <div class="col-md-offset-1">
+                <div class="col-md-offset-2">
                     <span>${sku.name}</span>
                 </div>
             </div>

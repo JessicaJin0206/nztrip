@@ -11,7 +11,7 @@
 <div class="container-fluid">
     <div class="row">
     <#include "menu.ftl"/>
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" skuId="${sku.id?c}">
+        <div class="col-sm-9 col-sm-offset-3 col-md-11 col-md-offset-1 main" skuId="${sku.id?c}">
             <#include "create_order_template.ftl"/>
         </div>
     </div>
