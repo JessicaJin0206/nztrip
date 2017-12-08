@@ -22,6 +22,8 @@ import com.fitibo.aotearoa.service.DiscountRateService;
 import com.fitibo.aotearoa.service.OrderRecordService;
 import com.fitibo.aotearoa.service.OrderService;
 import com.fitibo.aotearoa.service.PricingService;
+import com.fitibo.aotearoa.service.SkuInventoryService;
+import com.fitibo.aotearoa.util.DateUtils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -30,9 +32,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+
+import rx.Observable;
 
 @Service("orderService")
 public class OrderServiceImpl implements OrderService {
@@ -63,6 +68,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private OrderRecordService orderRecordService;
+
+    @Autowired
+    private SkuInventoryService skuInventoryService;
 
     private ArrayListMultimap<OrderStatus, Transition> transitionMultimap = ArrayListMultimap.create();
 
@@ -119,7 +127,8 @@ public class OrderServiceImpl implements OrderService {
         SkuTicket skuTicket = skuTicketMapper.findById(skuTicketId);
         SkuTicketPrice skuTicketPrice = skuTicketPriceMapper.findById(skuTicketPriceId);
 
-        Preconditions.checkArgument(order.getSkuId() == skuTicket.getSkuId(), "cannot replace with different sku");
+        int skuId = order.getSkuId();
+        Preconditions.checkArgument(skuId == skuTicket.getSkuId(), "cannot replace with different sku");
         Preconditions.checkArgument(skuTicket.getSkuId() == skuTicketPrice.getSkuId(), "invalid ticket");
         int ticketUserCount = Integer.parseInt(skuTicket.getCountConstraint());
         for (OrderTicket orderTicket : orderTickets) {
@@ -133,15 +142,25 @@ public class OrderServiceImpl implements OrderService {
             }
         }
         BigDecimal totalPrice = BigDecimal.ZERO;
+
+        Date date = skuTicketPrice.getDate();
+        String time = skuTicketPrice.getTime();
+        Observable.from(orderTickets).flatMap(input -> Observable.from(input.getUsers())).count().subscribe(input -> {
+            boolean available = skuInventoryService.checkAvailability(skuId, date, time, input);
+            if (!available) {
+                throw new InvalidParamException(DateUtils.formatDate(date) + " " + time + " has not enough inventory");
+            }
+        });
+
         for (OrderTicket oldTicket : orderTickets) {
             OrderTicket newTicket = new OrderTicket();
-            newTicket.setSkuId(order.getSkuId());
+            newTicket.setSkuId(skuId);
             newTicket.setOrderId(order.getId());
             newTicket.setSkuTicketId(skuTicketId);
             newTicket.setSkuTicket(skuTicket.getName());
             newTicket.setTicketPriceId(skuTicketPriceId);
-            newTicket.setTicketDate(skuTicketPrice.getDate());
-            newTicket.setTicketTime(skuTicketPrice.getTime());
+            newTicket.setTicketDate(date);
+            newTicket.setTicketTime(time);
             newTicket.setPriceDescription(skuTicketPrice.getDescription());
             newTicket.setGatheringPlace(gatheringPlace);
             newTicket.setGatheringTime(null);
@@ -155,6 +174,8 @@ public class OrderServiceImpl implements OrderService {
             BigDecimal price = pricingService.calculate(skuTicketPrice, discountRateService.getDiscountByOrder(order.getId()));
             totalPrice = totalPrice.add(price);
             newTicket.setPrice(price);
+
+
             orderTicketMapper.create(newTicket);
             for (OrderTicketUser oldUser : oldTicket.getUsers()) {
                 OrderTicketUser newUser = new OrderTicketUser();
@@ -169,6 +190,9 @@ public class OrderServiceImpl implements OrderService {
             orderTicketUserMapper.deleteByOrderTicketId(oldTicket.getId());
             orderRecordService.deleteTicket(order, oldTicket, token);
         }
+
+
+
         order.setPrice(totalPrice);
         order.setModifiedPrice(totalPrice);
         orderMapper.updateOrderInfo(order);

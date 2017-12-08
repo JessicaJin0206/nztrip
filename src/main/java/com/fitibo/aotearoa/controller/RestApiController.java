@@ -416,7 +416,7 @@ public class RestApiController extends AuthenticationRequiredController {
             if (CollectionUtils.isEmpty(orderTicketVo.getOrderTicketUsers())) {
                 throw new InvalidParamException("order ticket user cannot be empty");
             }
-            OrderTicket orderTicket = parse(orderTicketVo, orderVo, priceMap, skuTicketMap, discount);
+            OrderTicket orderTicket = parse(orderTicketVo, orderVo.getId(), orderVo.getSkuId(), priceMap, skuTicketMap, discount);
             validateTicketUser(orderTicket, orderTicketVo.getOrderTicketUsers());
             orderTicketMapper.create(orderTicket);
             orderTicketVo.setId(orderTicket.getId());
@@ -543,7 +543,7 @@ public class RestApiController extends AuthenticationRequiredController {
             if (CollectionUtils.isEmpty(orderTicketVo.getOrderTicketUsers())) {
                 throw new InvalidParamException();
             }
-            validateTicketUser(parse(orderTicketVo, orderVo, priceMap, skuTicketMap, discount), orderTicketVo.getOrderTicketUsers());
+            validateTicketUser(parse(orderTicketVo, orderVo.getId(), orderVo.getSkuId(), priceMap, skuTicketMap, discount), orderTicketVo.getOrderTicketUsers());
             if (orderTicketVo.getId() > 0) {//update
                 OrderTicket orderTicket = new OrderTicket();
                 orderTicket.setId(orderTicketVo.getId());
@@ -553,7 +553,7 @@ public class RestApiController extends AuthenticationRequiredController {
                 orderRecordService.updateTicket(orderTicket, token, order);
                 orderTicketMapper.update(orderTicket);
             } else {//create new
-                OrderTicket orderTicket = parse(orderTicketVo, orderVo, priceMap, skuTicketMap, discount);
+                OrderTicket orderTicket = parse(orderTicketVo, orderVo.getId(), orderVo.getSkuId(), priceMap, skuTicketMap, discount);
                 validateTicketUser(orderTicket, orderTicketVo.getOrderTicketUsers());
                 orderTicketMapper.create(orderTicket);
                 //订单日志
@@ -678,9 +678,10 @@ public class RestApiController extends AuthenticationRequiredController {
         for (Pair<String, String> session : sessionMultiset.elementSet()) {
             int number = sessionMultiset.count(session);
             Date date = DateUtils.parseDate(session.getLeft());
-            SkuInventoryDto skuInventory = skuInventoryService.getSkuInventory(skuId, date, session.getRight());
-            if (skuInventory.getTotalCount() - skuInventory.getCurrentCount() < number) {
-                throw new InvalidParamException(session.getLeft() + " " + session.getRight() + " has not enough inventory");
+            String time = session.getRight();
+            boolean result = skuInventoryService.checkAvailability(skuId, date, time, number);
+            if (!result) {
+                throw new InvalidParamException(session.getLeft() + " " + time + " has not enough inventory");
             }
         }
     }
@@ -1189,15 +1190,15 @@ public class RestApiController extends AuthenticationRequiredController {
         return result;
     }
 
-    private OrderTicket parse(OrderTicketVo ticketVo, OrderVo orderVo,
+    private OrderTicket parse(OrderTicketVo ticketVo, int orderId, int skuId,
                               Map<Integer, SkuTicketPrice> priceMap, Map<Integer, SkuTicket> skuTicketMap, int discount) {
         final OrderTicket result = new OrderTicket();
         final SkuTicketPrice skuTicketPrice = priceMap.get(ticketVo.getTicketPriceId());
         final SkuTicket skuTicket = skuTicketMap.get(ticketVo.getSkuTicketId());
         Preconditions.checkNotNull(skuTicketPrice, "invalid sku ticket price id:" + ticketVo.getTicketPriceId());
         Preconditions.checkNotNull(skuTicket, "invalid sku ticket id:" + ticketVo.getSkuTicketId());
-        result.setSkuId(orderVo.getSkuId());
-        result.setOrderId(orderVo.getId());
+        result.setSkuId(skuId);
+        result.setOrderId(orderId);
         result.setSkuTicketId(ticketVo.getSkuTicketId());
         result.setSkuTicket(ticketVo.getSkuTicket());
         result.setTicketPriceId(ticketVo.getTicketPriceId());

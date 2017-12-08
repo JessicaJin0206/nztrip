@@ -1,7 +1,10 @@
 package com.fitibo.aotearoa.service.impl;
 
+import com.google.common.collect.Multiset;
+
 import com.fitibo.aotearoa.constants.OrderStatus;
 import com.fitibo.aotearoa.dto.SkuInventoryDto;
+import com.fitibo.aotearoa.exception.InvalidParamException;
 import com.fitibo.aotearoa.mapper.OrderMapper;
 import com.fitibo.aotearoa.mapper.OrderTicketMapper;
 import com.fitibo.aotearoa.mapper.OrderTicketUserMapper;
@@ -13,6 +16,7 @@ import com.fitibo.aotearoa.model.SkuInventory;
 import com.fitibo.aotearoa.service.SkuInventoryService;
 import com.fitibo.aotearoa.util.DateUtils;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,6 +90,12 @@ public class SkuInventoryServiceImpl implements SkuInventoryService {
     @Override
     public boolean updateSkuInventory(int skuId, Date date, String time, int totalCount) {
         return skuInventoryMapper.updateBySkuIdAndDateTime(skuId, date, time, totalCount) == 1;
+    }
+
+    @Override
+    public boolean checkAvailability(int skuId, Date date, String time, int count) {
+        SkuInventoryDto skuInventory = getSkuInventory(skuId, date, time);
+        return skuInventory.getTotalCount() - skuInventory.getCurrentCount() >= count;
     }
 
 }

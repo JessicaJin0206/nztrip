@@ -2,7 +2,6 @@ package com.fitibo.aotearoa.service;
 
 import com.fitibo.aotearoa.dto.Token;
 import com.fitibo.aotearoa.dto.Transition;
-import com.fitibo.aotearoa.model.OrderTicket;
 import com.fitibo.aotearoa.model.OrderTicketUser;
 
 import org.apache.commons.lang3.tuple.Pair;
