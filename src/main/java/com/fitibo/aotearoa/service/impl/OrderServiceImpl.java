@@ -123,6 +123,9 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public boolean replaceAllTickets(Token token, int orderId, int skuTicketId, int skuTicketPriceId, String gatheringPlace) {
         Order order = orderMapper.findById(orderId);
+        if (order.getStatus() == OrderStatus.CONFIRMED.getValue()) {
+            throw new InvalidParamException("order status:" + OrderStatus.CONFIRMED + " cannot be modified");
+        }
         List<OrderTicket> orderTickets = orderTicketMapper.findByOrderId(orderId);
         SkuTicket skuTicket = skuTicketMapper.findById(skuTicketId);
         SkuTicketPrice skuTicketPrice = skuTicketPriceMapper.findById(skuTicketPriceId);
@@ -186,6 +189,7 @@ public class OrderServiceImpl implements OrderService {
                 orderTicketUserMapper.create(newUser);
             }
             orderRecordService.addTicket(token, newTicket, order);
+
             orderTicketMapper.deleteTicket(oldTicket.getId(), oldTicket.getOrderId());
             orderTicketUserMapper.deleteByOrderTicketId(oldTicket.getId());
             orderRecordService.deleteTicket(order, oldTicket, token);
