@@ -178,7 +178,7 @@
             </div>
             <div class="form-group">
                 <label>Notice</label>
-                <textarea id="j_attention" rows="3" class="form-control"
+                <textarea id="j_attention" rows="${attention_lines}" class="form-control"
                           <#if editing = false>disabled</#if>
                           value="">${sku.attention!!}</textarea>
             </div>

@@ -36,7 +36,11 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -73,6 +77,8 @@ public class HomeController extends AuthenticationRequiredController {
     private static final String MODULE_SCAN_ORDER = "scan_order";
     private static final String MODULE_QUERY_INVENTORY = "query_inventory";
     private static final String MODULE_SKU_RECORD = "sku_record";
+
+    private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 
     @Autowired
     private CityService cityService;
@@ -591,10 +597,11 @@ public class HomeController extends AuthenticationRequiredController {
         if (role == Role.Agent && !sku.isAvailable()) {
             throw new AuthenticationFailureException("sku is offline");
         }
-        model.put("sku", parse(sku));
+        SkuVo skuVo = parse(sku);
+        model.put("sku", skuVo);
         model.put("editing", false);
-        model.put("role", getToken().getRole().toString());
         model.put("userName", getUserName(getToken()));
+        model.put("attention_lines", Math.max(StringUtils.countMatches(skuVo.getAttention(), "\n"), 3));
         model.put("role", role.toString());
         return "sku_detail";
     }
@@ -629,13 +636,15 @@ public class HomeController extends AuthenticationRequiredController {
         if (sku == null) {
             throw new ResourceNotFoundException("invalid sku id:" + id);
         }
+        SkuVo skuVo = parse(sku);
         model.put("module", MODULE_SKU_DETAIL);
-        model.put("sku", parse(sku));
+        model.put("sku", skuVo);
         model.put("cities", cityService.findAll());
         model.put("categories", categoryService.findAll());
         model.put("vendors", vendorService.findAll());
         model.put("durations", durationService.findAll());
         model.put("editing", true);
+        model.put("attention_lines", Math.max(StringUtils.countMatches(skuVo.getAttention(), "\n"), 3));
         model.put("role", getToken().getRole().toString());
         model.put("userName", getUserName(getToken()));
         return "sku_detail";
