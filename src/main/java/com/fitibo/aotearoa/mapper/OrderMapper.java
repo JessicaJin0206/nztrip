@@ -23,7 +23,8 @@ public interface OrderMapper {
             "update_time, price, gathering_info, primary_contact, primary_contact_email, " +
             "primary_contact_phone, primary_contact_wechat, secondary_contact, " +
             "secondary_contact_email, secondary_contact_phone, secondary_contact_wechat," +
-            "reference_number, vendor_phone, agent_order_id, modified_price, refund, from_vendor" +
+            "reference_number, vendor_phone, agent_order_id, modified_price, refund, from_vendor," +
+            "currency, pay_status" +
             " from `order` o left join `sku` s on o.sku_id = s.id where o.id = #{id}")
     @Results({
             @Result(column = "id", property = "id"),
@@ -50,13 +51,16 @@ public interface OrderMapper {
             @Result(column = "modified_price", property = "modifiedPrice"),
             @Result(column = "refund", property = "refund"),
             @Result(column = "from_vendor", property = "fromVendor"),
+            @Result(column = "pay_status", property = "payStatus"),
+            @Result(column = "currency", property = "currency"),
     })
     Order findById(int id);
 
     @Select("select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
-            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund, o.from_vendor " +
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund, o.from_vendor," +
+            " o.pay_status, o.currency " +
             "from `order` o left join `sku` s on o.sku_id = s.id " +
             "where agent_id = #{agentId} order by o.id desc")
     @Results({
@@ -85,6 +89,8 @@ public interface OrderMapper {
             @Result(column = "modified_price", property = "modifiedPrice"),
             @Result(column = "refund", property = "refund"),
             @Result(column = "from_vendor", property = "fromVendor"),
+            @Result(column = "pay_status", property = "payStatus"),
+            @Result(column = "currency", property = "currency"),
     })
     List<Order> findByAgentId(@Param("agentId") int agentId, RowBounds rowBounds);
 
@@ -92,7 +98,8 @@ public interface OrderMapper {
             "select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
-            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund, o.from_vendor " +
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund, o.from_vendor, " +
+            "o.pay_status, o.currency " +
             "from `order` o left join `sku` s on o.sku_id = s.id " +
             "where false " +
             "<if test ='ids != null and ids.size() > 0'>" +
@@ -128,6 +135,8 @@ public interface OrderMapper {
             @Result(column = "modified_price", property = "modifiedPrice"),
             @Result(column = "refund", property = "refund"),
             @Result(column = "from_vendor", property = "fromVendor"),
+            @Result(column = "pay_status", property = "payStatus"),
+            @Result(column = "currency", property = "currency"),
     })
     List<Order> findByIds(@Param("ids") List<Integer> ids);
 
@@ -136,7 +145,8 @@ public interface OrderMapper {
             "select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
-            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund, o.from_vendor  " +
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund, o.from_vendor + " +
+            "o.pay_status, o.currency " +
             "from `order` o left join `sku` s on o.sku_id = s.id " +
             "where agent_id = #{agentId} and from_vendor = 0 " +
             "<if test =\"keyword != null and keyword != ''\"> and (s.name like CONCAT('%',#{keyword},'%') or o.primary_contact like CONCAT(#{keyword}, '%') ) </if> " +
@@ -173,6 +183,8 @@ public interface OrderMapper {
             @Result(column = "modified_price", property = "modifiedPrice"),
             @Result(column = "refund", property = "refund"),
             @Result(column = "from_vendor", property = "fromVendor"),
+            @Result(column = "pay_status", property = "payStatus"),
+            @Result(column = "currency", property = "currency"),
     })
     List<Order> findByAgentIdAndMultiFields(@Param("agentId") int agentId,
                                             @Param("uuid") String uuid,
@@ -187,7 +199,8 @@ public interface OrderMapper {
             "select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
-            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund, o.from_vendor " +
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund, o.from_vendor," +
+            "o.pay_status, o.currency " +
             "from `order` o left join `sku` s on o.sku_id = s.id " +
             "where agent_id = #{agentId} and o.id in (SELECT order_id FROM `order_ticket` GROUP BY order_id,ticket_date HAVING datediff(ticket_date,#{ticketDate}) = 0) and from_vendor = 0 " +
             " order by o.id desc" +
@@ -218,6 +231,8 @@ public interface OrderMapper {
             @Result(column = "modified_price", property = "modifiedPrice"),
             @Result(column = "refund", property = "refund"),
             @Result(column = "from_vendor", property = "fromVendor"),
+            @Result(column = "pay_status", property = "payStatus"),
+            @Result(column = "currency", property = "currency"),
     })
     List<Order> findByAgentIdAndTicketDate(@Param("agentId") int agentId,
                                            @Param("ticketDate") Date ticketDate,
@@ -227,7 +242,8 @@ public interface OrderMapper {
             "select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
-            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund, o.from_vendor " +
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund, o.from_vendor," +
+            "o.pay_status, o.currency " +
             "from `order` o left join `sku` s on o.sku_id = s.id " +
             "where agent_id = #{agentId} and datediff(o.create_time,#{createTime}) = 0 and from_vendor = 0" +
             " order by o.id desc" +
@@ -258,6 +274,8 @@ public interface OrderMapper {
             @Result(column = "modified_price", property = "modifiedPrice"),
             @Result(column = "refund", property = "refund"),
             @Result(column = "from_vendor", property = "fromVendor"),
+            @Result(column = "pay_status", property = "payStatus"),
+            @Result(column = "currency", property = "currency"),
     })
     List<Order> findByAgentIdAndCreateTime(@Param("agentId") int agentId,
                                            @Param("createTime") Date createTime,
@@ -267,7 +285,8 @@ public interface OrderMapper {
             "select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
-            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund, o.from_vendor " +
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund, o.from_vendor," +
+            "o.pay_status, o.currency " +
             "from `order` o left join `sku` s on o.sku_id = s.id " +
             "where s.vendor_id = #{vendorId} " +
             "<if test =\"primaryContact != null and primaryContact != ''\">and o.primary_contact like CONCAT('%',#{primaryContact},'%') </if>" +
@@ -299,6 +318,8 @@ public interface OrderMapper {
             @Result(column = "modified_price", property = "modifiedPrice"),
             @Result(column = "refund", property = "refund"),
             @Result(column = "from_vendor", property = "fromVendor"),
+            @Result(column = "pay_status", property = "payStatus"),
+            @Result(column = "currency", property = "currency"),
     })
     List<Order> findByVendorIdAndPrimaryContact(@Param("vendorId") int vendorId,
                                                 @Param("primaryContact") String primaryContact,
@@ -308,7 +329,8 @@ public interface OrderMapper {
     @Select("select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
-            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund, o.from_vendor " +
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, o.agent_order_id, o.modified_price, o.refund, o.from_vendor," +
+            "o.pay_status, o.currency " +
             "from `order` o left join `sku` s on o.sku_id = s.id order by o.id desc")
     @Results({
             @Result(column = "id", property = "id"),
@@ -336,6 +358,8 @@ public interface OrderMapper {
             @Result(column = "modified_price", property = "modifiedPrice"),
             @Result(column = "refund", property = "refund"),
             @Result(column = "from_vendor", property = "fromVendor"),
+            @Result(column = "pay_status", property = "payStatus"),
+            @Result(column = "currency", property = "currency"),
     })
     List<Order> findAll(RowBounds rowBounds);
 
@@ -344,7 +368,8 @@ public interface OrderMapper {
             "select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
-            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, agent.name as agent_name, o.agent_order_id, o.modified_price, o.refund, o.from_vendor " +
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, agent.name as agent_name, o.agent_order_id, o.modified_price, o.refund, o.from_vendor," +
+            "o.pay_status, o.currency " +
             "from `order` o left join `sku` s on o.sku_id = s.id left join agent on o.agent_id = agent.id " +
             "where 1 = 1 and from_vendor = 0 " +
             "<if test =\"keyword != null and keyword != ''\"> and (s.name like CONCAT('%',#{keyword},'%') or o.primary_contact like CONCAT(#{keyword}, '%') or agent.name like CONCAT(#{keyword}, '%')) </if> " +
@@ -382,6 +407,8 @@ public interface OrderMapper {
             @Result(column = "modified_price", property = "modifiedPrice"),
             @Result(column = "refund", property = "refund"),
             @Result(column = "from_vendor", property = "fromVendor"),
+            @Result(column = "pay_status", property = "payStatus"),
+            @Result(column = "currency", property = "currency"),
     })
     List<Order> findAllByMultiFields(@Param("uuid") String uuid,
                                      @Param("keyword") String keyword,
@@ -395,7 +422,8 @@ public interface OrderMapper {
             "select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
-            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, agent.name as agent_name, o.agent_order_id, o.modified_price, o.refund, o.from_vendor " +
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, agent.name as agent_name, o.agent_order_id, o.modified_price, o.refund, o.from_vendor," +
+            "o.pay_status, o.currency " +
             "from `order` o left join `sku` s on o.sku_id = s.id left join agent on o.agent_id = agent.id " +
             "where o.id in (SELECT order_id FROM `order_ticket` GROUP BY order_id,ticket_date HAVING datediff(ticket_date,#{ticketDate}) = 0) and from_vendor = 0 " +
             " order by o.id desc" +
@@ -427,6 +455,8 @@ public interface OrderMapper {
             @Result(column = "modified_price", property = "modifiedPrice"),
             @Result(column = "refund", property = "refund"),
             @Result(column = "from_vendor", property = "fromVendor"),
+            @Result(column = "pay_status", property = "payStatus"),
+            @Result(column = "currency", property = "currency"),
     })
     List<Order> findAllByTicketDate(@Param("ticketDate") Date ticketDate,
                                     RowBounds rowBounds);
@@ -435,7 +465,8 @@ public interface OrderMapper {
             "select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time," +
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
-            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, agent.name as agent_name, o.agent_order_id, o.modified_price, o.refund, o.from_vendor " +
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, agent.name as agent_name, o.agent_order_id, o.modified_price, o.refund, o.from_vendor," +
+            "o.pay_status, o.currency " +
             "from `order` o left join `sku` s on o.sku_id = s.id left join agent on o.agent_id = agent.id " +
             "where datediff(o.create_time,#{createTime}) = 0 and from_vendor = 0 " +
             " order by o.id desc" +
@@ -467,6 +498,8 @@ public interface OrderMapper {
             @Result(column = "modified_price", property = "modifiedPrice"),
             @Result(column = "refund", property = "refund"),
             @Result(column = "from_vendor", property = "fromVendor"),
+            @Result(column = "pay_status", property = "payStatus"),
+            @Result(column = "currency", property = "currency"),
     })
     List<Order> findAllByCreateTime(@Param("createTime") Date createTime,
                                     RowBounds rowBounds);
@@ -497,6 +530,8 @@ public interface OrderMapper {
             @Result(column = "modified_price", property = "modifiedPrice"),
             @Result(column = "refund", property = "refund"),
             @Result(column = "from_vendor", property = "fromVendor"),
+            @Result(column = "pay_status", property = "payStatus"),
+            @Result(column = "currency", property = "currency"),
 
     })
     List<Order> findByAgentIdAndStatus(@Param("agentId") int agentId, @Param("status") int status, RowBounds rowBounds);
@@ -560,7 +595,8 @@ public interface OrderMapper {
     @Select({"select o.id, o.sku_id, o.uuid, o.agent_id, o.remark, o.status, o.create_time, o.update_time,",
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone,",
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone,",
-            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, agent.name as agent_name, o.agent_order_id, o.modified_price, o.refund, o.from_vendor ",
+            "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, agent.name as agent_name, o.agent_order_id, o.modified_price, o.refund, o.from_vendor,",
+            "o.pay_status, o.currency ",
             "from `order` o left join `sku` s on o.sku_id = s.id left join agent on o.agent_id = agent.id ",
             "WHERE( o.id in (SELECT `order_id` FROM `order_record` GROUP BY `order_id`",
             "HAVING TIMESTAMPDIFF(HOUR,MAX(operate_time),NOW())>=48) ",
@@ -595,6 +631,8 @@ public interface OrderMapper {
             @Result(column = "modified_price", property = "modifiedPrice"),
             @Result(column = "refund", property = "refund"),
             @Result(column = "from_vendor", property = "fromVendor"),
+            @Result(column = "pay_status", property = "payStatus"),
+            @Result(column = "currency", property = "currency"),
     })
     List<Order> findAllUrgentOrders();
 
@@ -602,7 +640,8 @@ public interface OrderMapper {
             "o.price, o.gathering_info, o.primary_contact, o.primary_contact_email, o.primary_contact_phone," +
             "o.primary_contact_wechat, o.secondary_contact, o.secondary_contact_email, o.secondary_contact_phone," +
             "o.secondary_contact_wechat, o.reference_number, s.name, o.vendor_phone, agent.name as agent_name, " +
-            "o.agent_order_id, o.modified_price, o.refund, o.from_vendor " +
+            "o.agent_order_id, o.modified_price, o.refund, o.from_vendor," +
+            "o.pay_status, o.currency " +
             "from `order` o left join `sku` s on o.sku_id = s.id left join agent on o.agent_id = agent.id " +
             "WHERE( o.id in (SELECT `order_id` FROM `order_record` GROUP BY `order_id` " +
             "HAVING TIMESTAMPDIFF(HOUR,MAX(operate_time),NOW())>=48) " +
@@ -638,6 +677,8 @@ public interface OrderMapper {
             @Result(column = "modified_price", property = "modifiedPrice"),
             @Result(column = "refund", property = "refund"),
             @Result(column = "from_vendor", property = "fromVendor"),
+            @Result(column = "pay_status", property = "payStatus"),
+            @Result(column = "currency", property = "currency"),
     })
     List<Order> findAgentUrgentOrders(@Param("agentId") int agentId);
 }

@@ -1,5 +1,7 @@
 package com.fitibo.aotearoa.vo;
 
+import com.fitibo.aotearoa.constants.PayStatus;
+
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -41,4 +43,6 @@ public class OrderVo {
     private String agentOrderId;
     private BigDecimal modifiedPrice;
     private BigDecimal refund;
+    private PayStatus payStatus;
+    private String currency;
 }

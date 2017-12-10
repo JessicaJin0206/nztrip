@@ -38,4 +38,6 @@ public class Order extends ModelObject {
     private BigDecimal modifiedPrice;
     private BigDecimal refund;
     private boolean fromVendor;
+    private String currency;
+    private int payStatus;
 }
