@@ -1008,7 +1008,7 @@ public class RestApiController extends AuthenticationRequiredController {
     @RequestMapping(value = "/v1/api/skus/{skuId}/tickets", method = RequestMethod.DELETE)
     @Authentication(Role.Admin)
     public boolean removeAllTicketPrice(@PathVariable("skuId") int skuId,
-                                        @RequestBody() DeleteTicketPriceRequest request) {
+                                        @RequestBody DeleteTicketPriceRequest request) {
         Date startDate = DateUtils.parseDate(request.getStartDate());
         Date endDate = DateUtils.parseDate(request.getEndDate());
         List<Integer> skuTicketIds = request.getSkuTicketIds();

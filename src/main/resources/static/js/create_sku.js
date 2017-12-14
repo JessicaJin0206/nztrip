@@ -290,3 +290,10 @@ $('#j_view_record').on('click', function () {
     }
 });
 
+$('#j_delete_prices').on('click', function () {
+    if (window.location.pathname.endsWith("/")) {
+        window.open(window.location.pathname + "delete_sku_ticket_prices");
+    } else {
+        window.open(window.location.pathname + "/delete_sku_ticket_prices");
+    }
+});

@@ -361,6 +361,7 @@
             <button id="j_edit_inventory" class="btn btn-primary form-group">编辑库存</button>
             <button id="j_query_inventory" class="btn btn-primary form-group">查询库存</button>
             <button id="j_view_record" class="btn btn-primary form-group">查看日志</button>
+            <button id="j_delete_prices" class="btn btn-primary form-group">批量删除场次</button>
         </#if>
         <#if role?? && role == "Vendor">
             <button id="j_edit_inventory" class="btn btn-primary form-group">编辑库存</button>

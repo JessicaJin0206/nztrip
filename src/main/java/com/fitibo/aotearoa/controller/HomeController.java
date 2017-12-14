@@ -36,7 +36,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.slf4j.Logger;
@@ -77,6 +76,7 @@ public class HomeController extends AuthenticationRequiredController {
     private static final String MODULE_SCAN_ORDER = "scan_order";
     private static final String MODULE_QUERY_INVENTORY = "query_inventory";
     private static final String MODULE_SKU_RECORD = "sku_record";
+    private static final String MODULE_DELETE_SKU_TICKET_PRICES = "delete_sku_ticket_prices";
 
     private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 
@@ -953,6 +953,22 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("userName", getUserName(getToken()));
         model.put("sku", sku);
         return "query_inventory";
+    }
+
+    @RequestMapping("/skus/{id}/delete_sku_ticket_prices")
+    @Authentication(Role.Admin)
+    public String deleteSkuTicketPrices(@PathVariable("id") int id, Map<String, Object> model) {
+        Sku sku = skuService.findById(id);
+        if (sku == null || !sku.isAvailable()) {
+            throw new ResourceNotFoundException("sku:" + id + " not existed or is offline");
+        }
+        List<SkuTicketVo> skuTicketVos = skuTicketMapper.findOnlineBySkuId(id).stream().map(ObjectParser::parse).collect(Collectors.toList());
+        model.put("tickets", skuTicketVos);
+        model.put("module", MODULE_DELETE_SKU_TICKET_PRICES);
+        model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
+        model.put("sku", sku);
+        return "delete_sku_ticket_prices";
     }
 
     private String calculateTouristCount(List<OrderTicketVo> tickets) {
