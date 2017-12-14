@@ -22,12 +22,12 @@ public final class GuidGenerator {
         return dateFormat.get();
     }
 
-    public static final String generate(int length) {
+    public static String generate(int length) {
         String date = getSimpleDateFormat().format(new Date());
         return date + randomNumber(length - DATE_FORMAT.length());
     }
 
-    private static final String randomNumber(int length) {
+    private static String randomNumber(int length) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < length; i++) {
             sb.append(ThreadLocalRandom.current().nextInt(10));
