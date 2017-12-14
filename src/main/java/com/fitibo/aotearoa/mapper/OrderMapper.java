@@ -681,4 +681,9 @@ public interface OrderMapper {
             @Result(column = "currency", property = "currency"),
     })
     List<Order> findAgentUrgentOrders(@Param("agentId") int agentId);
+
+    @Select({
+            "select count(*) from `order` where uuid = #{uuid}"
+    })
+    int countByUuid(String uuid);
 }
