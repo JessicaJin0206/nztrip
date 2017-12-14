@@ -124,7 +124,8 @@
     </div>
 </#if>
     <div class="form-group"><label>Tourists Info</label><a id="add_ticket"><span
-            class="glyphicon glyphicon-plus-sign" aria-hidden="true"/></a></div>
+            class="glyphicon glyphicon-plus-sign" aria-hidden="true"/></a>
+        <label>👈 Long clicking U will be surprised</label></div>
 
 
 </div>

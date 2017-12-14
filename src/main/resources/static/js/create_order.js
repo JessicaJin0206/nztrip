@@ -143,7 +143,40 @@ $('#j_ticket_type_selector li a').on('click', function (e) {
     }
 });
 
-$('#add_ticket').on('click', function (e) {
+function longPress() {
+    bootbox.prompt("输入票种数量", function (amount) {
+        if (amount === null) {
+            warn("缺少数量");
+            return;
+        } else if (amount.length === 0) {
+            warn("缺少数量");
+            return;
+        } else {
+            try {
+                var count = parseInt(amount);
+                for (var i = 0; i < count; i++) {
+                    addTicket();
+                }
+            } catch (err) {
+                warn("输入错误");
+            }
+        }
+    });
+}
+
+var timeout;
+$("#add_ticket").mousedown(function () {
+    timeout = setTimeout(function () {
+        longPress();
+    }, 1000);
+});
+
+$("#add_ticket").mouseup(function () {
+    clearTimeout(timeout);
+    addTicket();
+});
+
+function addTicket() {
     var placeRadios = $('#j_gathering_place_container .input-group');
     var place = '';
     placeRadios.each(function (index, item) {
@@ -204,7 +237,7 @@ $('#add_ticket').on('click', function (e) {
     ticketContainer.find("a#j_ticket_delete").on('click', function () {
         ticketContainer.remove();
     })
-});
+}
 
 var submitBtn = $('#j_submit');
 submitBtn.on('click', function () {

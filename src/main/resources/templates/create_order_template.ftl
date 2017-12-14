@@ -123,8 +123,11 @@
         <input type="text" class="form-control j_place" value="">
     </div>
 </#if>
-    <div class="form-group"><label>游客信息</label><a id="add_ticket">
-        <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span></a></div>
+    <div class="form-group">
+        <label>游客信息</label>
+        <a id="add_ticket"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span></a>
+        <label>👈 长按有惊喜</label>
+    </div>
 
 
 </div>

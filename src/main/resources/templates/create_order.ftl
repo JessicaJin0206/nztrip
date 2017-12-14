@@ -38,6 +38,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.css"/>
 <script type="text/javascript"
         src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+<script type="text/javascript" src="/js/bootbox.min.js"></script>
 <link rel="stylesheet" href="/css/autosuggest.css"/>
 <script src="/js/autosuggest.js"></script>
 <script src="/js/create_order.js"></script>
