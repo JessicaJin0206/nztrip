@@ -127,7 +127,7 @@ public class ScanService {
                                     Method method = propertyDescriptor.getWriteMethod();
                                     if (propertyDescriptor.getPropertyType().equals(int.class)) {
                                         if (j + 1 < strings1.length) {
-                                            method.invoke(orderTicketUserVo, Integer.parseInt(strings1[j + 1]));
+                                            method.invoke(orderTicketUserVo, (int)Double.parseDouble(strings1[j + 1]));
                                             j++;
                                         }
                                     } else {
@@ -183,7 +183,7 @@ public class ScanService {
                         continue;
                     } else if (line.contains("Weight")) {
                         String weight = line.split("：")[1].trim();
-                        weightList.add(Integer.parseInt(weight.replace("公斤", "").trim()));
+                        weightList.add((int) Double.parseDouble(weight.replace("公斤", "").trim()));
                     }
                 }
                 if (line.contains("：")) {
