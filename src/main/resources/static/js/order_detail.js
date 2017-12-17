@@ -594,13 +594,8 @@ function updateOrderStatus(id, toStatus, sendEmail, data) {
 }
 
 $('#j_view_group').on('click', function () {
-    var checkAvailable = $('#j_check_available').attr('value');
-    if (checkAvailable.length === 0) {
-        warn("暂无查位链接");
-        checkAvailableButton.prop('disabled', false);
-        return;
-    }
-    window.open(checkAvailable);
+    var viewGroup = $('#j_view_group').attr('value');
+    window.open('/group/'+viewGroup);
 });
 
 

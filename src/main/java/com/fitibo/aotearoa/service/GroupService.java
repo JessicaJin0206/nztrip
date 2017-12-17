@@ -236,7 +236,6 @@ public class GroupService {
                 break;
             case TEAM://小包团直接break
                 break;
-
         }
         int result = groupOrderMapper.insert(new GroupOrder(groupId, orderVo.getId()));
         orderVo.setGroupType(group.getType());

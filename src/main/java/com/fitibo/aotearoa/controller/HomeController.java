@@ -643,6 +643,8 @@ public class HomeController extends AuthenticationRequiredController {
         model.put("role", role.toString());
         Agent agent = agentMapper.findById(order.getAgentId());
         model.put("agentName", Optional.ofNullable(agent).map(Agent::getName).orElse(""));
+        model.put("groupId", groupService.getGroupIdByOrderId(id));
+        model.put("types", GroupType.values());
         return "order_detail";
     }
 

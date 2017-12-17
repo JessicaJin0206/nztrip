@@ -234,7 +234,6 @@ public interface OrderMapper {
             "agent_order_id = #{agentOrderId}, " +
             "modified_price = #{modifiedPrice}, " +
             "refund = #{refund}, " +
-            "group_type = #{groupType}, " +
             "update_time = now() " +
             "where id = #{id}")
     int updateOrderInfo(Order order);

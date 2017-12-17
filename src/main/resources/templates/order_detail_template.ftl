@@ -69,7 +69,7 @@
     <div class="form-group">
         <div class="row">
             <label class="col-md-2">组类别:</label>
-            <button id="j_view_group" class="btn btn-default form-group">
+            <button id="j_view_group" class="btn btn-default form-group" value="${groupId}">
                 <#list types as type>
                 <#if (type.getValue() == order.groupType)>
                 ${type.getDesc()}
