@@ -48,6 +48,45 @@ public class ScanService {
     @Autowired
     private PricingService pricingService;
 
+    public OrderVo generateOrderByTeamOrderRequest(TeamOrderRequest request) {
+        OrderVo orderVo = new OrderVo();
+        orderVo.setPrimaryContact(request.getPrimaryContact());
+        orderVo.setPrimaryContactEmail(request.getPrimaryContactEmail());
+        orderVo.setPrimaryContactPhone(request.getPrimaryContactPhone());
+        orderVo.setPrimaryContactWechat(request.getPrimaryContactWechat());
+        orderVo.setSecondaryContact(request.getSecondaryContact());
+        orderVo.setSecondaryContactEmail(request.getSecondaryContactEmail());
+        orderVo.setSecondaryContactPhone(request.getSecondaryContactPhone());
+        orderVo.setSecondaryContactWechat(request.getSecondaryContactWechat());
+        orderVo.setSkuId(request.getSkuId());
+        orderVo.setTicketDate(request.getDate());
+        Sku sku = skuMapper.findById(request.getSkuId());
+        String gatheringPlace = Lists.newArrayList(sku.getGatheringPlace().split(CommonConstants.SEPARATOR)).get(0);
+        List<SkuTicket> skuTickets = skuTicketMapper.findOnlineBySkuId(request.getSkuId());
+        List<OrderTicketVo> ticketVos = Lists.newArrayList();
+        List<GroupMemberVo> members = request.getUsers();
+        for (GroupMemberVo member : members) {
+            List<OrderTicketVo> orderTicketVos = parse(skuTickets, orderVo, request, gatheringPlace);
+            for (OrderTicketVo orderTicketVo : orderTicketVos) {
+                if (orderTicketVo.getSkuTicket().contains(member.getPeopleType())) {
+                    orderTicketVo.setOrderTicketUsers(Lists.newArrayList(parse(member)));
+                    ticketVos.add(orderTicketVo);
+                    break;
+                }
+            }
+        }
+        orderVo.setOrderTickets(ticketVos);
+        return orderVo;
+    }
+
+    public OrderTicketUserVo parse(GroupMemberVo member) {
+        OrderTicketUserVo orderTicketUserVo = new OrderTicketUserVo();
+        orderTicketUserVo.setWeight(member.getWeight());
+        orderTicketUserVo.setName(member.getName());
+        orderTicketUserVo.setAge(member.getAge());
+        return orderTicketUserVo;
+    }
+
     public OrderVo scanOrder(Scan scan) {
         Map<String, String> map = Maps.newHashMap();
         //懒猫

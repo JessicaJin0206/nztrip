@@ -1013,6 +1013,27 @@ public class RestApiController extends AuthenticationRequiredController {
         return result == 1;
     }
 
+    @RequestMapping(value = "/v1/api/query_sku_name", method = RequestMethod.POST)
+    @Authentication(Role.Admin)
+    public List<SimpleSku> querySkuName(@RequestParam("sku") String name, @RequestParam("city") int city) {
+        List<Sku> skus = skuMapper.findAllByMultiFields(name, city, 0, 0, 0, new RowBounds());
+        return skus.stream().map(this::parseSimpleSku).collect(Collectors.toList());
+    }
+
+    @RequestMapping(value = "/v1/api/query_sku_times", method = RequestMethod.GET)
+    @Authentication(Role.Admin)
+    public List<String> querySkuName(@RequestParam("sku_id") int skuId) {
+        return skuTicketPriceMapper.getSessionsBySkuId(skuId).stream().sorted(ArchiveServiceImpl::compareTime).collect(Collectors.toList());
+    }
+
+    private SimpleSku parseSimpleSku(Sku sku) {
+        SimpleSku simpleSku = new SimpleSku();
+        simpleSku.setId(sku.getId());
+        simpleSku.setLabel(sku.getUuid());
+        simpleSku.setValue(sku.getName());
+        return simpleSku;
+    }
+
     @RequestMapping(value = "/v1/api/cities", method = RequestMethod.GET)
     @Authentication
     public List<City> queryCities() {

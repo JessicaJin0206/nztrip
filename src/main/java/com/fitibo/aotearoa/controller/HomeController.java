@@ -33,10 +33,12 @@ import com.fitibo.aotearoa.service.impl.CategoryServiceImpl;
 import com.fitibo.aotearoa.util.DateUtils;
 import com.fitibo.aotearoa.util.ObjectParser;
 import com.fitibo.aotearoa.vo.*;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.slf4j.Logger;
@@ -1226,5 +1228,51 @@ public class HomeController extends AuthenticationRequiredController {
             default:
                 return "";
         }
+    }
+
+    @RequestMapping("create_team_order")
+    @Authentication(Role.Admin)
+    public String createTeamOrder(Map<String, Object> model) {
+        model.put("module", MODULE_SCAN_ORDER);
+        model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
+        model.put("cities", cityService.findAll());
+        return "create_team_order";
+    }
+
+    @RequestMapping("order_request")
+    @Authentication(Role.Admin)
+    public String orderRequest(@RequestBody TeamOrderRequest teamOrderRequest, Map<String, Object> model) {
+        teamOrderRequest.setAgentId(getToken().getId());
+        int skuId = teamOrderRequest.getSkuId();
+        Sku sku;
+        if (skuId > 0) {
+            sku = skuService.findById(skuId);
+            if (sku == null) {
+                throw new ResourceNotFoundException("invalid sku id:" + skuId);
+            }
+        } else {
+            throw new InvalidParamException();
+        }
+        Vendor vendor = vendorService.findById(sku.getVendorId());
+        Category category = categoryService.findById(sku.getCategoryId());
+        Duration duration = durationService.findById(sku.getDurationId());
+        City city = cityService.findById(sku.getCityId());
+        SkuVo skuVo = parse(sku, city, category, vendor, duration);
+        Map<String, Collection<String>> availableDateMap = Maps.newHashMap();
+        for (SkuTicketVo skuTicketVo : skuVo.getTickets()) {
+            Set<String> availableDates = Sets.newLinkedHashSet(
+                    Lists.transform(skuTicketVo.getTicketPrices(), SkuTicketPriceVo::getDate));
+            availableDateMap.put(skuTicketVo.getId() + "", availableDates);
+        }
+        model.put("sku", skuVo);
+        model.put("availableDateMap", availableDateMap);
+        model.put("vendor", vendor);
+        model.put("module", MODULE_CREATE_ORDER);
+        model.put("role", getToken().getRole().toString());
+        model.put("userName", getUserName(getToken()));
+        OrderVo orderVo = scanService.generateOrderByTeamOrderRequest(teamOrderRequest);
+        model.put("order", orderVo);
+        return "create_order_template";
     }
 }
